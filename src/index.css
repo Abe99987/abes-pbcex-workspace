@@ -8,33 +8,49 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 20 15% 98%;
+    --foreground: 30 15% 8%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 45 25% 97%;
+    --card-foreground: 30 15% 12%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 45 25% 97%;
+    --popover-foreground: 30 15% 12%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 45 85% 42%;
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 45 95% 55%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 45 20% 92%;
+    --muted-foreground: 30 10% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 220 10% 88%;
+    --accent-foreground: 30 15% 12%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 45 15% 88%;
+    --input: 45 15% 92%;
+    --ring: 45 85% 42%;
+
+    --gold: 45 85% 42%;
+    --gold-light: 45 95% 55%;
+    --silver: 220 10% 75%;
+    --silver-light: 220 15% 85%;
+    --oil: 0 0% 11%;
+
+    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-light)));
+    --gradient-silver: linear-gradient(135deg, hsl(var(--silver)), hsl(var(--silver-light)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(var(--muted)));
+    
+    --shadow-gold: 0 10px 30px -10px hsl(var(--gold) / 0.3);
+    --shadow-elegant: 0 20px 40px -15px hsl(var(--foreground) / 0.1);
+    
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --radius: 0.5rem;
 
