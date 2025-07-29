@@ -5,6 +5,7 @@ import { Menu, Wallet, Shield, Globe, TrendingUp } from "lucide-react";
 const Navigation = () => {
   const navItems = [
     { label: "Assets", href: "#assets", icon: TrendingUp },
+    { label: "Trading", href: "/trading", icon: TrendingUp },
     { label: "Wallet", href: "#wallet", icon: Wallet },
     { label: "Security", href: "#security", icon: Shield },
     { label: "Global", href: "#global", icon: Globe },
