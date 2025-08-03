@@ -88,6 +88,16 @@ const Navigation = () => {
         { label: "Oil Fulfillment", icon: Truck },
         { label: "Global Delivery", description: "Send or receive assets anywhere FedEx delivers", icon: MapPin }
       ]
+    },
+    {
+      label: "Franchise",
+      href: "/franchise",
+      icon: Building2
+    },
+    {
+      label: "Education",
+      href: "/education",
+      icon: BookOpen
     }
   ];
 
@@ -125,68 +135,86 @@ const Navigation = () => {
         {/* Desktop Navigation - Center Menu */}
         <div className="hidden lg:flex items-center space-x-1">
           {menuItems.map((menu) => (
-            <DropdownMenu key={menu.label}>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className={`h-9 px-3 transition-colors ${
+            // Check if menu has items (dropdown) or is a direct link
+            menu.items ? (
+              <DropdownMenu key={menu.label}>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className={`h-9 px-3 transition-colors ${
+                      isTrading 
+                        ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    }`}
+                    onClick={() => handleMenuClick(menu)}
+                  >
+                    <menu.icon className="w-4 h-4 mr-2" />
+                    {menu.label}
+                    <ChevronDown className="w-3 h-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  className={`w-48 z-50 ${
                     isTrading 
-                      ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      ? 'bg-gray-900 border-gray-700 text-gray-100' 
+                      : 'bg-background border-border text-foreground'
                   }`}
-                  onClick={() => handleMenuClick(menu)}
+                  align="center"
                 >
-                  <menu.icon className="w-4 h-4 mr-2" />
-                  {menu.label}
-                  <ChevronDown className="w-3 h-3 ml-1" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                className={`w-48 z-50 ${
-                  isTrading 
-                    ? 'bg-gray-900 border-gray-700 text-gray-100' 
-                    : 'bg-background border-border text-foreground'
-                }`}
-                align="center"
-              >
-                {menu.items.map((item, index) => (
-                  <div key={typeof item === 'string' ? item : item.label}>
-                    <DropdownMenuItem 
-                      className={`cursor-pointer flex items-center justify-between ${
-                        isTrading 
-                          ? 'hover:bg-gray-800 focus:bg-gray-800' 
-                          : 'hover:bg-accent focus:bg-accent'
-                      } ${typeof item === 'object' && item.description === 'Coming Soon' ? 'opacity-60' : ''}`}
-                      onClick={() => handleMenuClick(menu, item)}
-                      disabled={typeof item === 'object' && item.description === 'Coming Soon'}
-                    >
-                      <div className="flex items-center">
-                        {typeof item === 'object' && item.icon && (
-                          <item.icon className="w-4 h-4 mr-2" />
-                        )}
-                        <div>
-                          <div>{typeof item === 'string' ? item : item.label}</div>
-                          {typeof item === 'object' && item.description && (
-                            <div className={`text-xs ${
-                              isTrading ? 'text-gray-400' : 'text-muted-foreground'
-                            }`}>
-                              {item.description}
-                            </div>
+                  {menu.items.map((item, index) => (
+                    <div key={typeof item === 'string' ? item : item.label}>
+                      <DropdownMenuItem 
+                        className={`cursor-pointer flex items-center justify-between ${
+                          isTrading 
+                            ? 'hover:bg-gray-800 focus:bg-gray-800' 
+                            : 'hover:bg-accent focus:bg-accent'
+                        } ${typeof item === 'object' && item.description === 'Coming Soon' ? 'opacity-60' : ''}`}
+                        onClick={() => handleMenuClick(menu, item)}
+                        disabled={typeof item === 'object' && item.description === 'Coming Soon'}
+                      >
+                        <div className="flex items-center">
+                          {typeof item === 'object' && item.icon && (
+                            <item.icon className="w-4 h-4 mr-2" />
                           )}
+                          <div>
+                            <div>{typeof item === 'string' ? item : item.label}</div>
+                            {typeof item === 'object' && item.description && (
+                              <div className={`text-xs ${
+                                isTrading ? 'text-gray-400' : 'text-muted-foreground'
+                              }`}>
+                                {item.description}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </DropdownMenuItem>
-                    {index < menu.items.length - 1 && (
-                      (menu.label === "Wallet" && index === 0) ||
-                      (menu.label === "Trade" && index === 2) ||
-                      (menu.label === "Realize" && index === 5)
-                    ) && (
-                      <DropdownMenuSeparator className={isTrading ? 'bg-gray-700' : 'bg-border'} />
-                    )}
-                  </div>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                      </DropdownMenuItem>
+                      {index < menu.items.length - 1 && (
+                        (menu.label === "Wallet" && index === 0) ||
+                        (menu.label === "Trade" && index === 2) ||
+                        (menu.label === "Realize" && index === 5)
+                      ) && (
+                        <DropdownMenuSeparator className={isTrading ? 'bg-gray-700' : 'bg-border'} />
+                      )}
+                    </div>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              // Direct link button
+              <Button
+                key={menu.label}
+                variant="ghost"
+                className={`h-9 px-3 transition-colors ${
+                  isTrading 
+                    ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                }`}
+                onClick={() => handleMenuClick(menu)}
+              >
+                <menu.icon className="w-4 h-4 mr-2" />
+                {menu.label}
+              </Button>
+            )
           ))}
         </div>
 
@@ -314,7 +342,7 @@ const Navigation = () => {
                     <menu.icon className="h-5 w-5" />
                     <span>{menu.label}</span>
                   </button>
-                   {menu.items.map((item) => (
+                  {menu.items && menu.items.map((item) => (
                      <button
                        key={typeof item === 'string' ? item : item.label}
                        onClick={() => handleMenuClick(menu, item)}
