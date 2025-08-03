@@ -37,14 +37,15 @@ const AssetPricing = () => {
       isLive: true
     },
     {
-      name: "Libyan Dinar",
-      symbol: "LYD",
-      price: "$0.207",
-      change: "-0.3%",
-      isPositive: false,
-      icon: "🏛️",
-      description: "vs USD",
-      isLive: true
+      name: "Platinum (XPT)",
+      symbol: "XPT",
+      price: "$924.80",
+      change: "+0.6%",
+      isPositive: true,
+      icon: "⚪",
+      description: "Per Troy Ounce",
+      isLive: true,
+      tooltip: "OSPT is a fully redeemable platinum-backed token issued by Orbiko. Tokens are 1:1 backed by platinum stored in insured vaults and are transparently audited."
     },
     // Bottom Row Assets
     {
@@ -147,7 +148,7 @@ const AssetPricing = () => {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
-                              {asset.symbol === "LYD" ? "Buy tokenized Libyan Dinar" : 
+                              {asset.symbol === "XPT" ? "Purchase tokenized platinum backed by OSPT" : 
                                asset.symbol === "NOC" ? "Buy Libyan NOC crude oil contracts" :
                                asset.symbol === "BRENT" ? "Buy Brent crude oil contracts" :
                                `Purchase tokenized ${asset.name.split(' ')[0].toLowerCase()} at real-time market price`}
@@ -174,7 +175,7 @@ const AssetPricing = () => {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
-                              {asset.symbol === "LYD" ? "Realize into LYD cash or bank transfer" :
+                              {asset.symbol === "XPT" ? "Redeem your digital platinum for physical delivery" :
                                asset.symbol === "NOC" ? "Sell NOC contracts or request delivery" :
                                asset.symbol === "BRENT" ? "Sell Brent contracts or request delivery" :
                                `Physically redeem your digital ${asset.name.split(' ')[0].toLowerCase()} balance`}
@@ -184,8 +185,8 @@ const AssetPricing = () => {
                       </TooltipProvider>
                     </div>
 
-                    {/* Finance With Gold - Only for Gold */}
-                    {asset.symbol === "AU" && (
+                    {/* Borrow Against Precious Metals - Gold and Platinum */}
+                    {(asset.symbol === "AU" || asset.symbol === "XPT") && (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -199,11 +200,11 @@ const AssetPricing = () => {
                               }}
                             >
                               <Coins className="w-3 h-3 mr-1" />
-                              Borrow Against Gold
+                              {asset.symbol === "AU" ? "Borrow Against Gold" : "Borrow Against Platinum"}
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Asset-Based Financing — No Credit Checks. Instant Cash. Always Backed.</p>
+                            <p>{asset.tooltip || "Asset-Based Financing — No Credit Checks. Instant Cash. Always Backed."}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
