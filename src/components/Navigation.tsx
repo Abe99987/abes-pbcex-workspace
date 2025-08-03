@@ -82,6 +82,11 @@ const Navigation = () => {
       ]
     },
     {
+      label: "Realize",
+      href: "/realize",
+      icon: Package
+    },
+    {
       label: "Send/Pay",
       icon: Send,
       items: [
