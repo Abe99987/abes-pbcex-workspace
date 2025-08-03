@@ -46,21 +46,12 @@ const Navigation = () => {
 
   const menuItems = [
     {
-      label: "Markets",
-      icon: BarChart3,
-      items: [
-        { label: "USDC Trading", description: "Settle in USDC", href: "/trading" },
-        { label: "COIN Trading", description: "Settle in PAXG, XAG, OSP, BTC, ETH, SOL, XRP, SUI", href: "/coin-trading" },
-        { label: "FX Trading", description: "USD, EUR, GBP, AED, LYD, JPY" }
-      ]
-    },
-    {
       label: "Trade",
       icon: CandlestickChart,
       items: [
-        { label: "Spot Trading", href: "/trading" },
-        { label: "Coin Trading", href: "/coin-trading" },
-        { label: "Copy Trading" },
+        { label: "USDC Trading", description: "Settle in USDC", href: "/trading" },
+        { label: "COIN Trading", description: "Settle in PAXG, XAG, OSP, BTC, ETH, SOL, XRP, SUI", href: "/coin-trading" },
+        { label: "FX Trading", description: "USD, EUR, GBP, AED, LYD, JPY" },
         { label: "Margin Trading", description: "Coming Soon" },
         { label: "DCA", description: "Dollar Cost Average Strategies" },
         { label: "Trade Analytics" },
@@ -128,8 +119,6 @@ const Navigation = () => {
       navigate(item.href);
     } else if (menu.href) {
       navigate(menu.href);
-    } else if (menu.label === "Markets" && !item) {
-      navigate("/trading");
     } else if (item?.label === "Spot Trading" || item?.label === "USDC Trading") {
       navigate("/trading");
     } else if (item?.label === "Coin Trading" || item?.label === "COIN Trading") {
