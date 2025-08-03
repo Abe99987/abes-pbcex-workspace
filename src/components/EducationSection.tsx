@@ -4,9 +4,9 @@ import { BookOpen, TrendingDown, DollarSign, Coins, ArrowRight } from "lucide-re
 
 const EducationSection = () => {
   return (
-    <section className="py-20 bg-gradient-to-br from-muted/30 to-accent/20">
+    <section className="py-16 bg-gradient-to-br from-muted/30 to-accent/20">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Understanding Asset-Backed Money
           </h2>

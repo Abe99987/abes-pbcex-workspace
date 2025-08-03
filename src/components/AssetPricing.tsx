@@ -50,13 +50,31 @@ const AssetPricing = () => {
       isPositive: true,
       icon: "🛢️",
       description: "Per Barrel"
+    },
+    {
+      name: "Libyan Crude Oil",
+      symbol: "NOC",
+      price: "$76.45",
+      change: "+1.8%",
+      isPositive: true,
+      icon: "🇱🇾",
+      description: "NOC Per Barrel"
+    },
+    {
+      name: "Brent Crude Oil",
+      symbol: "BRENT",
+      price: "$79.15",
+      change: "+2.3%",
+      isPositive: true,
+      icon: "⚡",
+      description: "Per Barrel"
     }
   ];
 
   return (
-    <section id="assets" className="py-20 bg-muted/30">
+    <section id="assets" className="py-12 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Live Asset Prices
           </h2>
@@ -66,7 +84,7 @@ const AssetPricing = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 max-w-7xl mx-auto">
           {assets.map((asset) => (
             <Card key={asset.symbol} className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30 relative overflow-hidden">
               <CardContent className="p-6">
@@ -92,7 +110,7 @@ const AssetPricing = () => {
                 </div>
 
                 {/* Action Buttons - Show for all assets except generic ones */}
-                {["AU", "AG", "LYD", "OIL"].includes(asset.symbol) && (
+                {["AU", "AG", "LYD", "OIL", "NOC", "BRENT"].includes(asset.symbol) && (
                   <div className="space-y-2 mt-4 opacity-0 group-hover:opacity-100 md:opacity-100 transition-opacity duration-300">
                     <div className="flex gap-2">
                       <TooltipProvider>
@@ -115,6 +133,8 @@ const AssetPricing = () => {
                             <p>
                               {asset.symbol === "LYD" ? "Buy tokenized Libyan Dinar" : 
                                asset.symbol === "OIL" ? "Buy tokenized oil contracts" :
+                               asset.symbol === "NOC" ? "Buy Libyan NOC crude oil contracts" :
+                               asset.symbol === "BRENT" ? "Buy Brent crude oil contracts" :
                                `Purchase tokenized ${asset.name.split(' ')[0].toLowerCase()} at real-time market price`}
                             </p>
                           </TooltipContent>
@@ -141,6 +161,8 @@ const AssetPricing = () => {
                             <p>
                               {asset.symbol === "LYD" ? "Realize into LYD cash or bank transfer" :
                                asset.symbol === "OIL" ? "Sell back or request physical delivery" :
+                               asset.symbol === "NOC" ? "Sell NOC contracts or request delivery" :
+                               asset.symbol === "BRENT" ? "Sell Brent contracts or request delivery" :
                                `Physically redeem your digital ${asset.name.split(' ')[0].toLowerCase()} balance`}
                             </p>
                           </TooltipContent>
