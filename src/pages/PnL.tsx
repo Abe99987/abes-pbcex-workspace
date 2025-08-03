@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Navigation from '@/components/Navigation';
+import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -149,6 +149,8 @@ const PnL = () => {
     return weeks;
   };
 
+  console.log('PnL component rendering, Navigation:', Navigation);
+  
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
