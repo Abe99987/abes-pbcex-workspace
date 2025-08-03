@@ -15,6 +15,7 @@ const AssetPricing = () => {
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
 
   const assets = [
+    // Top Row Assets (live and tradable)
     {
       name: "Gold (XAU)",
       symbol: "AU",
@@ -22,7 +23,8 @@ const AssetPricing = () => {
       change: "+1.2%",
       isPositive: true,
       icon: "🥇",
-      description: "Per Troy Ounce"
+      description: "Per Troy Ounce",
+      isLive: true
     },
     {
       name: "Silver (XAG)",
@@ -31,7 +33,8 @@ const AssetPricing = () => {
       change: "+0.8%",
       isPositive: true,
       icon: "🥈",
-      description: "Per Troy Ounce"
+      description: "Per Troy Ounce",
+      isLive: true
     },
     {
       name: "Libyan Dinar",
@@ -40,17 +43,10 @@ const AssetPricing = () => {
       change: "-0.3%",
       isPositive: false,
       icon: "🏛️",
-      description: "vs USD"
+      description: "vs USD",
+      isLive: true
     },
-    {
-      name: "Crude Oil",
-      symbol: "OIL",
-      price: "$78.20",
-      change: "+2.1%",
-      isPositive: true,
-      icon: "🛢️",
-      description: "Per Barrel"
-    },
+    // Bottom Row Assets
     {
       name: "Libyan Crude Oil",
       symbol: "NOC",
@@ -58,7 +54,8 @@ const AssetPricing = () => {
       change: "+1.8%",
       isPositive: true,
       icon: "🇱🇾",
-      description: "NOC Per Barrel"
+      description: "NOC Per Barrel",
+      isLive: true
     },
     {
       name: "Brent Crude Oil",
@@ -67,7 +64,19 @@ const AssetPricing = () => {
       change: "+2.3%",
       isPositive: true,
       icon: "⚡",
-      description: "Per Barrel"
+      description: "Per Barrel",
+      isLive: true
+    },
+    {
+      name: "Lithium",
+      symbol: "LI",
+      price: "$28,500",
+      change: "+0.0%",
+      isPositive: true,
+      icon: "🔋",
+      description: "Per Metric Ton",
+      isLive: false,
+      comingSoon: true
     }
   ];
 
@@ -84,23 +93,30 @@ const AssetPricing = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {assets.map((asset) => (
             <Card key={asset.symbol} className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30 relative overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-2xl">{asset.icon}</div>
-                  <Badge 
-                    variant={asset.isPositive ? "default" : "destructive"}
-                    className="flex items-center space-x-1"
-                  >
-                    {asset.isPositive ? (
-                      <TrendingUp className="w-3 h-3" />
-                    ) : (
-                      <TrendingDown className="w-3 h-3" />
+                  <div className="flex items-center gap-2">
+                    {asset.comingSoon && (
+                      <Badge variant="outline" className="text-xs bg-gold/10 text-gold border-gold/30">
+                        Early Access
+                      </Badge>
                     )}
-                    <span>{asset.change}</span>
-                  </Badge>
+                    <Badge 
+                      variant={asset.isPositive ? "default" : "destructive"}
+                      className="flex items-center space-x-1"
+                    >
+                      {asset.isPositive ? (
+                        <TrendingUp className="w-3 h-3" />
+                      ) : (
+                        <TrendingDown className="w-3 h-3" />
+                      )}
+                      <span>{asset.change}</span>
+                    </Badge>
+                  </div>
                 </div>
                 
                 <div className="space-y-2 mb-4">
@@ -110,7 +126,7 @@ const AssetPricing = () => {
                 </div>
 
                 {/* Action Buttons - Show for all assets except generic ones */}
-                {["AU", "AG", "LYD", "OIL", "NOC", "BRENT"].includes(asset.symbol) && (
+                {asset.isLive && (
                   <div className="space-y-2 mt-4 opacity-0 group-hover:opacity-100 md:opacity-100 transition-opacity duration-300">
                     <div className="flex gap-2">
                       <TooltipProvider>
@@ -132,7 +148,6 @@ const AssetPricing = () => {
                           <TooltipContent>
                             <p>
                               {asset.symbol === "LYD" ? "Buy tokenized Libyan Dinar" : 
-                               asset.symbol === "OIL" ? "Buy tokenized oil contracts" :
                                asset.symbol === "NOC" ? "Buy Libyan NOC crude oil contracts" :
                                asset.symbol === "BRENT" ? "Buy Brent crude oil contracts" :
                                `Purchase tokenized ${asset.name.split(' ')[0].toLowerCase()} at real-time market price`}
@@ -160,7 +175,6 @@ const AssetPricing = () => {
                           <TooltipContent>
                             <p>
                               {asset.symbol === "LYD" ? "Realize into LYD cash or bank transfer" :
-                               asset.symbol === "OIL" ? "Sell back or request physical delivery" :
                                asset.symbol === "NOC" ? "Sell NOC contracts or request delivery" :
                                asset.symbol === "BRENT" ? "Sell Brent contracts or request delivery" :
                                `Physically redeem your digital ${asset.name.split(' ')[0].toLowerCase()} balance`}
@@ -194,6 +208,30 @@ const AssetPricing = () => {
                         </Tooltip>
                       </TooltipProvider>
                     )}
+                  </div>
+                )}
+
+                {/* Token Raise Button - For coming soon assets */}
+                {asset.comingSoon && (
+                  <div className="space-y-2 mt-4">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="premium"
+                            className="w-full"
+                            disabled
+                          >
+                            <Coins className="w-3 h-3 mr-1" />
+                            Token Raise - Coming Soon
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Early access token raise opportunity with 5% rebate - launching soon!</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 )}
               </CardContent>
