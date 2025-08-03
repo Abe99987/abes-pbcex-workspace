@@ -9,73 +9,76 @@ import {
   CreditCard,
   TrendingUp,
   Users,
-  FileText
+  QrCode,
+  Banknote,
+  Coins,
+  Store
 } from "lucide-react";
 
 const FeaturesSection = () => {
   const features = [
     {
       icon: Wallet,
-      title: "Digital Asset Wallet",
-      description: "Hold tokenized gold, silver, oil, LYD, USD, EUR, and stablecoins. All assets are spendable, freezable, and fully auditable.",
+      title: "Real-Asset Wallet",
+      description: "Store and spend digital gold, silver, oil, LYD, USD, and EUR. Every token is auditable, redeemable, and backed 1:1 by real-world assets.",
       badge: "Core Feature",
       color: "gold"
     },
     {
       icon: Globe,
-      title: "Global Payments",
-      description: "Send cross-border transfers using gold-backed tokens or fiat. Integration with Visa, Mastercard, and local agents.",
+      title: "Global Banking",
+      description: "Access banking-grade services anywhere: send, receive, exchange, and spend in gold, USD, LYD, or stablecoins — instantly and globally.",
       badge: "Worldwide",
-      color: "silver"
+      color: "primary"
     },
     {
       icon: Smartphone,
-      title: "Mobile Banking",
-      description: "Complete banking experience on mobile. Shop, pay, send, and invest from a single app with Apple Pay, Google Pay support.",
-      badge: "Mobile First",
+      title: "Bank, Trade, Spend — One App",
+      description: "One mobile experience for tokenized assets, QR payments, real-time trading, physical redemptions, and branch onboarding.",
+      badge: "All-in-One",
       color: "primary"
+    },
+    {
+      icon: Coins,
+      title: "Spendable Gold — Buy & Use Any Amount",
+      description: "Buy just $10 worth of gold, or even less — no need to purchase a full ounce. Trade any amount, anytime. Spend tokenized gold directly with your PBCex Visa card.",
+      badge: "Fractional",
+      color: "gold"
     },
     {
       icon: Vault,
-      title: "Physical Gold Storage",
-      description: "Deposit physical gold at branches. Verified, sealed, and tokenized into your digital wallet for instant liquidity.",
-      badge: "Secure",
-      color: "gold"
-    },
-    {
-      icon: Shield,
-      title: "Regulatory Compliance",
-      description: "Central bank licensed with full KYC/AML. Assets can be frozen, burned, reissued. Compatible with Shariah finance.",
-      badge: "Licensed",
-      color: "secondary"
-    },
-    {
-      icon: CreditCard,
-      title: "Seamless Payments",
-      description: "Use Lightning Network for retail payments, QR-code scanning, and offline transaction support for low-infrastructure regions.",
-      badge: "Instant",
-      color: "primary"
-    },
-    {
-      icon: TrendingUp,
-      title: "Fractional Ownership",
-      description: "Invest in gold and silver down to nanograms. Make precious metals accessible to everyone regardless of budget.",
-      badge: "Accessible",
-      color: "gold"
-    },
-    {
-      icon: Users,
-      title: "Franchise Network",
-      description: "Physical branches with vault, staff, and POS systems. Local onboarding via QR code or cash deposit agents.",
-      badge: "Network",
+      title: "Gold, Silver, & Metals Fulfillment",
+      description: "Redeem your digital gold and silver for physical delivery. Choose insured shipping or in-person branch pickup. Fully verified and sealed.",
+      badge: "Physical",
       color: "silver"
     },
     {
-      icon: FileText,
-      title: "Blockchain Infrastructure",
-      description: "Built on Bitcoin Layer 1 for security, Stacks Layer 2 for smart contracts, with full audit trails on IPFS.",
-      badge: "Transparent",
+      icon: TrendingUp,
+      title: "Borrow Against Gold & Oil",
+      description: "Access instant liquidity without selling your assets. Freeze tokenized gold, silver, or oil as collateral and receive USD-backed stablecoins or fiat.",
+      badge: "Collateral",
+      color: "gold"
+    },
+    {
+      icon: Store,
+      title: "Most Profitable Franchise Model",
+      description: "Open a PBCex branch for as little as $55K. Earn from gold spreads, remittance fees, token minting, and physical delivery fulfillment.",
+      badge: "Business",
       color: "secondary"
+    },
+    {
+      icon: Shield,
+      title: "Regulated & Transparent",
+      description: "Designed for Shariah, U.S., and international compliance. All tokens can be frozen, audited, and burned under regulatory oversight.",
+      badge: "Compliant",
+      color: "secondary"
+    },
+    {
+      icon: QrCode,
+      title: "QR & Offline Payments",
+      description: "Works even with limited internet. Pay with QR codes, cash agents, or offline gold transactions that sync once online.",
+      badge: "Resilient",
+      color: "primary"
     }
   ];
 
