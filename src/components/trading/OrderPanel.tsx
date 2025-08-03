@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import ScaleOrderModal from "./ScaleOrderModal";
 
 interface OrderPanelProps {
   pair: string;
@@ -14,6 +15,7 @@ const OrderPanel = ({ pair }: OrderPanelProps) => {
   const [orderType, setOrderType] = useState("limit");
   const [price, setPrice] = useState("");
   const [amount, setAmount] = useState("");
+  const [scaleModalOpen, setScaleModalOpen] = useState(false);
   const { toast } = useToast();
 
   const handleSubmitOrder = (side: "buy" | "sell") => {
@@ -62,12 +64,15 @@ const OrderPanel = ({ pair }: OrderPanelProps) => {
             Market
           </Button>
           <Button
-            variant={orderType === "stop" ? "default" : "ghost"}
+            variant={orderType === "scale" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setOrderType("stop")}
+            onClick={() => {
+              setOrderType("scale");
+              setScaleModalOpen(true);
+            }}
             className="flex-1 text-xs h-8"
           >
-            Trigger
+            Scale
           </Button>
         </div>
       </div>
@@ -75,7 +80,7 @@ const OrderPanel = ({ pair }: OrderPanelProps) => {
       <div className="p-3 space-y-3">
 
         {/* Price Input */}
-        {orderType !== "market" && (
+        {orderType !== "market" && orderType !== "scale" && (
           <div>
             <Label htmlFor="price" className="text-gray-300 text-xs">
               Price (USD)
@@ -92,6 +97,7 @@ const OrderPanel = ({ pair }: OrderPanelProps) => {
         )}
 
         {/* Amount Input */}
+        {orderType !== "scale" && (
         <div>
           <div className="flex justify-between items-center mb-1">
             <Label htmlFor="amount" className="text-gray-300 text-xs">
@@ -113,8 +119,10 @@ const OrderPanel = ({ pair }: OrderPanelProps) => {
             className="bg-gray-900 border-gray-700 text-white text-sm h-9"
           />
         </div>
+        )}
 
         {/* Advanced Options */}
+        {orderType !== "scale" && (
         <div>
           <Button 
             variant="ghost" 
@@ -124,8 +132,10 @@ const OrderPanel = ({ pair }: OrderPanelProps) => {
             + Set Take Profit / Stop Loss
           </Button>
         </div>
+        )}
 
         {/* Total */}
+        {orderType !== "scale" && (
         <div className="p-2 bg-gray-900 rounded border border-gray-700">
           <div className="flex justify-between items-center">
             <span className="text-gray-400 text-xs">Total:</span>
@@ -134,8 +144,10 @@ const OrderPanel = ({ pair }: OrderPanelProps) => {
             </span>
           </div>
         </div>
+        )}
 
         {/* Buy/Sell Buttons */}
+        {orderType !== "scale" && (
         <div className="space-y-2">
           <Button
             onClick={() => handleSubmitOrder("buy")}
@@ -152,6 +164,15 @@ const OrderPanel = ({ pair }: OrderPanelProps) => {
             Sell {pair.split("/")[0]}
           </Button>
         </div>
+        )}
+
+        {/* Scale Order Message */}
+        {orderType === "scale" && (
+          <div className="text-center py-8">
+            <p className="text-gray-400 text-sm mb-2">Scale Order Mode</p>
+            <p className="text-xs text-gray-500">Configure your scale order in the modal above</p>
+          </div>
+        )}
       </div>
 
       {/* Balance Info */}
@@ -171,6 +192,13 @@ const OrderPanel = ({ pair }: OrderPanelProps) => {
           </div>
         </div>
       </div>
+
+      {/* Scale Order Modal */}
+      <ScaleOrderModal
+        isOpen={scaleModalOpen}
+        onClose={() => setScaleModalOpen(false)}
+        pair={pair}
+      />
     </div>
   );
 };
