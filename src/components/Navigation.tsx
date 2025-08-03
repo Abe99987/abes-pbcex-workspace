@@ -21,7 +21,18 @@ import {
   Home, 
   Send, 
   Building2, 
-  BookOpen 
+  BookOpen,
+  BarChart3,
+  Coins,
+  CandlestickChart,
+  History,
+  PieChart,
+  TrendingDown,
+  ArrowUpDown,
+  Receipt,
+  Package,
+  Truck,
+  MapPin
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -36,57 +47,58 @@ const Navigation = () => {
   const menuItems = [
     {
       label: "Markets",
-      icon: TrendingUp,
-      items: ["Gold/USD", "Silver/USD", "Oil/USD", "LYD/USD", "All Markets"]
+      icon: BarChart3,
+      items: [
+        { label: "USDC Trading", description: "Settle in USDC" },
+        { label: "COIN Trading", description: "Settle in PAXG, XAG, OSP, BTC, ETH, SOL, XRP, SUI" },
+        { label: "FX Trading", description: "USD, EUR, GBP, AED, LYD, JPY" }
+      ]
     },
     {
       label: "Trade",
-      icon: TrendingUp,
-      items: ["Spot Trading", "Copy Trading", "Order History", "Trading Analytics"],
-      href: "/trading"
+      icon: CandlestickChart,
+      items: [
+        { label: "Spot Trading", href: "/trading" },
+        { label: "Copy Trading" },
+        { label: "Margin Trading", description: "Coming Soon" },
+        { label: "Trade Analytics" },
+        { label: "Market Reports" },
+        { label: "News" }
+      ]
     },
     {
       label: "Wallet",
       icon: Wallet,
-      items: ["Balances", "Freeze/Unfreeze", "Transaction History", "Security Settings"]
-    },
-    {
-      label: "Send/Pay",
-      icon: Send,
-      items: ["Send Assets", "Request Payment", "Payment Links", "Transaction Fees"]
+      items: [
+        { label: "My Assets", description: "Buy, Sell, Realize, Send/Receive, Spend, Transfer" },
+        { label: "Transaction History" },
+        { label: "Order History" },
+        { label: "PnL", description: "Profit and Loss" }
+      ]
     },
     {
       label: "Realize",
-      icon: Home,
-      items: ["Physical Gold", "Physical Silver", "Cash Pickup", "Bank Transfer"]
-    },
-    {
-      label: "Franchise",
-      icon: Building2,
-      items: ["Open Branch", "Partner Program", "Requirements", "Support"]
-    },
-    {
-      label: "Education",
-      icon: BookOpen,
-      items: ["Trading Basics", "Asset Backing", "Risk Management", "Video Tutorials"]
-    },
-    {
-      label: "Security",
-      icon: Shield,
-      items: ["2FA Settings", "API Keys", "Login History", "Security Tips"]
-    },
-    {
-      label: "Help",
-      icon: HelpCircle,
-      items: ["Support Center", "Live Chat", "FAQ", "Contact Us"]
+      icon: Package,
+      items: [
+        { label: "Receive Gold", icon: Coins },
+        { label: "Receive Silver", icon: Coins },
+        { label: "Receive Platinum", icon: Coins },
+        { label: "Receive Palladium", icon: Coins },
+        { label: "Receive Copper", icon: Coins },
+        { label: "Oil Fulfillment", icon: Truck },
+        { label: "Global Delivery", description: "Send or receive assets anywhere FedEx delivers", icon: MapPin }
+      ]
     }
   ];
 
-  const handleMenuClick = (menu: any, item?: string) => {
-    if (menu.href) {
+  const handleMenuClick = (menu: any, item?: any) => {
+    if (item?.href) {
+      navigate(item.href);
+    } else if (menu.href) {
       navigate(menu.href);
     } else if (menu.label === "Markets" && !item) {
-      // Default markets action
+      navigate("/trading");
+    } else if (item?.label === "Spot Trading") {
       navigate("/trading");
     }
     // Add other navigation logic as needed
@@ -122,7 +134,7 @@ const Navigation = () => {
                       ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
                       : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
-                  onClick={() => menu.href && handleMenuClick(menu)}
+                  onClick={() => handleMenuClick(menu)}
                 >
                   <menu.icon className="w-4 h-4 mr-2" />
                   {menu.label}
@@ -138,18 +150,37 @@ const Navigation = () => {
                 align="center"
               >
                 {menu.items.map((item, index) => (
-                  <div key={item}>
+                  <div key={typeof item === 'string' ? item : item.label}>
                     <DropdownMenuItem 
-                      className={`cursor-pointer ${
+                      className={`cursor-pointer flex items-center justify-between ${
                         isTrading 
                           ? 'hover:bg-gray-800 focus:bg-gray-800' 
                           : 'hover:bg-accent focus:bg-accent'
-                      }`}
+                      } ${typeof item === 'object' && item.description === 'Coming Soon' ? 'opacity-60' : ''}`}
                       onClick={() => handleMenuClick(menu, item)}
+                      disabled={typeof item === 'object' && item.description === 'Coming Soon'}
                     >
-                      {item}
+                      <div className="flex items-center">
+                        {typeof item === 'object' && item.icon && (
+                          <item.icon className="w-4 h-4 mr-2" />
+                        )}
+                        <div>
+                          <div>{typeof item === 'string' ? item : item.label}</div>
+                          {typeof item === 'object' && item.description && (
+                            <div className={`text-xs ${
+                              isTrading ? 'text-gray-400' : 'text-muted-foreground'
+                            }`}>
+                              {item.description}
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </DropdownMenuItem>
-                    {index < menu.items.length - 1 && menu.label === "Wallet" && index === 1 && (
+                    {index < menu.items.length - 1 && (
+                      (menu.label === "Wallet" && index === 0) ||
+                      (menu.label === "Trade" && index === 2) ||
+                      (menu.label === "Realize" && index === 5)
+                    ) && (
                       <DropdownMenuSeparator className={isTrading ? 'bg-gray-700' : 'bg-border'} />
                     )}
                   </div>
@@ -283,19 +314,32 @@ const Navigation = () => {
                     <menu.icon className="h-5 w-5" />
                     <span>{menu.label}</span>
                   </button>
-                  {menu.items.map((item) => (
-                    <button
-                      key={item}
-                      onClick={() => handleMenuClick(menu, item)}
-                      className={`w-full text-left text-sm pl-10 py-1 transition-colors ${
-                        isTrading 
-                          ? 'text-gray-400 hover:text-gray-200' 
-                          : 'text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  ))}
+                   {menu.items.map((item) => (
+                     <button
+                       key={typeof item === 'string' ? item : item.label}
+                       onClick={() => handleMenuClick(menu, item)}
+                       className={`w-full text-left text-sm pl-10 py-2 transition-colors flex items-center ${
+                         isTrading 
+                           ? 'text-gray-400 hover:text-gray-200' 
+                           : 'text-muted-foreground hover:text-foreground'
+                       } ${typeof item === 'object' && item.description === 'Coming Soon' ? 'opacity-60' : ''}`}
+                       disabled={typeof item === 'object' && item.description === 'Coming Soon'}
+                     >
+                       {typeof item === 'object' && item.icon && (
+                         <item.icon className="w-4 h-4 mr-2" />
+                       )}
+                       <div>
+                         <div>{typeof item === 'string' ? item : item.label}</div>
+                         {typeof item === 'object' && item.description && (
+                           <div className={`text-xs ${
+                             isTrading ? 'text-gray-500' : 'text-muted-foreground/60'
+                           }`}>
+                             {item.description}
+                           </div>
+                         )}
+                       </div>
+                     </button>
+                   ))}
                 </div>
               ))}
               <Button 
