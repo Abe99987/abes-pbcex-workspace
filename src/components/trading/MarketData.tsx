@@ -68,79 +68,75 @@ const MarketData = ({ selectedPair, onSelectPair }: MarketDataProps) => {
   };
 
   return (
-    <div className="h-full bg-slate-950 p-4">
-      <h3 className="text-sm font-semibold text-gold mb-4">Markets</h3>
-      
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+    <div className="h-full bg-slate-950 flex flex-col">
+      {/* Header */}
+      <div className="p-3 border-b border-slate-800">
+        <h3 className="text-sm font-semibold text-white mb-3">Markets</h3>
         <Input
-          placeholder="Search pairs..."
+          type="text"
+          placeholder="Search markets..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 bg-slate-900 border-slate-700 text-slate-100"
+          className="bg-slate-900 border-slate-700 text-white placeholder-slate-400 text-sm h-8"
         />
+        
+        {/* Filter Tabs */}
+        <div className="flex mt-3 space-x-1">
+          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 bg-slate-800 text-white">All</Button>
+          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-slate-400">★</Button>
+          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-slate-400">Gold</Button>
+          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-slate-400">Oil</Button>
+        </div>
       </div>
 
       {/* Market List */}
-      <div className="space-y-2">
+      <div className="flex-1 overflow-y-auto">
         {filteredData.map((market) => (
           <div
             key={market.pair}
-            className={`p-3 rounded cursor-pointer transition-colors ${
-              selectedPair === market.pair
-                ? "bg-gold/20 border border-gold/40"
-                : "bg-slate-900 hover:bg-slate-800"
-            }`}
             onClick={() => onSelectPair(market.pair)}
+            className={`p-3 border-b border-slate-800 cursor-pointer hover:bg-slate-900/50 transition-colors ${
+              selectedPair === market.pair ? 'bg-slate-900 border-l-2 border-l-gold' : ''
+            }`}
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-1">
               <div className="flex items-center space-x-2">
-                <span className="font-medium text-slate-100">{market.pair}</span>
+                <span className="font-medium text-white text-sm">{market.pair}</span>
                 <Button
-                  size="sm"
                   variant="ghost"
-                  className="h-5 w-5 p-0"
+                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFavorite(market.pair);
                   }}
+                  className="p-0 h-4 w-4"
                 >
-                  <Star
-                    className={`h-3 w-3 ${
-                      favorites.includes(market.pair)
-                        ? "fill-gold text-gold"
-                        : "text-slate-400"
-                    }`}
+                  <Star 
+                    className={`w-3 h-3 ${
+                      favorites.includes(market.pair) 
+                        ? 'fill-yellow-400 text-yellow-400' 
+                        : 'text-slate-500 hover:text-slate-300'
+                    }`} 
                   />
                 </Button>
               </div>
-              <div
-                className={`text-sm font-medium ${
-                  market.change >= 0 ? "text-green-400" : "text-red-400"
+              <span 
+                className={`text-xs font-medium ${
+                  market.change >= 0 ? 'text-green-400' : 'text-red-400'
                 }`}
               >
-                {market.change >= 0 ? "+" : ""}{market.change}%
-              </div>
+                {market.change >= 0 ? '+' : ''}{market.change.toFixed(2)}%
+              </span>
             </div>
             
-            <div className="space-y-1 text-xs text-slate-400">
-              <div className="flex justify-between">
-                <span>Price:</span>
-                <span className="text-slate-100">${market.price}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>24h Vol:</span>
-                <span>{market.volume}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>24h High:</span>
-                <span className="text-green-400">${market.high24h}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>24h Low:</span>
-                <span className="text-red-400">${market.low24h}</span>
-              </div>
+            <div className="flex justify-between items-center">
+              <span className="text-white font-mono text-sm">${market.price.toFixed(2)}</span>
+              <span className="text-slate-400 text-xs">Vol: {market.volume}</span>
+            </div>
+            
+            <div className="flex justify-between items-center text-xs text-slate-500 mt-1">
+              <span>H: ${market.high24h.toFixed(2)}</span>
+              <span>L: ${market.low24h.toFixed(2)}</span>
             </div>
           </div>
         ))}

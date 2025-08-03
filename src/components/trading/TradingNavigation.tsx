@@ -1,0 +1,184 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ChevronDown, User, Globe, Wallet, TrendingUp, Shield, HelpCircle, Home, Send, Building2, Users, BookOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+const TradingNavigation = () => {
+  const navigate = useNavigate();
+  const [selectedLanguage, setSelectedLanguage] = useState("EN");
+
+  const menuItems = [
+    {
+      label: "Markets",
+      icon: TrendingUp,
+      items: ["Gold/USD", "Silver/USD", "Oil/USD", "LYD/USD", "All Markets"]
+    },
+    {
+      label: "Trade",
+      icon: TrendingUp,
+      items: ["Spot Trading", "Copy Trading", "Order History", "Trading Analytics"]
+    },
+    {
+      label: "Wallet",
+      icon: Wallet,
+      items: ["Balances", "Freeze/Unfreeze", "Transaction History", "Security Settings"]
+    },
+    {
+      label: "Send/Pay",
+      icon: Send,
+      items: ["Send Assets", "Request Payment", "Payment Links", "Transaction Fees"]
+    },
+    {
+      label: "Realize",
+      icon: Home,
+      items: ["Physical Gold", "Physical Silver", "Cash Pickup", "Bank Transfer"]
+    },
+    {
+      label: "Franchise",
+      icon: Building2,
+      items: ["Open Branch", "Partner Program", "Requirements", "Support"]
+    },
+    {
+      label: "Education",
+      icon: BookOpen,
+      items: ["Trading Basics", "Asset Backing", "Risk Management", "Video Tutorials"]
+    },
+    {
+      label: "Security",
+      icon: Shield,
+      items: ["2FA Settings", "API Keys", "Login History", "Security Tips"]
+    },
+    {
+      label: "Help",
+      icon: HelpCircle,
+      items: ["Support Center", "Live Chat", "FAQ", "Contact Us"]
+    }
+  ];
+
+  return (
+    <nav className="sticky top-0 z-50 h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-4">
+      {/* Left - Logo */}
+      <div className="flex items-center space-x-2">
+        <button 
+          onClick={() => navigate("/")}
+          className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+        >
+          <div className="w-8 h-8 bg-gradient-to-r from-gold to-gold-light rounded-lg flex items-center justify-center">
+            <span className="text-black font-bold text-sm">PBC</span>
+          </div>
+          <span className="text-white font-semibold text-lg">PBCex</span>
+        </button>
+      </div>
+
+      {/* Center - Navigation Menu */}
+      <div className="hidden lg:flex items-center space-x-1">
+        {menuItems.map((menu) => (
+          <DropdownMenu key={menu.label}>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                className="h-9 px-3 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+              >
+                <menu.icon className="w-4 h-4 mr-2" />
+                {menu.label}
+                <ChevronDown className="w-3 h-3 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              className="w-48 bg-slate-900 border-slate-700 text-slate-100"
+              align="center"
+            >
+              {menu.items.map((item, index) => (
+                <div key={item}>
+                  <DropdownMenuItem className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">
+                    {item}
+                  </DropdownMenuItem>
+                  {index < menu.items.length - 1 && menu.label === "Wallet" && index === 1 && (
+                    <DropdownMenuSeparator className="bg-slate-700" />
+                  )}
+                </div>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ))}
+      </div>
+
+      {/* Right - Profile, Deposit, Language */}
+      <div className="flex items-center space-x-3">
+        <Button
+          size="sm"
+          className="bg-green-600 hover:bg-green-700 text-white"
+        >
+          Deposit
+        </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white">
+              <Globe className="w-4 h-4 mr-1" />
+              {selectedLanguage}
+              <ChevronDown className="w-3 h-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-slate-900 border-slate-700 text-slate-100">
+            <DropdownMenuItem 
+              onClick={() => setSelectedLanguage("EN")}
+              className="hover:bg-slate-800 cursor-pointer"
+            >
+              English
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => setSelectedLanguage("AR")}
+              className="hover:bg-slate-800 cursor-pointer"
+            >
+              العربية
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => setSelectedLanguage("FR")}
+              className="hover:bg-slate-800 cursor-pointer"
+            >
+              Français
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="p-2">
+              <Avatar className="w-6 h-6">
+                <AvatarFallback className="bg-slate-700 text-slate-300 text-xs">
+                  <User className="w-3 h-3" />
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-48 bg-slate-900 border-slate-700 text-slate-100" align="end">
+            <DropdownMenuItem className="hover:bg-slate-800 cursor-pointer">
+              <User className="w-4 h-4 mr-2" />
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem className="hover:bg-slate-800 cursor-pointer">
+              <Shield className="w-4 h-4 mr-2" />
+              Security
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-slate-700" />
+            <DropdownMenuItem className="hover:bg-slate-800 cursor-pointer text-red-400">
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </nav>
+  );
+};
+
+export default TradingNavigation;

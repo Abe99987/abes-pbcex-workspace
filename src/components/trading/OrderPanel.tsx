@@ -38,86 +38,136 @@ const OrderPanel = ({ pair }: OrderPanelProps) => {
   const total = price && amount ? (parseFloat(price) * parseFloat(amount)).toFixed(2) : "0.00";
 
   return (
-    <div className="h-full bg-slate-950 p-4">
-      <h3 className="text-sm font-semibold text-gold mb-4">Place Order</h3>
-      
-      <div className="space-y-4">
-        {/* Order Type Selector */}
-        <div>
-          <Label className="text-xs text-slate-400">Order Type</Label>
-          <Select value={orderType} onValueChange={setOrderType}>
-            <SelectTrigger className="bg-slate-900 border-slate-700">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="limit">Limit Order</SelectItem>
-              <SelectItem value="market">Market Order</SelectItem>
-              <SelectItem value="stop">Stop Order</SelectItem>
-            </SelectContent>
-          </Select>
+    <div className="h-full bg-slate-950">
+      {/* Header */}
+      <div className="p-3 border-b border-slate-800">
+        <h3 className="text-sm font-semibold text-white mb-3">Place Order</h3>
+        
+        {/* Order Type Selection */}
+        <div className="flex bg-slate-900 rounded-md p-1 mb-4">
+          <Button
+            variant={orderType === "limit" ? "default" : "ghost"}
+            size="sm"
+            onClick={() => setOrderType("limit")}
+            className="flex-1 text-xs h-8"
+          >
+            Limit
+          </Button>
+          <Button
+            variant={orderType === "market" ? "default" : "ghost"}
+            size="sm"
+            onClick={() => setOrderType("market")}
+            className="flex-1 text-xs h-8"
+          >
+            Market
+          </Button>
+          <Button
+            variant={orderType === "stop" ? "default" : "ghost"}
+            size="sm"
+            onClick={() => setOrderType("stop")}
+            className="flex-1 text-xs h-8"
+          >
+            Trigger
+          </Button>
         </div>
+      </div>
+      
+      <div className="p-3 space-y-3">
 
         {/* Price Input */}
         {orderType !== "market" && (
           <div>
-            <Label className="text-xs text-slate-400">Price (USD)</Label>
+            <Label htmlFor="price" className="text-slate-300 text-xs">
+              Price (USD)
+            </Label>
             <Input
+              id="price"
               type="number"
-              placeholder="0.00"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="bg-slate-900 border-slate-700 text-slate-100"
+              placeholder="2,380.50"
+              className="mt-1 bg-slate-900 border-slate-700 text-white text-sm h-9"
             />
           </div>
         )}
 
         {/* Amount Input */}
         <div>
-          <Label className="text-xs text-slate-400">Amount ({pair.split("/")[0]})</Label>
+          <div className="flex justify-between items-center mb-1">
+            <Label htmlFor="amount" className="text-slate-300 text-xs">
+              Amount (grams)
+            </Label>
+            <div className="flex space-x-1">
+              <Button size="sm" variant="ghost" className="text-xs h-5 px-1 text-slate-400">25%</Button>
+              <Button size="sm" variant="ghost" className="text-xs h-5 px-1 text-slate-400">50%</Button>
+              <Button size="sm" variant="ghost" className="text-xs h-5 px-1 text-slate-400">75%</Button>
+              <Button size="sm" variant="ghost" className="text-xs h-5 px-1 text-slate-400">Max</Button>
+            </div>
+          </div>
           <Input
+            id="amount"
             type="number"
-            placeholder="0.000"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="bg-slate-900 border-slate-700 text-slate-100"
+            placeholder="0.00"
+            className="bg-slate-900 border-slate-700 text-white text-sm h-9"
           />
         </div>
 
-        {/* Total */}
+        {/* Advanced Options */}
         <div>
-          <Label className="text-xs text-slate-400">Total (USD)</Label>
-          <div className="text-sm text-slate-100 py-2 px-3 bg-slate-900 rounded border border-slate-700">
-            ${total}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-xs text-slate-400 hover:text-white p-0 h-6"
+          >
+            + Set Take Profit / Stop Loss
+          </Button>
+        </div>
+
+        {/* Total */}
+        <div className="p-2 bg-slate-900 rounded border border-slate-700">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400 text-xs">Total:</span>
+            <span className="text-white font-mono text-sm">
+              ${total}
+            </span>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-2">
+        {/* Buy/Sell Buttons */}
+        <div className="space-y-2">
           <Button
             onClick={() => handleSubmitOrder("buy")}
-            className="bg-green-600 hover:bg-green-700 text-white"
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium h-10"
+            disabled={!amount || (!price && orderType === "limit")}
           >
             Buy {pair.split("/")[0]}
           </Button>
           <Button
             onClick={() => handleSubmitOrder("sell")}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-medium h-10"
+            disabled={!amount || (!price && orderType === "limit")}
           >
             Sell {pair.split("/")[0]}
           </Button>
         </div>
+      </div>
 
-        {/* Balance Information */}
-        <div className="pt-4 border-t border-slate-800">
-          <div className="text-xs text-slate-400 space-y-1">
-            <div className="flex justify-between">
-              <span>Available USD:</span>
-              <span className="text-slate-100">$10,000.00</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Available {pair.split("/")[0]}:</span>
-              <span className="text-slate-100">5.250</span>
-            </div>
+      {/* Balance Info */}
+      <div className="p-3 border-t border-slate-800 bg-slate-900/50">
+        <div className="space-y-1 text-xs">
+          <div className="flex justify-between">
+            <span className="text-slate-400">Available USD:</span>
+            <span className="text-white font-mono">$12,450.00</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-400">Available Gold:</span>
+            <span className="text-gold font-mono">24.5g</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-400">Buying Power:</span>
+            <span className="text-green-400 font-mono">$12,450.00</span>
           </div>
         </div>
       </div>

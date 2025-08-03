@@ -26,64 +26,87 @@ const OrderBook = ({ pair }: OrderBookProps) => {
   }, [pair]);
 
   return (
-    <div className="h-full bg-slate-950 p-4">
-      <h3 className="text-sm font-semibold text-gold mb-4">Order Book</h3>
-      
-      <div className="space-y-4">
+    <div className="h-full bg-slate-950 flex flex-col">
+      {/* Header */}
+      <div className="p-3 border-b border-slate-800">
+        <h3 className="text-sm font-semibold text-white">Order Book</h3>
+      </div>
+
+      {/* Order Book Content */}
+      <div className="flex-1 overflow-hidden">
         {/* Asks (Sell Orders) */}
-        <div>
-          <div className="text-xs text-slate-400 mb-2 grid grid-cols-3 gap-2">
-            <span>Price (USD)</span>
-            <span>Amount</span>
-            <span>Total</span>
+        <div className="h-[45%] overflow-y-auto">
+          <div className="px-3 py-1 bg-slate-900">
+            <div className="grid grid-cols-3 gap-2 text-xs text-slate-400 font-medium">
+              <span>Price (USD)</span>
+              <span className="text-right">Amount</span>
+              <span className="text-right">Total</span>
+            </div>
           </div>
-          <div className="space-y-1 max-h-32 overflow-y-auto">
-            {orderBook.asks.slice(0, 8).reverse().map((ask, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-3 gap-2 text-xs py-1 relative"
-              >
-                <div
-                  className="absolute inset-0 bg-red-500/10"
-                  style={{ width: `${(ask.total / Math.max(...orderBook.asks.map(a => a.total))) * 100}%` }}
-                />
-                <span className="text-red-400 relative z-10">{ask.price.toFixed(2)}</span>
-                <span className="text-slate-300 relative z-10">{ask.amount.toFixed(3)}</span>
-                <span className="text-slate-400 relative z-10">{ask.total.toFixed(2)}</span>
-              </div>
-            ))}
+          
+          <div>
+            {orderBook.asks.slice(0, 8).reverse().map((ask, index) => {
+              const total = ask.price * ask.amount;
+              const maxTotal = Math.max(...orderBook.asks.map(a => a.price * a.amount));
+              const widthPercentage = (total / maxTotal) * 100;
+              
+              return (
+                <div 
+                  key={`ask-${index}`} 
+                  className="relative px-3 py-0.5 hover:bg-slate-800/50 cursor-pointer"
+                >
+                  <div 
+                    className="absolute right-0 top-0 h-full bg-red-500/10"
+                    style={{ width: `${widthPercentage}%` }}
+                  />
+                  <div className="relative grid grid-cols-3 gap-2 text-xs leading-5">
+                    <span className="text-red-400 font-mono">${ask.price.toFixed(2)}</span>
+                    <span className="text-right text-white font-mono">{ask.amount.toFixed(3)}</span>
+                    <span className="text-right text-slate-300 font-mono">${total.toFixed(2)}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         {/* Spread */}
-        <div className="border-t border-b border-slate-800 py-2">
+        <div className="px-3 py-2 bg-slate-900 border-y border-slate-700">
           <div className="text-center">
             <div className="text-xs text-slate-400">Spread</div>
-            <div className="text-sm text-gold">
+            <div className="text-xs font-mono text-yellow-400">
               {orderBook.asks.length > 0 && orderBook.bids.length > 0
-                ? (orderBook.asks[0].price - orderBook.bids[0].price).toFixed(2)
-                : "0.00"}
+                ? `$${(orderBook.asks[0].price - orderBook.bids[0].price).toFixed(2)} (${(((orderBook.asks[0].price - orderBook.bids[0].price) / orderBook.asks[0].price) * 100).toFixed(3)}%)`
+                : "$0.00 (0.000%)"}
             </div>
           </div>
         </div>
 
         {/* Bids (Buy Orders) */}
-        <div>
-          <div className="space-y-1 max-h-32 overflow-y-auto">
-            {orderBook.bids.slice(0, 8).map((bid, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-3 gap-2 text-xs py-1 relative"
-              >
-                <div
-                  className="absolute inset-0 bg-green-500/10"
-                  style={{ width: `${(bid.total / Math.max(...orderBook.bids.map(b => b.total))) * 100}%` }}
-                />
-                <span className="text-green-400 relative z-10">{bid.price.toFixed(2)}</span>
-                <span className="text-slate-300 relative z-10">{bid.amount.toFixed(3)}</span>
-                <span className="text-slate-400 relative z-10">{bid.total.toFixed(2)}</span>
-              </div>
-            ))}
+        <div className="h-[45%] overflow-y-auto">
+          <div>
+            {orderBook.bids.slice(0, 8).map((bid, index) => {
+              const total = bid.price * bid.amount;
+              const maxTotal = Math.max(...orderBook.bids.map(b => b.price * b.amount));
+              const widthPercentage = (total / maxTotal) * 100;
+              
+              return (
+                <div 
+                  key={`bid-${index}`} 
+                  className="relative px-3 py-0.5 hover:bg-slate-800/50 cursor-pointer"
+                >
+                  <div 
+                    className="absolute right-0 top-0 h-full bg-green-500/10"
+                    style={{ width: `${widthPercentage}%` }}
+                  />
+                  <div className="relative grid grid-cols-3 gap-2 text-xs leading-5">
+                    <span className="text-green-400 font-mono">${bid.price.toFixed(2)}</span>
+                    <span className="text-right text-white font-mono">{bid.amount.toFixed(3)}</span>
+                    <span className="text-right text-slate-300 font-mono">${total.toFixed(2)}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

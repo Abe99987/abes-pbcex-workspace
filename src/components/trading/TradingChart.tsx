@@ -66,76 +66,162 @@ const TradingChart = ({ pair }: TradingChartProps) => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-950">
+    <div className="h-full flex flex-col bg-black">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-slate-800">
-        <div className="flex items-center space-x-4">
-          <h3 className="text-lg font-semibold text-gold">{pair}</h3>
-          <div className="text-sm text-slate-400">
-            Last: <span className="text-green-400">$2,380.50</span>
-            <span className="text-green-400 ml-2">+1.25%</span>
+      <div className="flex items-center justify-between p-3 border-b border-slate-800">
+        <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-3">
+            <h3 className="text-xl font-bold text-gold">{pair}</h3>
+            <div className="flex items-center space-x-1">
+              <span className="text-2xl font-bold text-white">$2,380.50</span>
+              <span className="text-green-400 text-sm font-medium">+1.25%</span>
+              <span className="text-green-400 text-sm">+$29.42</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4 text-xs text-slate-400">
+            <div>24h High: <span className="text-white">$2,395.80</span></div>
+            <div>24h Low: <span className="text-white">$2,351.20</span></div>
+            <div>Volume: <span className="text-white">1.2M</span></div>
           </div>
         </div>
         
-        {/* Timeframe buttons */}
-        <div className="flex space-x-1">
-          {timeframes.map((tf) => (
+        {/* Chart Controls */}
+        <div className="flex items-center space-x-3">
+          {/* View Toggle */}
+          <div className="flex bg-slate-900 rounded-md p-1">
             <Button
-              key={tf}
-              variant={selectedTimeframe === tf ? "gold" : "ghost"}
               size="sm"
-              onClick={() => setSelectedTimeframe(tf)}
-              className="text-xs"
+              variant="ghost"
+              className="text-xs px-3 py-1 bg-slate-800 text-white"
             >
-              {tf}
+              Chart
             </Button>
-          ))}
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-xs px-3 py-1 text-slate-400 hover:text-white"
+            >
+              Depth
+            </Button>
+          </div>
+          
+          {/* Timeframe buttons */}
+          <div className="flex bg-slate-900 rounded-md p-1">
+            {timeframes.map((tf) => (
+              <Button
+                key={tf}
+                variant={selectedTimeframe === tf ? "gold" : "ghost"}
+                size="sm"
+                onClick={() => setSelectedTimeframe(tf)}
+                className="text-xs px-2 py-1 h-7"
+              >
+                {tf}
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Chart */}
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-2 bg-black">
         <ChartContainer config={config} className="h-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData}>
+            <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+              <defs>
+                <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
               <XAxis 
                 dataKey="time" 
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: '#64748b', fontSize: 12 }}
+                tick={{ fill: '#64748b', fontSize: 11 }}
+                interval="preserveStartEnd"
               />
               <YAxis 
-                domain={['dataMin - 10', 'dataMax + 10']}
+                domain={['dataMin - 5', 'dataMax + 5']}
                 orientation="right"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: '#64748b', fontSize: 12 }}
+                tick={{ fill: '#64748b', fontSize: 11 }}
+                width={60}
               />
+              
+              {/* Grid Lines */}
+              <defs>
+                <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                  <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#1e293b" strokeWidth="0.5"/>
+                </pattern>
+              </defs>
+              
               <ChartTooltip 
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
+                    const isGreen = data.close > data.open;
                     return (
-                      <div className="bg-slate-900 border border-slate-700 rounded p-2 text-xs">
-                        <p className="text-slate-300">Time: {label}</p>
-                        <p className="text-green-400">Open: ${data.open}</p>
-                        <p className="text-red-400">High: ${data.high}</p>
-                        <p className="text-blue-400">Low: ${data.low}</p>
-                        <p className="text-yellow-400">Close: ${data.close}</p>
-                        <p className="text-slate-400">Volume: {data.volume}</p>
+                      <div className="bg-black border border-slate-600 rounded-lg p-3 shadow-xl">
+                        <p className="text-slate-300 text-xs mb-2 font-medium">{label}</p>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-slate-400">O: </span>
+                            <span className="text-white font-mono">${data.open}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400">H: </span>
+                            <span className="text-green-400 font-mono">${data.high}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400">L: </span>
+                            <span className="text-red-400 font-mono">${data.low}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400">C: </span>
+                            <span className={`font-mono ${isGreen ? 'text-green-400' : 'text-red-400'}`}>
+                              ${data.close}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="mt-2 pt-2 border-t border-slate-700">
+                          <span className="text-slate-400 text-xs">Vol: </span>
+                          <span className="text-slate-300 text-xs font-mono">{data.volume}</span>
+                        </div>
                       </div>
                     );
                   }
                   return null;
                 }}
+                cursor={{ stroke: '#64748b', strokeWidth: 1, strokeDasharray: '3 3' }}
               />
-              {/* Custom candlestick rendering */}
+              
+              {/* Render custom candlesticks */}
+              {chartData.map((entry, index) => {
+                if (!entry) return null;
+                const x = index * (100 / chartData.length);
+                return (
+                  <Candlestick 
+                    key={index} 
+                    payload={entry} 
+                    x={x} 
+                    y={0} 
+                    width={5} 
+                    height={100} 
+                  />
+                );
+              })}
+              
+              {/* Price line for current value */}
               <Line
                 type="monotone"
                 dataKey="close"
-                stroke="transparent"
+                stroke="#10b981"
+                strokeWidth={2}
                 dot={false}
-                activeDot={false}
+                activeDot={{ r: 4, fill: '#10b981', stroke: '#000', strokeWidth: 2 }}
+                fill="url(#priceGradient)"
               />
             </ComposedChart>
           </ResponsiveContainer>
