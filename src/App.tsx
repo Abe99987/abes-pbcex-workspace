@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Trading from "./pages/Trading";
 import Franchise from "./pages/Franchise";
 import Education from "./pages/Education";
+import MyAssets from "./pages/MyAssets";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/trading" element={<Trading />} />
           <Route path="/franchise" element={<Franchise />} />
           <Route path="/education" element={<Education />} />
+          <Route path="/my-assets" element={<MyAssets />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

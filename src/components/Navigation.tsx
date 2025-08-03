@@ -70,7 +70,11 @@ const Navigation = () => {
       label: "Wallet",
       icon: Wallet,
       items: [
-        { label: "My Assets", description: "Buy, Sell, Realize, Send/Receive, Spend, Transfer" },
+        { 
+          label: "My Assets", 
+          description: "Buy, Sell, Realize, Send/Receive, Spend, Transfer",
+          onClick: () => navigate('/my-assets')
+        },
         { label: "Transaction History" },
         { label: "Order History" },
         { label: "PnL", description: "Profit and Loss" }
@@ -102,7 +106,9 @@ const Navigation = () => {
   ];
 
   const handleMenuClick = (menu: any, item?: any) => {
-    if (item?.href) {
+    if (item?.onClick) {
+      item.onClick();
+    } else if (item?.href) {
       navigate(item.href);
     } else if (menu.href) {
       navigate(menu.href);
