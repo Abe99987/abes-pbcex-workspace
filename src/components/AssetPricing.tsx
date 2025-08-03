@@ -3,13 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { TrendingUp, TrendingDown, ShoppingCart, Package } from "lucide-react";
+import { TrendingUp, TrendingDown, ShoppingCart, Package, Coins } from "lucide-react";
 import BuyAssetModal from "./BuyAssetModal";
 import RealizeAssetModal from "./RealizeAssetModal";
+import BorrowingModal from "./BorrowingModal";
 
 const AssetPricing = () => {
   const [buyModalOpen, setBuyModalOpen] = useState(false);
   const [realizeModalOpen, setRealizeModalOpen] = useState(false);
+  const [borrowingModalOpen, setBorrowingModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
 
   const assets = [
@@ -91,58 +93,85 @@ const AssetPricing = () => {
 
                 {/* Action Buttons - Show for all assets except generic ones */}
                 {["AU", "AG", "LYD", "OIL"].includes(asset.symbol) && (
-                  <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 md:opacity-100 transition-opacity duration-300">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex-1"
-                            onClick={() => {
-                              setSelectedAsset(asset);
-                              setBuyModalOpen(true);
-                            }}
-                          >
-                            <ShoppingCart className="w-3 h-3 mr-1" />
-                            Buy
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>
-                            {asset.symbol === "LYD" ? "Buy tokenized Libyan Dinar" : 
-                             asset.symbol === "OIL" ? "Buy tokenized oil contracts" :
-                             `Purchase tokenized ${asset.name.split(' ')[0].toLowerCase()} at real-time market price`}
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                  <div className="space-y-2 mt-4 opacity-0 group-hover:opacity-100 md:opacity-100 transition-opacity duration-300">
+                    <div className="flex gap-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1"
+                              onClick={() => {
+                                setSelectedAsset(asset);
+                                setBuyModalOpen(true);
+                              }}
+                            >
+                              <ShoppingCart className="w-3 h-3 mr-1" />
+                              Buy
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              {asset.symbol === "LYD" ? "Buy tokenized Libyan Dinar" : 
+                               asset.symbol === "OIL" ? "Buy tokenized oil contracts" :
+                               `Purchase tokenized ${asset.name.split(' ')[0].toLowerCase()} at real-time market price`}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
 
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex-1"
-                            onClick={() => {
-                              setSelectedAsset(asset);
-                              setRealizeModalOpen(true);
-                            }}
-                          >
-                            <Package className="w-3 h-3 mr-1" />
-                            Realize
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>
-                            {asset.symbol === "LYD" ? "Realize into LYD cash or bank transfer" :
-                             asset.symbol === "OIL" ? "Sell back or request physical delivery" :
-                             `Physically redeem your digital ${asset.name.split(' ')[0].toLowerCase()} balance`}
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1"
+                              onClick={() => {
+                                setSelectedAsset(asset);
+                                setRealizeModalOpen(true);
+                              }}
+                            >
+                              <Package className="w-3 h-3 mr-1" />
+                              Realize
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              {asset.symbol === "LYD" ? "Realize into LYD cash or bank transfer" :
+                               asset.symbol === "OIL" ? "Sell back or request physical delivery" :
+                               `Physically redeem your digital ${asset.name.split(' ')[0].toLowerCase()} balance`}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+
+                    {/* Finance With Gold - Only for Gold */}
+                    {asset.symbol === "AU" && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="premium"
+                              className="w-full"
+                              onClick={() => {
+                                setSelectedAsset(asset);
+                                setBorrowingModalOpen(true);
+                              }}
+                            >
+                              <Coins className="w-3 h-3 mr-1" />
+                              Borrow Against Gold
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Asset-Based Financing — No Credit Checks. Instant Cash. Always Backed.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                   </div>
                 )}
               </CardContent>
@@ -182,6 +211,11 @@ const AssetPricing = () => {
           <RealizeAssetModal
             isOpen={realizeModalOpen}
             onClose={() => setRealizeModalOpen(false)}
+            asset={selectedAsset}
+          />
+          <BorrowingModal
+            isOpen={borrowingModalOpen}
+            onClose={() => setBorrowingModalOpen(false)}
             asset={selectedAsset}
           />
         </>
