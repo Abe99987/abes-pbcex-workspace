@@ -49,8 +49,8 @@ const Navigation = () => {
       label: "Markets",
       icon: BarChart3,
       items: [
-        { label: "USDC Trading", description: "Settle in USDC" },
-        { label: "COIN Trading", description: "Settle in PAXG, XAG, OSP, BTC, ETH, SOL, XRP, SUI" },
+        { label: "USDC Trading", description: "Settle in USDC", href: "/trading" },
+        { label: "COIN Trading", description: "Settle in PAXG, XAG, OSP, BTC, ETH, SOL, XRP, SUI", href: "/coin-trading" },
         { label: "FX Trading", description: "USD, EUR, GBP, AED, LYD, JPY" }
       ]
     },
@@ -130,9 +130,9 @@ const Navigation = () => {
       navigate(menu.href);
     } else if (menu.label === "Markets" && !item) {
       navigate("/trading");
-    } else if (item?.label === "Spot Trading") {
+    } else if (item?.label === "Spot Trading" || item?.label === "USDC Trading") {
       navigate("/trading");
-    } else if (item?.label === "Coin Trading") {
+    } else if (item?.label === "Coin Trading" || item?.label === "COIN Trading") {
       navigate("/coin-trading");
     }
     // Add other navigation logic as needed
