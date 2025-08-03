@@ -26,9 +26,9 @@ const OrderBook = ({ pair }: OrderBookProps) => {
   }, [pair]);
 
   return (
-    <div className="h-full bg-slate-950 flex flex-col">
+    <div className="h-full bg-black flex flex-col">
       {/* Header */}
-      <div className="p-3 border-b border-slate-800">
+      <div className="p-3 border-b border-gray-800">
         <h3 className="text-sm font-semibold text-white">Order Book</h3>
       </div>
 
@@ -36,8 +36,8 @@ const OrderBook = ({ pair }: OrderBookProps) => {
       <div className="flex-1 overflow-hidden">
         {/* Asks (Sell Orders) */}
         <div className="h-[45%] overflow-y-auto">
-          <div className="px-3 py-1 bg-slate-900">
-            <div className="grid grid-cols-3 gap-2 text-xs text-slate-400 font-medium">
+          <div className="px-3 py-1 bg-gray-900">
+            <div className="grid grid-cols-3 gap-2 text-xs text-gray-400 font-medium">
               <span>Price (USD)</span>
               <span className="text-right">Amount</span>
               <span className="text-right">Total</span>
@@ -53,16 +53,16 @@ const OrderBook = ({ pair }: OrderBookProps) => {
               return (
                 <div 
                   key={`ask-${index}`} 
-                  className="relative px-3 py-0.5 hover:bg-slate-800/50 cursor-pointer"
+                  className="relative px-3 py-0.5 hover:bg-gray-800/50 cursor-pointer"
                 >
-                  <div 
+                  <div
                     className="absolute right-0 top-0 h-full bg-red-500/10"
                     style={{ width: `${widthPercentage}%` }}
                   />
                   <div className="relative grid grid-cols-3 gap-2 text-xs leading-5">
                     <span className="text-red-400 font-mono">${ask.price.toFixed(2)}</span>
                     <span className="text-right text-white font-mono">{ask.amount.toFixed(3)}</span>
-                    <span className="text-right text-slate-300 font-mono">${total.toFixed(2)}</span>
+                    <span className="text-right text-gray-300 font-mono">${total.toFixed(2)}</span>
                   </div>
                 </div>
               );
@@ -71,9 +71,9 @@ const OrderBook = ({ pair }: OrderBookProps) => {
         </div>
 
         {/* Spread */}
-        <div className="px-3 py-2 bg-slate-900 border-y border-slate-700">
+        <div className="px-3 py-2 bg-gray-900 border-y border-gray-700">
           <div className="text-center">
-            <div className="text-xs text-slate-400">Spread</div>
+            <div className="text-xs text-gray-400">Spread</div>
             <div className="text-xs font-mono text-yellow-400">
               {orderBook.asks.length > 0 && orderBook.bids.length > 0
                 ? `$${(orderBook.asks[0].price - orderBook.bids[0].price).toFixed(2)} (${(((orderBook.asks[0].price - orderBook.bids[0].price) / orderBook.asks[0].price) * 100).toFixed(3)}%)`
@@ -93,16 +93,16 @@ const OrderBook = ({ pair }: OrderBookProps) => {
               return (
                 <div 
                   key={`bid-${index}`} 
-                  className="relative px-3 py-0.5 hover:bg-slate-800/50 cursor-pointer"
+                  className="relative px-3 py-0.5 hover:bg-gray-800/50 cursor-pointer"
                 >
-                  <div 
+                  <div
                     className="absolute right-0 top-0 h-full bg-green-500/10"
                     style={{ width: `${widthPercentage}%` }}
                   />
                   <div className="relative grid grid-cols-3 gap-2 text-xs leading-5">
                     <span className="text-green-400 font-mono">${bid.price.toFixed(2)}</span>
                     <span className="text-right text-white font-mono">{bid.amount.toFixed(3)}</span>
-                    <span className="text-right text-slate-300 font-mono">${total.toFixed(2)}</span>
+                    <span className="text-right text-gray-300 font-mono">${total.toFixed(2)}</span>
                   </div>
                 </div>
               );

@@ -21,7 +21,7 @@ const TradingInterface = () => {
         <ResizablePanelGroup direction="horizontal" className="flex-1">
           {/* Left Panel - Market Data */}
           <ResizablePanel defaultSize={20} minSize={15} className="hidden lg:block">
-            <div className="h-full border-r border-slate-800 bg-slate-950">
+            <div className="h-full border-r border-gray-800 bg-black">
               <MarketData 
                 selectedPair={selectedPair} 
                 onSelectPair={setSelectedPair} 
@@ -36,7 +36,7 @@ const TradingInterface = () => {
             <ResizablePanelGroup direction="vertical">
               {/* Chart */}
               <ResizablePanel defaultSize={75} minSize={60}>
-                <div className="h-full border-b border-slate-800 bg-black">
+                <div className="h-full border-b border-gray-800 bg-black">
                   <TradingChart pair={selectedPair} />
                 </div>
               </ResizablePanel>
@@ -45,15 +45,15 @@ const TradingInterface = () => {
               
               {/* Order Management */}
               <ResizablePanel defaultSize={25} minSize={20}>
-                <div className="bg-slate-950 h-full">
+                <div className="bg-black h-full">
                   <Tabs defaultValue="positions" className="h-full">
-                    <TabsList className="grid w-full grid-cols-3 bg-slate-900 border-b border-slate-800">
+                    <TabsList className="grid w-full grid-cols-3 bg-gray-900 border-b border-gray-800">
                       <TabsTrigger value="positions" className="text-xs">Positions</TabsTrigger>
                       <TabsTrigger value="orders" className="text-xs">Open Orders</TabsTrigger>
                       <TabsTrigger value="history" className="text-xs">Order History</TabsTrigger>
                     </TabsList>
                     <TabsContent value="positions" className="h-full pt-2 px-4">
-                      <div className="text-slate-400 text-sm">No open positions</div>
+                      <div className="text-gray-400 text-sm">No open positions</div>
                     </TabsContent>
                     <TabsContent value="orders" className="h-full pt-2">
                       <OrderHistory type="active" />
@@ -74,7 +74,7 @@ const TradingInterface = () => {
             <ResizablePanelGroup direction="vertical">
               {/* Order Book */}
               <ResizablePanel defaultSize={60} minSize={40}>
-                <div className="h-full border-b border-slate-800 bg-slate-950">
+                <div className="h-full border-b border-gray-800 bg-black">
                   <OrderBook pair={selectedPair} />
                 </div>
               </ResizablePanel>
@@ -83,7 +83,7 @@ const TradingInterface = () => {
               
               {/* Order Panel */}
               <ResizablePanel defaultSize={40} minSize={30}>
-                <div className="bg-slate-950 h-full">
+                <div className="bg-black h-full">
                   <OrderPanel pair={selectedPair} />
                 </div>
               </ResizablePanel>

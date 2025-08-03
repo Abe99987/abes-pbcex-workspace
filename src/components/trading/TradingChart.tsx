@@ -12,6 +12,7 @@ const timeframes = ["1m", "5m", "15m", "1h", "4h", "1d"];
 
 const TradingChart = ({ pair }: TradingChartProps) => {
   const [selectedTimeframe, setSelectedTimeframe] = useState("1h");
+  const [chartType, setChartType] = useState("candles");
   const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -86,28 +87,48 @@ const TradingChart = ({ pair }: TradingChartProps) => {
           </div>
         </div>
         
-        {/* Chart Controls */}
-        <div className="flex items-center space-x-3">
-          {/* View Toggle */}
-          <div className="flex bg-slate-900 rounded-md p-1">
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-xs px-3 py-1 bg-slate-800 text-white"
-            >
-              Chart
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-xs px-3 py-1 text-slate-400 hover:text-white"
-            >
-              Depth
-            </Button>
-          </div>
-          
-          {/* Timeframe buttons */}
-          <div className="flex bg-slate-900 rounded-md p-1">
+          {/* Chart Controls */}
+          <div className="flex items-center space-x-3">
+            {/* Chart Type Toggle */}
+            <div className="flex bg-gray-900 rounded-md p-1">
+              <Button
+                size="sm"
+                variant={chartType === "candles" ? "default" : "ghost"}
+                onClick={() => setChartType("candles")}
+                className="text-xs px-3 py-1 h-7"
+              >
+                Candles
+              </Button>
+              <Button
+                size="sm"
+                variant={chartType === "line" ? "default" : "ghost"}
+                onClick={() => setChartType("line")}
+                className="text-xs px-3 py-1 h-7"
+              >
+                Line
+              </Button>
+            </div>
+
+            {/* Indicators Toggle */}
+            <div className="flex bg-gray-900 rounded-md p-1">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-xs px-2 py-1 h-7 text-gray-400 hover:text-white"
+              >
+                MA
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-xs px-2 py-1 h-7 text-gray-400 hover:text-white"
+              >
+                RSI
+              </Button>
+            </div>
+            
+            {/* Timeframe buttons */}
+            <div className="flex bg-gray-900 rounded-md p-1">
             {timeframes.map((tf) => (
               <Button
                 key={tf}
@@ -124,10 +145,10 @@ const TradingChart = ({ pair }: TradingChartProps) => {
       </div>
 
       {/* Chart */}
-      <div className="flex-1 p-2 bg-black">
+      <div className="flex-1 bg-black">
         <ChartContainer config={config} className="h-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+            <ComposedChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
               <defs>
                 <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
@@ -138,7 +159,7 @@ const TradingChart = ({ pair }: TradingChartProps) => {
                 dataKey="time" 
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: '#64748b', fontSize: 11 }}
+                tick={{ fill: '#9ca3af', fontSize: 10 }}
                 interval="preserveStartEnd"
               />
               <YAxis 
@@ -146,14 +167,14 @@ const TradingChart = ({ pair }: TradingChartProps) => {
                 orientation="right"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: '#64748b', fontSize: 11 }}
-                width={60}
+                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                width={50}
               />
               
               {/* Grid Lines */}
               <defs>
                 <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                  <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#1e293b" strokeWidth="0.5"/>
+                  <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#374151" strokeWidth="0.5"/>
                 </pattern>
               </defs>
               
@@ -163,66 +184,72 @@ const TradingChart = ({ pair }: TradingChartProps) => {
                     const data = payload[0].payload;
                     const isGreen = data.close > data.open;
                     return (
-                      <div className="bg-black border border-slate-600 rounded-lg p-3 shadow-xl">
-                        <p className="text-slate-300 text-xs mb-2 font-medium">{label}</p>
+                      <div className="bg-black border border-gray-600 rounded-lg p-3 shadow-xl">
+                        <p className="text-gray-300 text-xs mb-2 font-medium">{label}</p>
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           <div>
-                            <span className="text-slate-400">O: </span>
+                            <span className="text-gray-400">O: </span>
                             <span className="text-white font-mono">${data.open}</span>
                           </div>
                           <div>
-                            <span className="text-slate-400">H: </span>
+                            <span className="text-gray-400">H: </span>
                             <span className="text-green-400 font-mono">${data.high}</span>
                           </div>
                           <div>
-                            <span className="text-slate-400">L: </span>
+                            <span className="text-gray-400">L: </span>
                             <span className="text-red-400 font-mono">${data.low}</span>
                           </div>
                           <div>
-                            <span className="text-slate-400">C: </span>
+                            <span className="text-gray-400">C: </span>
                             <span className={`font-mono ${isGreen ? 'text-green-400' : 'text-red-400'}`}>
                               ${data.close}
                             </span>
                           </div>
                         </div>
-                        <div className="mt-2 pt-2 border-t border-slate-700">
-                          <span className="text-slate-400 text-xs">Vol: </span>
-                          <span className="text-slate-300 text-xs font-mono">{data.volume}</span>
+                        <div className="mt-2 pt-2 border-t border-gray-700">
+                          <span className="text-gray-400 text-xs">Vol: </span>
+                          <span className="text-gray-300 text-xs font-mono">{data.volume}</span>
                         </div>
                       </div>
                     );
                   }
                   return null;
                 }}
-                cursor={{ stroke: '#64748b', strokeWidth: 1, strokeDasharray: '3 3' }}
+                cursor={{ stroke: '#9ca3af', strokeWidth: 1, strokeDasharray: '3 3' }}
               />
               
-              {/* Render custom candlesticks */}
-              {chartData.map((entry, index) => {
-                if (!entry) return null;
-                const x = index * (100 / chartData.length);
-                return (
-                  <Candlestick 
-                    key={index} 
-                    payload={entry} 
-                    x={x} 
-                    y={0} 
-                    width={5} 
-                    height={100} 
-                  />
-                );
-              })}
+              {/* Render based on chart type */}
+              {chartType === "candles" ? (
+                // Custom candlestick rendering
+                chartData.map((entry, index) => {
+                  if (!entry) return null;
+                  const chartWidth = 100; // percentage width
+                  const x = (index / chartData.length) * chartWidth;
+                  const width = chartWidth / chartData.length * 0.8;
+                  return (
+                    <Candlestick 
+                      key={index} 
+                      payload={entry} 
+                      x={x} 
+                      y={0} 
+                      width={width} 
+                      height={100} 
+                    />
+                  );
+                })
+              ) : (
+                // Line chart for line mode
+                <Line
+                  type="monotone"
+                  dataKey="close"
+                  stroke="#10b981"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 4, fill: '#10b981', stroke: '#000', strokeWidth: 2 }}
+                  fill="url(#priceGradient)"
+                />
+              )}
               
-              {/* Price line for current value */}
-              <Line
-                type="monotone"
-                dataKey="close"
-                stroke="#10b981"
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, fill: '#10b981', stroke: '#000', strokeWidth: 2 }}
-                fill="url(#priceGradient)"
-              />
             </ComposedChart>
           </ResponsiveContainer>
         </ChartContainer>

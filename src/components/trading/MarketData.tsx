@@ -68,24 +68,24 @@ const MarketData = ({ selectedPair, onSelectPair }: MarketDataProps) => {
   };
 
   return (
-    <div className="h-full bg-slate-950 flex flex-col">
+    <div className="h-full bg-black flex flex-col">
       {/* Header */}
-      <div className="p-3 border-b border-slate-800">
+      <div className="p-3 border-b border-gray-800">
         <h3 className="text-sm font-semibold text-white mb-3">Markets</h3>
         <Input
           type="text"
           placeholder="Search markets..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="bg-slate-900 border-slate-700 text-white placeholder-slate-400 text-sm h-8"
+          className="bg-gray-900 border-gray-700 text-white placeholder-gray-400 text-sm h-8"
         />
         
         {/* Filter Tabs */}
         <div className="flex mt-3 space-x-1">
-          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 bg-slate-800 text-white">All</Button>
-          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-slate-400">★</Button>
-          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-slate-400">Gold</Button>
-          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-slate-400">Oil</Button>
+          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 bg-gray-800 text-white">All</Button>
+          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-gray-400">★</Button>
+          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-gray-400">Gold</Button>
+          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-gray-400">Oil</Button>
         </div>
       </div>
 
@@ -95,8 +95,8 @@ const MarketData = ({ selectedPair, onSelectPair }: MarketDataProps) => {
           <div
             key={market.pair}
             onClick={() => onSelectPair(market.pair)}
-            className={`p-3 border-b border-slate-800 cursor-pointer hover:bg-slate-900/50 transition-colors ${
-              selectedPair === market.pair ? 'bg-slate-900 border-l-2 border-l-gold' : ''
+            className={`p-3 border-b border-gray-800 cursor-pointer hover:bg-gray-900/50 transition-colors ${
+              selectedPair === market.pair ? 'bg-gray-900 border-l-2 border-l-gold' : ''
             }`}
           >
             <div className="flex items-center justify-between mb-1">
@@ -115,7 +115,7 @@ const MarketData = ({ selectedPair, onSelectPair }: MarketDataProps) => {
                     className={`w-3 h-3 ${
                       favorites.includes(market.pair) 
                         ? 'fill-yellow-400 text-yellow-400' 
-                        : 'text-slate-500 hover:text-slate-300'
+                        : 'text-gray-500 hover:text-gray-300'
                     }`} 
                   />
                 </Button>
@@ -131,10 +131,10 @@ const MarketData = ({ selectedPair, onSelectPair }: MarketDataProps) => {
             
             <div className="flex justify-between items-center">
               <span className="text-white font-mono text-sm">${market.price.toFixed(2)}</span>
-              <span className="text-slate-400 text-xs">Vol: {market.volume}</span>
+              <span className="text-gray-400 text-xs">Vol: {market.volume}</span>
             </div>
             
-            <div className="flex justify-between items-center text-xs text-slate-500 mt-1">
+            <div className="flex justify-between items-center text-xs text-gray-500 mt-1">
               <span>H: ${market.high24h.toFixed(2)}</span>
               <span>L: ${market.low24h.toFixed(2)}</span>
             </div>

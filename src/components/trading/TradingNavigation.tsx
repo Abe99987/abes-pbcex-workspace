@@ -65,7 +65,7 @@ const TradingNavigation = () => {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-4">
+    <nav className="sticky top-0 z-50 h-14 bg-black border-b border-gray-800 flex items-center justify-between px-4">
       {/* Left - Logo */}
       <div className="flex items-center space-x-2">
         <button 
@@ -86,7 +86,7 @@ const TradingNavigation = () => {
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="ghost" 
-                className="h-9 px-3 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                className="h-9 px-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
               >
                 <menu.icon className="w-4 h-4 mr-2" />
                 {menu.label}
@@ -94,16 +94,16 @@ const TradingNavigation = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
-              className="w-48 bg-slate-900 border-slate-700 text-slate-100"
+              className="w-48 bg-gray-900 border-gray-700 text-gray-100"
               align="center"
             >
               {menu.items.map((item, index) => (
                 <div key={item}>
-                  <DropdownMenuItem className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">
+                  <DropdownMenuItem className="hover:bg-gray-800 focus:bg-gray-800 cursor-pointer">
                     {item}
                   </DropdownMenuItem>
                   {index < menu.items.length - 1 && menu.label === "Wallet" && index === 1 && (
-                    <DropdownMenuSeparator className="bg-slate-700" />
+                    <DropdownMenuSeparator className="bg-gray-700" />
                   )}
                 </div>
               ))}
@@ -123,28 +123,28 @@ const TradingNavigation = () => {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white">
+            <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">
               <Globe className="w-4 h-4 mr-1" />
               {selectedLanguage}
               <ChevronDown className="w-3 h-3 ml-1" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-slate-900 border-slate-700 text-slate-100">
+          <DropdownMenuContent className="bg-gray-900 border-gray-700 text-gray-100">
             <DropdownMenuItem 
               onClick={() => setSelectedLanguage("EN")}
-              className="hover:bg-slate-800 cursor-pointer"
+              className="hover:bg-gray-800 cursor-pointer"
             >
               English
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={() => setSelectedLanguage("AR")}
-              className="hover:bg-slate-800 cursor-pointer"
+              className="hover:bg-gray-800 cursor-pointer"
             >
               العربية
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={() => setSelectedLanguage("FR")}
-              className="hover:bg-slate-800 cursor-pointer"
+              className="hover:bg-gray-800 cursor-pointer"
             >
               Français
             </DropdownMenuItem>
@@ -155,23 +155,23 @@ const TradingNavigation = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="p-2">
               <Avatar className="w-6 h-6">
-                <AvatarFallback className="bg-slate-700 text-slate-300 text-xs">
+                <AvatarFallback className="bg-gray-700 text-gray-300 text-xs">
                   <User className="w-3 h-3" />
                 </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48 bg-slate-900 border-slate-700 text-slate-100" align="end">
-            <DropdownMenuItem className="hover:bg-slate-800 cursor-pointer">
+          <DropdownMenuContent className="w-48 bg-gray-900 border-gray-700 text-gray-100" align="end">
+            <DropdownMenuItem className="hover:bg-gray-800 cursor-pointer">
               <User className="w-4 h-4 mr-2" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem className="hover:bg-slate-800 cursor-pointer">
+            <DropdownMenuItem className="hover:bg-gray-800 cursor-pointer">
               <Shield className="w-4 h-4 mr-2" />
               Security
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-slate-700" />
-            <DropdownMenuItem className="hover:bg-slate-800 cursor-pointer text-red-400">
+            <DropdownMenuSeparator className="bg-gray-700" />
+            <DropdownMenuItem className="hover:bg-gray-800 cursor-pointer text-red-400">
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
