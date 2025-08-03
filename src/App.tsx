@@ -9,6 +9,7 @@ import Franchise from "./pages/Franchise";
 import Education from "./pages/Education";
 import MyAssets from "./pages/MyAssets";
 import Realize from "./pages/Realize";
+import PnL from "./pages/PnL";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/education" element={<Education />} />
           <Route path="/my-assets" element={<MyAssets />} />
           <Route path="/realize" element={<Realize />} />
+          <Route path="/pnl" element={<PnL />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -78,7 +78,11 @@ const Navigation = () => {
         },
         { label: "Transaction History" },
         { label: "Order History" },
-        { label: "PnL", description: "Profit and Loss" }
+        { 
+          label: "PnL", 
+          description: "Profit and Loss",
+          onClick: () => navigate('/pnl')
+        }
       ]
     },
     {
