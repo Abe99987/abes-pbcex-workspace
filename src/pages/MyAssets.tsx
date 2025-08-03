@@ -19,6 +19,7 @@ import {
 import BuyAssetModal from "@/components/BuyAssetModal";
 import RealizeAssetModal from "@/components/RealizeAssetModal";
 import BorrowingModal from "@/components/BorrowingModal";
+import Navigation from "@/components/Navigation";
 
 const MyAssets = () => {
   const [buyModalOpen, setBuyModalOpen] = useState(false);
@@ -138,6 +139,7 @@ const MyAssets = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navigation />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">

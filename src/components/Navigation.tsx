@@ -60,8 +60,8 @@ const Navigation = () => {
       items: [
         { label: "Spot Trading", href: "/trading" },
         { label: "Copy Trading" },
-        { label: "DCA", description: "Dollar Cost Average Strategies" },
         { label: "Margin Trading", description: "Coming Soon" },
+        { label: "DCA", description: "Dollar Cost Average Strategies" },
         { label: "Trade Analytics" },
         { label: "Market Reports" },
         { label: "News" }
@@ -82,26 +82,13 @@ const Navigation = () => {
       ]
     },
     {
-      label: "Realize",
-      icon: Package,
-      items: [
-        { label: "Receive Gold", icon: Coins },
-        { label: "Receive Silver", icon: Coins },
-        { label: "Receive Platinum", icon: Coins },
-        { label: "Receive Palladium", icon: Coins },
-        { label: "Receive Copper", icon: Coins },
-        { label: "Oil Fulfillment", icon: Truck },
-        { label: "Global Delivery", description: "Send or receive assets anywhere FedEx delivers", icon: MapPin }
-      ]
-    },
-    {
       label: "Send/Pay",
       icon: Send,
       items: [
-        { label: "Send Money" },
-        { label: "QR Payments" },
-        { label: "Bill Pay" },
-        { label: "International Transfer" }
+        { label: "Internal Transfers" },
+        { label: "QR Code Payments" },
+        { label: "Spend with Visa" },
+        { label: "Remittances" }
       ]
     },
     {
@@ -116,23 +103,11 @@ const Navigation = () => {
     },
     {
       label: "Security",
-      icon: Shield,
-      items: [
-        { label: "2FA Settings" },
-        { label: "Security Logs" },
-        { label: "Backup & Recovery" },
-        { label: "API Keys" }
-      ]
+      icon: Shield
     },
     {
       label: "Help",
-      icon: HelpCircle,
-      items: [
-        { label: "Support Center" },
-        { label: "Live Chat" },
-        { label: "Documentation" },
-        { label: "Contact Us" }
-      ]
+      icon: HelpCircle
     }
   ];
 
