@@ -42,7 +42,7 @@ const Navigation = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("EN");
   
   // Check if we're on trading page for theme adaptation
-  const isTrading = location.pathname === '/trading';
+  const isTrading = location.pathname === '/trading' || location.pathname === '/coin-trading';
 
   const menuItems = [
     {
@@ -59,6 +59,7 @@ const Navigation = () => {
       icon: CandlestickChart,
       items: [
         { label: "Spot Trading", href: "/trading" },
+        { label: "Coin Trading", href: "/coin-trading" },
         { label: "Copy Trading" },
         { label: "Margin Trading", description: "Coming Soon" },
         { label: "DCA", description: "Dollar Cost Average Strategies" },
@@ -131,6 +132,8 @@ const Navigation = () => {
       navigate("/trading");
     } else if (item?.label === "Spot Trading") {
       navigate("/trading");
+    } else if (item?.label === "Coin Trading") {
+      navigate("/coin-trading");
     }
     // Add other navigation logic as needed
   };

@@ -9,9 +9,10 @@ import ScaleOrderModal from "./ScaleOrderModal";
 
 interface OrderPanelProps {
   pair: string;
+  settlementAsset?: string;
 }
 
-const OrderPanel = ({ pair }: OrderPanelProps) => {
+const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
   const [orderType, setOrderType] = useState("limit");
   const [price, setPrice] = useState("");
   const [amount, setAmount] = useState("");
