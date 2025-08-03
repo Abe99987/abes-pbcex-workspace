@@ -89,8 +89,8 @@ const AssetPricing = () => {
                   <p className="text-sm text-muted-foreground">{asset.description}</p>
                 </div>
 
-                {/* Action Buttons - Only show for Gold and Silver */}
-                {(asset.symbol === "AU" || asset.symbol === "AG") && (
+                {/* Action Buttons - Show for all assets except generic ones */}
+                {["AU", "AG", "LYD", "OIL"].includes(asset.symbol) && (
                   <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 md:opacity-100 transition-opacity duration-300">
                     <TooltipProvider>
                       <Tooltip>
@@ -109,7 +109,11 @@ const AssetPricing = () => {
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Purchase tokenized {asset.name.split(' ')[0].toLowerCase()} at real-time market price</p>
+                          <p>
+                            {asset.symbol === "LYD" ? "Buy tokenized Libyan Dinar" : 
+                             asset.symbol === "OIL" ? "Buy tokenized oil contracts" :
+                             `Purchase tokenized ${asset.name.split(' ')[0].toLowerCase()} at real-time market price`}
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -131,7 +135,11 @@ const AssetPricing = () => {
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Physically redeem your digital {asset.name.split(' ')[0].toLowerCase()} balance</p>
+                          <p>
+                            {asset.symbol === "LYD" ? "Realize into LYD cash or bank transfer" :
+                             asset.symbol === "OIL" ? "Sell back or request physical delivery" :
+                             `Physically redeem your digital ${asset.name.split(' ')[0].toLowerCase()} balance`}
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
