@@ -1,64 +1,311 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Wallet, Shield, Globe, TrendingUp } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { 
+  Menu, 
+  ChevronDown, 
+  User, 
+  Globe, 
+  Wallet, 
+  TrendingUp, 
+  Shield, 
+  HelpCircle, 
+  Home, 
+  Send, 
+  Building2, 
+  BookOpen 
+} from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Navigation = () => {
-  const navItems = [
-    { label: "Assets", href: "#assets", icon: TrendingUp },
-    { label: "Trading", href: "/trading", icon: TrendingUp },
-    { label: "Wallet", href: "#wallet", icon: Wallet },
-    { label: "Security", href: "#security", icon: Shield },
-    { label: "Global", href: "#global", icon: Globe },
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [selectedLanguage, setSelectedLanguage] = useState("EN");
+  
+  // Check if we're on trading page for theme adaptation
+  const isTrading = location.pathname === '/trading';
+
+  const menuItems = [
+    {
+      label: "Markets",
+      icon: TrendingUp,
+      items: ["Gold/USD", "Silver/USD", "Oil/USD", "LYD/USD", "All Markets"]
+    },
+    {
+      label: "Trade",
+      icon: TrendingUp,
+      items: ["Spot Trading", "Copy Trading", "Order History", "Trading Analytics"],
+      href: "/trading"
+    },
+    {
+      label: "Wallet",
+      icon: Wallet,
+      items: ["Balances", "Freeze/Unfreeze", "Transaction History", "Security Settings"]
+    },
+    {
+      label: "Send/Pay",
+      icon: Send,
+      items: ["Send Assets", "Request Payment", "Payment Links", "Transaction Fees"]
+    },
+    {
+      label: "Realize",
+      icon: Home,
+      items: ["Physical Gold", "Physical Silver", "Cash Pickup", "Bank Transfer"]
+    },
+    {
+      label: "Franchise",
+      icon: Building2,
+      items: ["Open Branch", "Partner Program", "Requirements", "Support"]
+    },
+    {
+      label: "Education",
+      icon: BookOpen,
+      items: ["Trading Basics", "Asset Backing", "Risk Management", "Video Tutorials"]
+    },
+    {
+      label: "Security",
+      icon: Shield,
+      items: ["2FA Settings", "API Keys", "Login History", "Security Tips"]
+    },
+    {
+      label: "Help",
+      icon: HelpCircle,
+      items: ["Support Center", "Live Chat", "FAQ", "Contact Us"]
+    }
   ];
 
+  const handleMenuClick = (menu: any, item?: string) => {
+    if (menu.href) {
+      navigate(menu.href);
+    } else if (menu.label === "Markets" && !item) {
+      // Default markets action
+      navigate("/trading");
+    }
+    // Add other navigation logic as needed
+  };
+
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className={`sticky top-0 z-50 w-full border-b ${
+      isTrading 
+        ? 'bg-black border-gray-800' 
+        : 'border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'
+    }`}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-gold to-gold-light flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">PB</span>
+        {/* Left - Logo */}
+        <button 
+          onClick={() => navigate("/")}
+          className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+        >
+          <div className={`h-8 w-8 rounded-lg bg-gradient-to-br from-gold to-gold-light flex items-center justify-center`}>
+            <span className={`${isTrading ? 'text-black' : 'text-primary-foreground'} font-bold text-sm`}>PB</span>
           </div>
-          <span className="text-xl font-bold text-foreground">PBCex</span>
+          <span className={`text-xl font-bold ${isTrading ? 'text-white' : 'text-foreground'}`}>PBCex</span>
+        </button>
+
+        {/* Desktop Navigation - Center Menu */}
+        <div className="hidden lg:flex items-center space-x-1">
+          {menuItems.map((menu) => (
+            <DropdownMenu key={menu.label}>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className={`h-9 px-3 transition-colors ${
+                    isTrading 
+                      ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`}
+                  onClick={() => menu.href && handleMenuClick(menu)}
+                >
+                  <menu.icon className="w-4 h-4 mr-2" />
+                  {menu.label}
+                  <ChevronDown className="w-3 h-3 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                className={`w-48 z-50 ${
+                  isTrading 
+                    ? 'bg-gray-900 border-gray-700 text-gray-100' 
+                    : 'bg-background border-border text-foreground'
+                }`}
+                align="center"
+              >
+                {menu.items.map((item, index) => (
+                  <div key={item}>
+                    <DropdownMenuItem 
+                      className={`cursor-pointer ${
+                        isTrading 
+                          ? 'hover:bg-gray-800 focus:bg-gray-800' 
+                          : 'hover:bg-accent focus:bg-accent'
+                      }`}
+                      onClick={() => handleMenuClick(menu, item)}
+                    >
+                      {item}
+                    </DropdownMenuItem>
+                    {index < menu.items.length - 1 && menu.label === "Wallet" && index === 1 && (
+                      <DropdownMenuSeparator className={isTrading ? 'bg-gray-700' : 'bg-border'} />
+                    )}
+                  </div>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ))}
         </div>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
-          {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className="text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center space-x-2"
-            >
-              <item.icon className="h-4 w-4" />
-              <span>{item.label}</span>
-            </a>
-          ))}
-          <Button variant="gold" size="sm">
-            Get Started
+        {/* Right - Actions */}
+        <div className="hidden md:flex items-center space-x-3">
+          <Button
+            size="sm"
+            className={`${
+              isTrading 
+                ? 'bg-green-600 hover:bg-green-700 text-white' 
+                : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+            }`}
+          >
+            Deposit
           </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className={`${
+                  isTrading 
+                    ? 'text-gray-300 hover:text-white' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Globe className="w-4 h-4 mr-1" />
+                {selectedLanguage}
+                <ChevronDown className="w-3 h-3 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className={`z-50 ${
+              isTrading 
+                ? 'bg-gray-900 border-gray-700 text-gray-100' 
+                : 'bg-background border-border text-foreground'
+            }`}>
+              <DropdownMenuItem 
+                onClick={() => setSelectedLanguage("EN")}
+                className={`cursor-pointer ${
+                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+                }`}
+              >
+                English
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSelectedLanguage("AR")}
+                className={`cursor-pointer ${
+                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+                }`}
+              >
+                العربية
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSelectedLanguage("FR")}
+                className={`cursor-pointer ${
+                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+                }`}
+              >
+                Français
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="p-2">
+                <Avatar className="w-6 h-6">
+                  <AvatarFallback className={`${
+                    isTrading 
+                      ? 'bg-gray-700 text-gray-300' 
+                      : 'bg-muted text-muted-foreground'
+                  } text-xs`}>
+                    <User className="w-3 h-3" />
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className={`w-48 z-50 ${
+              isTrading 
+                ? 'bg-gray-900 border-gray-700 text-gray-100' 
+                : 'bg-background border-border text-foreground'
+            }`} align="end">
+              <DropdownMenuItem className={`cursor-pointer ${
+                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+              }`}>
+                <User className="w-4 h-4 mr-2" />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem className={`cursor-pointer ${
+                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+              }`}>
+                <Shield className="w-4 h-4 mr-2" />
+                Security
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className={isTrading ? 'bg-gray-700' : 'bg-border'} />
+              <DropdownMenuItem className={`cursor-pointer text-red-400 ${
+                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+              }`}>
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Mobile Navigation */}
         <Sheet>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon">
-              <Menu className="h-5 w-5" />
+              <Menu className={`h-5 w-5 ${isTrading ? 'text-white' : 'text-foreground'}`} />
             </Button>
           </SheetTrigger>
-          <SheetContent>
+          <SheetContent className={isTrading ? 'bg-gray-900 border-gray-700' : ''}>
             <div className="flex flex-col space-y-4 mt-8">
-              {navItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="text-foreground hover:text-primary transition-colors duration-200 flex items-center space-x-3 p-2"
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span>{item.label}</span>
-                </a>
+              {menuItems.map((menu) => (
+                <div key={menu.label} className="space-y-2">
+                  <button
+                    onClick={() => handleMenuClick(menu)}
+                    className={`w-full text-left transition-colors duration-200 flex items-center space-x-3 p-2 ${
+                      isTrading 
+                        ? 'text-gray-300 hover:text-white' 
+                        : 'text-foreground hover:text-primary'
+                    }`}
+                  >
+                    <menu.icon className="h-5 w-5" />
+                    <span>{menu.label}</span>
+                  </button>
+                  {menu.items.map((item) => (
+                    <button
+                      key={item}
+                      onClick={() => handleMenuClick(menu, item)}
+                      className={`w-full text-left text-sm pl-10 py-1 transition-colors ${
+                        isTrading 
+                          ? 'text-gray-400 hover:text-gray-200' 
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
               ))}
-              <Button variant="gold" className="mt-4">
-                Get Started
+              <Button 
+                className={`mt-4 ${
+                  isTrading 
+                    ? 'bg-green-600 hover:bg-green-700' 
+                    : 'bg-primary hover:bg-primary/90'
+                }`}
+              >
+                Deposit
               </Button>
             </div>
           </SheetContent>

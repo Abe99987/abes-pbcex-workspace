@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import TradingNavigation from "./TradingNavigation";
+
 import TradingChart from "./TradingChart";
 import OrderBook from "./OrderBook";
 import OrderPanel from "./OrderPanel";
@@ -15,8 +15,6 @@ const TradingInterface = () => {
 
   return (
     <div className="h-screen bg-black text-white overflow-hidden flex flex-col">
-      <TradingNavigation />
-      
       <div className="flex-1 flex flex-col">
         <ResizablePanelGroup direction="horizontal" className="flex-1">
           {/* Left Panel - Market Data */}
