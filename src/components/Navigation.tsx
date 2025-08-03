@@ -60,6 +60,7 @@ const Navigation = () => {
       items: [
         { label: "Spot Trading", href: "/trading" },
         { label: "Copy Trading" },
+        { label: "DCA", description: "Dollar Cost Average Strategies" },
         { label: "Margin Trading", description: "Coming Soon" },
         { label: "Trade Analytics" },
         { label: "Market Reports" },
@@ -94,6 +95,16 @@ const Navigation = () => {
       ]
     },
     {
+      label: "Send/Pay",
+      icon: Send,
+      items: [
+        { label: "Send Money" },
+        { label: "QR Payments" },
+        { label: "Bill Pay" },
+        { label: "International Transfer" }
+      ]
+    },
+    {
       label: "Franchise",
       href: "/franchise",
       icon: Building2
@@ -102,6 +113,26 @@ const Navigation = () => {
       label: "Education",
       href: "/education",
       icon: BookOpen
+    },
+    {
+      label: "Security",
+      icon: Shield,
+      items: [
+        { label: "2FA Settings" },
+        { label: "Security Logs" },
+        { label: "Backup & Recovery" },
+        { label: "API Keys" }
+      ]
+    },
+    {
+      label: "Help",
+      icon: HelpCircle,
+      items: [
+        { label: "Support Center" },
+        { label: "Live Chat" },
+        { label: "Documentation" },
+        { label: "Contact Us" }
+      ]
     }
   ];
 
