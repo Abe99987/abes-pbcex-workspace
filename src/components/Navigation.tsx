@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import DepositModal from "@/components/modals/DepositModal";
 import WalletConnectModal from "@/components/modals/WalletConnectModal";
 import { 
@@ -34,7 +35,16 @@ import {
   Receipt,
   Package,
   Truck,
-  MapPin
+  MapPin,
+  Settings,
+  LogOut,
+  CreditCard,
+  Users,
+  Gift,
+  Target,
+  Code,
+  Badge as BadgeIcon,
+  Crown
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -316,7 +326,7 @@ const Navigation = () => {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className={`w-48 z-50 ${
+            <DropdownMenuContent className={`w-52 z-50 ${
               isTrading 
                 ? 'bg-gray-900 border-gray-700 text-gray-100' 
                 : 'bg-background border-border text-foreground'
@@ -324,20 +334,64 @@ const Navigation = () => {
               <DropdownMenuItem className={`cursor-pointer ${
                 isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
               }`}>
-                <User className="w-4 h-4 mr-2" />
-                Profile
+                <Shield className="w-4 h-4 mr-3" />
+                Account & Security
               </DropdownMenuItem>
               <DropdownMenuItem className={`cursor-pointer ${
                 isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
               }`}>
-                <Shield className="w-4 h-4 mr-2" />
-                Security
+                <BadgeIcon className="w-4 h-4 mr-3" />
+                Identification
+              </DropdownMenuItem>
+              <DropdownMenuItem className={`cursor-pointer ${
+                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+              }`}>
+                <Gift className="w-4 h-4 mr-3" />
+                My Coupons
+              </DropdownMenuItem>
+              <DropdownMenuItem className={`cursor-pointer ${
+                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+              }`}>
+                <Users className="w-4 h-4 mr-3" />
+                Affiliate
+              </DropdownMenuItem>
+              <DropdownMenuItem className={`cursor-pointer ${
+                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+              }`}>
+                <CreditCard className="w-4 h-4 mr-3" />
+                Trading Fees
+              </DropdownMenuItem>
+              <DropdownMenuItem className={`cursor-pointer ${
+                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+              }`}>
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center">
+                    <Crown className="w-4 h-4 mr-3" />
+                    Sub-Account
+                  </div>
+                  <Badge variant="secondary" className="text-xs">
+                    Beta
+                  </Badge>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem className={`cursor-pointer ${
+                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+              }`}>
+                <Code className="w-4 h-4 mr-3" />
+                API
               </DropdownMenuItem>
               <DropdownMenuSeparator className={isTrading ? 'bg-gray-700' : 'bg-border'} />
+              <DropdownMenuItem className={`cursor-pointer ${
+                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+              }`}>
+                <Settings className="w-4 h-4 mr-3" />
+                Settings
+              </DropdownMenuItem>
               <DropdownMenuItem className={`cursor-pointer text-red-400 ${
                 isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
               }`}>
-                Logout
+                <LogOut className="w-4 h-4 mr-3" />
+                Log Out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
