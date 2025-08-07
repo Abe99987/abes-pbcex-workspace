@@ -22,92 +22,83 @@ const Education = () => {
     {
       id: 1,
       title: "So You Want to Start Trading?",
-      subtitle: "What to Buy, How to Buy It",
+      subtitle: "What is value, how is it established, and what is overvalued.",
       description: "Complete beginner's guide to getting started with trading and investments",
       icon: TrendingUp,
-      duration: "25 min",
+      duration: "17 min",
       difficulty: "Beginner"
     },
     {
       id: 2,
-      title: "Value vs Overvalued Assets",
-      subtitle: "Shopping Sales",
-      description: "Learn to identify undervalued opportunities and avoid market bubbles",
+      title: "How to Use an Exchange",
+      subtitle: "Learn deposits, order types, and spot vs. leverage.",
+      description: "Navigate trading platforms and understand different order mechanisms",
       icon: DollarSign,
-      duration: "18 min",
+      duration: "9 min",
       difficulty: "Beginner"
     },
     {
       id: 3,
-      title: "Store of Value vs Utility Value",
-      subtitle: "DefiLlama & Expenses",
-      description: "Understanding different asset classes and their fundamental purposes",
-      icon: Shield,
-      duration: "22 min",
+      title: "Intro to TradingView",
+      subtitle: "How to use TradingView and read exchange charts.",
+      description: "Master the most popular charting platform used by professionals",
+      icon: Activity,
+      duration: "12 min",
       difficulty: "Intermediate"
     },
     {
       id: 4,
-      title: "Picking Coins with CoinGecko",
-      subtitle: "Categories",
-      description: "Navigate cryptocurrency markets using professional research tools",
+      title: "Market Structure & Candles",
+      subtitle: "Learn wicks, trends, BOS/CHoCH, and ranges.",
+      description: "Technical analysis fundamentals and price action interpretation",
       icon: BarChart3,
-      duration: "15 min",
-      difficulty: "Beginner"
+      duration: "23 min",
+      difficulty: "Intermediate"
     },
     {
       id: 5,
-      title: "Pragmatic Investing",
-      subtitle: "Spray n Pray + Top Movers",
-      description: "Diversification strategies and momentum trading fundamentals",
+      title: "Indicators & Fibs",
+      subtitle: "Build your chart with Fibs, RSI, MACD, and more.",
+      description: "Advanced technical indicators and Fibonacci analysis tools",
       icon: Target,
-      duration: "30 min",
+      duration: "27 min",
       difficulty: "Intermediate"
     },
     {
       id: 6,
-      title: "Onboarding Money",
-      subtitle: "CEX, DEX, Hot Wallets, Cold Wallets",
-      description: "Secure methods for funding your trading accounts and storing assets",
-      icon: Wallet,
-      duration: "28 min",
-      difficulty: "Beginner"
+      title: "Risk Management",
+      subtitle: "Stop loss, risk/reward, and laddered entries.",
+      description: "Essential risk management strategies for successful trading",
+      icon: Shield,
+      duration: "12 min",
+      difficulty: "Intermediate"
     },
     {
       id: 7,
-      title: "Intro to TradingView & Naked Charts",
-      subtitle: "",
-      description: "Master the most popular charting platform used by professionals",
-      icon: Activity,
-      duration: "35 min",
-      difficulty: "Intermediate"
+      title: "Trading Checklist",
+      subtitle: "Follow rules, probabilities, and test your trades.",
+      description: "Systematic approach to trade evaluation and execution",
+      icon: BookOpen,
+      duration: "22 min",
+      difficulty: "Advanced"
     },
     {
       id: 8,
-      title: "Candles & Market Structure",
-      subtitle: "BOS, CHoCH, Trends",
-      description: "Technical analysis fundamentals and price action interpretation",
-      icon: BarChart3,
-      duration: "40 min",
-      difficulty: "Intermediate"
+      title: "Portfolio Management",
+      subtitle: "Structure your risk, balance, and profit-taking.",
+      description: "Advanced portfolio construction and profit optimization strategies",
+      icon: PieChart,
+      duration: "14 min",
+      difficulty: "Advanced"
     },
     {
       id: 9,
-      title: "Portfolio Management + Taking Profits",
-      subtitle: "",
-      description: "Risk management and systematic profit-taking strategies",
-      icon: PieChart,
-      duration: "32 min",
-      difficulty: "Advanced"
-    },
-    {
-      id: 10,
-      title: "Orders, R:R, Stop Loss, Scaling Orders",
-      subtitle: "",
-      description: "Advanced order types and risk/reward optimization techniques",
+      title: "Pay Your Taxes",
+      subtitle: "Export reports and stay compliant.",
+      description: "Tax reporting requirements and compliance for traders",
       icon: Calculator,
-      duration: "45 min",
-      difficulty: "Advanced"
+      duration: "3 min",
+      difficulty: "Beginner"
     }
   ];
 
@@ -141,7 +132,7 @@ const Education = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center text-muted-foreground">
               <div className="flex items-center">
                 <Play className="w-5 h-5 mr-2" />
-                <span>10 comprehensive courses</span>
+                <span>9 comprehensive courses</span>
               </div>
               <div className="flex items-center">
                 <Target className="w-5 h-5 mr-2" />
