@@ -261,7 +261,7 @@ const MyAssets = () => {
 
                       {/* Action Buttons */}
                       <div className="lg:col-span-3">
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                           <Button size="sm" variant="outline" onClick={() => { setSelectedAsset(asset); setBuyModalOpen(true); }}>
                             <ShoppingCart className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Buy</span>
@@ -270,7 +270,7 @@ const MyAssets = () => {
                             <Package className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Sell</span>
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
+                          <Button size="sm" variant="premium" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
                             <Package className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Realize</span>
                           </Button>
@@ -279,7 +279,7 @@ const MyAssets = () => {
                             <span className="hidden lg:inline">Send</span>
                           </Button>
                         </div>
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
                           <Button size="sm" variant="outline">
                             <CreditCard className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Spend</span>
@@ -355,7 +355,7 @@ const MyAssets = () => {
 
                       {/* Action Buttons */}
                       <div className="lg:col-span-3">
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                           <Button size="sm" variant="outline" onClick={() => { setSelectedAsset(asset); setBuyModalOpen(true); }}>
                             <ShoppingCart className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Buy</span>
@@ -364,7 +364,7 @@ const MyAssets = () => {
                             <Package className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Sell</span>
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
+                          <Button size="sm" variant="premium" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
                             <Package className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Realize</span>
                           </Button>
@@ -373,7 +373,7 @@ const MyAssets = () => {
                             <span className="hidden lg:inline">Send</span>
                           </Button>
                         </div>
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
                           <Button size="sm" variant="outline">
                             <CreditCard className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Spend</span>
@@ -449,7 +449,7 @@ const MyAssets = () => {
 
                       {/* Action Buttons */}
                       <div className="lg:col-span-3">
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                           <Button size="sm" variant="outline" onClick={() => { setSelectedAsset(asset); setBuyModalOpen(true); }}>
                             <ShoppingCart className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Buy</span>
@@ -458,7 +458,7 @@ const MyAssets = () => {
                             <Package className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Sell</span>
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
+                          <Button size="sm" variant="premium" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
                             <Package className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Realize</span>
                           </Button>
@@ -467,7 +467,7 @@ const MyAssets = () => {
                             <span className="hidden lg:inline">Send</span>
                           </Button>
                         </div>
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
                           <Button size="sm" variant="outline">
                             <CreditCard className="w-3 h-3 lg:mr-1" />
                             <span className="hidden lg:inline">Spend</span>
