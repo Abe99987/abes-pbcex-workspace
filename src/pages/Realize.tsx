@@ -40,7 +40,8 @@ const Realize = () => {
       icon: "🥇",
       description: "Per Troy Ounce",
       isLive: true,
-      minimumOrder: null
+      minimumOrder: "1 gram",
+      deliveryInfo: "3–5 business days (domestic), 7–14 business days (international). Fully insured and tracked by FedEx."
     },
     {
       name: "Silver (XAG)",
@@ -51,7 +52,8 @@ const Realize = () => {
       icon: "🥈",
       description: "Per Troy Ounce",
       isLive: true,
-      minimumOrder: null
+      minimumOrder: "1 gram",
+      deliveryInfo: "3–5 business days (domestic), 7–14 business days (international). Fully insured and tracked by FedEx."
     },
     {
       name: "Platinum (XPT)",
@@ -62,7 +64,8 @@ const Realize = () => {
       icon: "⚪",
       description: "Per Troy Ounce",
       isLive: true,
-      minimumOrder: null
+      minimumOrder: "1 gram",
+      deliveryInfo: "3–5 business days (domestic), 7–14 business days (international). Fully insured and tracked by FedEx."
     },
     {
       name: "Palladium (XPD)",
@@ -73,7 +76,8 @@ const Realize = () => {
       icon: "⚫",
       description: "Per Troy Ounce",
       isLive: true,
-      minimumOrder: null
+      minimumOrder: "1 gram",
+      deliveryInfo: "3–5 business days (domestic), 7–14 business days (international). Fully insured and tracked by FedEx."
     },
     {
       name: "Copper (XCU)",
@@ -84,10 +88,11 @@ const Realize = () => {
       icon: "🟤",
       description: "Per Metric Ton",
       isLive: true,
-      minimumOrder: "10 Metric Tons"
+      minimumOrder: "1 ton",
+      deliveryInfo: "3–5 weeks. Fully insured and tracked by MRST Shipping."
     },
     {
-      name: "Oil Fulfillment",
+      name: "Crude Oil",
       symbol: "OIL",
       price: "$76.45",
       change: "+1.8%",
@@ -95,7 +100,8 @@ const Realize = () => {
       icon: "🛢️",
       description: "Per Barrel",
       isLive: true,
-      minimumOrder: "500 Barrels"
+      minimumOrder: "500,000 barrels",
+      deliveryInfo: "3–5 weeks. Fully insured and tracked by MRST Shipping."
     }
   ];
 
@@ -113,7 +119,7 @@ const Realize = () => {
             Buy Physical Assets
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            Purchase and receive physical delivery of precious metals and commodities. All shipments are insured and tracked by FedEx.
+            Purchase and receive physical delivery of precious metals and commodities. All shipments are insured and tracked by FedEx or MRST.
           </p>
         </div>
 
@@ -213,14 +219,14 @@ const Realize = () => {
                           <TooltipTrigger asChild>
                              <Button
                                variant="premium"
-                               className="h-10 px-4"
+                               className="h-10 px-4 bg-black text-white hover:bg-black/90"
                                onClick={() => {
                                  setSelectedAsset(asset);
                                  setRealizeModalOpen(true);
                                }}
                              >
                                <Truck className="w-4 h-4 mr-2" />
-                               Receive Physical
+                               Order
                              </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -270,7 +276,7 @@ const Realize = () => {
                     {/* Delivery Note */}
                     <div className="mt-4 text-center lg:text-left">
                       <p className="text-sm text-muted-foreground">
-                        Delivery ETA: 3–5 business days (domestic), 7–14 business days (international). Fully insured and tracked by FedEx.
+                        Delivery ETA: {asset.deliveryInfo}
                       </p>
                     </div>
                   </div>
@@ -283,10 +289,10 @@ const Realize = () => {
         {/* Footer Note */}
         <div className="text-center mt-8 space-y-2">
           <p className="text-sm text-muted-foreground">
-            All physical deliveries are fully insured and tracked via FedEx
+            All physical deliveries are fully insured and tracked via FedEx or MRST
           </p>
           <p className="text-xs text-muted-foreground">
-            Delivery times: 1-3 business days domestic, 3-7 business days international
+            Delivery times vary by asset and location. See individual asset details above.
           </p>
         </div>
       </div>
