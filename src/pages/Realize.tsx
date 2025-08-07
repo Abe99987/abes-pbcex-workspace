@@ -29,7 +29,7 @@ const Realize = () => {
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const navigate = useNavigate();
 
-  // Asset list for realize page
+  // Asset list for shop page
   const assets = [
     {
       name: "Gold (XAU)",
@@ -39,7 +39,8 @@ const Realize = () => {
       isPositive: true,
       icon: "🥇",
       description: "Per Troy Ounce",
-      isLive: true
+      isLive: true,
+      minimumOrder: null
     },
     {
       name: "Silver (XAG)",
@@ -49,7 +50,8 @@ const Realize = () => {
       isPositive: true,
       icon: "🥈",
       description: "Per Troy Ounce",
-      isLive: true
+      isLive: true,
+      minimumOrder: null
     },
     {
       name: "Platinum (XPT)",
@@ -59,7 +61,8 @@ const Realize = () => {
       isPositive: true,
       icon: "⚪",
       description: "Per Troy Ounce",
-      isLive: true
+      isLive: true,
+      minimumOrder: null
     },
     {
       name: "Palladium (XPD)",
@@ -69,7 +72,8 @@ const Realize = () => {
       isPositive: true,
       icon: "⚫",
       description: "Per Troy Ounce",
-      isLive: true
+      isLive: true,
+      minimumOrder: null
     },
     {
       name: "Copper (XCU)",
@@ -79,7 +83,8 @@ const Realize = () => {
       isPositive: true,
       icon: "🟤",
       description: "Per Metric Ton",
-      isLive: true
+      isLive: true,
+      minimumOrder: "10 Metric Tons"
     },
     {
       name: "Oil Fulfillment",
@@ -89,7 +94,8 @@ const Realize = () => {
       isPositive: true,
       icon: "🛢️",
       description: "Per Barrel",
-      isLive: true
+      isLive: true,
+      minimumOrder: "500 Barrels"
     }
   ];
 
@@ -104,10 +110,10 @@ const Realize = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Realize Assets
+            Buy Physical Assets
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            Convert your digital assets into physical delivery. All shipments are insured and tracked by FedEx.
+            Purchase and receive physical delivery of precious metals and commodities. All shipments are insured and tracked by FedEx.
           </p>
         </div>
 
@@ -124,6 +130,11 @@ const Realize = () => {
                     <div>
                       <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
                       <p className="text-sm text-muted-foreground">{asset.description}</p>
+                      {asset.minimumOrder && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Minimum Order: {asset.minimumOrder}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -154,24 +165,24 @@ const Realize = () => {
 
                   {/* Action Buttons */}
                   <div className="lg:col-span-4">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
-                              size="sm"
                               variant="outline"
+                              className="h-10 px-4"
                               onClick={() => {
                                 setSelectedAsset(asset);
                                 setBuyModalOpen(true);
                               }}
                             >
-                              <ShoppingCart className="w-3 h-3 lg:mr-1" />
-                              <span className="hidden lg:inline">Buy</span>
+                              <ShoppingCart className="w-4 h-4 mr-2" />
+                              Buy
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Buy {asset.name}</p>
+                            <p>Purchase using USDC, PAXG, bank wire, or debit card</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -180,15 +191,15 @@ const Realize = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
-                              size="sm"
                               variant="outline"
+                              className="h-10 px-4"
                               onClick={() => {
                                 setSelectedAsset(asset);
                                 setRealizeModalOpen(true);
                               }}
                             >
-                              <Package className="w-3 h-3 lg:mr-1" />
-                              <span className="hidden lg:inline">Sell</span>
+                              <Package className="w-4 h-4 mr-2" />
+                              Sell
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -201,19 +212,19 @@ const Realize = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                              <Button
-                               size="sm"
                                variant="premium"
+                               className="h-10 px-4"
                                onClick={() => {
                                  setSelectedAsset(asset);
                                  setRealizeModalOpen(true);
                                }}
                              >
-                               <Truck className="w-3 h-3 lg:mr-1" />
-                               <span className="hidden lg:inline">Receive Physical {asset.name.split(' ')[0]}</span>
+                               <Truck className="w-4 h-4 mr-2" />
+                               Receive Physical
                              </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Request physical delivery of {asset.name}</p>
+                            <p>Ship physical asset to your address. Token will be burned on fulfillment.</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -222,14 +233,14 @@ const Realize = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
-                              size="sm"
                               variant="outline"
+                              className="h-10 px-4"
                               onClick={() => {
                                 setSelectedAsset(asset);
                               }}
                             >
-                              <Send className="w-3 h-3 lg:mr-1" />
-                              <span className="hidden lg:inline">Send</span>
+                              <Send className="w-4 h-4 mr-2" />
+                              Send
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -237,53 +248,16 @@ const Realize = () => {
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                    </div>
-
-                    {/* Second Row of Buttons */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                            >
-                              <CreditCard className="w-3 h-3 lg:mr-1" />
-                              <span className="hidden lg:inline">Spend</span>
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Spend {asset.name}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
 
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
-                              size="sm"
                               variant="outline"
+                              className="h-10 px-4"
                             >
-                              <ArrowUpDown className="w-3 h-3 lg:mr-1" />
-                              <span className="hidden lg:inline">Convert</span>
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Convert {asset.name}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                            >
-                              <Upload className="w-3 h-3 lg:mr-1" />
-                              <span className="hidden lg:inline">Deposit</span>
+                              <Upload className="w-4 h-4 mr-2" />
+                              Deposit
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -291,29 +265,12 @@ const Realize = () => {
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                            >
-                              <Download className="w-3 h-3 lg:mr-1" />
-                              <span className="hidden lg:inline">Withdraw</span>
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Withdraw {asset.name}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
                     </div>
 
                     {/* Delivery Note */}
-                    <div className="mt-3 text-center lg:text-left">
-                      <p className="text-xs text-muted-foreground">
-                        📦 Send or receive this asset anywhere FedEx delivers
+                    <div className="mt-4 text-center lg:text-left">
+                      <p className="text-sm text-muted-foreground">
+                        Delivery ETA: 3–5 business days (domestic), 7–14 business days (international). Fully insured and tracked by FedEx.
                       </p>
                     </div>
                   </div>

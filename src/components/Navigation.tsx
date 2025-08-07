@@ -215,9 +215,15 @@ const Navigation = () => {
                           isTrading 
                             ? 'hover:bg-gray-800 focus:bg-gray-800' 
                             : 'hover:bg-accent focus:bg-accent'
-                        } ${typeof item === 'object' && item.description === 'Coming Soon' ? 'opacity-60' : ''}`}
-                        onClick={() => handleMenuClick(menu, item)}
-                        disabled={typeof item === 'object' && item.description === 'Coming Soon'}
+                        } ${(typeof item === 'object' && item.label && item.label.includes('Coming Soon')) || (typeof item === 'string' && item.includes('Coming Soon')) ? 'opacity-50 text-muted-foreground cursor-not-allowed' : ''}`}
+                        onClick={(e) => {
+                          const isComingSoon = (typeof item === 'object' && item.label && item.label.includes('Coming Soon')) || (typeof item === 'string' && item.includes('Coming Soon'));
+                          if (isComingSoon) {
+                            e.preventDefault();
+                            return;
+                          }
+                          handleMenuClick(menu, item);
+                        }}
                       >
                         <div className="flex items-center">
                           {typeof item === 'object' && item.icon && (
@@ -435,16 +441,22 @@ const Navigation = () => {
                     <span>{menu.label}</span>
                   </button>
                   {menu.items && menu.items.map((item) => (
-                     <button
-                       key={typeof item === 'string' ? item : item.label}
-                       onClick={() => handleMenuClick(menu, item)}
-                       className={`w-full text-left text-sm pl-10 py-2 transition-colors flex items-center ${
-                         isTrading 
-                           ? 'text-gray-400 hover:text-gray-200' 
-                           : 'text-muted-foreground hover:text-foreground'
-                       } ${typeof item === 'object' && item.description === 'Coming Soon' ? 'opacity-60' : ''}`}
-                       disabled={typeof item === 'object' && item.description === 'Coming Soon'}
-                     >
+                       <button
+                         key={typeof item === 'string' ? item : item.label}
+                         onClick={(e) => {
+                           const isComingSoon = (typeof item === 'object' && item.label && item.label.includes('Coming Soon')) || (typeof item === 'string' && item.includes('Coming Soon'));
+                           if (isComingSoon) {
+                             e.preventDefault();
+                             return;
+                           }
+                           handleMenuClick(menu, item);
+                         }}
+                         className={`w-full text-left text-sm pl-10 py-2 transition-colors flex items-center ${
+                           isTrading 
+                             ? 'text-gray-400 hover:text-gray-200' 
+                             : 'text-muted-foreground hover:text-foreground'
+                         } ${(typeof item === 'object' && item.label && item.label.includes('Coming Soon')) || (typeof item === 'string' && item.includes('Coming Soon')) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                       >
                        {typeof item === 'object' && item.icon && (
                          <item.icon className="w-4 h-4 mr-2" />
                        )}
