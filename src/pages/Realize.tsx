@@ -118,10 +118,10 @@ const Realize = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Buy Physical Assets
+            Buy Physical Assets and Tokens
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            Purchase and receive physical delivery of precious metals and commodities. All shipments are insured and tracked by FedEx or MRST.
+            Purchase and receive physical delivery of precious metals and commodities. All shipments are insured and tracked by FedEx or Maersk.
           </p>
         </div>
 
