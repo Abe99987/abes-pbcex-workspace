@@ -9,6 +9,7 @@ import CoinTrading from "./pages/CoinTrading";
 import Franchise from "./pages/Franchise";
 import Education from "./pages/Education";
 import MyAssets from "./pages/MyAssets";
+import TitledAsset from "./pages/TitledAsset";
 import Realize from "./pages/Realize";
 import PnL from "./pages/PnL";
 import NotFound from "./pages/NotFound";
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/franchise" element={<Franchise />} />
           <Route path="/education" element={<Education />} />
           <Route path="/my-assets" element={<MyAssets />} />
+          <Route path="/titled-asset/:address" element={<TitledAsset />} />
           <Route path="/realize" element={<Realize />} />
           <Route path="/pnl" element={<PnL />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

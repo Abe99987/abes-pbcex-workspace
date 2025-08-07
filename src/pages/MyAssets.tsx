@@ -187,6 +187,12 @@ const MyAssets = () => {
     navigate(`/trading?symbol=${asset.symbol}`);
   };
 
+  const handleTitledAssetClick = (asset: any) => {
+    if (asset.symbol === "HOME") {
+      navigate("/titled-asset/1987-future-drive-pittsburgh-pa");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -504,7 +510,13 @@ const MyAssets = () => {
             <h2 className="text-2xl font-bold text-foreground mb-4">Titled Assets</h2>
             <div className="space-y-4">
               {titledAssets.map((asset) => (
-                <Card key={asset.symbol} className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30">
+                <Card 
+                  key={asset.symbol} 
+                  className={`group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30 ${
+                    asset.symbol === "HOME" ? "cursor-pointer" : ""
+                  }`}
+                  onClick={() => asset.symbol === "HOME" && handleTitledAssetClick(asset)}
+                >
                   <CardContent className="p-6">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
                       
