@@ -47,12 +47,12 @@ const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
         <h3 className="text-sm font-semibold text-white mb-3">Place Order</h3>
         
         {/* Order Type Selection */}
-        <div className="flex bg-gray-900 rounded-md p-1 mb-4">
+        <div className="grid grid-cols-3 gap-1 bg-gray-900 rounded-md p-1 mb-4">
           <Button
             variant={orderType === "limit" ? "default" : "ghost"}
             size="sm"
             onClick={() => setOrderType("limit")}
-            className="flex-1 text-xs h-8"
+            className="text-xs h-8"
           >
             Limit
           </Button>
@@ -60,7 +60,7 @@ const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
             variant={orderType === "market" ? "default" : "ghost"}
             size="sm"
             onClick={() => setOrderType("market")}
-            className="flex-1 text-xs h-8"
+            className="text-xs h-8"
           >
             Market
           </Button>
@@ -71,9 +71,22 @@ const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
               setOrderType("scale");
               setScaleModalOpen(true);
             }}
-            className="flex-1 text-xs h-8"
+            className="text-xs h-8"
           >
             Scale
+          </Button>
+        </div>
+
+        {/* Direct Fulfill Button */}
+        <div className="mb-4">
+          <Button
+            disabled
+            variant="ghost"
+            size="sm"
+            className="w-full text-xs h-8 text-gray-500 border border-gray-700 hover:bg-gray-800"
+            title="Only available for 100-ton+ wholesale commodity trades"
+          >
+            Accept Direct Fulfill
           </Button>
         </div>
       </div>

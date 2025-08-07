@@ -144,115 +144,16 @@ const TradingChart = ({ pair }: TradingChartProps) => {
         </div>
       </div>
 
-      {/* Chart */}
-      <div className="flex-1 bg-black">
-        <ChartContainer config={config} className="h-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-              <defs>
-                <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <XAxis 
-                dataKey="time" 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#9ca3af', fontSize: 10 }}
-                interval="preserveStartEnd"
-              />
-              <YAxis 
-                domain={['dataMin - 5', 'dataMax + 5']}
-                orientation="right"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#9ca3af', fontSize: 10 }}
-                width={50}
-              />
-              
-              {/* Grid Lines */}
-              <defs>
-                <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                  <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#374151" strokeWidth="0.5"/>
-                </pattern>
-              </defs>
-              
-              <ChartTooltip 
-                content={({ active, payload, label }) => {
-                  if (active && payload && payload.length) {
-                    const data = payload[0].payload;
-                    const isGreen = data.close > data.open;
-                    return (
-                      <div className="bg-black border border-gray-600 rounded-lg p-3 shadow-xl">
-                        <p className="text-gray-300 text-xs mb-2 font-medium">{label}</p>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div>
-                            <span className="text-gray-400">O: </span>
-                            <span className="text-white font-mono">${data.open}</span>
-                          </div>
-                          <div>
-                            <span className="text-gray-400">H: </span>
-                            <span className="text-green-400 font-mono">${data.high}</span>
-                          </div>
-                          <div>
-                            <span className="text-gray-400">L: </span>
-                            <span className="text-red-400 font-mono">${data.low}</span>
-                          </div>
-                          <div>
-                            <span className="text-gray-400">C: </span>
-                            <span className={`font-mono ${isGreen ? 'text-green-400' : 'text-red-400'}`}>
-                              ${data.close}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="mt-2 pt-2 border-t border-gray-700">
-                          <span className="text-gray-400 text-xs">Vol: </span>
-                          <span className="text-gray-300 text-xs font-mono">{data.volume}</span>
-                        </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-                cursor={{ stroke: '#9ca3af', strokeWidth: 1, strokeDasharray: '3 3' }}
-              />
-              
-              {/* Render based on chart type */}
-              {chartType === "candles" ? (
-                // Custom candlestick rendering
-                chartData.map((entry, index) => {
-                  if (!entry) return null;
-                  const chartWidth = 100; // percentage width
-                  const x = (index / chartData.length) * chartWidth;
-                  const width = chartWidth / chartData.length * 0.8;
-                  return (
-                    <Candlestick 
-                      key={index} 
-                      payload={entry} 
-                      x={x} 
-                      y={0} 
-                      width={width} 
-                      height={100} 
-                    />
-                  );
-                })
-              ) : (
-                // Line chart for line mode
-                <Line
-                  type="monotone"
-                  dataKey="close"
-                  stroke="#10b981"
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4, fill: '#10b981', stroke: '#000', strokeWidth: 2 }}
-                  fill="url(#priceGradient)"
-                />
-              )}
-              
-            </ComposedChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+      {/* Chart - Replace with placeholder image */}
+      <div className="flex-1 bg-black relative">
+        <img 
+          src="/api/placeholder/800/400" 
+          alt="Trading Chart Placeholder - TradingView integration coming soon"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute top-4 right-4 bg-black/80 text-white text-xs px-2 py-1 rounded border border-gray-600">
+          TradingView integration coming soon — showing sample liquidity view
+        </div>
       </div>
     </div>
   );

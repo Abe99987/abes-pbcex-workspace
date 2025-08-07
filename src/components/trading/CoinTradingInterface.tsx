@@ -10,10 +10,12 @@ import MarketData from "./MarketData";
 import OrderHistory from "./OrderHistory";
 import TradingFooter from "./TradingFooter";
 import SettlementDropdown from "./SettlementDropdown";
+import CopperInfoPanel from "./CopperInfoPanel";
 
 const CoinTradingInterface = () => {
   const [selectedPair, setSelectedPair] = useState("GOLD/USD");
   const [settlementAsset, setSettlementAsset] = useState("PAXG");
+  const [activeTab, setActiveTab] = useState("chart");
 
   const handleSettlementChange = (settlement: string) => {
     setSettlementAsset(settlement);
@@ -40,10 +42,43 @@ const CoinTradingInterface = () => {
           {/* Center Panel - Chart and Orders */}
           <ResizablePanel defaultSize={60} minSize={40}>
             <ResizablePanelGroup direction="vertical">
-              {/* Chart */}
+              {/* Chart/Info Tabs */}
               <ResizablePanel defaultSize={75} minSize={60}>
-                <div className="h-full border-b border-gray-800 bg-black">
-                  <TradingChart pair={selectedPair} />
+                <div className="h-full border-b border-gray-800 bg-black flex flex-col">
+                  {/* Chart/Info Toggle */}
+                  <div className="flex border-b border-gray-800 bg-black">
+                    <div className="flex bg-gray-900 rounded-md m-2 p-1">
+                      <button
+                        onClick={() => setActiveTab("chart")}
+                        className={`px-4 py-2 text-sm font-medium rounded-sm transition-all ${
+                          activeTab === "chart" 
+                            ? "bg-gray-700 text-white" 
+                            : "text-gray-400 hover:text-white"
+                        }`}
+                      >
+                        Chart
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("info")}
+                        className={`px-4 py-2 text-sm font-medium rounded-sm transition-all ${
+                          activeTab === "info" 
+                            ? "bg-gray-700 text-white" 
+                            : "text-gray-400 hover:text-white"
+                        }`}
+                      >
+                        Info
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-1">
+                    {activeTab === "chart" ? (
+                      <TradingChart pair={selectedPair} />
+                    ) : (
+                      <CopperInfoPanel />
+                    )}
+                  </div>
                 </div>
               </ResizablePanel>
               
@@ -53,10 +88,12 @@ const CoinTradingInterface = () => {
               <ResizablePanel defaultSize={25} minSize={20}>
                 <div className="bg-black h-full">
                   <Tabs defaultValue="positions" className="h-full">
-                    <TabsList className="grid w-full grid-cols-3 bg-gray-900 border-b border-gray-800">
+                    <TabsList className="grid w-full grid-cols-5 bg-gray-900 border-b border-gray-800">
                       <TabsTrigger value="positions" className="text-xs">Positions</TabsTrigger>
                       <TabsTrigger value="orders" className="text-xs">Open Orders</TabsTrigger>
                       <TabsTrigger value="history" className="text-xs">Order History</TabsTrigger>
+                      <TabsTrigger value="assets" className="text-xs">Assets</TabsTrigger>
+                      <TabsTrigger value="bots" className="text-xs">Trading Bots</TabsTrigger>
                     </TabsList>
                     <TabsContent value="positions" className="h-full pt-2 px-4">
                       <div className="text-gray-400 text-sm">No open positions</div>
@@ -66,6 +103,12 @@ const CoinTradingInterface = () => {
                     </TabsContent>
                     <TabsContent value="history" className="h-full pt-2">
                       <OrderHistory type="history" />
+                    </TabsContent>
+                    <TabsContent value="assets" className="h-full pt-2 px-4">
+                      <div className="text-gray-400 text-sm">Assets coming soon</div>
+                    </TabsContent>
+                    <TabsContent value="bots" className="h-full pt-2 px-4">
+                      <div className="text-gray-400 text-sm">Trading Bots coming soon</div>
                     </TabsContent>
                   </Tabs>
                 </div>
