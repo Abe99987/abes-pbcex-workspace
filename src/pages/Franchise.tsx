@@ -61,12 +61,17 @@ const Franchise = () => {
     {
       icon: Package,
       title: "Physical Delivery Fulfillment",
-      description: "Markups on delivery and packaging via Dillon Gage API"
+      description: "Markups on delivery and packaging"
     },
     {
       icon: CreditCard,
       title: "POS and QR Payment Margins",
       description: "Transaction fees from payment processing services"
+    },
+    {
+      icon: CreditCard,
+      title: "Card Services",
+      description: "Earn revenue from card transactions and service fees"
     }
   ];
 
