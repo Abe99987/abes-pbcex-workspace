@@ -9,6 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import DepositModal from "@/components/modals/DepositModal";
+import WalletConnectModal from "@/components/modals/WalletConnectModal";
 import { 
   Menu, 
   ChevronDown, 
@@ -40,6 +42,8 @@ const Navigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedLanguage, setSelectedLanguage] = useState("EN");
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
+  const [walletConnectModalOpen, setWalletConnectModalOpen] = useState(false);
   
   // Check if we're on trading page for theme adaptation
   const isTrading = location.pathname === '/trading' || location.pathname === '/coin-trading';
@@ -74,6 +78,11 @@ const Navigation = () => {
           label: "PnL", 
           description: "Profit and Loss",
           onClick: () => navigate('/pnl')
+        },
+        { 
+          label: "Connect Wallet", 
+          description: "Connect external wallets",
+          onClick: () => setWalletConnectModalOpen(true)
         }
       ]
     },
@@ -240,6 +249,7 @@ const Navigation = () => {
                 ? 'bg-green-600 hover:bg-green-700 text-white' 
                 : 'bg-primary hover:bg-primary/90 text-primary-foreground'
             }`}
+            onClick={() => setDepositModalOpen(true)}
           >
             Deposit
           </Button>
@@ -389,6 +399,7 @@ const Navigation = () => {
                     ? 'bg-green-600 hover:bg-green-700' 
                     : 'bg-primary hover:bg-primary/90'
                 }`}
+                onClick={() => setDepositModalOpen(true)}
               >
                 Deposit
               </Button>
@@ -396,6 +407,16 @@ const Navigation = () => {
           </SheetContent>
         </Sheet>
       </div>
+      
+      {/* Modals */}
+      <DepositModal 
+        open={depositModalOpen} 
+        onOpenChange={setDepositModalOpen} 
+      />
+      <WalletConnectModal 
+        open={walletConnectModalOpen} 
+        onOpenChange={setWalletConnectModalOpen} 
+      />
     </nav>
   );
 };
