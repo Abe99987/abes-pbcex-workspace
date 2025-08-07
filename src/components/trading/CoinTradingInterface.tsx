@@ -45,25 +45,25 @@ const CoinTradingInterface = () => {
               {/* Chart/Info Tabs */}
               <ResizablePanel defaultSize={75} minSize={60}>
                 <div className="h-full border-b border-gray-800 bg-black flex flex-col">
-                  {/* Chart/Info Toggle */}
-                  <div className="flex border-b border-gray-800 bg-black">
-                    <div className="flex bg-gray-900 rounded-md m-2 p-1">
+                  {/* Chart/Info Toggle - Styled like BloFin */}
+                  <div className="flex border-b border-gray-800 bg-black px-4 py-2">
+                    <div className="flex space-x-1">
                       <button
                         onClick={() => setActiveTab("chart")}
-                        className={`px-4 py-2 text-sm font-medium rounded-sm transition-all ${
+                        className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
                           activeTab === "chart" 
-                            ? "bg-gray-700 text-white" 
-                            : "text-gray-400 hover:text-white"
+                            ? "text-white border-gold bg-gray-800/50" 
+                            : "text-gray-400 border-transparent hover:text-white hover:bg-gray-800/30"
                         }`}
                       >
                         Chart
                       </button>
                       <button
                         onClick={() => setActiveTab("info")}
-                        className={`px-4 py-2 text-sm font-medium rounded-sm transition-all ${
+                        className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
                           activeTab === "info" 
-                            ? "bg-gray-700 text-white" 
-                            : "text-gray-400 hover:text-white"
+                            ? "text-white border-gold bg-gray-800/50" 
+                            : "text-gray-400 border-transparent hover:text-white hover:bg-gray-800/30"
                         }`}
                       >
                         Info

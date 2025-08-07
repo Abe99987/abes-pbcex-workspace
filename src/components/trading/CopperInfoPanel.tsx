@@ -2,12 +2,12 @@ import { Badge } from "@/components/ui/badge";
 
 const CopperInfoPanel = () => {
   const ratingData = [
-    { category: "Roadmap & Progress", value: 79.0 },
-    { category: "Ecosystem Development", value: 71.5 },
-    { category: "Token Economics", value: 53.2 },
-    { category: "Underlying Tech & Security", value: 49.8 },
-    { category: "Performance", value: 52.9 },
-    { category: "Team, Partners, Investors", value: 76.0 },
+    { category: "Roadmap & Progress", value: 82.0, color: "from-green-500 to-green-400" },
+    { category: "Ecosystem Development", value: 72.1, color: "from-blue-500 to-blue-400" },
+    { category: "Token Economics", value: 51.3, color: "from-yellow-500 to-yellow-400" },
+    { category: "Underlying Tech & Security", value: 48.2, color: "from-orange-500 to-orange-400" },
+    { category: "Performance", value: 48.9, color: "from-red-500 to-red-400" },
+    { category: "Team, Partners, Investors", value: 75.3, color: "from-purple-500 to-purple-400" },
   ];
 
   const copperGrades = [
@@ -20,36 +20,52 @@ const CopperInfoPanel = () => {
   return (
     <div className="h-full bg-black p-6 overflow-y-auto">
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
+        {/* Header - BloFin style */}
         <div className="border-b border-gray-800 pb-4">
-          <h2 className="text-2xl font-bold text-white mb-2">Copper Market Information</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-bold text-white">Copper (COPPER) Rating</h2>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-green-400">$8,900</div>
+              <div className="text-sm text-gray-400">+2.4%</div>
+            </div>
+          </div>
           <div className="flex items-center space-x-4">
-            <Badge variant="secondary" className="bg-yellow-600 text-white">
-              BBB (Stable)
-            </Badge>
-            <span className="text-gray-400 text-sm">Last Review: August 6, 2025</span>
+            <div className="flex items-center space-x-2">
+              <div className="text-3xl font-bold text-white">BBB</div>
+              <Badge variant="secondary" className="bg-blue-600 text-white">
+                Stable
+              </Badge>
+            </div>
+            <div className="text-gray-400 text-sm flex items-center space-x-1">
+              <span>🛡️ TokenInsight</span>
+              <span>|</span>
+              <span>Last Review: April 26, 2025</span>
+            </div>
           </div>
         </div>
 
-        {/* Rating Breakdown */}
+        {/* Rating Breakdown - BloFin radar style */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">Rating Breakdown</h3>
-            <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-white">Copper (COPPER) Rating Breakdown: 62.72/100</h3>
+            <div className="space-y-4">
               {ratingData.map((item, index) => (
                 <div key={index} className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-300 text-sm">{item.category}</span>
-                    <span className="text-white font-mono text-sm">{item.value}%</span>
+                    <span className="text-white font-mono text-sm font-bold">{item.value}%</span>
                   </div>
                   <div className="w-full bg-gray-800 rounded-full h-2">
                     <div 
-                      className="bg-gradient-to-r from-gold to-gold-light h-2 rounded-full"
+                      className={`bg-gradient-to-r ${item.color} h-2 rounded-full transition-all duration-500`}
                       style={{ width: `${item.value}%` }}
                     />
                   </div>
                 </div>
               ))}
+              <div className="mt-4 text-xs text-gray-500">
+                Data Updated in 37 minutes
+              </div>
             </div>
           </div>
 

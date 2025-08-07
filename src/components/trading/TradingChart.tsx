@@ -3,6 +3,7 @@ import { ComposedChart, XAxis, YAxis, ResponsiveContainer, Line } from "recharts
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
 import { generateCandlestickData } from "./TradingUtils";
+import blocksChart from "@/assets/blocks-chart.png";
 
 interface TradingChartProps {
   pair: string;
@@ -144,14 +145,14 @@ const TradingChart = ({ pair }: TradingChartProps) => {
         </div>
       </div>
 
-      {/* Chart - Replace with placeholder image */}
+      {/* Chart - Replace with blocks and bands visualization */}
       <div className="flex-1 bg-black relative">
         <img 
-          src="/api/placeholder/800/400" 
-          alt="Trading Chart Placeholder - TradingView integration coming soon"
+          src={blocksChart}
+          alt="Order Blocks and Liquidity Bands Visualization"
           className="w-full h-full object-cover"
         />
-        <div className="absolute top-4 right-4 bg-black/80 text-white text-xs px-2 py-1 rounded border border-gray-600">
+        <div className="absolute top-4 right-4 bg-black/80 text-white text-xs px-3 py-2 rounded border border-gray-600 backdrop-blur-sm">
           TradingView integration coming soon — showing sample liquidity view
         </div>
       </div>
