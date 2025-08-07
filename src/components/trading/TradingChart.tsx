@@ -3,7 +3,7 @@ import { ComposedChart, XAxis, YAxis, ResponsiveContainer, Line } from "recharts
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
 import { generateCandlestickData } from "./TradingUtils";
-import blocksChart from "@/assets/blocks-chart.png";
+const blocksChart = "/lovable-uploads/21364ad9-6a4b-4411-ab5d-8e565d4c1cbe.png";
 
 interface TradingChartProps {
   pair: string;
