@@ -16,7 +16,9 @@ const TitledAsset = () => {
     homeValue: 328500,
     paymentsRemaining: 32000,
     principalPayments: 18,
-    maintenancePayments: 6,
+    principalPaymentAmount: 3420,
+    maintenancePayments: 18,
+    maintenancePaymentAmount: 1200,
     paidOffPercentage: 71,
     payoffAmount: 52000,
     paymentsLeftToUnfreeze: 3
@@ -24,7 +26,9 @@ const TitledAsset = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top Navigation Bar */}
+      <Navigation />
+      
+      {/* Titled Asset Header */}
       <div className="bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -82,19 +86,19 @@ const TitledAsset = () => {
                     <h3 className="text-lg font-semibold text-foreground">Principal vs Maintenance</h3>
                   </div>
                   
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="text-3xl font-bold text-foreground">{assetData.principalPayments}</span>
-                        <p className="text-sm text-muted-foreground">Principal Payments<br />Remaining</p>
-                      </div>
+                  <div className="space-y-6">
+                    <div>
+                      <span className="text-3xl font-bold text-foreground">{assetData.principalPayments}</span>
+                      <p className="text-sm text-muted-foreground">payments remaining</p>
+                      <p className="text-lg font-semibold text-foreground">${assetData.principalPaymentAmount.toLocaleString()} each</p>
+                      <p className="text-xs text-muted-foreground mt-1">Principal Payments Remaining</p>
                     </div>
                     
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="text-3xl font-bold text-foreground">{assetData.maintenancePayments}</span>
-                        <p className="text-sm text-muted-foreground">Maintenance Payments<br />Remaining</p>
-                      </div>
+                    <div>
+                      <span className="text-3xl font-bold text-foreground">{assetData.maintenancePayments}</span>
+                      <p className="text-sm text-muted-foreground">payments remaining</p>
+                      <p className="text-lg font-semibold text-foreground">${assetData.maintenancePaymentAmount.toLocaleString()} each</p>
+                      <p className="text-xs text-muted-foreground mt-1">Maintenance Payments Remaining</p>
                     </div>
                   </div>
                 </div>
