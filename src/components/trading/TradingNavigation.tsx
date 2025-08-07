@@ -38,9 +38,9 @@ const TradingNavigation = () => {
       items: ["Send to PBcex User", "External Transfers (Bank / Crypto Withdrawal)", "Remittances (via Wise)", "Pay with QR Code", "Spend with Visa Card", "Set Up Bill Pay", "Request a Payment", "Set Up Recurring Transfers", "Bank Wire Transfer"]
     },
     {
-      label: "Realize",
+      label: "Shop",
       icon: Home,
-      items: ["Physical Gold", "Physical Silver", "Cash Pickup", "Bank Transfer"]
+      items: ["Buy Physical Gold", "Buy Physical Silver", "Buy Physical Platinum", "Buy Physical Palladium", "Buy Physical Copper", "Oil — Coming Soon", "Natural Gas — Coming Soon", "Lithium — Coming Soon"]
     },
     {
       label: "Franchise",

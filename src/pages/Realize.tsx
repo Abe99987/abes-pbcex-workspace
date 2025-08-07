@@ -200,17 +200,17 @@ const Realize = () => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="premium"
-                              onClick={() => {
-                                setSelectedAsset(asset);
-                                setRealizeModalOpen(true);
-                              }}
-                            >
-                              <Truck className="w-3 h-3 lg:mr-1" />
-                              <span className="hidden lg:inline">Realize</span>
-                            </Button>
+                             <Button
+                               size="sm"
+                               variant="premium"
+                               onClick={() => {
+                                 setSelectedAsset(asset);
+                                 setRealizeModalOpen(true);
+                               }}
+                             >
+                               <Truck className="w-3 h-3 lg:mr-1" />
+                               <span className="hidden lg:inline">Receive Physical {asset.name.split(' ')[0]}</span>
+                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Request physical delivery of {asset.name}</p>

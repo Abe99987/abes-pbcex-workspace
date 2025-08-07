@@ -97,9 +97,18 @@ const Navigation = () => {
       ]
     },
     {
-      label: "Realize",
-      href: "/realize",
-      icon: Package
+      label: "Shop",
+      icon: Package,
+      items: [
+        { label: "Buy Physical Gold", href: "/realize" },
+        { label: "Buy Physical Silver", href: "/realize" },
+        { label: "Buy Physical Platinum", href: "/realize" },
+        { label: "Buy Physical Palladium", href: "/realize" },
+        { label: "Buy Physical Copper", href: "/realize" },
+        { label: "Oil — Coming Soon", href: "/realize" },
+        { label: "Natural Gas — Coming Soon", href: "/realize" },
+        { label: "Lithium — Coming Soon", href: "/realize" }
+      ]
     },
     {
       label: "Send/Pay",
