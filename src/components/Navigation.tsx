@@ -105,10 +105,15 @@ const Navigation = () => {
       label: "Send/Pay",
       icon: Send,
       items: [
-        { label: "Internal Transfers" },
-        { label: "QR Code Payments" },
-        { label: "Spend with Visa" },
-        { label: "Remittances" }
+        { label: "Send to PBcex User" },
+        { label: "External Transfers (Bank / Crypto Withdrawal)" },
+        { label: "Remittances (via Wise)" },
+        { label: "Pay with QR Code" },
+        { label: "Spend with Visa Card" },
+        { label: "Set Up Bill Pay" },
+        { label: "Request a Payment" },
+        { label: "Set Up Recurring Transfers" },
+        { label: "Bank Wire Transfer" }
       ]
     },
     {
