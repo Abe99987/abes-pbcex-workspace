@@ -50,8 +50,8 @@ const Franchise = () => {
     },
     {
       icon: TrendingUp,
-      title: "Token Minting & Redemption Fees",
-      description: "Revenue from PAXG, XAG, and other token transactions"
+      title: "Asset-Backed Mortgages & Loans",
+      description: "Revenue from home and vehicle mortgages, and collateralized loans backed by tokenized assets like gold, silver, or crypto"
     },
     {
       icon: ArrowRightLeft,
