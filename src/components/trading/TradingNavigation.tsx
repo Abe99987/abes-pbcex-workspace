@@ -35,7 +35,7 @@ const TradingNavigation = () => {
     {
       label: "Send/Pay",
       icon: Send,
-      items: ["Send Assets", "Request Payment", "Payment Links", "Transaction Fees"]
+      items: ["Send to PBcex User", "External Transfers (Bank / Crypto Withdrawal)", "Remittances (via Wise)", "Pay with QR Code", "Spend with Visa Card", "Set Up Bill Pay", "Request a Payment", "Set Up Recurring Transfers", "Bank Wire Transfer"]
     },
     {
       label: "Realize",
