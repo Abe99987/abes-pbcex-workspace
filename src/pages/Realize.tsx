@@ -91,7 +91,7 @@ const Realize = () => {
       description: "Per Metric Ton",
       isLive: true,
       minimumOrder: "1 ton",
-      deliveryInfo: "3–5 weeks. Fully insured and tracked by MRST Shipping."
+      deliveryInfo: "3–5 weeks. Fully insured and tracked by Maersk Shipping."
     },
     {
       name: "Crude Oil",
@@ -103,7 +103,7 @@ const Realize = () => {
       description: "Per Barrel",
       isLive: true,
       minimumOrder: "500,000 barrels",
-      deliveryInfo: "3–5 weeks. Fully insured and tracked by MRST Shipping."
+      deliveryInfo: "3–5 weeks. Fully insured and tracked by Maersk Shipping."
     }
   ];
 
