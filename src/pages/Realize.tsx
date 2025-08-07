@@ -19,12 +19,14 @@ import {
 } from "lucide-react";
 import BuyAssetModal from "@/components/BuyAssetModal";
 import RealizeAssetModal from "@/components/RealizeAssetModal";
+import BuyPhysicalModal from "@/components/BuyPhysicalModal";
 import BorrowingModal from "@/components/BorrowingModal";
 import Navigation from "@/components/Navigation";
 
 const Realize = () => {
   const [buyModalOpen, setBuyModalOpen] = useState(false);
   const [realizeModalOpen, setRealizeModalOpen] = useState(false);
+  const [buyPhysicalModalOpen, setBuyPhysicalModalOpen] = useState(false);
   const [borrowingModalOpen, setBorrowingModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const navigate = useNavigate();
@@ -222,7 +224,7 @@ const Realize = () => {
                                className="h-10 px-4 bg-black text-white hover:bg-black/90"
                                onClick={() => {
                                  setSelectedAsset(asset);
-                                 setRealizeModalOpen(true);
+                                 setBuyPhysicalModalOpen(true);
                                }}
                              >
                                <Truck className="w-4 h-4 mr-2" />
@@ -308,6 +310,11 @@ const Realize = () => {
           <RealizeAssetModal
             isOpen={realizeModalOpen}
             onClose={() => setRealizeModalOpen(false)}
+            asset={selectedAsset}
+          />
+          <BuyPhysicalModal
+            isOpen={buyPhysicalModalOpen}
+            onClose={() => setBuyPhysicalModalOpen(false)}
             asset={selectedAsset}
           />
           <BorrowingModal
