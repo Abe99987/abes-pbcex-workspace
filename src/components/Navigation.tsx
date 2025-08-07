@@ -158,10 +158,11 @@ const Navigation = () => {
           onClick={() => navigate("/")}
           className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
         >
-          <div className={`h-8 w-8 rounded-lg bg-gradient-to-br from-gold to-gold-light flex items-center justify-center`}>
-            <span className={`${isTrading ? 'text-black' : 'text-primary-foreground'} font-bold text-sm`}>PB</span>
-          </div>
-          <span className={`text-xl font-bold ${isTrading ? 'text-white' : 'text-foreground'}`}>PBCex</span>
+          <img 
+            src="/lovable-uploads/85edd95a-cedc-4291-a8a7-8884e15ead12.png" 
+            alt="PBCEX" 
+            className="h-8 w-auto"
+          />
         </button>
 
         {/* Desktop Navigation - Center Menu */}

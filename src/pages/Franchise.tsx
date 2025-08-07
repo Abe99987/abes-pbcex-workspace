@@ -83,7 +83,7 @@ const Franchise = () => {
               Franchise Opportunity
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent mb-6">
-              Open a PBCE Franchise
+              Open a PBCEX Franchise
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
               Bank like a vault. Earn like an exchange. Operate like a gold dealer.
@@ -178,7 +178,7 @@ const Franchise = () => {
                 Start a Franchise
               </h2>
               <p className="text-xl text-muted-foreground">
-                Ready to join the PBCE network? Get in touch with our team.
+                Ready to join the PBCEX network? Get in touch with our team.
               </p>
             </div>
 
@@ -263,7 +263,7 @@ const Franchise = () => {
                       rows={4}
                       value={formData.message}
                       onChange={handleInputChange}
-                      placeholder="Tell us about your interest in a PBCE franchise..."
+                      placeholder="Tell us about your interest in a PBCEX franchise..."
                     />
                   </div>
 

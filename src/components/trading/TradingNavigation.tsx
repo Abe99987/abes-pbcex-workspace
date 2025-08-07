@@ -72,10 +72,11 @@ const TradingNavigation = () => {
           onClick={() => navigate("/")}
           className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
         >
-          <div className="w-8 h-8 bg-gradient-to-r from-gold to-gold-light rounded-lg flex items-center justify-center">
-            <span className="text-black font-bold text-sm">PBC</span>
-          </div>
-          <span className="text-white font-semibold text-lg">PBCex</span>
+          <img 
+            src="/lovable-uploads/85edd95a-cedc-4291-a8a7-8884e15ead12.png" 
+            alt="PBCEX" 
+            className="h-8 w-auto"
+          />
         </button>
       </div>
 
