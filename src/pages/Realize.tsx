@@ -291,7 +291,7 @@ const Realize = () => {
         {/* Footer Note */}
         <div className="text-center mt-8 space-y-2">
           <p className="text-sm text-muted-foreground">
-            All physical deliveries are fully insured and tracked via FedEx or MRST
+            All physical deliveries are fully insured and tracked via FedEx or Maersk
           </p>
           <p className="text-xs text-muted-foreground">
             Delivery times vary by asset and location. See individual asset details above.
