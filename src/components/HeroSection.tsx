@@ -17,15 +17,15 @@ const HeroSection = () => {
           </Badge>
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-            A Bank for the{" "}
+            A Bank for{" "}
             <span className="bg-gradient-to-r from-gold to-gold-light bg-clip-text text-transparent">
-              People
+              Real People
             </span>
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-            Backed by Real Assets, Connected to the World. Buy, sell, save, and spend 
-            gold, silver, oil, and fiat currencies through our secure digital platform.
+            Back to the roots of trading — real assets, real settlement, real utility. 
+            Lock in prices. Buy when the moment is right.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
