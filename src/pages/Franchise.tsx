@@ -91,7 +91,7 @@ const Franchise = () => {
               Open a PBCEX Franchise
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
-              Bank like a vault. Earn like an exchange. Operate like a gold dealer.
+              118 elements exist. 25 commodities make the world work. Yet we trade in 180 fiat currencies and over 10,000 cryptocurrencies.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <div className="flex items-center text-lg">
