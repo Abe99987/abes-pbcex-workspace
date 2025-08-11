@@ -55,6 +55,8 @@ const generateMockData = () => {
 const PnL = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [data, setData] = useState(generateMockData);
+  const [metricsTimeframe, setMetricsTimeframe] = useState<'day' | 'month' | 'year'>('month');
+  const [chartTimeframe, setChartTimeframe] = useState<'day' | 'month' | 'year'>('month');
 
   // Mock performance metrics
   const performanceMetrics = {
@@ -149,6 +151,34 @@ const PnL = () => {
     return weeks;
   };
 
+  const TimeframeSelector = ({ 
+    activeTimeframe, 
+    onTimeframeChange, 
+    className = "" 
+  }: { 
+    activeTimeframe: 'day' | 'month' | 'year';
+    onTimeframeChange: (timeframe: 'day' | 'month' | 'year') => void;
+    className?: string;
+  }) => (
+    <div className={`flex bg-muted/30 rounded-lg p-1 ${className}`}>
+      {(['day', 'month', 'year'] as const).map((timeframe) => (
+        <button
+          key={timeframe}
+          onClick={() => onTimeframeChange(timeframe)}
+          className={`
+            px-3 py-1 text-xs font-medium rounded-md transition-all
+            ${activeTimeframe === timeframe 
+              ? 'bg-gold text-primary-foreground shadow-sm' 
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            }
+          `}
+        >
+          {timeframe.charAt(0).toUpperCase() + timeframe.slice(1)}
+        </button>
+      ))}
+    </div>
+  );
+
   console.log('PnL component rendering, Navigation:', Navigation);
   
   return (
@@ -165,8 +195,15 @@ const PnL = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
           {/* Total PnL */}
           <Card className="bg-card border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total PnL</CardTitle>
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total PnL ({metricsTimeframe === 'day' ? 'Latest Day' : metricsTimeframe === 'month' ? 'This Month' : 'This Year'})
+              </CardTitle>
+              <TimeframeSelector 
+                activeTimeframe={metricsTimeframe}
+                onTimeframeChange={setMetricsTimeframe}
+                className="hidden sm:flex"
+              />
             </CardHeader>
             <CardContent>
               <div className="flex items-center space-x-2">
@@ -185,8 +222,13 @@ const PnL = () => {
 
           {/* Win Rate */}
           <Card className="bg-card border-border">
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Win Rate</CardTitle>
+              <TimeframeSelector 
+                activeTimeframe={metricsTimeframe}
+                onTimeframeChange={setMetricsTimeframe}
+                className="hidden sm:flex"
+              />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{performanceMetrics.winRate}%</div>
@@ -201,8 +243,13 @@ const PnL = () => {
 
           {/* Profit Factor */}
           <Card className="bg-card border-border">
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Profit Factor</CardTitle>
+              <TimeframeSelector 
+                activeTimeframe={metricsTimeframe}
+                onTimeframeChange={setMetricsTimeframe}
+                className="hidden sm:flex"
+              />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{performanceMetrics.profitFactor}</div>
@@ -214,8 +261,13 @@ const PnL = () => {
 
           {/* Best Day % */}
           <Card className="bg-card border-border">
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Best Day %</CardTitle>
+              <TimeframeSelector 
+                activeTimeframe={metricsTimeframe}
+                onTimeframeChange={setMetricsTimeframe}
+                className="hidden sm:flex"
+              />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-400">
@@ -231,8 +283,13 @@ const PnL = () => {
         {/* Avg Win/Loss & Day Win % */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <Card className="bg-card border-border">
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
               <CardTitle>Average Win / Loss</CardTitle>
+              <TimeframeSelector 
+                activeTimeframe={metricsTimeframe}
+                onTimeframeChange={setMetricsTimeframe}
+                className="hidden sm:flex"
+              />
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -271,8 +328,14 @@ const PnL = () => {
 
         {/* Daily Account Balance Chart */}
         <Card className="bg-card border-border mb-8">
-          <CardHeader>
-            <CardTitle>Daily Account Balance</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
+            <CardTitle>
+              Daily Account Balance ({chartTimeframe === 'day' ? 'Hourly Today' : chartTimeframe === 'month' ? 'Daily This Month' : 'Monthly This Year'})
+            </CardTitle>
+            <TimeframeSelector 
+              activeTimeframe={chartTimeframe}
+              onTimeframeChange={setChartTimeframe}
+            />
           </CardHeader>
           <CardContent>
             <div className="h-[300px] w-full">
@@ -309,6 +372,21 @@ const PnL = () => {
             <div className="flex items-center justify-between">
               <CardTitle>Monthly Calendar View</CardTitle>
               <div className="flex items-center space-x-4">
+                <select
+                  value={format(currentMonth, 'yyyy-MM')}
+                  onChange={(e) => setCurrentMonth(new Date(e.target.value + '-01'))}
+                  className="bg-background border border-input rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const date = new Date();
+                    date.setMonth(date.getMonth() - 6 + i);
+                    return (
+                      <option key={i} value={format(date, 'yyyy-MM')}>
+                        {format(date, 'MMM yyyy')}
+                      </option>
+                    );
+                  })}
+                </select>
                 <Button
                   variant="outline"
                   size="sm"
