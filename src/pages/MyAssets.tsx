@@ -16,6 +16,7 @@ import {
   Upload,
   BarChart3
 } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import BuyAssetModal from "@/components/BuyAssetModal";
 import RealizeAssetModal from "@/components/RealizeAssetModal";
 import BorrowingModal from "@/components/BorrowingModal";
@@ -178,10 +179,39 @@ const MyAssets = () => {
 
   const allAssets = [...fxAssets, ...mineralAssets, ...cryptoAssets, ...titledAssets];
 
-  const totalPortfolioValue = allAssets.reduce((total, asset) => {
-    const numericValue = parseFloat(asset.value.replace(/[$,]/g, ''));
-    return total + numericValue;
+  // Calculate category totals
+  const fxTotal = fxAssets.reduce((total, asset) => {
+    return total + parseFloat(asset.value.replace(/[$,]/g, ''));
   }, 0);
+  
+  const mineralTotal = mineralAssets.reduce((total, asset) => {
+    return total + parseFloat(asset.value.replace(/[$,]/g, ''));
+  }, 0);
+  
+  const cryptoTotal = cryptoAssets.reduce((total, asset) => {
+    return total + parseFloat(asset.value.replace(/[$,]/g, ''));
+  }, 0);
+  
+  const titledTotal = titledAssets.reduce((total, asset) => {
+    return total + parseFloat(asset.value.replace(/[$,]/g, ''));
+  }, 0);
+
+  const totalPortfolioValue = fxTotal + mineralTotal + cryptoTotal + titledTotal;
+
+  // Data for donut chart
+  const chartData = [
+    { name: 'Minerals', value: mineralTotal, color: '#FFD700' },
+    { name: 'Crypto', value: cryptoTotal, color: '#F7931A' },
+    { name: 'FX', value: fxTotal, color: '#2E86C1' },
+    { name: 'Titled', value: titledTotal, color: '#6B7280' }
+  ].filter(item => item.value > 0); // Only show categories with value
+
+  const COLORS = {
+    'Minerals': '#FFD700',
+    'Crypto': '#F7931A', 
+    'FX': '#2E86C1',
+    'Titled': '#6B7280'
+  };
 
   const handleTradingChart = (asset: any) => {
     navigate(`/trading?symbol=${asset.symbol}`);
@@ -211,6 +241,100 @@ const MyAssets = () => {
               <p className="text-2xl font-bold text-primary">
                 ${totalPortfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Portfolio Overview */}
+        <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Column - Aggregated Totals */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Portfolio Breakdown</h2>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">FX Assets:</span>
+                <span className="text-xl font-bold text-primary">
+                  ${fxTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Mineral Assets:</span>
+                <span className="text-xl font-bold text-primary">
+                  ${mineralTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Crypto Assets:</span>
+                <span className="text-xl font-bold text-primary">
+                  ${cryptoTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Titled Assets:</span>
+                <span className="text-xl font-bold text-primary">
+                  ${titledTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="border-t pt-3 mt-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-foreground">Total Portfolio Value:</span>
+                  <span className="text-2xl font-bold text-primary">
+                    ${totalPortfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Donut Chart */}
+          <div className="flex flex-col items-center">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Asset Allocation</h2>
+            <div className="w-full h-80 relative">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={120}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[entry.name as keyof typeof COLORS]} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip 
+                    formatter={(value: number, name: string) => [
+                      `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                      name
+                    ]}
+                    labelFormatter={(name: string) => `${name} (${((chartData.find(d => d.name === name)?.value || 0) / totalPortfolioValue * 100).toFixed(1)}%)`}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              
+              {/* Center Value Display */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                <div className="text-sm text-muted-foreground">Total Value</div>
+                <div className="text-lg font-bold text-primary">
+                  ${(totalPortfolioValue / 1000).toFixed(0)}K
+                </div>
+              </div>
+            </div>
+            
+            {/* Legend */}
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              {chartData.map((entry) => (
+                <div key={entry.name} className="flex items-center space-x-2">
+                  <div 
+                    className="w-4 h-4 rounded"
+                    style={{ backgroundColor: entry.color }}
+                  />
+                  <span className="text-sm text-muted-foreground">{entry.name}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
