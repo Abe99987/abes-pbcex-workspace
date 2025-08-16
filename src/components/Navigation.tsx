@@ -82,6 +82,11 @@ const Navigation = () => {
           description: "Buy, Sell, Realize, Send/Receive, Spend, Transfer",
           onClick: () => navigate('/my-assets')
         },
+        { 
+          label: "My Spending", 
+          description: "Track expenses, categories, and savings goals",
+          onClick: () => navigate('/my-spending')
+        },
         { label: "Transaction History" },
         { label: "Order History" },
         { 
