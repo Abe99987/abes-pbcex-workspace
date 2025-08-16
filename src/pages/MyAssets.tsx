@@ -232,17 +232,9 @@ const MyAssets = () => {
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             My Assets
           </h1>
-          <div className="flex items-center justify-between">
-            <p className="text-xl text-muted-foreground">
-              Manage your digital and physical assets
-            </p>
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Total Portfolio Value</p>
-              <p className="text-2xl font-bold text-primary">
-                ${totalPortfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-          </div>
+          <p className="text-xl text-muted-foreground">
+            Manage your digital and physical assets
+          </p>
         </div>
 
         {/* Portfolio Overview */}
@@ -287,7 +279,7 @@ const MyAssets = () => {
           </div>
 
           {/* Right Column - Donut Chart */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col">
             <h2 className="text-xl font-semibold text-foreground mb-4">Asset Allocation</h2>
             <div className="w-full h-80 relative">
               <ResponsiveContainer width="100%" height="100%">
