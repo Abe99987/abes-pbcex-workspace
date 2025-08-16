@@ -240,7 +240,7 @@ const MyAssets = () => {
         {/* Portfolio Overview */}
         <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Aggregated Totals */}
-          <div className="space-y-4">
+          <div>
             <h2 className="text-xl font-semibold text-foreground mb-4">Portfolio Breakdown</h2>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
