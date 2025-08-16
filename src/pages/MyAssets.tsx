@@ -258,7 +258,7 @@ const MyAssets = () => {
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Mineral Assets:</span>
+                <span className="text-muted-foreground">Commodity Assets:</span>
                 <span className="text-xl font-bold text-primary">
                   ${mineralTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
@@ -439,7 +439,7 @@ const MyAssets = () => {
 
           {/* Mineral Assets */}
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-4">Mineral Assets</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Commodity Assets</h2>
             <div className="space-y-4">
               {mineralAssets.map((asset) => (
                 <Card key={asset.symbol} className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30">
