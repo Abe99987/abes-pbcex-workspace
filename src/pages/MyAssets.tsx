@@ -200,14 +200,14 @@ const MyAssets = () => {
 
   // Data for donut chart
   const chartData = [
-    { name: 'Minerals', value: mineralTotal, color: '#FFD700' },
+    { name: 'Commodities', value: mineralTotal, color: '#FFD700' },
     { name: 'Crypto', value: cryptoTotal, color: '#F7931A' },
     { name: 'FX', value: fxTotal, color: '#2E86C1' },
     { name: 'Titled', value: titledTotal, color: '#6B7280' }
   ].filter(item => item.value > 0); // Only show categories with value
 
   const COLORS = {
-    'Minerals': '#FFD700',
+    'Commodities': '#FFD700',
     'Crypto': '#F7931A', 
     'FX': '#2E86C1',
     'Titled': '#6B7280'
