@@ -19,13 +19,12 @@ const HeroSection = () => {
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
             A Bank for{" "}
             <span className="bg-gradient-to-r from-gold to-gold-light bg-clip-text text-transparent">
-              Real People
+              Real Assets
             </span>
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-            Back to the roots of trading — real assets, real settlement, real utility. 
-            Lock in prices. Buy when the moment is right.
+            The Home of Hard Commodities. Back to the Roots of Trading, Real Assets, Real Settlement, Real Utility. Lock-in Prices. Buy When the Moment is Right.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
