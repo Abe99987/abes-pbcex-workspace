@@ -24,7 +24,8 @@ const HeroSection = () => {
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-            The Home of Hard Commodities. Back to the Roots of Trading, Real Assets, Real Settlement, Real Utility. Lock-in Prices. Buy When the Moment is Right.
+            The Home of Hard Commodities. Real Assets, Real Settlement, Real Utility. Buy when the moment is right, Realize when you're ready.
+            Back to the roots of trading
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
