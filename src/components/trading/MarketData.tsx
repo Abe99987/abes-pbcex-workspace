@@ -16,6 +16,7 @@ const marketData = [
     volume: "1.2M",
     high24h: 2395.00,
     low24h: 2365.00,
+    type: "Commodities",
   },
   {
     pair: "SILVER/USD",
@@ -24,6 +25,7 @@ const marketData = [
     volume: "850K",
     high24h: 32.10,
     low24h: 31.20,
+    type: "Commodities",
   },
   {
     pair: "OIL/USD",
@@ -32,6 +34,7 @@ const marketData = [
     volume: "2.1M",
     high24h: 86.00,
     low24h: 83.50,
+    type: "Commodities",
   },
   {
     pair: "LYD/USD",
@@ -40,6 +43,7 @@ const marketData = [
     volume: "500K",
     high24h: 0.215,
     low24h: 0.208,
+    type: "FX",
   },
   {
     pair: "EUR/USD",
@@ -48,16 +52,105 @@ const marketData = [
     volume: "5.5M",
     high24h: 1.0875,
     low24h: 1.0840,
+    type: "FX",
+  },
+  {
+    pair: "GBP/USD",
+    price: 1.2650,
+    change: 0.35,
+    volume: "3.2M",
+    high24h: 1.2680,
+    low24h: 1.2620,
+    type: "FX",
+  },
+  {
+    pair: "JPY/USD",
+    price: 0.0067,
+    change: -0.25,
+    volume: "4.1M",
+    high24h: 0.0068,
+    low24h: 0.0066,
+    type: "FX",
+  },
+  {
+    pair: "AED/USD",
+    price: 0.2722,
+    change: 0.05,
+    volume: "800K",
+    high24h: 0.2725,
+    low24h: 0.2720,
+    type: "FX",
+  },
+  {
+    pair: "BTC/USD",
+    price: 43250.00,
+    change: 2.85,
+    volume: "8.5M",
+    high24h: 43800.00,
+    low24h: 42100.00,
+    type: "Crypto",
+  },
+  {
+    pair: "ETH/USD",
+    price: 2650.00,
+    change: 1.45,
+    volume: "6.2M",
+    high24h: 2680.00,
+    low24h: 2590.00,
+    type: "Crypto",
+  },
+  {
+    pair: "SOL/USD",
+    price: 98.50,
+    change: 4.25,
+    volume: "2.8M",
+    high24h: 102.00,
+    low24h: 94.20,
+    type: "Crypto",
+  },
+  {
+    pair: "XRP/USD",
+    price: 0.62,
+    change: -1.15,
+    volume: "1.9M",
+    high24h: 0.64,
+    low24h: 0.61,
+    type: "Crypto",
+  },
+  {
+    pair: "SUI/USD",
+    price: 3.85,
+    change: 3.75,
+    volume: "1.1M",
+    high24h: 4.02,
+    low24h: 3.70,
+    type: "Crypto",
   },
 ];
 
 const MarketData = ({ selectedPair, onSelectPair }: MarketDataProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [favorites, setFavorites] = useState<string[]>(["GOLD/USD"]);
+  const [activeFilter, setActiveFilter] = useState<string>("All");
 
-  const filteredData = marketData.filter(item =>
-    item.pair.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredData = marketData.filter(item => {
+    // First apply search filter
+    const matchesSearch = item.pair.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Then apply category filter
+    if (activeFilter === "All") {
+      return matchesSearch;
+    } else if (activeFilter === "★") {
+      return matchesSearch && favorites.includes(item.pair);
+    } else if (activeFilter === "FX") {
+      return matchesSearch && item.type === "FX";
+    } else if (activeFilter === "Commodities") {
+      return matchesSearch && item.type === "Commodities";
+    } else if (activeFilter === "Crypto") {
+      return matchesSearch && item.type === "Crypto";
+    }
+    return matchesSearch;
+  });
 
   const toggleFavorite = (pair: string) => {
     setFavorites(prev =>
@@ -82,10 +175,46 @@ const MarketData = ({ selectedPair, onSelectPair }: MarketDataProps) => {
         
         {/* Filter Tabs */}
         <div className="flex mt-3 space-x-1">
-          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 bg-gray-800 text-white">All</Button>
-          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-gray-400">★</Button>
-          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-gray-400">Gold</Button>
-          <Button size="sm" variant="ghost" className="text-xs h-6 px-2 text-gray-400">Oil</Button>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={() => setActiveFilter("All")}
+            className={`text-xs h-6 px-2 ${activeFilter === "All" ? "bg-gray-800 text-white" : "text-gray-400"}`}
+          >
+            All
+          </Button>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={() => setActiveFilter("★")}
+            className={`text-xs h-6 px-2 ${activeFilter === "★" ? "bg-gray-800 text-white" : "text-gray-400"}`}
+          >
+            ★
+          </Button>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={() => setActiveFilter("FX")}
+            className={`text-xs h-6 px-2 ${activeFilter === "FX" ? "bg-gray-800 text-white" : "text-gray-400"}`}
+          >
+            FX
+          </Button>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={() => setActiveFilter("Commodities")}
+            className={`text-xs h-6 px-2 ${activeFilter === "Commodities" ? "bg-gray-800 text-white" : "text-gray-400"}`}
+          >
+            Commodities
+          </Button>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={() => setActiveFilter("Crypto")}
+            className={`text-xs h-6 px-2 ${activeFilter === "Crypto" ? "bg-gray-800 text-white" : "text-gray-400"}`}
+          >
+            Crypto
+          </Button>
         </div>
       </div>
 
