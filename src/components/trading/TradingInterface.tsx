@@ -14,7 +14,7 @@ const TradingInterface = () => {
   const [selectedPair, setSelectedPair] = useState("GOLD/USD");
 
   return (
-    <div className="h-screen bg-black text-white overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-black text-white flex flex-col">
       <div className="flex-1 flex flex-col">
         <ResizablePanelGroup direction="horizontal" className="flex-1">
           {/* Left Panel - Market Data */}
@@ -34,7 +34,7 @@ const TradingInterface = () => {
             <ResizablePanelGroup direction="vertical">
               {/* Chart */}
               <ResizablePanel defaultSize={75} minSize={60}>
-                <div className="h-full border-b border-gray-800 bg-black">
+                <div className="flex-1 min-h-[420px] border-b border-gray-800 bg-black">
                   <TradingChart pair={selectedPair} />
                 </div>
               </ResizablePanel>
@@ -43,7 +43,7 @@ const TradingInterface = () => {
               
               {/* Order Management */}
               <ResizablePanel defaultSize={25} minSize={20}>
-                <div className="bg-black h-full">
+                <div className="bg-black flex-none min-h-[300px] pb-6">
                   <Tabs defaultValue="positions" className="h-full">
                     <TabsList className="grid w-full grid-cols-3 bg-gray-900 border-b border-gray-800">
                       <TabsTrigger value="positions" className="text-xs">Positions</TabsTrigger>

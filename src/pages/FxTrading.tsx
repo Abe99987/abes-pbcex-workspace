@@ -1,13 +1,13 @@
 import Navigation from "@/components/Navigation";
-import CoinTradingInterface from "@/components/trading/CoinTradingInterface";
+import TradingInterface from "@/components/trading/TradingInterface";
 
-const CoinTrading = () => {
+const FxTrading = () => {
   return (
     <div className="min-h-screen bg-background overflow-y-auto">
       <Navigation />
-      <CoinTradingInterface />
+      <TradingInterface />
     </div>
   );
 };
 
-export default CoinTrading;
+export default FxTrading;
