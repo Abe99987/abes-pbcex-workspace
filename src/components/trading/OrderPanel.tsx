@@ -92,6 +92,30 @@ const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
       </div>
       
       <div className="p-3 space-y-3">
+        {/* Source of funds selector */}
+        {orderType !== "scale" && (
+          <div>
+            <Label htmlFor="funding-source" className="text-gray-300 text-xs">
+              Source of funds
+            </Label>
+            <div className="grid grid-cols-2 gap-1 bg-gray-900 rounded-md p-1 mt-1">
+              <Button
+                variant="default"
+                size="sm"
+                className="text-xs h-8"
+              >
+                Trading Balance
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs h-8 text-gray-400"
+              >
+                Transfer from Funding...
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Price Input */}
         {orderType !== "market" && orderType !== "scale" && (

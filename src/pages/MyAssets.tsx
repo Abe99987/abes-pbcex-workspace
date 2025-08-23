@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
   TrendingUp, 
@@ -20,27 +21,157 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTo
 import BuyAssetModal from "@/components/BuyAssetModal";
 import RealizeAssetModal from "@/components/RealizeAssetModal";
 import BorrowingModal from "@/components/BorrowingModal";
+import TransferModal from "@/components/modals/TransferModal";
 import Navigation from "@/components/Navigation";
 
 const MyAssets = () => {
   const [buyModalOpen, setBuyModalOpen] = useState(false);
   const [realizeModalOpen, setRealizeModalOpen] = useState(false);
   const [borrowingModalOpen, setBorrowingModalOpen] = useState(false);
+  const [transferModalOpen, setTransferModalOpen] = useState(false);
+  const [transferDirection, setTransferDirection] = useState<"funding-to-trading" | "trading-to-funding">("funding-to-trading");
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const navigate = useNavigate();
 
-  // Function to determine asset badge type
-  const getAssetBadge = (symbol: string) => {
-    if (symbol === 'PAXG') {
-      return { text: 'Redeemable (External)', variant: 'default' as const, tooltip: 'Externally portable token; 1:1 backed; custody only—retail fulfillment via JM/DG.' };
-    }
-    if (['XAG', 'XPT', 'XPD', 'XCU'].includes(symbol)) {
+  // Function to determine asset badge type and category
+  const getAssetBadge = (symbol: string, category: "funding" | "trading") => {
+    if (category === "funding") {
+      if (symbol === 'PAXG') {
+        return { text: 'Redeemable (External)', variant: 'default' as const, tooltip: 'Externally portable token; 1:1 backed; custody only—retail fulfillment via JM/DG.' };
+      }
+      return null; // USD, USDC, USDT don't need badges
+    } else {
+      // Trading category - all synthetics
       return { text: 'Trade-Only (Internal)', variant: 'secondary' as const, tooltip: 'Internal PBcex token; secure, freeze/burn capable; not transferable off PBcex.' };
     }
-    return null;
   };
 
-  // Asset categories
+  // Funding Assets (Spot/Vault)
+  const fundingAssets = [
+    {
+      name: "USD",
+      symbol: "USD",
+      price: "$1.00",
+      change: "0.0%",
+      isPositive: true,
+      icon: "💵",
+      description: "United States Dollar",
+      balance: "$12,450.00",
+      value: "$12,450.00",
+      isLive: true,
+      category: "funding"
+    },
+    {
+      name: "USDC",
+      symbol: "USDC",
+      price: "$1.00",
+      change: "0.0%",
+      isPositive: true,
+      icon: "🔵",
+      description: "USD Coin Stablecoin",
+      balance: "$8,500.00",
+      value: "$8,500.00",
+      isLive: true,
+      category: "funding"
+    },
+    {
+      name: "USDT",
+      symbol: "USDT",
+      price: "$1.00",
+      change: "0.0%",
+      isPositive: true,
+      icon: "🟢",
+      description: "Tether USD Stablecoin",
+      balance: "$3,200.00",
+      value: "$3,200.00",
+      isLive: true,
+      category: "funding"
+    },
+    {
+      name: "PAXG",
+      symbol: "PAXG",
+      price: "$2,048.50",
+      change: "+1.2%",
+      isPositive: true,
+      icon: "🥇",
+      description: "PAX Gold Token",
+      balance: "2.5 oz",
+      value: "$5,121.25",
+      isLive: true,
+      category: "funding"
+    }
+  ];
+
+  // Trading Assets (Synthetic)
+  const tradingAssets = [
+    {
+      name: "Gold Synthetic",
+      symbol: "XAU-s",
+      price: "$2,048.50",
+      change: "+1.2%",
+      isPositive: true,
+      icon: "🥇",
+      description: "Synthetic Gold Token",
+      balance: "3.2 oz",
+      value: "$6,555.20",
+      isLive: true,
+      category: "trading"
+    },
+    {
+      name: "Silver Synthetic",
+      symbol: "XAG-s",
+      price: "$24.85",
+      change: "+0.8%",
+      isPositive: true,
+      icon: "🥈",
+      description: "Synthetic Silver Token",
+      balance: "125.5 oz",
+      value: "$3,118.68",
+      isLive: true,
+      category: "trading"
+    },
+    {
+      name: "Platinum Synthetic",
+      symbol: "XPT-s",
+      price: "$924.80",
+      change: "+0.6%",
+      isPositive: true,
+      icon: "⚪",
+      description: "Synthetic Platinum Token",
+      balance: "1.8 oz",
+      value: "$1,664.64",
+      isLive: true,
+      category: "trading"
+    },
+    {
+      name: "Palladium Synthetic",
+      symbol: "XPD-s",
+      price: "$1,280.40",
+      change: "-0.2%",
+      isPositive: false,
+      icon: "⚫",
+      description: "Synthetic Palladium Token",
+      balance: "0.9 oz",
+      value: "$1,152.36",
+      isLive: true,
+      category: "trading"
+    },
+    {
+      name: "Copper Synthetic",
+      symbol: "XCU-s",
+      price: "$8,420.00",
+      change: "+2.1%",
+      isPositive: true,
+      icon: "🟤",
+      description: "Synthetic Copper Token",
+      balance: "2.1 tons",
+      value: "$17,682.00",
+      isLive: true,
+      category: "trading"
+    }
+  ];
+
+  // Legacy asset categories for compatibility
   const fxAssets = [
     {
       name: "USD",
@@ -191,6 +322,14 @@ const MyAssets = () => {
   const allAssets = [...fxAssets, ...mineralAssets, ...cryptoAssets, ...titledAssets];
 
   // Calculate category totals
+  const fundingTotal = fundingAssets.reduce((total, asset) => {
+    return total + parseFloat(asset.value.replace(/[$,]/g, ''));
+  }, 0);
+
+  const tradingTotal = tradingAssets.reduce((total, asset) => {
+    return total + parseFloat(asset.value.replace(/[$,]/g, ''));
+  }, 0);
+
   const fxTotal = fxAssets.reduce((total, asset) => {
     return total + parseFloat(asset.value.replace(/[$,]/g, ''));
   }, 0);
@@ -207,10 +346,12 @@ const MyAssets = () => {
     return total + parseFloat(asset.value.replace(/[$,]/g, ''));
   }, 0);
 
-  const totalPortfolioValue = fxTotal + mineralTotal + cryptoTotal + titledTotal;
+  const totalPortfolioValue = fundingTotal + tradingTotal + fxTotal + mineralTotal + cryptoTotal + titledTotal;
 
   // Data for donut chart
   const chartData = [
+    { name: 'Funding', value: fundingTotal, color: '#10B981' },
+    { name: 'Trading', value: tradingTotal, color: '#F59E0B' },
     { name: 'Commodities', value: mineralTotal, color: '#FFD700' },
     { name: 'Crypto', value: cryptoTotal, color: '#F7931A' },
     { name: 'FX', value: fxTotal, color: '#2E86C1' },
@@ -218,6 +359,8 @@ const MyAssets = () => {
   ].filter(item => item.value > 0); // Only show categories with value
 
   const COLORS = {
+    'Funding': '#10B981',
+    'Trading': '#F59E0B',
     'Commodities': '#FFD700',
     'Crypto': '#F7931A', 
     'FX': '#2E86C1',
@@ -254,6 +397,18 @@ const MyAssets = () => {
           <div>
             <h2 className="text-xl font-semibold text-foreground mb-4">Portfolio Breakdown</h2>
             <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Funding (Spot/Vault):</span>
+                <span className="text-xl font-bold text-primary">
+                  ${fundingTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Trading (Synthetic):</span>
+                <span className="text-xl font-bold text-primary">
+                  ${tradingTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">FX Assets:</span>
                 <span className="text-xl font-bold text-primary">
@@ -342,7 +497,213 @@ const MyAssets = () => {
           </div>
         </div>
 
-        {/* Assets Grid by Category */}
+        {/* Wallet Tabs */}
+        <Tabs defaultValue="funding" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="funding">Funding (Spot/Vault)</TabsTrigger>
+            <TabsTrigger value="trading">Trading (Synthetic)</TabsTrigger>
+          </TabsList>
+
+          {/* Funding Tab */}
+          <TabsContent value="funding" className="space-y-8">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-foreground">Funding Assets</h2>
+              <Button
+                onClick={() => {
+                  setTransferDirection("funding-to-trading");
+                  setTransferModalOpen(true);
+                }}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <ArrowUpDown className="w-4 h-4" />
+                Transfer
+              </Button>
+            </div>
+            <div className="space-y-4">
+              {fundingAssets.map((asset) => (
+                <Card key={asset.symbol} className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30">
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                      
+                      {/* Asset Info */}
+                      <div className="lg:col-span-3 flex items-center space-x-4">
+                        <div className="text-3xl">{asset.icon}</div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
+                            {getAssetBadge(asset.symbol, "funding") && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Badge variant={getAssetBadge(asset.symbol, "funding")!.variant} className="text-xs">
+                                      {getAssetBadge(asset.symbol, "funding")!.text}
+                                    </Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="max-w-xs">{getAssetBadge(asset.symbol, "funding")!.tooltip}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground">{asset.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Prices powered by TradingView (Chainlink added later).</p>
+                        </div>
+                      </div>
+
+                      {/* Price & Change */}
+                      <div className="lg:col-span-2 text-center lg:text-left">
+                        <div className="text-xl font-bold text-primary mb-1">{asset.price}</div>
+                        <Badge 
+                          variant={asset.isPositive ? "default" : "destructive"}
+                          className="flex items-center space-x-1 w-fit"
+                        >
+                          {asset.isPositive ? (
+                            <TrendingUp className="w-3 h-3" />
+                          ) : (
+                            <TrendingDown className="w-3 h-3" />
+                          )}
+                          <span>{asset.change}</span>
+                        </Badge>
+                      </div>
+
+                      {/* Mini Chart Placeholder */}
+                      <div className="lg:col-span-2 flex justify-center">
+                        <div className="w-24 h-12 bg-muted rounded flex items-center justify-center">
+                          <BarChart3 className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                      </div>
+
+                      {/* Balance & Value */}
+                      <div className="lg:col-span-2 text-center lg:text-left">
+                        <div className="text-sm text-muted-foreground">Balance</div>
+                        <div className="font-semibold text-foreground">{asset.balance}</div>
+                        <div className="text-sm text-primary font-medium">{asset.value}</div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="lg:col-span-3">
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                          <Button size="default" variant="outline">
+                            <Upload className="w-4 h-4 mr-2" />
+                            <span>Deposit</span>
+                          </Button>
+                          <Button size="default" variant="outline">
+                            <Download className="w-4 h-4 mr-2" />
+                            <span>Withdraw</span>
+                          </Button>
+                          <Button size="default" variant="outline">
+                            <Send className="w-4 h-4 mr-2" />
+                            <span>Send</span>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Trading Tab */}
+          <TabsContent value="trading" className="space-y-8">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-foreground">Trading Assets</h2>
+              <Button
+                onClick={() => {
+                  setTransferDirection("trading-to-funding");
+                  setTransferModalOpen(true);
+                }}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <ArrowUpDown className="w-4 h-4" />
+                Transfer
+              </Button>
+            </div>
+            <div className="space-y-4">
+              {tradingAssets.map((asset) => (
+                <Card key={asset.symbol} className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30">
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                      
+                      {/* Asset Info */}
+                      <div className="lg:col-span-3 flex items-center space-x-4">
+                        <div className="text-3xl">{asset.icon}</div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Badge variant="secondary" className="text-xs">
+                                    Trade-Only (Internal)
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="max-w-xs">Internal PBcex token; secure, freeze/burn capable; not transferable off PBcex.</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{asset.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Prices powered by TradingView (Chainlink added later).</p>
+                        </div>
+                      </div>
+
+                      {/* Price & Change */}
+                      <div className="lg:col-span-2 text-center lg:text-left">
+                        <div className="text-xl font-bold text-primary mb-1">{asset.price}</div>
+                        <Badge 
+                          variant={asset.isPositive ? "default" : "destructive"}
+                          className="flex items-center space-x-1 w-fit"
+                        >
+                          {asset.isPositive ? (
+                            <TrendingUp className="w-3 h-3" />
+                          ) : (
+                            <TrendingDown className="w-3 h-3" />
+                          )}
+                          <span>{asset.change}</span>
+                        </Badge>
+                      </div>
+
+                      {/* Mini Chart Placeholder */}
+                      <div className="lg:col-span-2 flex justify-center">
+                        <div className="w-24 h-12 bg-muted rounded flex items-center justify-center">
+                          <BarChart3 className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                      </div>
+
+                      {/* Balance & Value */}
+                      <div className="lg:col-span-2 text-center lg:text-left">
+                        <div className="text-sm text-muted-foreground">Balance</div>
+                        <div className="font-semibold text-foreground">{asset.balance}</div>
+                        <div className="text-sm text-primary font-medium">{asset.value}</div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="lg:col-span-3">
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                          <Button size="default" variant="outline" onClick={() => { setSelectedAsset(asset); setBuyModalOpen(true); }}>
+                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            <span>Buy</span>
+                          </Button>
+                          <Button size="default" variant="outline" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
+                            <Package className="w-4 h-4 mr-2" />
+                            <span>Sell</span>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Legacy Assets Grid by Category */}
         <div className="space-y-8">
           {/* FX Assets */}
           <div>
@@ -359,20 +720,6 @@ const MyAssets = () => {
                         <div>
                           <div className="flex items-center gap-2">
                             <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
-                            {getAssetBadge(asset.symbol) && (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <Badge variant={getAssetBadge(asset.symbol)!.variant} className="text-xs">
-                                      {getAssetBadge(asset.symbol)!.text}
-                                    </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p className="max-w-xs">{getAssetBadge(asset.symbol)!.tooltip}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
                           </div>
                           <p className="text-sm text-muted-foreground">{asset.description}</p>
                           <p className="text-xs text-muted-foreground mt-1">Prices powered by TradingView (Chainlink added later).</p>
@@ -472,20 +819,18 @@ const MyAssets = () => {
                         <div>
                           <div className="flex items-center gap-2">
                             <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
-                            {getAssetBadge(asset.symbol) && (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <Badge variant={getAssetBadge(asset.symbol)!.variant} className="text-xs">
-                                      {getAssetBadge(asset.symbol)!.text}
-                                    </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p className="max-w-xs">{getAssetBadge(asset.symbol)!.tooltip}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Badge variant="secondary" className="text-xs">
+                                    Trade-Only (Internal)
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="max-w-xs">Internal PBcex token; secure, freeze/burn capable; not transferable off PBcex.</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           </div>
                           <p className="text-sm text-muted-foreground">{asset.description}</p>
                           <p className="text-xs text-muted-foreground mt-1">Prices powered by TradingView (Chainlink added later).</p>
@@ -583,23 +928,9 @@ const MyAssets = () => {
                       <div className="lg:col-span-3 flex items-center space-x-4">
                         <div className="text-3xl">{asset.icon}</div>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
-                            {getAssetBadge(asset.symbol) && (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <Badge variant={getAssetBadge(asset.symbol)!.variant} className="text-xs">
-                                      {getAssetBadge(asset.symbol)!.text}
-                                    </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p className="max-w-xs">{getAssetBadge(asset.symbol)!.tooltip}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
-                          </div>
+                           <div className="flex items-center gap-2">
+                             <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
+                           </div>
                           <p className="text-sm text-muted-foreground">{asset.description}</p>
                           <p className="text-xs text-muted-foreground mt-1">Prices powered by TradingView (Chainlink added later).</p>
                         </div>
@@ -745,6 +1076,12 @@ const MyAssets = () => {
       </div>
 
       {/* Modals */}
+      <TransferModal
+        isOpen={transferModalOpen}
+        onClose={() => setTransferModalOpen(false)}
+        direction={transferDirection}
+      />
+      
       {selectedAsset && (
         <>
           <BuyAssetModal
@@ -752,11 +1089,13 @@ const MyAssets = () => {
             onClose={() => setBuyModalOpen(false)}
             asset={selectedAsset}
           />
+
           <RealizeAssetModal
             isOpen={realizeModalOpen}
             onClose={() => setRealizeModalOpen(false)}
             asset={selectedAsset}
           />
+
           <BorrowingModal
             isOpen={borrowingModalOpen}
             onClose={() => setBorrowingModalOpen(false)}
