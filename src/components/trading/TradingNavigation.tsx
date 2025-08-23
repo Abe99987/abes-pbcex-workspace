@@ -48,7 +48,7 @@ const TradingNavigation = () => {
       items: ["Open Branch", "Partner Program", "Requirements", "Support"]
     },
     {
-      label: "Education",
+      label: "Learn",
       icon: BookOpen,
       items: ["Trading Basics", "Asset Backing", "Risk Management", "Video Tutorials"]
     },

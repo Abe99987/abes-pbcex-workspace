@@ -136,7 +136,7 @@ const Navigation = () => {
       icon: Building2
     },
     {
-      label: "Education",
+      label: "Learn",
       href: "/education",
       icon: BookOpen
     },
