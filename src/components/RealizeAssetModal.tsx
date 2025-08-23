@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,9 @@ const RealizeAssetModal = ({ isOpen, onClose, asset }: RealizeAssetModalProps) =
   const [format, setFormat] = useState("bar");
   const [deliveryMethod, setDeliveryMethod] = useState("ship");
   const [amount, setAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("pbcex-tokens");
+  const [priceLockedUntil, setPriceLockedUntil] = useState<Date | null>(null);
+  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
   const [address, setAddress] = useState({
     street: "",
     city: "",
@@ -43,6 +46,36 @@ const RealizeAssetModal = ({ isOpen, onClose, asset }: RealizeAssetModalProps) =
   const [selectedBranch, setSelectedBranch] = useState<any>(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const { toast } = useToast();
+
+  // Price lock countdown effect
+  useEffect(() => {
+    if (priceLockedUntil && timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            setPriceLockedUntil(null);
+            return 600;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [priceLockedUntil, timeLeft]);
+
+  // Lock price when amount is entered
+  useEffect(() => {
+    if (amount && parseFloat(amount) > 0 && !priceLockedUntil) {
+      setPriceLockedUntil(new Date(Date.now() + 10 * 60 * 1000));
+      setTimeLeft(600);
+    }
+  }, [amount]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Asset-specific user balances and configurations
   const getAssetConfig = () => {
@@ -173,15 +206,26 @@ const RealizeAssetModal = ({ isOpen, onClose, asset }: RealizeAssetModalProps) =
       ? `via insured ${address.carrier.toUpperCase()}`
       : `at ${selectedBranch?.name}`;
     
-    toast({
-      title: "Realization Confirmed!",
-      description: `${amount} ${assetConfig.unit} of ${asset.name} will be ${asset.symbol === "OIL" && format === "sell" ? "sold" : "delivered"} ${deliveryText}`,
-    });
+    // Handle token burning if PBcex Tokens selected
+    if (paymentMethod === "pbcex-tokens") {
+      const burnAmount = parseFloat(amount) || 0;
+      toast({
+        title: "Realization Confirmed!",
+        description: `${amount} ${assetConfig.unit} of ${asset.name} realized. Payment: ${burnAmount.toFixed(3)} PBcex ${asset.symbol} → $${(burnAmount * 2000).toFixed(2)} applied credit`,
+      });
+    } else {
+      toast({
+        title: "Realization Confirmed!",
+        description: `${amount} ${assetConfig.unit} of ${asset.name} will be ${asset.symbol === "OIL" && format === "sell" ? "sold" : "delivered"} ${deliveryText}`,
+      });
+    }
     
     setIsConfirming(false);
     onClose();
     setStep(1);
     setAmount("");
+    setPriceLockedUntil(null);
+    setTimeLeft(600);
   };
 
   const insuranceFee = (asset.symbol === "AU" || asset.symbol === "AG") ? parseFloat(amount) * 0.02 || 0 : 0; // 2% insurance for precious metals
@@ -198,6 +242,21 @@ const RealizeAssetModal = ({ isOpen, onClose, asset }: RealizeAssetModalProps) =
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Price Lock Display */}
+          {priceLockedUntil && (
+            <Card className="border-blue-200 bg-blue-50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-800">Price locked</span>
+                  </div>
+                  <span className="text-sm font-bold text-blue-800">Time left: {formatTime(timeLeft)}</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Balance Display */}
           <Card className="bg-muted/30">
             <CardContent className="p-4">
@@ -224,6 +283,8 @@ const RealizeAssetModal = ({ isOpen, onClose, asset }: RealizeAssetModalProps) =
                 />
                 <div className="text-sm text-muted-foreground">
                   Maximum: {assetConfig.userBalance.toFixed(3)} {assetConfig.unit} available
+                  <br />
+                  <span className="text-xs text-muted-foreground">Prices powered by TradingView (Chainlink added later).</span>
                 </div>
               </div>
 
@@ -269,6 +330,34 @@ const RealizeAssetModal = ({ isOpen, onClose, asset }: RealizeAssetModalProps) =
                 </Card>
               )}
 
+              {/* Payment Method Selection */}
+              <div className="space-y-3">
+                <Label>Payment Method</Label>
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <div className="flex items-center space-x-3 p-4 border rounded-lg">
+                    <RadioGroupItem value="pbcex-tokens" id="realize-pbcex-tokens" />
+                    <div className="flex-1">
+                      <Label htmlFor="realize-pbcex-tokens" className="font-medium">PBcex Tokens</Label>
+                      <div className="text-sm text-muted-foreground">Burn tokens and receive proceeds</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3 p-4 border rounded-lg">
+                    <RadioGroupItem value="usd" id="realize-usd" />
+                    <div className="flex-1">
+                      <Label htmlFor="realize-usd" className="font-medium">USD</Label>
+                      <div className="text-sm text-muted-foreground">Receive US Dollars</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3 p-4 border rounded-lg">
+                    <RadioGroupItem value="usdc" id="realize-usdc" />
+                    <div className="flex-1">
+                      <Label htmlFor="realize-usdc" className="font-medium">USDC/USDT</Label>
+                      <div className="text-sm text-muted-foreground">Receive stablecoins</div>
+                    </div>
+                  </div>
+                </RadioGroup>
+              </div>
+
               {amount && selectedFormat && parseFloat(amount) >= selectedFormat.minAmount && (
                 <Card className="bg-muted/30">
                   <CardContent className="p-4">
@@ -277,6 +366,11 @@ const RealizeAssetModal = ({ isOpen, onClose, asset }: RealizeAssetModalProps) =
                         {asset.symbol === "OIL" && format === "sell" ? "Sale" : "Redemption"} Preview:
                       </strong><br />
                       {getRedemptionBreakdown()}
+                      {paymentMethod === "pbcex-tokens" && parseFloat(amount) > 0 && (
+                        <div className="mt-2 pt-2 border-t">
+                          <div className="text-green-700">Payment: {parseFloat(amount).toFixed(3)} PBcex {asset.symbol} (internal) → ${(parseFloat(amount) * 2000).toFixed(2)} applied</div>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

@@ -29,6 +29,17 @@ const MyAssets = () => {
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const navigate = useNavigate();
 
+  // Function to determine asset badge type
+  const getAssetBadge = (symbol: string) => {
+    if (symbol === 'PAXG') {
+      return { text: 'Redeemable (External)', variant: 'default' as const, tooltip: 'Externally portable token; 1:1 backed; custody only—retail fulfillment via JM/DG.' };
+    }
+    if (['XAG', 'XPT', 'XPD', 'XCU'].includes(symbol)) {
+      return { text: 'Trade-Only (Internal)', variant: 'secondary' as const, tooltip: 'Internal PBcex token; secure, freeze/burn capable; not transferable off PBcex.' };
+    }
+    return null;
+  };
+
   // Asset categories
   const fxAssets = [
     {
@@ -346,8 +357,25 @@ const MyAssets = () => {
                       <div className="lg:col-span-3 flex items-center space-x-4">
                         <div className="text-3xl">{asset.icon}</div>
                         <div>
-                          <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
+                            {getAssetBadge(asset.symbol) && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Badge variant={getAssetBadge(asset.symbol)!.variant} className="text-xs">
+                                      {getAssetBadge(asset.symbol)!.text}
+                                    </Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="max-w-xs">{getAssetBadge(asset.symbol)!.tooltip}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </div>
                           <p className="text-sm text-muted-foreground">{asset.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Prices powered by TradingView (Chainlink added later).</p>
                         </div>
                       </div>
 
@@ -442,8 +470,25 @@ const MyAssets = () => {
                       <div className="lg:col-span-3 flex items-center space-x-4">
                         <div className="text-3xl">{asset.icon}</div>
                         <div>
-                          <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
+                            {getAssetBadge(asset.symbol) && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Badge variant={getAssetBadge(asset.symbol)!.variant} className="text-xs">
+                                      {getAssetBadge(asset.symbol)!.text}
+                                    </Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="max-w-xs">{getAssetBadge(asset.symbol)!.tooltip}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </div>
                           <p className="text-sm text-muted-foreground">{asset.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Prices powered by TradingView (Chainlink added later).</p>
                         </div>
                       </div>
 
@@ -538,8 +583,25 @@ const MyAssets = () => {
                       <div className="lg:col-span-3 flex items-center space-x-4">
                         <div className="text-3xl">{asset.icon}</div>
                         <div>
-                          <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
+                            {getAssetBadge(asset.symbol) && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Badge variant={getAssetBadge(asset.symbol)!.variant} className="text-xs">
+                                      {getAssetBadge(asset.symbol)!.text}
+                                    </Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="max-w-xs">{getAssetBadge(asset.symbol)!.tooltip}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </div>
                           <p className="text-sm text-muted-foreground">{asset.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Prices powered by TradingView (Chainlink added later).</p>
                         </div>
                       </div>
 
