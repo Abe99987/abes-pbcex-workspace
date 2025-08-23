@@ -86,7 +86,7 @@ const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
             className="w-full text-xs h-8 text-gray-500 border border-gray-700 hover:bg-gray-800"
             title="Only available for 100-ton+ wholesale commodity trades"
           >
-            Accept Direct Fulfill
+            Direct Fill
           </Button>
         </div>
       </div>
