@@ -416,15 +416,47 @@ const FranchiseAndPartnershipsForm = () => {
           
           <div>
             <Label>Preferred Franchise Model</Label>
-            <div className="mt-2 space-y-2">
-              {["Retail Storefront", "Gold Exchange Kiosk", "Teller/Counter", "Online-Only", "Hybrid"].map(model => (
-                <div key={model} className="flex items-center space-x-2">
+            <div className="mt-2 space-y-3">
+              {[
+                { 
+                  value: "Retail Storefront", 
+                  description: "Full branch experience: customer deposits & withdrawals, cash-to-gold exchange, and retail precious-metals sales." 
+                },
+                { 
+                  value: "Gold FX Exchange Kiosk", 
+                  description: "Small footprint (mall/airport kiosk) for fast foreign exchange, gold-token sales, and basic deposits/withdrawals." 
+                },
+                { 
+                  value: "Teller / Counter", 
+                  description: "Bank-counter services only: deposits, withdrawals, and account setup. No on-site retail sales or trading." 
+                },
+                { 
+                  value: "Online-Only", 
+                  description: "Digital-first operator or metals provider who can fulfill orders in-country via logistics partners. No physical storefront." 
+                },
+                { 
+                  value: "Hybrid", 
+                  description: "Combination model (e.g., teller/counter + retail FX/gold sales); configure based on local demand and footprint." 
+                }
+              ].map(model => (
+                <div key={model.value} className="flex items-start space-x-2">
                   <Checkbox 
-                    id={`model-${model}`}
-                    checked={formData.franchiseModel.includes(model)}
-                    onCheckedChange={(checked) => handleCheckboxChange("franchiseModel", model, checked as boolean)}
+                    id={`model-${model.value}`}
+                    checked={formData.franchiseModel.includes(model.value)}
+                    onCheckedChange={(checked) => handleCheckboxChange("franchiseModel", model.value, checked as boolean)}
+                    className="mt-1"
                   />
-                  <Label htmlFor={`model-${model}`}>{model}</Label>
+                  <div className="flex-1">
+                    <Label htmlFor={`model-${model.value}`} className="cursor-pointer">
+                      {model.value}
+                    </Label>
+                    <p 
+                      className="text-sm text-muted-foreground mt-1 leading-relaxed"
+                      aria-describedby={`model-${model.value}`}
+                    >
+                      {model.description}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
