@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import DepositModal from "@/components/modals/DepositModal";
 import WalletConnectModal from "@/components/modals/WalletConnectModal";
+import AuthModal from "@/components/modals/AuthModal";
 import { 
   Menu, 
   ChevronDown, 
@@ -54,6 +55,7 @@ const Navigation = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("EN");
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [walletConnectModalOpen, setWalletConnectModalOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   
   // Check if we're on trading page for theme adaptation
   const isTrading = location.pathname === '/trading' || location.pathname === '/coin-trading';
@@ -338,89 +340,18 @@ const Navigation = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="p-2">
-                <Avatar className="w-6 h-6">
-                  <AvatarFallback className={`${
-                    isTrading 
-                      ? 'bg-gray-700 text-gray-300' 
-                      : 'bg-muted text-muted-foreground'
-                  } text-xs`}>
-                    <User className="w-3 h-3" />
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className={`w-52 z-50 ${
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`p-2 ${
               isTrading 
-                ? 'bg-gray-900 border-gray-700 text-gray-100' 
-                : 'bg-background border-border text-foreground'
-            }`} align="end">
-              <DropdownMenuItem className={`cursor-pointer ${
-                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-              }`}>
-                <Shield className="w-4 h-4 mr-3" />
-                Account & Security
-              </DropdownMenuItem>
-              <DropdownMenuItem className={`cursor-pointer ${
-                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-              }`}>
-                <BadgeIcon className="w-4 h-4 mr-3" />
-                Identification
-              </DropdownMenuItem>
-              <DropdownMenuItem className={`cursor-pointer ${
-                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-              }`}>
-                <Gift className="w-4 h-4 mr-3" />
-                My Coupons
-              </DropdownMenuItem>
-              <DropdownMenuItem className={`cursor-pointer ${
-                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-              }`}>
-                <Users className="w-4 h-4 mr-3" />
-                Affiliate
-              </DropdownMenuItem>
-              <DropdownMenuItem className={`cursor-pointer ${
-                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-              }`}>
-                <CreditCard className="w-4 h-4 mr-3" />
-                Trading Fees
-              </DropdownMenuItem>
-              <DropdownMenuItem className={`cursor-pointer ${
-                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-              }`}>
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center">
-                    <Crown className="w-4 h-4 mr-3" />
-                    Sub-Account
-                  </div>
-                  <Badge variant="secondary" className="text-xs">
-                    Beta
-                  </Badge>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem className={`cursor-pointer ${
-                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-              }`}>
-                <Code className="w-4 h-4 mr-3" />
-                API
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className={isTrading ? 'bg-gray-700' : 'bg-border'} />
-              <DropdownMenuItem className={`cursor-pointer ${
-                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-              }`}>
-                <Settings className="w-4 h-4 mr-3" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuItem className={`cursor-pointer text-red-400 ${
-                isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-              }`}>
-                <LogOut className="w-4 h-4 mr-3" />
-                Log Out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                ? 'text-gray-300 hover:text-white hover:bg-gray-800' 
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+            }`}
+            onClick={() => setAuthModalOpen(true)}
+          >
+            <User className="w-4 h-4" />
+          </Button>
         </div>
 
         {/* Mobile Navigation */}
@@ -502,6 +433,10 @@ const Navigation = () => {
       <WalletConnectModal 
         open={walletConnectModalOpen} 
         onOpenChange={setWalletConnectModalOpen} 
+      />
+      <AuthModal 
+        open={authModalOpen} 
+        onOpenChange={setAuthModalOpen} 
       />
     </nav>
   );
