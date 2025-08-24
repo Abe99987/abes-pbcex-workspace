@@ -8,6 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+import { ChevronDown, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const countries = [
@@ -15,10 +19,25 @@ const countries = [
   "Singapore", "India", "Japan", "United Arab Emirates", "Saudi Arabia", "Nigeria", "South Africa"
 ];
 
-const commodities = [
-  "Gold", "Silver", "Platinum", "Palladium", "Copper", "Lithium", "Cobalt", "Nickel", 
-  "Oil", "Gas", "Other"
-];
+const commoditiesData = {
+  "Precious Metals": [
+    "Gold", "Silver", "Platinum", "Palladium", "Rhodium"
+  ],
+  "Base & Industrial Metals": [
+    "Copper", "Aluminum", "Nickel", "Zinc", "Tin", "Iron / Steel", "Tungsten"
+  ],
+  "Energy": [
+    "Crude Oil (WTI, Brent)", "Natural Gas", "Uranium", "Graphite"
+  ],
+  "Rare Earth Elements (REEs)": [
+    "Neodymium", "Dysprosium", "Terbium", "Yttrium", "Praseodymium", 
+    "Samarium", "Europium", "Holmium", "Erbium", "Thulium", "Lutetium"
+  ],
+  "Strategic / Other Metals": [
+    "Gallium", "Germanium", "Indium", "Antimony", "Bismuth", 
+    "Tantalum", "Scandium", "Other (please specify)"
+  ]
+};
 
 const incoterms = ["FOB", "CIF", "EXW", "DDP", "FCA", "CPT", "CIP", "DAP", "DPU"];
 
@@ -26,6 +45,7 @@ const FranchiseAndPartnershipsForm = () => {
   const { toast } = useToast();
   const [formType, setFormType] = useState("franchise_applicant");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [commodityDropdownOpen, setCommodityDropdownOpen] = useState(false);
   const honeypotRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
@@ -657,156 +677,240 @@ const FranchiseAndPartnershipsForm = () => {
     </div>
   );
 
-  const renderCommodityProviderForm = () => (
-    <div className="space-y-6">
-      {/* Company */}
-      <div>
-        <h4 className="font-semibold mb-4">Company</h4>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="companyName">Company Name *</Label>
-            <Input
-              id="companyName"
-              value={formData.companyName}
-              onChange={(e) => handleInputChange("companyName", e.target.value)}
-              data-error={!!errors.companyName}
-              className={errors.companyName ? "border-destructive" : ""}
-            />
-            {errors.companyName && <p className="text-sm text-destructive mt-1">{errors.companyName}</p>}
-          </div>
-          <div>
-            <Label htmlFor="countryOfOperation">Country of Operation *</Label>
-            <Select value={formData.countryOfOperation} onValueChange={(value) => handleInputChange("countryOfOperation", value)}>
-              <SelectTrigger className={errors.countryOfOperation ? "border-destructive" : ""}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {countries.map(country => (
-                  <SelectItem key={country} value={country}>{country}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.countryOfOperation && <p className="text-sm text-destructive mt-1">{errors.countryOfOperation}</p>}
-          </div>
-          <div>
-            <Label htmlFor="authorizedSignatory">Authorized Signatory Name & Title *</Label>
-            <Input
-              id="authorizedSignatory"
-              value={formData.authorizedSignatory}
-              onChange={(e) => handleInputChange("authorizedSignatory", e.target.value)}
-              data-error={!!errors.authorizedSignatory}
-              className={errors.authorizedSignatory ? "border-destructive" : ""}
-              placeholder="Name and Title"
-            />
-            {errors.authorizedSignatory && <p className="text-sm text-destructive mt-1">{errors.authorizedSignatory}</p>}
-          </div>
-        </div>
-      </div>
+  const renderCommodityProviderForm = () => {
+    const handleCommoditySelect = (commodity: string) => {
+      const currentValues = formData.primaryCommodities;
+      if (currentValues.includes(commodity)) {
+        handleInputChange("primaryCommodities", currentValues.filter(v => v !== commodity));
+      } else {
+        handleInputChange("primaryCommodities", [...currentValues, commodity]);
+      }
+      
+      // If "Other (please specify)" was unselected, clear the other commodity field
+      if (commodity === "Other (please specify)" && currentValues.includes(commodity)) {
+        handleInputChange("otherCommodity", "");
+      }
+    };
 
-      {/* Supply */}
-      <div>
-        <h4 className="font-semibold mb-4">Supply</h4>
-        <div className="space-y-4">
-          <div>
-            <Label>Primary Commodities Supplied *</Label>
-            <div className="mt-2 space-y-2 max-h-32 overflow-y-auto">
-              {commodities.map(commodity => (
-                <div key={commodity} className="flex items-center space-x-2">
-                  <Checkbox 
-                    id={`commodity-${commodity}`}
-                    checked={formData.primaryCommodities.includes(commodity)}
-                    onCheckedChange={(checked) => handleCheckboxChange("primaryCommodities", commodity, checked as boolean)}
-                  />
-                  <Label htmlFor={`commodity-${commodity}`}>{commodity}</Label>
-                </div>
-              ))}
-            </div>
-            {formData.primaryCommodities.includes("Other") && (
-              <Input
-                placeholder="Specify other commodity"
-                value={formData.otherCommodity}
-                onChange={(e) => handleInputChange("otherCommodity", e.target.value)}
-                className="mt-2"
-              />
-            )}
-            {errors.primaryCommodities && <p className="text-sm text-destructive mt-1">{errors.primaryCommodities}</p>}
-          </div>
-          <div>
-            <Label htmlFor="annualCapacity">Annual Production / Supply Capacity *</Label>
-            <Input
-              id="annualCapacity"
-              value={formData.annualCapacity}
-              onChange={(e) => handleInputChange("annualCapacity", e.target.value)}
-              data-error={!!errors.annualCapacity}
-              className={errors.annualCapacity ? "border-destructive" : ""}
-              placeholder="e.g., 1000 tons/year"
-            />
-            {errors.annualCapacity && <p className="text-sm text-destructive mt-1">{errors.annualCapacity}</p>}
-          </div>
-        </div>
-      </div>
+    const removeCommodity = (commodity: string) => {
+      const currentValues = formData.primaryCommodities;
+      handleInputChange("primaryCommodities", currentValues.filter(v => v !== commodity));
+      
+      if (commodity === "Other (please specify)") {
+        handleInputChange("otherCommodity", "");
+      }
+    };
 
-      {/* Trade/Logistics */}
-      <div>
-        <h4 className="font-semibold mb-4">Trade/Logistics</h4>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="fulfillmentMethod">Preferred Fulfillment Method *</Label>
-            <Select value={formData.fulfillmentMethod} onValueChange={(value) => handleInputChange("fulfillmentMethod", value)}>
-              <SelectTrigger className={errors.fulfillmentMethod ? "border-destructive" : ""}>
-                <SelectValue placeholder="Select method" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="bonded-warehouse">Bonded Warehouse</SelectItem>
-                <SelectItem value="cif">CIF</SelectItem>
-                <SelectItem value="fob">FOB</SelectItem>
-                <SelectItem value="direct-fill">Direct Fill</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.fulfillmentMethod && <p className="text-sm text-destructive mt-1">{errors.fulfillmentMethod}</p>}
-          </div>
-          <div>
-            <Label htmlFor="exportLicenses">Existing Export/Customs Licenses *</Label>
-            <Input
-              id="exportLicenses"
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => handleInputChange("exportLicenses", e.target.files?.[0] || null)}
-            />
-            <p className="text-sm text-muted-foreground mt-1">PDF, JPG, PNG up to 10MB</p>
-          </div>
-          <div>
-            <Label htmlFor="incotermsPreference">Incoterms Preference</Label>
-            <Select value={formData.incotermsPreference} onValueChange={(value) => handleInputChange("incotermsPreference", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select incoterms" />
-              </SelectTrigger>
-              <SelectContent>
-                {incoterms.map(term => (
-                  <SelectItem key={term} value={term}>{term}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+    return (
+      <div className="space-y-6">
+        {/* Intro Pitch */}
+        <div className="p-4 bg-muted/20 rounded-lg border-l-4 border-primary">
+          <p className="text-sm leading-relaxed">
+            Join the PBCEx global supply network — connect your commodities directly to our marketplace. 
+            Approved providers can set pricing margins, fulfill in-country, and access institutional buyers worldwide.
+          </p>
         </div>
-      </div>
 
-      {/* Notes */}
-      <div>
-        <h4 className="font-semibold mb-4">Notes</h4>
+        {/* Company */}
         <div>
-          <Label htmlFor="additionalDetails">Additional Details</Label>
-          <Textarea
-            id="additionalDetails"
-            value={formData.additionalDetails}
-            onChange={(e) => handleInputChange("additionalDetails", e.target.value)}
-            rows={4}
-            placeholder="Any additional information about your supply capabilities..."
-          />
+          <h4 className="font-semibold mb-4">Company</h4>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="companyName">Company Name *</Label>
+              <Input
+                id="companyName"
+                value={formData.companyName}
+                onChange={(e) => handleInputChange("companyName", e.target.value)}
+                data-error={!!errors.companyName}
+                className={errors.companyName ? "border-destructive" : ""}
+              />
+              {errors.companyName && <p className="text-sm text-destructive mt-1">{errors.companyName}</p>}
+            </div>
+            <div>
+              <Label htmlFor="countryOfOperation">Country of Operation *</Label>
+              <Select value={formData.countryOfOperation} onValueChange={(value) => handleInputChange("countryOfOperation", value)}>
+                <SelectTrigger className={errors.countryOfOperation ? "border-destructive" : ""}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {countries.map(country => (
+                    <SelectItem key={country} value={country}>{country}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.countryOfOperation && <p className="text-sm text-destructive mt-1">{errors.countryOfOperation}</p>}
+            </div>
+            <div>
+              <Label htmlFor="authorizedSignatory">Authorized Signatory Name & Title *</Label>
+              <Input
+                id="authorizedSignatory"
+                value={formData.authorizedSignatory}
+                onChange={(e) => handleInputChange("authorizedSignatory", e.target.value)}
+                data-error={!!errors.authorizedSignatory}
+                className={errors.authorizedSignatory ? "border-destructive" : ""}
+                placeholder="Name and Title"
+              />
+              {errors.authorizedSignatory && <p className="text-sm text-destructive mt-1">{errors.authorizedSignatory}</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* Supply */}
+        <div>
+          <h4 className="font-semibold mb-4">Supply</h4>
+          <div className="space-y-4">
+            <div>
+              <Label>Primary Commodities Supplied *</Label>
+              <Popover open={commodityDropdownOpen} onOpenChange={setCommodityDropdownOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={commodityDropdownOpen}
+                    className={`w-full justify-between min-h-[40px] ${errors.primaryCommodities ? "border-destructive" : ""}`}
+                  >
+                    <div className="flex flex-wrap gap-1 flex-1 text-left">
+                      {formData.primaryCommodities.length === 0 ? (
+                        <span className="text-muted-foreground">Select commodities...</span>
+                      ) : (
+                        formData.primaryCommodities.map((commodity) => (
+                          <Badge
+                            key={commodity}
+                            variant="secondary"
+                            className="mr-1 mb-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeCommodity(commodity);
+                            }}
+                          >
+                            {commodity}
+                            <X className="h-3 w-3 ml-1 cursor-pointer" />
+                          </Badge>
+                        ))
+                      )}
+                    </div>
+                    <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <div className="flex items-center border-b px-3">
+                      <input
+                        className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                        placeholder="Search commodities..."
+                      />
+                    </div>
+                    <CommandList className="max-h-60">
+                      <CommandEmpty>No commodities found.</CommandEmpty>
+                      {Object.entries(commoditiesData).map(([category, items]) => (
+                        <CommandGroup key={category} heading={category}>
+                          {items.map((commodity) => (
+                            <CommandItem
+                              key={commodity}
+                              onSelect={() => handleCommoditySelect(commodity)}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center space-x-2">
+                                <Checkbox
+                                  checked={formData.primaryCommodities.includes(commodity)}
+                                />
+                                <span>{commodity}</span>
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      ))}
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              {formData.primaryCommodities.includes("Other (please specify)") && (
+                <Input
+                  placeholder="Specify other commodity"
+                  value={formData.otherCommodity}
+                  onChange={(e) => handleInputChange("otherCommodity", e.target.value)}
+                  className="mt-2"
+                />
+              )}
+              {errors.primaryCommodities && <p className="text-sm text-destructive mt-1">{errors.primaryCommodities}</p>}
+            </div>
+            <div>
+              <Label htmlFor="annualCapacity">Annual Production / Supply Capacity *</Label>
+              <Input
+                id="annualCapacity"
+                value={formData.annualCapacity}
+                onChange={(e) => handleInputChange("annualCapacity", e.target.value)}
+                data-error={!!errors.annualCapacity}
+                className={errors.annualCapacity ? "border-destructive" : ""}
+                placeholder="e.g., 1000 tons/year"
+              />
+              {errors.annualCapacity && <p className="text-sm text-destructive mt-1">{errors.annualCapacity}</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* Trade/Logistics */}
+        <div>
+          <h4 className="font-semibold mb-4">Trade/Logistics</h4>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="fulfillmentMethod">Preferred Fulfillment Method *</Label>
+              <Select value={formData.fulfillmentMethod} onValueChange={(value) => handleInputChange("fulfillmentMethod", value)}>
+                <SelectTrigger className={errors.fulfillmentMethod ? "border-destructive" : ""}>
+                  <SelectValue placeholder="Select method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bonded-warehouse">Bonded Warehouse</SelectItem>
+                  <SelectItem value="cif">CIF</SelectItem>
+                  <SelectItem value="fob">FOB</SelectItem>
+                  <SelectItem value="direct-fill">Direct Fill</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.fulfillmentMethod && <p className="text-sm text-destructive mt-1">{errors.fulfillmentMethod}</p>}
+            </div>
+            <div>
+              <Label htmlFor="exportLicenses">Existing Export/Customs Licenses *</Label>
+              <Input
+                id="exportLicenses"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => handleInputChange("exportLicenses", e.target.files?.[0] || null)}
+              />
+              <p className="text-sm text-muted-foreground mt-1">PDF, JPG, PNG up to 10MB</p>
+            </div>
+            <div>
+              <Label htmlFor="incotermsPreference">Incoterms Preference</Label>
+              <Select value={formData.incotermsPreference} onValueChange={(value) => handleInputChange("incotermsPreference", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select incoterms" />
+                </SelectTrigger>
+                <SelectContent>
+                  {incoterms.map(term => (
+                    <SelectItem key={term} value={term}>{term}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Notes */}
+        <div>
+          <h4 className="font-semibold mb-4">Notes</h4>
+          <div>
+            <Label htmlFor="additionalDetails">Additional Details</Label>
+            <Textarea
+              id="additionalDetails"
+              value={formData.additionalDetails}
+              onChange={(e) => handleInputChange("additionalDetails", e.target.value)}
+              rows={4}
+              placeholder="Any additional information about your supply capabilities..."
+            />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderCustomerVoteForm = () => (
     <div className="space-y-6">
