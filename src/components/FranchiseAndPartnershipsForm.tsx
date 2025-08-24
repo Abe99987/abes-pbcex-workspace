@@ -1202,23 +1202,23 @@ const FranchiseAndPartnershipsForm = () => {
               <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Type Selector */}
                 <Tabs value={formType} onValueChange={setFormType}>
-                  <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 h-auto">
-                    <TabsTrigger value="franchise_applicant" className="text-xs p-2">
+                  <TabsList className="flex w-full overflow-x-auto whitespace-nowrap p-1">
+                    <TabsTrigger value="franchise_applicant" className="flex-1 text-xs p-2 min-w-fit">
                       Franchise Applicant
                     </TabsTrigger>
-                    <TabsTrigger value="bank_partner" className="text-xs p-2">
+                    <TabsTrigger value="bank_partner" className="flex-1 text-xs p-2 min-w-fit">
                       Bank Partner
                     </TabsTrigger>
-                    <TabsTrigger value="commodity_provider" className="text-xs p-2">
+                    <TabsTrigger value="commodity_provider" className="flex-1 text-xs p-2 min-w-fit">
                       Commodity Provider
                     </TabsTrigger>
-                    <TabsTrigger value="customer_vote" className="text-xs p-2">
-                      Customer Vote / Feedback
+                    <TabsTrigger value="customer_vote" className="flex-1 text-xs p-2 min-w-fit">
+                      Customer Vote
                     </TabsTrigger>
-                    <TabsTrigger value="general_business_inquiry" className="text-xs p-2">
-                      General Business Inquiry
+                    <TabsTrigger value="general_business_inquiry" className="flex-1 text-xs p-2 min-w-fit">
+                      General Inquiry
                     </TabsTrigger>
-                    <TabsTrigger value="investor" className="text-xs p-2">
+                    <TabsTrigger value="investor" className="flex-1 text-xs p-2 min-w-fit">
                       Investor
                     </TabsTrigger>
                   </TabsList>
