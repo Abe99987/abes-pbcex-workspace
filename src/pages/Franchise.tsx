@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import FranchiseAndPartnershipsForm from "@/components/FranchiseAndPartnershipsForm";
+import FranchiseDemandCounter from "@/components/FranchiseDemandCounter";
 
 const Franchise = () => {
 
@@ -151,6 +152,9 @@ const Franchise = () => {
 
       {/* Contact Form Section */}
       <FranchiseAndPartnershipsForm />
+      
+      {/* Franchise Demand Counter */}
+      <FranchiseDemandCounter />
     </div>
   );
 };

@@ -183,10 +183,54 @@ const FranchiseAndPartnershipsForm = () => {
     
     console.log("Form submission payload:", payload);
     
+    // Update franchise demand counter
+    const store = (window as any).franchiseDemandStore;
+    const countFranchiseAsFive = (window as any).countFranchiseAsFive;
+    
+    if (store) {
+      if (formType === "customer_vote") {
+        const result = store.addRecord({
+          city: formData.cityWanted,
+          country: formData.countryWanted,
+          weight: 1,
+          source: 'vote',
+          email: formData.email
+        });
+        
+        if (!result.success) {
+          toast({
+            title: "Notice",
+            description: result.message,
+            variant: "destructive"
+          });
+          setIsSubmitting(false);
+          return;
+        }
+      } else if (formType === "franchise_applicant" && countFranchiseAsFive) {
+        store.addRecord({
+          city: formData.city,
+          country: formData.country,
+          weight: 5,
+          source: 'franchise',
+          email: formData.email
+        });
+      }
+    }
+    
     toast({
       title: "Success!",
       description: "Thanks — we received your submission.",
     });
+    
+    // Show additional demand update toast for relevant form types
+    if (formType === "customer_vote" || (formType === "franchise_applicant" && countFranchiseAsFive)) {
+      setTimeout(() => {
+        toast({
+          title: "Demand Updated",
+          description: "Thanks — demand updated.",
+        });
+      }, 500);
+    }
     
     // Reset form
     setFormData({
