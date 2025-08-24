@@ -24,6 +24,14 @@ import DigitalWallet from "./pages/DigitalWallet";
 import AssetTrading from "./pages/AssetTrading";
 import GlobalPayments from "./pages/GlobalPayments";
 import MobileApp from "./pages/MobileApp";
+import Contact from "./pages/Contact";
+import HelpCenter from "./pages/support/HelpCenter";
+import Security from "./pages/support/Security";
+import Compliance from "./pages/support/Compliance";
+import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
+import TermsOfService from "./pages/legal/TermsOfService";
+import Regulatory from "./pages/legal/Regulatory";
+import Licenses from "./pages/legal/Licenses";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +64,14 @@ const App = () => (
           <Route path="/asset-trading" element={<AssetTrading />} />
           <Route path="/payments" element={<GlobalPayments />} />
           <Route path="/app" element={<MobileApp />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/support/help-center" element={<HelpCenter />} />
+          <Route path="/support/security" element={<Security />} />
+          <Route path="/support/compliance" element={<Compliance />} />
+          <Route path="/legal/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/legal/terms-of-service" element={<TermsOfService />} />
+          <Route path="/legal/regulatory" element={<Regulatory />} />
+          <Route path="/legal/licenses" element={<Licenses />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
