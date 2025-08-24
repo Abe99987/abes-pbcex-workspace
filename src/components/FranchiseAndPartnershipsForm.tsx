@@ -407,8 +407,10 @@ const FranchiseAndPartnershipsForm = () => {
                 <SelectItem value="under-50k">&lt;$50k</SelectItem>
                 <SelectItem value="50-100k">$50–100k</SelectItem>
                 <SelectItem value="100-250k">$100–250k</SelectItem>
-                <SelectItem value="250-500k">$250k–$500k</SelectItem>
-                <SelectItem value="500k-plus">$500k+</SelectItem>
+                <SelectItem value="250-500k">$250–500k</SelectItem>
+                <SelectItem value="500k-1m">$500k–$1M</SelectItem>
+                <SelectItem value="1m-10m">$1M–$10M</SelectItem>
+                <SelectItem value="10m-plus">$10M+</SelectItem>
               </SelectContent>
             </Select>
             {errors.investmentCapacity && <p className="text-sm text-destructive mt-1">{errors.investmentCapacity}</p>}
@@ -575,15 +577,63 @@ const FranchiseAndPartnershipsForm = () => {
         <h4 className="font-semibold mb-4">Focus Areas</h4>
         <div>
           <Label>Preferred Partnership Areas</Label>
-          <div className="mt-2 space-y-2">
-            {["FX/Settlement", "Custody", "API Integration", "Payments", "Vaulting", "Card Issuing"].map(area => (
-              <div key={area} className="flex items-center space-x-2">
+          <div className="mt-2 space-y-3">
+            {[
+              { 
+                value: "Integrate PBCEx Rails", 
+                description: "Embed PBCEx into your bank, letting customers hold and transact in precious metals alongside fiat." 
+              },
+              { 
+                value: "FX Settlement", 
+                description: "Enable cross-border exchange and settlement for remittances and wires." 
+              },
+              { 
+                value: "Custody", 
+                description: "Offer insured custody of tokenized metals and fiat via PBCEx vault partners." 
+              },
+              { 
+                value: "API Integration (Trading)", 
+                description: "Trading APIs so clients can buy/sell metals and FX pairs directly in your apps." 
+              },
+              { 
+                value: "Payments", 
+                description: "Cards and QR payments linked to asset-backed accounts for retail customers." 
+              },
+              { 
+                value: "Vaulting", 
+                description: "Institutional vault access with full insurance for metals storage and settlements." 
+              },
+              { 
+                value: "Card Issuing", 
+                description: "Provide branded debit/credit cards tied to PBCEx rails." 
+              },
+              { 
+                value: "Retail Metals Sales", 
+                description: "Enable OTC gold/silver/platinum sales at your bank branches via PBCEx suppliers." 
+              },
+              { 
+                value: "Future: Home Loan Program", 
+                description: "Offer mortgages collateralized by tokenized metals and bonds (asset-backed, halal-finance compatible)." 
+              }
+            ].map(area => (
+              <div key={area.value} className="flex items-start space-x-2">
                 <Checkbox 
-                  id={`area-${area}`}
-                  checked={formData.partnershipAreas.includes(area)}
-                  onCheckedChange={(checked) => handleCheckboxChange("partnershipAreas", area, checked as boolean)}
+                  id={`area-${area.value}`}
+                  checked={formData.partnershipAreas.includes(area.value)}
+                  onCheckedChange={(checked) => handleCheckboxChange("partnershipAreas", area.value, checked as boolean)}
+                  className="mt-1"
                 />
-                <Label htmlFor={`area-${area}`}>{area}</Label>
+                <div className="flex-1">
+                  <Label htmlFor={`area-${area.value}`} className="cursor-pointer">
+                    {area.value}
+                  </Label>
+                  <p 
+                    className="text-sm text-muted-foreground mt-1 leading-relaxed"
+                    aria-describedby={`area-${area.value}`}
+                  >
+                    {area.description}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
