@@ -8,11 +8,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, MessageSquare } from "lucide-react";
+import { Mail, MessageSquare, CheckCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import FranchiseAndPartnershipsForm from "@/components/FranchiseAndPartnershipsForm";
+import PressForm from "@/components/PressForm";
 
 const Contact = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -47,12 +52,15 @@ const Contact = () => {
     if (!validateForm()) return;
     
     setIsSubmitting(true);
-    setTimeout(() => setIsSubmitting(false), 2000);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     const payload = {
       ...formData,
       attachment: formData.attachment?.name || null,
-      page: "contact_general"
+      page: "contact_general",
+      timestamp: new Date().toISOString()
     };
     
     console.log("Contact form submission:", payload);
@@ -62,14 +70,13 @@ const Contact = () => {
       description: "Thank you for contacting us. We'll respond within 24 hours.",
     });
     
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      topic: "",
-      message: "",
-      attachment: null
-    });
+    setIsSubmitting(false);
+    setIsConfirmed(true);
+    
+    // Redirect after 4 seconds
+    setTimeout(() => {
+      navigate('/thank-you?type=contact');
+    }, 4000);
   };
 
   return (
@@ -88,89 +95,110 @@ const Contact = () => {
               </p>
             </div>
 
-            <Card className="shadow-xl border-border/50 rounded-2xl">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <MessageSquare className="w-5 h-5" />
-                  <span>Send us a message</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                      placeholder="Optional"
-                    />
+            {isConfirmed ? (
+              <Card className="shadow-xl border-border/50 rounded-2xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <MessageSquare className="w-5 h-5" />
+                    <span>Send us a message</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center py-12">
+                  <div className="flex flex-col items-center space-y-4">
+                    <CheckCircle className="w-12 h-12 text-green-500" />
+                    <h3 className="text-lg font-semibold">Thank you!</h3>
+                    <p className="text-muted-foreground max-w-md">
+                      Your submission has been received. Our team will follow up within 24 hours.
+                    </p>
                   </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="shadow-xl border-border/50 rounded-2xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <MessageSquare className="w-5 h-5" />
+                    <span>Send us a message</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                      <Label htmlFor="name">Name</Label>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => handleInputChange("name", e.target.value)}
+                        placeholder="Optional"
+                      />
+                    </div>
 
-                  <div>
-                    <Label htmlFor="email">Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      className={errors.email ? "border-destructive" : ""}
-                    />
-                    {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
-                  </div>
+                    <div>
+                      <Label htmlFor="email">Email *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        className={errors.email ? "border-destructive" : ""}
+                      />
+                      {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
+                    </div>
 
-                  <div>
-                    <Label htmlFor="topic">Topic *</Label>
-                    <Select value={formData.topic} onValueChange={(value) => handleInputChange("topic", value)}>
-                      <SelectTrigger className={errors.topic ? "border-destructive" : ""}>
-                        <SelectValue placeholder="Select a topic" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="account-kyc">Account/KYC</SelectItem>
-                        <SelectItem value="wallet">Wallet</SelectItem>
-                        <SelectItem value="trading">Trading</SelectItem>
-                        <SelectItem value="fulfillment">Fulfillment</SelectItem>
-                        <SelectItem value="security">Security</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {errors.topic && <p className="text-sm text-destructive mt-1">{errors.topic}</p>}
-                  </div>
+                    <div>
+                      <Label htmlFor="topic">Topic *</Label>
+                      <Select value={formData.topic} onValueChange={(value) => handleInputChange("topic", value)}>
+                        <SelectTrigger className={errors.topic ? "border-destructive" : ""}>
+                          <SelectValue placeholder="Select a topic" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="account-kyc">Account/KYC</SelectItem>
+                          <SelectItem value="wallet">Wallet</SelectItem>
+                          <SelectItem value="trading">Trading</SelectItem>
+                          <SelectItem value="fulfillment">Fulfillment</SelectItem>
+                          <SelectItem value="security">Security</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.topic && <p className="text-sm text-destructive mt-1">{errors.topic}</p>}
+                    </div>
 
-                  <div>
-                    <Label htmlFor="message">Message *</Label>
-                    <Textarea
-                      id="message"
-                      value={formData.message}
-                      onChange={(e) => handleInputChange("message", e.target.value)}
-                      rows={4}
-                      className={errors.message ? "border-destructive" : ""}
-                    />
-                    {errors.message && <p className="text-sm text-destructive mt-1">{errors.message}</p>}
-                  </div>
+                    <div>
+                      <Label htmlFor="message">Message *</Label>
+                      <Textarea
+                        id="message"
+                        value={formData.message}
+                        onChange={(e) => handleInputChange("message", e.target.value)}
+                        rows={4}
+                        className={errors.message ? "border-destructive" : ""}
+                      />
+                      {errors.message && <p className="text-sm text-destructive mt-1">{errors.message}</p>}
+                    </div>
 
-                  <div>
-                    <Label htmlFor="attachment">Attachment</Label>
-                    <Input
-                      id="attachment"
-                      type="file"
-                      onChange={(e) => handleInputChange("attachment", e.target.files?.[0] || null)}
-                      className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                    />
-                  </div>
+                    <div>
+                      <Label htmlFor="attachment">Attachment</Label>
+                      <Input
+                        id="attachment"
+                        type="file"
+                        onChange={(e) => handleInputChange("attachment", e.target.files?.[0] || null)}
+                        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                      />
+                    </div>
 
-                  <Button 
-                    type="submit" 
-                    disabled={isSubmitting}
-                    className="w-full"
-                    size="lg"
-                  >
-                    {isSubmitting ? "Sending..." : "Send Message"}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="w-full"
+                      size="lg"
+                    >
+                      {isSubmitting ? "Sending..." : "Send Message"}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
 
+            {/* Direct Email Section */}
             <div className="mt-8 text-center">
               <Card className="shadow-xl border-border/50 rounded-2xl bg-gradient-to-r from-gold/10 to-gold-light/10 border-gold/20">
                 <CardContent className="p-6">
@@ -186,6 +214,32 @@ const Contact = () => {
                   </p>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Franchise & Partnerships Section */}
+            <div className="mt-12">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                  Franchise & Partnerships
+                </h2>
+                <p className="text-lg text-muted-foreground">
+                  Join our network or explore partnership opportunities
+                </p>
+              </div>
+              <FranchiseAndPartnershipsForm />
+            </div>
+
+            {/* Press & Media Section */}
+            <div className="mt-12">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                  Press & Media
+                </h2>
+                <p className="text-lg text-muted-foreground">
+                  Connect with our media team for interviews and collaborations
+                </p>
+              </div>
+              <PressForm showHeader={false} />
             </div>
           </div>
         </div>

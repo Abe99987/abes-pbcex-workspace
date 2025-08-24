@@ -25,6 +25,7 @@ import AssetTrading from "./pages/AssetTrading";
 import GlobalPayments from "./pages/GlobalPayments";
 import MobileApp from "./pages/MobileApp";
 import Contact from "./pages/Contact";
+import ThankYou from "./pages/ThankYou";
 import HelpCenter from "./pages/support/HelpCenter";
 import Security from "./pages/support/Security";
 import Compliance from "./pages/support/Compliance";
@@ -65,6 +66,7 @@ const App = () => (
           <Route path="/payments" element={<GlobalPayments />} />
           <Route path="/app" element={<MobileApp />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/support/help-center" element={<HelpCenter />} />
           <Route path="/support/security" element={<Security />} />
           <Route path="/support/compliance" element={<Compliance />} />

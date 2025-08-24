@@ -144,11 +144,18 @@ const Navigation = () => {
     },
     {
       label: "Security",
+      href: "/support/security",
       icon: Shield
     },
     {
       label: "Help",
-      icon: HelpCircle
+      icon: HelpCircle,
+      items: [
+        { label: "Help Center", href: "/support/help-center" },
+        { label: "Security", href: "/support/security" },
+        { label: "Compliance", href: "/support/compliance" },
+        { label: "Contact", href: "/contact" }
+      ]
     }
   ];
 

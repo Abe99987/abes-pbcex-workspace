@@ -11,8 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, X, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const countries = [
   "United States", "European Union (EU/EEA)", "United Kingdom", "China", "Hong Kong", 
@@ -35,7 +36,7 @@ const commoditiesData = {
     "Copper", "Aluminum", "Nickel", "Zinc", "Tin", "Iron / Steel", "Tungsten"
   ],
   "Energy": [
-    "Crude Oil (WTI, Brent)", "Natural Gas", "Uranium", "Graphite"
+    "Crude Oil", "Natural Gas", "Uranium", "Graphite"
   ],
   "Rare Earth Elements (REEs)": [
     "Neodymium", "Dysprosium", "Terbium", "Yttrium", "Praseodymium", 
@@ -51,8 +52,10 @@ const incoterms = ["FOB", "CIF", "EXW", "DDP", "FCA", "CPT", "CIP", "DAP", "DPU"
 
 const FranchiseAndPartnershipsForm = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [formType, setFormType] = useState("franchise_applicant");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
   const [commodityDropdownOpen, setCommodityDropdownOpen] = useState(false);
   const honeypotRef = useRef<HTMLInputElement>(null);
   
@@ -203,8 +206,8 @@ const FranchiseAndPartnershipsForm = () => {
     
     setIsSubmitting(true);
     
-    // Rate limiting - disable for 3 seconds
-    setTimeout(() => setIsSubmitting(false), 3000);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Get lead tag
     const leadTagMap = {
@@ -219,7 +222,8 @@ const FranchiseAndPartnershipsForm = () => {
     const payload = {
       formType,
       leadTag: leadTagMap[formType as keyof typeof leadTagMap],
-      fields: formData
+      fields: formData,
+      timestamp: new Date().toISOString()
     };
     
     console.log("Form submission payload:", payload);
@@ -273,51 +277,21 @@ const FranchiseAndPartnershipsForm = () => {
       }, 500);
     }
     
-    // Reset form
-    setFormData({
-      fullName: "",
-      email: "",
-      phone: "",
-      city: "",
-      country: "United States",
-      launchTimeline: "",
-      ownsBusinessCurrently: "",
-      businessName: "",
-      investmentCapacity: "",
-      franchiseModel: [],
-      businessLicense: null,
-      motivation: "",
-      institutionName: "",
-      countryOfIncorporation: "United States",
-      regulatoryStatus: "",
-      assetsUnderManagement: "",
-      contactTitle: "",
-      partnershipAreas: [],
-      regulatoryApproval: null,
-      companyName: "",
-      countryOfOperation: "United States",
-      authorizedSignatory: "",
-      primaryCommodities: [],
-      otherCommodity: "",
-      annualCapacity: "",
-      fulfillmentMethod: "",
-      exportLicenses: null,
-      incotermsPreference: "",
-      additionalDetails: "",
-      accountNumber: "",
-      cityWanted: "",
-      countryWanted: "United States",
-      wouldBeCustomer: "",
-      likelyToUse: "",
-      feedbackImprovement: "",
-      websiteSocial: "",
-      inquiryType: [],
-      message: "",
-      investorFirmName: "",
-      investorAumRange: "",
-      investorType: "",
-      investorMessage: ""
-    });
+    setIsSubmitting(false);
+    setIsConfirmed(true);
+    
+    // Redirect after 4 seconds
+    setTimeout(() => {
+      const redirectMap = {
+        franchise_applicant: '/thank-you?type=franchise',
+        bank_partner: '/thank-you?type=franchise',
+        commodity_provider: '/thank-you?type=franchise',
+        customer_vote: '/thank-you?type=vote',
+        general_business_inquiry: '/thank-you?type=contact',
+        investor: '/thank-you?type=investor'
+      };
+      navigate(redirectMap[formType as keyof typeof redirectMap]);
+    }, 4000);
   };
 
   const renderCommonFields = () => (
@@ -1199,7 +1173,19 @@ const FranchiseAndPartnershipsForm = () => {
                 autoComplete="off"
               />
               
-              <form onSubmit={handleSubmit} className="space-y-8">
+              {isConfirmed ? (
+                <div className="text-center py-12">
+                  <div className="flex flex-col items-center space-y-4">
+                    <CheckCircle className="w-12 h-12 text-green-500" />
+                    <h3 className="text-lg font-semibold">Thank you!</h3>
+                    <p className="text-muted-foreground max-w-md">
+                      Your submission has been received. Our team will follow up within 24 hours.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  {/* ... keep existing code (all form content) */}
                 {/* Type Selector */}
                 <Tabs value={formType} onValueChange={setFormType}>
                   <TabsList className="flex w-full overflow-x-auto whitespace-nowrap p-1">
@@ -1284,7 +1270,8 @@ const FranchiseAndPartnershipsForm = () => {
                     {isSubmitting ? "Submitting..." : "Submit Application"}
                   </Button>
                 </div>
-              </form>
+                </form>
+              )}
             </CardContent>
           </Card>
         </div>
