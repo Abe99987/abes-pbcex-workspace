@@ -65,10 +65,19 @@ const Franchise = () => {
               Franchise Opportunity
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent mb-6">
-              Open a PBCEX Franchise
+              Open a PBCEx Franchise
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-xl md:text-2xl text-muted-foreground mb-4 leading-relaxed">
               118 elements exist. 25 commodities make the world work. Yet we trade in 180 fiat currencies and over 10,000 cryptocurrencies.
+            </p>
+            <p className="text-2xl font-semibold text-foreground mb-2">
+              Bank the Things That Matter.
+            </p>
+            <p className="text-lg text-muted-foreground mb-6">
+              Partner with us and include PBCEx rails in your bank or institution.
+            </p>
+            <p className="text-base text-muted-foreground mb-8">
+              Franchises unlock access to PBCEx global settlement — trade, payments, and fulfillment integrated directly into your city or institution.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <div className="flex items-center text-lg">

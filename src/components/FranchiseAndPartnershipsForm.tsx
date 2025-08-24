@@ -105,7 +105,13 @@ const FranchiseAndPartnershipsForm = () => {
     // General Business Inquiry
     websiteSocial: "",
     inquiryType: [] as string[],
-    message: ""
+    message: "",
+    
+    // Investor
+    investorFirmName: "",
+    investorAumRange: "",
+    investorType: "",
+    investorMessage: ""
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -169,6 +175,11 @@ const FranchiseAndPartnershipsForm = () => {
         if (formData.inquiryType.length === 0) newErrors.inquiryType = "Select at least one inquiry type";
         if (!formData.message.trim()) newErrors.message = "Message is required";
         break;
+        
+      case "investor":
+        if (!formData.investorType) newErrors.investorType = "Investor type is required";
+        if (!formData.investorMessage.trim()) newErrors.investorMessage = "Message is required";
+        break;
     }
     
     setErrors(newErrors);
@@ -201,7 +212,8 @@ const FranchiseAndPartnershipsForm = () => {
       bank_partner: "bank_partner_lead", 
       commodity_provider: "supply_lead",
       customer_vote: "franchise_vote",
-      general_business_inquiry: "inbound_lead"
+      general_business_inquiry: "inbound_lead",
+      investor: "investor_lead"
     };
     
     const payload = {
@@ -300,7 +312,11 @@ const FranchiseAndPartnershipsForm = () => {
       feedbackImprovement: "",
       websiteSocial: "",
       inquiryType: [],
-      message: ""
+      message: "",
+      investorFirmName: "",
+      investorAumRange: "",
+      investorType: "",
+      investorMessage: ""
     });
   };
 
@@ -1082,6 +1098,76 @@ const FranchiseAndPartnershipsForm = () => {
     </div>
   );
 
+  const renderInvestorForm = () => (
+    <div className="space-y-6">
+      <div>
+        <Label htmlFor="investorFirmName">Firm/Company Name</Label>
+        <Input
+          id="investorFirmName"
+          value={formData.investorFirmName}
+          onChange={(e) => handleInputChange("investorFirmName", e.target.value)}
+          placeholder="Optional"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="investorAumRange">AUM / Investment Range</Label>
+        <Input
+          id="investorAumRange"
+          value={formData.investorAumRange}
+          onChange={(e) => handleInputChange("investorAumRange", e.target.value)}
+          placeholder="e.g., $1M-$10M, $50M+, etc."
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="investorType">Investor Type *</Label>
+        <Select value={formData.investorType} onValueChange={(value) => handleInputChange("investorType", value)}>
+          <SelectTrigger className={errors.investorType ? "border-destructive" : ""}>
+            <SelectValue placeholder="Select investor type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="vc">VC</SelectItem>
+            <SelectItem value="family-office">Family Office</SelectItem>
+            <SelectItem value="institutional">Institutional</SelectItem>
+            <SelectItem value="angel">Angel</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.investorType && <p className="text-sm text-destructive mt-1">{errors.investorType}</p>}
+      </div>
+
+      <div>
+        <Label htmlFor="investorMessage">Message *</Label>
+        <Textarea
+          id="investorMessage"
+          value={formData.investorMessage}
+          onChange={(e) => handleInputChange("investorMessage", e.target.value)}
+          rows={4}
+          data-error={!!errors.investorMessage}
+          className={errors.investorMessage ? "border-destructive" : ""}
+          placeholder="Tell us about your investment interests and thesis"
+        />
+        {errors.investorMessage && <p className="text-sm text-destructive mt-1">{errors.investorMessage}</p>}
+      </div>
+
+      {/* Investor Portal Link Card */}
+      <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 mt-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Investor Portal (Coming Soon)</CardTitle>
+          <CardDescription>
+            Access live KPIs, trading volumes, and financial dashboards as an approved investor.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button variant="outline" className="w-full" asChild>
+            <a href="/investors">Learn More →</a>
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   return (
     <section className="py-20 bg-gradient-to-br from-background to-muted/20">
       <div className="container mx-auto px-4">
@@ -1116,7 +1202,7 @@ const FranchiseAndPartnershipsForm = () => {
               <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Type Selector */}
                 <Tabs value={formType} onValueChange={setFormType}>
-                  <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 h-auto">
+                  <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 h-auto">
                     <TabsTrigger value="franchise_applicant" className="text-xs p-2">
                       Franchise Applicant
                     </TabsTrigger>
@@ -1131,6 +1217,9 @@ const FranchiseAndPartnershipsForm = () => {
                     </TabsTrigger>
                     <TabsTrigger value="general_business_inquiry" className="text-xs p-2">
                       General Business Inquiry
+                    </TabsTrigger>
+                    <TabsTrigger value="investor" className="text-xs p-2">
+                      Investor
                     </TabsTrigger>
                   </TabsList>
 
@@ -1173,6 +1262,13 @@ const FranchiseAndPartnershipsForm = () => {
                     <div className="border-t pt-6">
                       <h3 className="font-semibold mb-4 text-lg">Your Inquiry</h3>
                       {renderGeneralInquiryForm()}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="investor" className="mt-8">
+                    <div className="border-t pt-6">
+                      <h3 className="font-semibold mb-4 text-lg">Investment Details</h3>
+                      {renderInvestorForm()}
                     </div>
                   </TabsContent>
                 </Tabs>
