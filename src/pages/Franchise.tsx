@@ -1,7 +1,3 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -17,30 +13,9 @@ import {
   Users
 } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import FranchiseAndPartnershipsForm from "@/components/FranchiseAndPartnershipsForm";
 
 const Franchise = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    city: "",
-    zipCode: "",
-    message: ""
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, this would send to contact@pbcex.com
-    console.log("Form submitted:", formData);
-    // Reset form
-    setFormData({ name: "", email: "", city: "", zipCode: "", message: "" });
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
 
   const revenueStreams = [
     {
@@ -175,116 +150,7 @@ const Franchise = () => {
       </section>
 
       {/* Contact Form Section */}
-      <section className="py-20 bg-gradient-to-br from-background to-muted/20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Start a Franchise
-              </h2>
-              <p className="text-xl text-muted-foreground">
-                Ready to join the PBCEX network? Get in touch with our team.
-              </p>
-            </div>
-
-            <Card className="shadow-xl border-border/50">
-              <CardHeader>
-                <CardTitle className="text-xl text-center">Franchise Application</CardTitle>
-                <CardDescription className="text-center">
-                  Fill out the form below and we'll contact you within 24 hours
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium mb-2">
-                        Full Name *
-                      </label>
-                      <Input
-                        id="name"
-                        name="name"
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        placeholder="Enter your full name"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium mb-2">
-                        Email Address *
-                      </label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="Enter your email"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="city" className="block text-sm font-medium mb-2">
-                        City *
-                      </label>
-                      <Input
-                        id="city"
-                        name="city"
-                        type="text"
-                        required
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        placeholder="Enter your city"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="zipCode" className="block text-sm font-medium mb-2">
-                        Zip Code *
-                      </label>
-                      <Input
-                        id="zipCode"
-                        name="zipCode"
-                        type="text"
-                        required
-                        value={formData.zipCode}
-                        onChange={handleInputChange}
-                        placeholder="Enter your zip code"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium mb-2">
-                      Message
-                    </label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      rows={4}
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      placeholder="Tell us about your interest in a PBCEX franchise..."
-                    />
-                  </div>
-
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                    size="lg"
-                  >
-                    Submit Application
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+      <FranchiseAndPartnershipsForm />
     </div>
   );
 };
