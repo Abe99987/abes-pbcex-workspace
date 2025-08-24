@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import ScaleOrderModal from "./ScaleOrderModal";
+import { FEATURE_FLAGS } from "@/config/features";
 
 interface OrderPanelProps {
   pair: string;
@@ -18,6 +20,9 @@ const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
   const [amount, setAmount] = useState("");
   const [scaleModalOpen, setScaleModalOpen] = useState(false);
   const { toast } = useToast();
+
+  // Mock provider accepted assets
+  const mockProviderAssets = ["PAXG", "XAU-s", "USD", "USDC"];
 
   const handleSubmitOrder = (side: "buy" | "sell") => {
     if (!price || !amount) {
@@ -92,6 +97,20 @@ const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
       </div>
       
       <div className="p-3 space-y-3">
+        {/* Provider Accepts Pills */}
+        {FEATURE_FLAGS.providerMarketplaceMock && orderType !== "scale" && (
+          <div className="mb-4">
+            <Label className="text-gray-300 text-xs">Provider accepts:</Label>
+            <div className="flex flex-wrap gap-1 mt-1">
+              {mockProviderAssets.map((asset) => (
+                <Badge key={asset} variant="secondary" className="text-xs">
+                  {asset}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Source of funds selector */}
         {orderType !== "scale" && (
           <div>

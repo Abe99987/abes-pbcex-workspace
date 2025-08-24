@@ -14,6 +14,8 @@ import MySpending from "./pages/MySpending";
 import TitledAsset from "./pages/TitledAsset";
 import Realize from "./pages/Realize";
 import PnL from "./pages/PnL";
+import ProviderSettings from "./pages/ProviderSettings";
+import LargeLimit from "./pages/LargeLimit";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +38,8 @@ const App = () => (
           <Route path="/titled-asset/:address" element={<TitledAsset />} />
           <Route path="/realize" element={<Realize />} />
           <Route path="/pnl" element={<PnL />} />
+          <Route path="/provider-settings" element={<ProviderSettings />} />
+          <Route path="/large-limit" element={<LargeLimit />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
