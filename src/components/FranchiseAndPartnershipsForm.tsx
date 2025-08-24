@@ -19,6 +19,14 @@ const countries = [
   "Singapore", "India", "Japan", "United Arab Emirates", "Saudi Arabia", "Nigeria", "South Africa"
 ];
 
+// World cities for the dropdown - abbreviated list for demo
+const worldCities = [
+  "New York", "London", "Singapore", "Hong Kong", "Dubai", "Tokyo", "Mumbai", "Shanghai", "Paris", "Berlin",
+  "Sydney", "Toronto", "Los Angeles", "Chicago", "Frankfurt", "Zurich", "Amsterdam", "Stockholm", "Madrid", "Rome",
+  "Bangkok", "Seoul", "Taipei", "Jakarta", "Kuala Lumpur", "Manila", "Ho Chi Minh City", "Mexico City", "São Paulo",
+  "Buenos Aires", "Lima", "Santiago", "Bogotá", "Caracas", "Lagos", "Cairo", "Johannesburg", "Nairobi", "Casablanca"
+];
+
 const commoditiesData = {
   "Precious Metals": [
     "Gold", "Silver", "Platinum", "Palladium", "Rhodium"
@@ -86,14 +94,17 @@ const FranchiseAndPartnershipsForm = () => {
     incotermsPreference: "",
     additionalDetails: "",
     
-    // Customer Vote
+    // Customer Vote / Feedback
+    accountNumber: "",
     cityWanted: "",
     countryWanted: "United States",
     wouldBeCustomer: "",
     likelyToUse: "",
+    feedbackImprovement: "",
     
     // General Business Inquiry
-    inquiryType: "",
+    websiteSocial: "",
+    inquiryType: [] as string[],
     message: ""
   });
 
@@ -152,12 +163,10 @@ const FranchiseAndPartnershipsForm = () => {
       case "customer_vote":
         if (!formData.cityWanted.trim()) newErrors.cityWanted = "City is required";
         if (!formData.countryWanted) newErrors.countryWanted = "Country is required";
-        if (!formData.wouldBeCustomer) newErrors.wouldBeCustomer = "This field is required";
-        if (!formData.likelyToUse) newErrors.likelyToUse = "This field is required";
         break;
         
       case "general_business_inquiry":
-        if (!formData.inquiryType) newErrors.inquiryType = "Inquiry type is required";
+        if (formData.inquiryType.length === 0) newErrors.inquiryType = "Select at least one inquiry type";
         if (!formData.message.trim()) newErrors.message = "Message is required";
         break;
     }
@@ -283,11 +292,14 @@ const FranchiseAndPartnershipsForm = () => {
       exportLicenses: null,
       incotermsPreference: "",
       additionalDetails: "",
+      accountNumber: "",
       cityWanted: "",
       countryWanted: "United States",
       wouldBeCustomer: "",
       likelyToUse: "",
-      inquiryType: "",
+      feedbackImprovement: "",
+      websiteSocial: "",
+      inquiryType: [],
       message: ""
     });
   };
@@ -914,77 +926,98 @@ const FranchiseAndPartnershipsForm = () => {
 
   const renderCustomerVoteForm = () => (
     <div className="space-y-6">
-      {/* Location Preference */}
       <div>
-        <h4 className="font-semibold mb-4">Location Preference</h4>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="cityWanted">City you want a PBCEx in *</Label>
-            <Input
-              id="cityWanted"
-              value={formData.cityWanted}
-              onChange={(e) => handleInputChange("cityWanted", e.target.value)}
-              data-error={!!errors.cityWanted}
-              className={errors.cityWanted ? "border-destructive" : ""}
-            />
-            {errors.cityWanted && <p className="text-sm text-destructive mt-1">{errors.cityWanted}</p>}
-          </div>
-          <div>
-            <Label htmlFor="countryWanted">Country *</Label>
-            <Select value={formData.countryWanted} onValueChange={(value) => handleInputChange("countryWanted", value)}>
-              <SelectTrigger className={errors.countryWanted ? "border-destructive" : ""}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {countries.map(country => (
-                  <SelectItem key={country} value={country}>{country}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.countryWanted && <p className="text-sm text-destructive mt-1">{errors.countryWanted}</p>}
-          </div>
-        </div>
+        <Label htmlFor="accountNumber">PBCEx Account Number</Label>
+        <Input
+          id="accountNumber"
+          value={formData.accountNumber}
+          onChange={(e) => handleInputChange("accountNumber", e.target.value)}
+          placeholder="If you already have one"
+        />
+        <p className="text-sm text-muted-foreground mt-1">If you already have one</p>
       </div>
 
-      {/* Interest */}
+      {/* Location Preference */}
       <div>
-        <h4 className="font-semibold mb-4">Interest</h4>
-        <div className="space-y-4">
-          <div>
-            <Label>Would you be a customer if this franchise opened? *</Label>
-            <RadioGroup 
-              value={formData.wouldBeCustomer} 
-              onValueChange={(value) => handleInputChange("wouldBeCustomer", value)}
-              className="mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="yes" id="customer-yes" />
-                <Label htmlFor="customer-yes">Yes</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="no" id="customer-no" />
-                <Label htmlFor="customer-no">No</Label>
-              </div>
-            </RadioGroup>
-            {errors.wouldBeCustomer && <p className="text-sm text-destructive mt-1">{errors.wouldBeCustomer}</p>}
+        <Label htmlFor="cityWanted">City *</Label>
+        <Select value={formData.cityWanted} onValueChange={(value) => handleInputChange("cityWanted", value)}>
+          <SelectTrigger className={errors.cityWanted ? "border-destructive" : ""}>
+            <SelectValue placeholder="Select city" />
+          </SelectTrigger>
+          <SelectContent>
+            <div className="p-2">
+              <Input
+                placeholder="Search cities..."
+                className="mb-2"
+              />
+            </div>
+            {worldCities.map(city => (
+              <SelectItem key={city} value={city}>{city}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {errors.cityWanted && <p className="text-sm text-destructive mt-1">{errors.cityWanted}</p>}
+      </div>
+
+      <div>
+        <Label htmlFor="countryWanted">Country *</Label>
+        <Select value={formData.countryWanted} onValueChange={(value) => handleInputChange("countryWanted", value)}>
+          <SelectTrigger className={errors.countryWanted ? "border-destructive" : ""}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {countries.map(country => (
+              <SelectItem key={country} value={country}>{country}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {errors.countryWanted && <p className="text-sm text-destructive mt-1">{errors.countryWanted}</p>}
+      </div>
+
+      <div>
+        <Label>Would you be a customer if this franchise opened?</Label>
+        <RadioGroup 
+          value={formData.wouldBeCustomer} 
+          onValueChange={(value) => handleInputChange("wouldBeCustomer", value)}
+          className="mt-2"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="yes" id="customer-yes" />
+            <Label htmlFor="customer-yes">Yes</Label>
           </div>
-          <div>
-            <Label htmlFor="likelyToUse">How likely are you to use PBCEx (trading, payments, redemption)? *</Label>
-            <Select value={formData.likelyToUse} onValueChange={(value) => handleInputChange("likelyToUse", value)}>
-              <SelectTrigger className={errors.likelyToUse ? "border-destructive" : ""}>
-                <SelectValue placeholder="1-5 scale" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1 - Very Unlikely</SelectItem>
-                <SelectItem value="2">2 - Unlikely</SelectItem>
-                <SelectItem value="3">3 - Neutral</SelectItem>
-                <SelectItem value="4">4 - Likely</SelectItem>
-                <SelectItem value="5">5 - Very Likely</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.likelyToUse && <p className="text-sm text-destructive mt-1">{errors.likelyToUse}</p>}
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="no" id="customer-no" />
+            <Label htmlFor="customer-no">No</Label>
           </div>
-        </div>
+        </RadioGroup>
+      </div>
+
+      <div>
+        <Label htmlFor="likelyToUse">How likely are you to use PBCEx (trading, payments, redemption)?</Label>
+        <Select value={formData.likelyToUse} onValueChange={(value) => handleInputChange("likelyToUse", value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="1-5 scale" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">1 - Very Unlikely</SelectItem>
+            <SelectItem value="2">2 - Unlikely</SelectItem>
+            <SelectItem value="3">3 - Neutral</SelectItem>
+            <SelectItem value="4">4 - Likely</SelectItem>
+            <SelectItem value="5">5 - Very Likely</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="feedbackImprovement">What would you like to see improved in PBCEx?</Label>
+        <Textarea
+          id="feedbackImprovement"
+          value={formData.feedbackImprovement}
+          onChange={(e) => handleInputChange("feedbackImprovement", e.target.value)}
+          rows={3}
+          placeholder="Features or recommendations to make PBCEx better"
+        />
+        <p className="text-sm text-muted-foreground mt-1">Features or recommendations to make PBCEx better</p>
       </div>
     </div>
   );
@@ -992,21 +1025,47 @@ const FranchiseAndPartnershipsForm = () => {
   const renderGeneralInquiryForm = () => (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="inquiryType">Inquiry Type *</Label>
-        <Select value={formData.inquiryType} onValueChange={(value) => handleInputChange("inquiryType", value)}>
-          <SelectTrigger className={errors.inquiryType ? "border-destructive" : ""}>
-            <SelectValue placeholder="Select inquiry type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="investor">Investor</SelectItem>
-            <SelectItem value="vendor">Vendor</SelectItem>
-            <SelectItem value="press">Press</SelectItem>
-            <SelectItem value="partnership">Partnership</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
+        <Label htmlFor="websiteSocial">Website / Social Media</Label>
+        <Input
+          id="websiteSocial"
+          value={formData.websiteSocial}
+          onChange={(e) => handleInputChange("websiteSocial", e.target.value)}
+          placeholder="Share your site, Twitter/X, or LinkedIn"
+        />
+        <p className="text-sm text-muted-foreground mt-1">Share your site, Twitter/X, or LinkedIn</p>
+      </div>
+
+      <div>
+        <Label>Inquiry Type *</Label>
+        <div className="mt-2 space-y-3">
+          {[
+            "Investor",
+            "Bank / Financial Institution", 
+            "Commodity Provider",
+            "Blockchain / Technology Partner",
+            "Exchange / Trading Platform",
+            "Vendor / Service Provider",
+            "Press / Media",
+            "Partnership (general)",
+            "Other"
+          ].map((type) => (
+            <div key={type} className="flex items-center space-x-2">
+              <Checkbox
+                id={`inquiry-${type.toLowerCase().replace(/\s+/g, '-').replace('/', '-')}`}
+                checked={formData.inquiryType.includes(type)}
+                onCheckedChange={(checked) => 
+                  handleCheckboxChange("inquiryType", type, checked as boolean)
+                }
+              />
+              <Label htmlFor={`inquiry-${type.toLowerCase().replace(/\s+/g, '-').replace('/', '-')}`}>
+                {type}
+              </Label>
+            </div>
+          ))}
+        </div>
         {errors.inquiryType && <p className="text-sm text-destructive mt-1">{errors.inquiryType}</p>}
       </div>
+
       <div>
         <Label htmlFor="message">Message *</Label>
         <Textarea
@@ -1068,7 +1127,7 @@ const FranchiseAndPartnershipsForm = () => {
                       Commodity Provider
                     </TabsTrigger>
                     <TabsTrigger value="customer_vote" className="text-xs p-2">
-                      Customer Vote
+                      Customer Vote / Feedback
                     </TabsTrigger>
                     <TabsTrigger value="general_business_inquiry" className="text-xs p-2">
                       General Business Inquiry
@@ -1105,7 +1164,7 @@ const FranchiseAndPartnershipsForm = () => {
 
                   <TabsContent value="customer_vote" className="mt-8">
                     <div className="border-t pt-6">
-                      <h3 className="font-semibold mb-4 text-lg">Location Request</h3>
+                      <h3 className="font-semibold mb-4 text-lg">Customer Feedback</h3>
                       {renderCustomerVoteForm()}
                     </div>
                   </TabsContent>

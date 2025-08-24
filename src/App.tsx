@@ -16,6 +16,7 @@ import Realize from "./pages/Realize";
 import PnL from "./pages/PnL";
 import ProviderSettings from "./pages/ProviderSettings";
 import LargeLimit from "./pages/LargeLimit";
+import Careers from "./pages/Careers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/pnl" element={<PnL />} />
           <Route path="/provider-settings" element={<ProviderSettings />} />
           <Route path="/large-limit" element={<LargeLimit />} />
+          <Route path="/careers" element={<Careers />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -15,6 +15,7 @@ import {
 import Navigation from "@/components/Navigation";
 import FranchiseAndPartnershipsForm from "@/components/FranchiseAndPartnershipsForm";
 import FranchiseDemandCounter from "@/components/FranchiseDemandCounter";
+import Footer from "@/components/Footer";
 
 const Franchise = () => {
 
@@ -155,6 +156,8 @@ const Franchise = () => {
       
       {/* Franchise Demand Counter */}
       <FranchiseDemandCounter />
+      
+      <Footer />
     </div>
   );
 };

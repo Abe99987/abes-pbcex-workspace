@@ -16,6 +16,7 @@ import {
   Calculator
 } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 
 const Education = () => {
   const courses = [
@@ -231,6 +232,8 @@ const Education = () => {
           </div>
         </div>
       </section>
+      
+      <Footer />
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { Shield, Globe, Coins, Mail, Phone, MapPin } from "lucide-react";
 const Footer = () => {
   const companyLinks = [
     { label: "About Us", href: "#" },
-    { label: "Careers", href: "#" },
+    { label: "Careers", href: "/careers" },
     { label: "Press", href: "#" },
     { label: "Investors", href: "#" },
   ];
