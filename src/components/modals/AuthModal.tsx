@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -18,13 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, Upload, X } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { FORM_CONFIGS } from "./auth-form-configs";
 
@@ -35,7 +31,7 @@ interface AuthModalProps {
 
 const COUNTRIES = [
   "United States",
-  "European Union", 
+  "European Union (EU/EEA)", 
   "United Kingdom",
   "China",
   "Hong Kong",
@@ -54,13 +50,11 @@ export default function AuthModal({ open, onOpenChange }: AuthModalProps) {
   const [accountType, setAccountType] = useState<"personal" | "business">("personal");
   const [selectedCountry, setSelectedCountry] = useState("United States");
   const [formData, setFormData] = useState<Record<string, any>>({});
-  const [advancedShippingOpen, setAdvancedShippingOpen] = useState(false);
 
   // Login form states
-  const [loginData, setLoginData] = useState({
-    email: "",
-    password: ""
-  });
+  const [loginEmail, setLoginEmail] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
+  const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
 
   const handleInputChange = (fieldName: string, value: any) => {
     setFormData(prev => ({
@@ -69,24 +63,56 @@ export default function AuthModal({ open, onOpenChange }: AuthModalProps) {
     }));
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSendCode = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!loginData.email || !loginData.password) {
+    if (!loginEmail) {
       toast({
         title: "Validation Error",
-        description: "Please fill in both email and password.",
+        description: "Please enter your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setCodeSent(true);
+    toast({
+      title: "Code sent!",
+      description: "Check your email for the 6-digit verification code.",
+    });
+  };
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const codeComplete = verificationCode.every(digit => digit !== "");
+    
+    if (!codeComplete) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter the complete 6-digit code.",
         variant: "destructive",
       });
       return;
     }
 
     toast({
-      title: "Login successful!",
+      title: "Logged in (prototype)",
       description: "Welcome back to PBcex.",
     });
     
     onOpenChange(false);
+  };
+
+  const handleCodeChange = (index: number, value: string) => {
+    if (value.length <= 1 && /^\d*$/.test(value)) {
+      const newCode = [...verificationCode];
+      newCode[index] = value;
+      setVerificationCode(newCode);
+      
+      // Auto-focus next input
+      if (value && index < 5) {
+        const nextInput = document.getElementById(`code-${index + 1}`);
+        nextInput?.focus();
+      }
+    }
   };
 
   const handleSignUp = (e: React.FormEvent) => {
@@ -115,7 +141,7 @@ export default function AuthModal({ open, onOpenChange }: AuthModalProps) {
 
     // Success handling
     toast({
-      title: "Sign-up data captured",
+      title: "Sign-up data captured (prototype)",
       description: "Your registration has been submitted successfully.",
     });
 
@@ -141,7 +167,14 @@ export default function AuthModal({ open, onOpenChange }: AuthModalProps) {
           <Input
             type={field.type}
             value={value}
-            onChange={(e) => handleInputChange(field.name, e.target.value)}
+            onChange={(e) => {
+              let inputValue = e.target.value;
+              // Mask SSN/ITIN while typing
+              if (field.name === "ssn" && inputValue) {
+                inputValue = inputValue.replace(/\D/g, '').replace(/(\d{3})(\d{2})(\d{4})/, '***-**-$3');
+              }
+              handleInputChange(field.name, inputValue);
+            }}
             placeholder={field.placeholder}
           />
         );
@@ -223,9 +256,13 @@ export default function AuthModal({ open, onOpenChange }: AuthModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Account Access</DialogTitle>
+      <DialogContent className="max-w-xl w-full mx-4 md:mx-auto rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="relative">
+          <DialogTitle className="text-center">Account Access</DialogTitle>
+          <DialogClose className="absolute right-0 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </DialogClose>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -235,42 +272,69 @@ export default function AuthModal({ open, onOpenChange }: AuthModalProps) {
           </TabsList>
 
           <TabsContent value="login" className="space-y-6">
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
-                <Input
-                  id="login-email"
-                  type="email"
-                  value={loginData.email}
-                  onChange={(e) => setLoginData(prev => ({ ...prev, email: e.target.value }))}
-                  required
-                />
-              </div>
+            {!codeSent ? (
+              <form onSubmit={handleSendCode} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="login-email">Email</Label>
+                  <Input
+                    id="login-email"
+                    type="email"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    required
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="login-password">Password</Label>
-                <Input
-                  id="login-password"
-                  type="password"
-                  value={loginData.password}
-                  onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
-                  required
-                />
-              </div>
+                <div className="flex gap-3">
+                  <Button type="submit" className="flex-1">
+                    Send 6-digit code
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                    Cancel
+                  </Button>
+                </div>
 
-              <button type="button" className="text-sm text-primary hover:underline">
-                Forgot password?
-              </button>
+                <button type="button" className="text-sm text-primary hover:underline">
+                  Forgot password?
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Enter 6-digit verification code</Label>
+                  <div className="flex gap-2 justify-center">
+                    {verificationCode.map((digit, index) => (
+                      <Input
+                        key={index}
+                        id={`code-${index}`}
+                        type="text"
+                        value={digit}
+                        onChange={(e) => handleCodeChange(index, e.target.value)}
+                        className="w-12 h-12 text-center text-lg font-mono"
+                        maxLength={1}
+                      />
+                    ))}
+                  </div>
+                </div>
 
-              <div className="flex gap-3">
-                <Button type="submit" className="flex-1">
-                  Log In
-                </Button>
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                  Cancel
-                </Button>
-              </div>
-            </form>
+                <div className="flex gap-3">
+                  <Button type="submit" className="flex-1">
+                    Log In
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                    Cancel
+                  </Button>
+                </div>
+
+                <button 
+                  type="button" 
+                  onClick={() => setCodeSent(false)}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Back to email
+                </button>
+              </form>
+            )}
           </TabsContent>
 
           <TabsContent value="signup" className="space-y-6">
@@ -341,41 +405,7 @@ export default function AuthModal({ open, onOpenChange }: AuthModalProps) {
                     ))}
                   </CardContent>
                 </Card>
-              ))}
-
-              {/* Advanced Shipping Section */}
-              <Collapsible open={advancedShippingOpen} onOpenChange={setAdvancedShippingOpen}>
-                <CollapsibleTrigger asChild>
-                  <Button variant="outline" className="w-full justify-between">
-                    Advanced Shipping Options
-                    <ChevronDown className={`h-4 w-4 transition-transform ${advancedShippingOpen ? 'rotate-180' : ''}`} />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="space-y-4 mt-4">
-                  <Card>
-                    <CardContent className="pt-6 space-y-4">
-                      <div className="space-y-2">
-                        <Label>Secure Pickup Location</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose pickup location" />
-                          </SelectTrigger>
-                          <SelectContent className="z-[60]">
-                            <SelectItem value="fedex">FedEx Center</SelectItem>
-                            <SelectItem value="ups">UPS Center</SelectItem>
-                            <SelectItem value="dhl">DHL Center</SelectItem>
-                            <SelectItem value="brinks">Brinks Secure Site</SelectItem>
-                            <SelectItem value="warehouse">Bonded Warehouse</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-muted-foreground">
-                          Government ID required for release.
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </CollapsibleContent>
-              </Collapsible>
+               ))}
 
               {/* Submit Buttons */}
               <div className="flex gap-3">
