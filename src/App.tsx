@@ -17,6 +17,13 @@ import PnL from "./pages/PnL";
 import ProviderSettings from "./pages/ProviderSettings";
 import LargeLimit from "./pages/LargeLimit";
 import Careers from "./pages/Careers";
+import About from "./pages/About";
+import Press from "./pages/Press";
+import Investors from "./pages/Investors";
+import DigitalWallet from "./pages/DigitalWallet";
+import AssetTrading from "./pages/AssetTrading";
+import GlobalPayments from "./pages/GlobalPayments";
+import MobileApp from "./pages/MobileApp";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +49,13 @@ const App = () => (
           <Route path="/provider-settings" element={<ProviderSettings />} />
           <Route path="/large-limit" element={<LargeLimit />} />
           <Route path="/careers" element={<Careers />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/press" element={<Press />} />
+          <Route path="/investors" element={<Investors />} />
+          <Route path="/wallet" element={<DigitalWallet />} />
+          <Route path="/asset-trading" element={<AssetTrading />} />
+          <Route path="/payments" element={<GlobalPayments />} />
+          <Route path="/app" element={<MobileApp />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

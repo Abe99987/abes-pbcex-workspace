@@ -3,17 +3,17 @@ import { Shield, Globe, Coins, Mail, Phone, MapPin } from "lucide-react";
 
 const Footer = () => {
   const companyLinks = [
-    { label: "About Us", href: "#" },
+    { label: "About Us", href: "/about" },
     { label: "Careers", href: "/careers" },
-    { label: "Press", href: "#" },
-    { label: "Investors", href: "#" },
+    { label: "Press", href: "/press" },
+    { label: "Investors", href: "/investors" },
   ];
 
   const productLinks = [
-    { label: "Digital Wallet", href: "#" },
-    { label: "Asset Trading", href: "#" },
-    { label: "Global Payments", href: "#" },
-    { label: "Mobile App", href: "#" },
+    { label: "Digital Wallet", href: "/wallet" },
+    { label: "Asset Trading", href: "/asset-trading" },
+    { label: "Global Payments", href: "/payments" },
+    { label: "Mobile App", href: "/app" },
   ];
 
   const supportLinks = [

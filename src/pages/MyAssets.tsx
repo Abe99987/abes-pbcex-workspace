@@ -23,6 +23,7 @@ import RealizeAssetModal from "@/components/RealizeAssetModal";
 import BorrowingModal from "@/components/BorrowingModal";
 import TransferModal from "@/components/modals/TransferModal";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 
 const MyAssets = () => {
   const [buyModalOpen, setBuyModalOpen] = useState(false);
@@ -1103,6 +1104,8 @@ const MyAssets = () => {
           />
         </>
       )}
+      
+      <Footer />
     </div>
   );
 };
