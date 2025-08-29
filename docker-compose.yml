@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: pbcex-postgres
+    environment:
+      POSTGRES_DB: pbcex
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - pbcex-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: pbcex-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - pbcex-network
+    command: redis-server --appendonly yes
+
+  maildev:
+    image: maildev/maildev
+    container_name: pbcex-maildev
+    ports:
+      - "1080:1080"  # Web interface
+      - "1025:1025"  # SMTP server
+    networks:
+      - pbcex-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  pbcex-network:
+    driver: bridge

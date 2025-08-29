@@ -1,0 +1,52 @@
+{
+  "name": "@pbcex/e2e-tests",
+  "version": "1.0.0",
+  "description": "PBCEx End-to-End Test Suite",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "install": "playwright install",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:auth": "playwright test tests/auth.e2e.spec.ts",
+    "test:kyc": "playwright test tests/kyc.e2e.spec.ts", 
+    "test:trade": "playwright test tests/trade.e2e.spec.ts",
+    "test:shop": "playwright test tests/shop.e2e.spec.ts",
+    "test:support": "playwright test tests/support.e2e.spec.ts",
+    "test:parallel": "playwright test --workers=3",
+    "test:serial": "playwright test --workers=1",
+    "test:mobile": "playwright test --project=mobile-chrome",
+    "test:tablet": "playwright test --project=tablet",
+    "test:cross-browser": "playwright test --project=chromium --project=firefox --project=webkit",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen",
+    "trace": "playwright show-trace",
+    "setup": "npm run install && playwright install-deps",
+    "clean": "rm -rf test-results && rm -rf playwright-report",
+    "lint": "eslint . --ext .ts --fix"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.40.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "typescript": "^5.2.2",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "eslint": "^8.54.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "playwright",
+    "e2e",
+    "testing", 
+    "pbcex",
+    "automation"
+  ],
+  "author": "PBCEx Team",
+  "license": "PROPRIETARY"
+}

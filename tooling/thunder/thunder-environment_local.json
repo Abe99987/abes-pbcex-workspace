@@ -1,0 +1,56 @@
+{
+	"client": "Thunder Client",
+	"environmentName": "PBCEx Local",
+	"dateExported": "2024-01-30T10:30:00.000Z",
+	"version": "1.0",
+	"variables": [
+		{
+			"name": "baseUrl",
+			"value": "http://localhost:4001"
+		},
+		{
+			"name": "userToken",
+			"value": ""
+		},
+		{
+			"name": "adminToken",
+			"value": ""
+		},
+		{
+			"name": "supportToken",
+			"value": ""
+		},
+		{
+			"name": "tellerToken",
+			"value": ""
+		},
+		{
+			"name": "quoteId",
+			"value": ""
+		},
+		{
+			"name": "redemptionId",
+			"value": ""
+		},
+		{
+			"name": "testUserId",
+			"value": "user_123456789"
+		},
+		{
+			"name": "testProductId",
+			"value": "prod_au_bar_1oz"
+		},
+		{
+			"name": "apiVersion",
+			"value": "v1"
+		},
+		{
+			"name": "environment",
+			"value": "local"
+		},
+		{
+			"name": "timeout",
+			"value": "5000"
+		}
+	]
+}

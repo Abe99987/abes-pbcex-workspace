@@ -1,0 +1,56 @@
+{
+	"client": "Thunder Client",
+	"environmentName": "PBCEx Staging",
+	"dateExported": "2024-01-30T10:30:00.000Z",
+	"version": "1.0",
+	"variables": [
+		{
+			"name": "baseUrl",
+			"value": "https://api.staging.pbcex.com"
+		},
+		{
+			"name": "userToken",
+			"value": ""
+		},
+		{
+			"name": "adminToken",
+			"value": ""
+		},
+		{
+			"name": "supportToken",
+			"value": ""
+		},
+		{
+			"name": "tellerToken",
+			"value": ""
+		},
+		{
+			"name": "quoteId",
+			"value": ""
+		},
+		{
+			"name": "redemptionId",
+			"value": ""
+		},
+		{
+			"name": "testUserId",
+			"value": ""
+		},
+		{
+			"name": "testProductId",
+			"value": "prod_au_bar_1oz"
+		},
+		{
+			"name": "apiVersion",
+			"value": "v1"
+		},
+		{
+			"name": "environment",
+			"value": "staging"
+		},
+		{
+			"name": "timeout",
+			"value": "10000"
+		}
+	]
+}

@@ -1,0 +1,62 @@
+reporter: apiary
+custom:
+  # Custom API endpoint
+  apiEndpoint: http://localhost:4001
+dry-run: false
+hookfiles: tests/contract/dredd-hooks.ts
+language: typescript
+sandbox: false
+server: npm start
+server-wait: 3
+init: false
+custom:
+  # Test only a subset of endpoints for faster execution
+  names:
+    - Health > GET /health
+    - Authentication > POST /api/auth/register
+    - Authentication > POST /api/auth/login
+    - Authentication > GET /api/auth/me
+    - Wallet > GET /api/wallet/balances
+    - Trading > GET /api/trade/prices
+    - Trading > POST /api/trade/order
+    - Shop > GET /api/shop/products
+    - Admin > GET /api/admin/exposure
+    - Redemption > POST /api/redeem
+    - Redemption > GET /api/redeem/status/{id}
+    - Redemption > GET /api/redeem/quote
+    - Vault > GET /api/vault/inventory
+    - Support > GET /api/support/search
+    - Support > GET /api/support/user/{id}
+only:
+  - Health > GET /health
+  - Authentication > POST /api/auth/register
+  - Authentication > POST /api/auth/login
+# Add more endpoints as needed for comprehensive testing
+
+# Skip endpoints that require complex setup
+skip:
+  - Admin > GET /api/admin/exposure
+  - Vault > POST /api/vault/inventory/restock
+  - Vault > POST /api/vault/redemptions/*
+  - Support > POST /api/support/user/*/reset-password
+  - Support > POST /api/support/order/*/adjust
+
+# Headers for authenticated requests
+header:
+  - "Content-Type: application/json"
+  - "Accept: application/json"
+
+# Sort requests by method
+sorted: true
+
+# Inline errors instead of stopping on first error
+inline-errors: true
+
+# Output details for debugging
+details: true
+
+# Use color output
+color: true
+
+# Timeout for requests (in seconds)
+timeout: 10000

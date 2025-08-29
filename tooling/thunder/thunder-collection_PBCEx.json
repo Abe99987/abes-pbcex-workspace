@@ -1,0 +1,969 @@
+{
+	"client": "Thunder Client",
+	"collectionName": "PBCEx API",
+	"dateExported": "2024-01-30T10:30:00.000Z",
+	"version": "1.1",
+	"folders": [
+		{
+			"_id": "folder_auth",
+			"name": "Auth",
+			"containerId": "",
+			"created": "2024-01-30T10:30:00.000Z",
+			"sortNum": 10000
+		},
+		{
+			"_id": "folder_kyc",
+			"name": "KYC",
+			"containerId": "",
+			"created": "2024-01-30T10:30:00.000Z",
+			"sortNum": 20000
+		},
+		{
+			"_id": "folder_wallet",
+			"name": "Wallet",
+			"containerId": "",
+			"created": "2024-01-30T10:30:00.000Z",
+			"sortNum": 30000
+		},
+		{
+			"_id": "folder_trade",
+			"name": "Trade",
+			"containerId": "",
+			"created": "2024-01-30T10:30:00.000Z",
+			"sortNum": 40000
+		},
+		{
+			"_id": "folder_shop",
+			"name": "Shop",
+			"containerId": "",
+			"created": "2024-01-30T10:30:00.000Z",
+			"sortNum": 50000
+		},
+		{
+			"_id": "folder_admin",
+			"name": "Admin",
+			"containerId": "",
+			"created": "2024-01-30T10:30:00.000Z",
+			"sortNum": 60000
+		},
+		{
+			"_id": "folder_phase3",
+			"name": "Phase-3 (Feature Gated)",
+			"containerId": "",
+			"created": "2024-01-30T10:30:00.000Z",
+			"sortNum": 70000
+		},
+		{
+			"_id": "folder_analytics",
+			"name": "Experiments & Analytics",
+			"containerId": "",
+			"created": "2024-01-30T10:30:00.000Z",
+			"sortNum": 80000
+		}
+	],
+	"requests": [
+		{
+			"_id": "req_health",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_auth",
+			"name": "Health Check",
+			"url": "{{baseUrl}}/health",
+			"method": "GET",
+			"sortNum": 10000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [],
+			"params": [],
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.status",
+					"action": "equal",
+					"value": "healthy"
+				},
+				{
+					"type": "res-time",
+					"custom": "",
+					"action": "less",
+					"value": "1000"
+				}
+			]
+		},
+		{
+			"_id": "req_register",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_auth",
+			"name": "Register User",
+			"url": "{{baseUrl}}/api/auth/register",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "201"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.code",
+					"action": "istype",
+					"value": "string"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.user.email",
+					"action": "equal",
+					"value": "john.doe@example.com"
+				}
+			]
+		},
+		{
+			"_id": "req_login",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_auth",
+			"name": "Login User",
+			"url": "{{baseUrl}}/api/auth/login",
+			"method": "POST",
+			"sortNum": 30000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePassword123!\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.token",
+					"action": "istype",
+					"value": "string"
+				},
+				{
+					"type": "set-env-var",
+					"custom": "json.data.token",
+					"action": "setto",
+					"value": "userToken"
+				}
+			]
+		},
+		{
+			"_id": "req_admin_login",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_auth",
+			"name": "Admin Login",
+			"url": "{{baseUrl}}/api/auth/login",
+			"method": "POST",
+			"sortNum": 40000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"email\": \"admin@pbcex.com\",\n  \"password\": \"AdminPassword123!\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.user.role",
+					"action": "equal",
+					"value": "ADMIN"
+				},
+				{
+					"type": "set-env-var",
+					"custom": "json.data.token",
+					"action": "setto",
+					"value": "adminToken"
+				}
+			]
+		},
+		{
+			"_id": "req_profile",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_auth",
+			"name": "Get Current User Profile",
+			"url": "{{baseUrl}}/api/auth/me",
+			"method": "GET",
+			"sortNum": 50000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				}
+			],
+			"params": [],
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.user.id",
+					"action": "istype",
+					"value": "string"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.user.email",
+					"action": "istype",
+					"value": "string"
+				}
+			]
+		},
+		{
+			"_id": "req_kyc_submit",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_kyc",
+			"name": "Submit Personal KYC",
+			"url": "{{baseUrl}}/api/kyc/submit",
+			"method": "POST",
+			"sortNum": 10000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				},
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"personalInfo\": {\n    \"fullName\": \"John Michael Doe\",\n    \"dateOfBirth\": \"1990-05-15\",\n    \"ssn\": \"123-45-6789\",\n    \"address\": {\n      \"street\": \"123 Main Street\",\n      \"city\": \"Dallas\",\n      \"state\": \"TX\",\n      \"zipCode\": \"75201\",\n      \"country\": \"US\"\n    },\n    \"phone\": \"+1-555-123-4567\"\n  },\n  \"documents\": {\n    \"driversLicense\": {\n      \"number\": \"DL12345678\",\n      \"state\": \"TX\",\n      \"expirationDate\": \"2028-05-15\"\n    }\n  },\n  \"questionnaire\": {\n    \"employmentStatus\": \"employed\",\n    \"annualIncome\": \"50000-100000\",\n    \"investmentExperience\": \"intermediate\",\n    \"riskTolerance\": \"moderate\"\n  }\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "201"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.status",
+					"action": "contains",
+					"value": "PENDING"
+				}
+			]
+		},
+		{
+			"_id": "req_kyc_status",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_kyc",
+			"name": "Get KYC Status",
+			"url": "{{baseUrl}}/api/kyc/status",
+			"method": "GET",
+			"sortNum": 20000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				}
+			],
+			"params": [],
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.status",
+					"action": "istype",
+					"value": "string"
+				}
+			]
+		},
+		{
+			"_id": "req_balances",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_wallet",
+			"name": "Get Account Balances",
+			"url": "{{baseUrl}}/api/wallet/balances",
+			"method": "GET",
+			"sortNum": 10000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				}
+			],
+			"params": [],
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.funding",
+					"action": "istype",
+					"value": "object"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.trading",
+					"action": "istype",
+					"value": "object"
+				}
+			]
+		},
+		{
+			"_id": "req_transfer",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_wallet",
+			"name": "Transfer PAXG to XAU-s",
+			"url": "{{baseUrl}}/api/wallet/transfer",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				},
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"fromAsset\": \"PAXG\",\n  \"toAsset\": \"XAU-s\",\n  \"amount\": \"0.5\",\n  \"fromAccount\": \"funding\",\n  \"toAccount\": \"trading\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.transaction.id",
+					"action": "istype",
+					"value": "string"
+				}
+			]
+		},
+		{
+			"_id": "req_prices",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_trade",
+			"name": "Get Asset Prices",
+			"url": "{{baseUrl}}/api/trade/prices?asset=AU",
+			"method": "GET",
+			"sortNum": 10000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				}
+			],
+			"params": [
+				{
+					"name": "asset",
+					"value": "AU",
+					"isPath": false
+				}
+			],
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.prices",
+					"action": "istype",
+					"value": "object"
+				},
+				{
+					"type": "res-time",
+					"custom": "",
+					"action": "less",
+					"value": "500"
+				}
+			]
+		},
+		{
+			"_id": "req_trade_order",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_trade",
+			"name": "Place Market Order",
+			"url": "{{baseUrl}}/api/trade/order",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				},
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"fromAsset\": \"USD\",\n  \"toAsset\": \"AU\",\n  \"amount\": \"1000.00\",\n  \"orderType\": \"market\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "201"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.trade.id",
+					"action": "istype",
+					"value": "string"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.trade.status",
+					"action": "contains",
+					"value": "PENDING"
+				}
+			]
+		},
+		{
+			"_id": "req_products",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_shop",
+			"name": "List Products",
+			"url": "{{baseUrl}}/api/shop/products?metal=AU&category=BARS",
+			"method": "GET",
+			"sortNum": 10000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [],
+			"params": [
+				{
+					"name": "metal",
+					"value": "AU",
+					"isPath": false
+				},
+				{
+					"name": "category",
+					"value": "BARS",
+					"isPath": false
+				}
+			],
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.products",
+					"action": "istype",
+					"value": "array"
+				}
+			]
+		},
+		{
+			"_id": "req_lock_quote",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_shop",
+			"name": "Lock Price Quote",
+			"url": "{{baseUrl}}/api/shop/lock-quote",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				},
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"productId\": \"prod_au_bar_1oz\",\n  \"quantity\": 5,\n  \"lockDurationMinutes\": 10\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "201"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.quote.id",
+					"action": "istype",
+					"value": "string"
+				},
+				{
+					"type": "set-env-var",
+					"custom": "json.data.quote.id",
+					"action": "setto",
+					"value": "quoteId"
+				}
+			]
+		},
+		{
+			"_id": "req_checkout",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_shop",
+			"name": "Checkout with Locked Quote",
+			"url": "{{baseUrl}}/api/shop/checkout",
+			"method": "POST",
+			"sortNum": 30000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				},
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"shippingAddress\": {\n    \"name\": \"John Doe\",\n    \"street\": \"123 Main Street\",\n    \"city\": \"Dallas\",\n    \"state\": \"TX\",\n    \"zipCode\": \"75201\",\n    \"country\": \"US\"\n  },\n  \"paymentMethod\": \"xau_balance\",\n  \"fulfillmentPreference\": \"standard\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "201"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.order.id",
+					"action": "istype",
+					"value": "string"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.order.quoteId",
+					"action": "equal",
+					"value": "{{quoteId}}"
+				}
+			]
+		},
+		{
+			"_id": "req_admin_exposure",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_admin",
+			"name": "Get System Exposure",
+			"url": "{{baseUrl}}/api/admin/exposure",
+			"method": "GET",
+			"sortNum": 10000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{adminToken}}"
+				}
+			],
+			"params": [],
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.exposure",
+					"action": "istype",
+					"value": "object"
+				}
+			]
+		},
+		{
+			"_id": "req_redeem",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_phase3",
+			"name": "Request Redemption",
+			"url": "{{baseUrl}}/api/redeem",
+			"method": "POST",
+			"sortNum": 10000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				},
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"asset\": \"AU\",\n  \"qty\": \"1.0\",\n  \"format\": \"bar\",\n  \"preferredSku\": \"AU_BAR_1OZ_PAMP\",\n  \"shippingAddress\": {\n    \"street\": \"123 Main Street\",\n    \"city\": \"Dallas\",\n    \"state\": \"TX\",\n    \"zipCode\": \"75201\",\n    \"country\": \"US\"\n  }\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "in",
+					"value": "201,501"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.code",
+					"action": "istype",
+					"value": "string"
+				}
+			]
+		},
+		{
+			"_id": "req_redeem_status",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_phase3",
+			"name": "Get Redemption Status",
+			"url": "{{baseUrl}}/api/redeem/status/{{redemptionId}}",
+			"method": "GET",
+			"sortNum": 20000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				}
+			],
+			"params": [],
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "in",
+					"value": "200,404,501"
+				}
+			]
+		},
+		{
+			"_id": "req_redeem_quote",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_phase3",
+			"name": "Get Redemption Quote",
+			"url": "{{baseUrl}}/api/redeem/quote?asset=AU&qty=1.0&format=bar",
+			"method": "GET",
+			"sortNum": 30000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				}
+			],
+			"params": [
+				{
+					"name": "asset",
+					"value": "AU",
+					"isPath": false
+				},
+				{
+					"name": "qty",
+					"value": "1.0",
+					"isPath": false
+				},
+				{
+					"name": "format",
+					"value": "bar",
+					"isPath": false
+				}
+			],
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "in",
+					"value": "200,501"
+				}
+			]
+		},
+		{
+			"_id": "req_vault_inventory",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_phase3",
+			"name": "Get Vault Inventory (Admin)",
+			"url": "{{baseUrl}}/api/vault/inventory?metal=AU",
+			"method": "GET",
+			"sortNum": 40000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{adminToken}}"
+				}
+			],
+			"params": [
+				{
+					"name": "metal",
+					"value": "AU",
+					"isPath": false
+				}
+			],
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "in",
+					"value": "200,403,501"
+				}
+			]
+		},
+		{
+			"_id": "req_experiment_assignments",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_analytics",
+			"name": "Get Experiment Assignments",
+			"url": "{{baseUrl}}/api/analytics/experiments/assignments",
+			"method": "GET",
+			"sortNum": 10000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				}
+			],
+			"params": [],
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.assignments",
+					"action": "istype",
+					"value": "object"
+				}
+			]
+		},
+		{
+			"_id": "req_experiment_assign",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_analytics",
+			"name": "Assign Experiment Variants",
+			"url": "{{baseUrl}}/api/analytics/experiments/assign",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				},
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"experiments\": [\n    \"onboarding_form_length\",\n    \"order_form_layout\",\n    \"spread_hint_tooltip\"\n  ]\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.data.assignments",
+					"action": "istype",
+					"value": "object"
+				}
+			]
+		},
+		{
+			"_id": "req_track_event",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_analytics",
+			"name": "Track Analytics Event",
+			"url": "{{baseUrl}}/api/analytics/event",
+			"method": "POST",
+			"sortNum": 30000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				},
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"eventType\": \"experiment_view\",\n  \"properties\": {\n    \"page\": \"/trade\",\n    \"component\": \"OrderForm\",\n    \"action\": \"form_interaction\"\n  },\n  \"experimentData\": {\n    \"experimentKey\": \"order_form_layout\",\n    \"variant\": \"compact\"\n  },\n  \"context\": {\n    \"page\": \"/trade\",\n    \"userAgent\": \"Thunder Client\"\n  }\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.code",
+					"action": "equal",
+					"value": "EVENT_LOGGED"
+				}
+			]
+		},
+		{
+			"_id": "req_track_performance",
+			"colId": "thunder_pbcex",
+			"containerId": "folder_analytics",
+			"name": "Track Performance Metric",
+			"url": "{{baseUrl}}/api/analytics/performance",
+			"method": "POST",
+			"sortNum": 40000,
+			"created": "2024-01-30T10:30:00.000Z",
+			"modified": "2024-01-30T10:30:00.000Z",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "Bearer {{userToken}}"
+				},
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"params": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"operation\": \"page_load\",\n  \"duration\": 1250,\n  \"success\": true,\n  \"properties\": {\n    \"page\": \"/trade\",\n    \"cached\": false,\n    \"connectionType\": \"4g\"\n  }\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				},
+				{
+					"type": "json-query",
+					"custom": "json.code",
+					"action": "equal",
+					"value": "PERFORMANCE_LOGGED"
+				}
+			]
+		}
+	]
+}

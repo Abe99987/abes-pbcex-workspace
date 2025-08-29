@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Run staged linters/formatters only on changed files
+npx --no-install lint-staged
