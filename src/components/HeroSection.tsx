@@ -17,9 +17,9 @@ const HeroSection = () => {
           </Badge>
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-            A Bank for{" "}
+            People's Bank Commodities{" "}
             <span className="bg-gradient-to-r from-gold to-gold-light bg-clip-text text-transparent">
-              Real Assets
+              Exchange
             </span>
           </h1>
           
