@@ -28,6 +28,25 @@ interface Asset {
   category: "funding" | "trading";
 }
 
+// Separate typing for legacy display-only sections (not used by funding/trading logic)
+type LegacyCategory = "FX Assets" | "Mineral Assets" | "Crypto Assets" | "Titled Assets";
+interface LegacyAsset {
+  name: string;
+  symbol: string;
+  price: string;
+  change: string;
+  isPositive: boolean;
+  icon: string;
+  description: string;
+  balance: string;
+  value: string;
+  isLive: boolean;
+  category: LegacyCategory;
+  remainingBalance?: string; // titled-only
+  debtAmount?: string;       // titled-only
+  actions?: string[];        // titled-only
+}
+
 const MyAssets = () => {
   const [buyModalOpen, setBuyModalOpen] = useState(false);
   const [realizeModalOpen, setRealizeModalOpen] = useState(false);
@@ -150,7 +169,7 @@ const MyAssets = () => {
   ];
 
   // Legacy asset categories for compatibility
-  const fxAssets = [
+  const fxAssets: LegacyAsset[] = [
     {
       name: "USD",
       symbol: "USD",
@@ -192,7 +211,7 @@ const MyAssets = () => {
     }
   ];
 
-  const mineralAssets = [
+  const mineralAssets: LegacyAsset[] = [
     {
       name: "Gold (XAU)",
       symbol: "AU",
@@ -234,7 +253,7 @@ const MyAssets = () => {
     }
   ];
 
-  const cryptoAssets = [
+  const cryptoAssets: LegacyAsset[] = [
     {
       name: "Bitcoin",
       symbol: "BTC",
@@ -263,7 +282,7 @@ const MyAssets = () => {
     }
   ];
 
-  const titledAssets = [
+  const titledAssets: LegacyAsset[] = [
     {
       name: "Tesla Model Y",
       symbol: "TESLA",
