@@ -1,23 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  ShoppingCart, 
-  Package, 
-  Send, 
-  CreditCard, 
-  ArrowUpDown, 
-  Download,
-  Upload,
-  BarChart3
-} from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from 'recharts';
+import { TrendingUp, TrendingDown, ArrowRight, ArrowLeft, Package, Coins, DollarSign, Home, Car, Plane, ArrowUpDown, BarChart3, Upload, Download, Send, ShoppingCart, CreditCard } from "lucide-react";
+import { Tooltip as TooltipComponent, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import BuyAssetModal from "@/components/BuyAssetModal";
 import RealizeAssetModal from "@/components/RealizeAssetModal";
 import BorrowingModal from "@/components/BorrowingModal";
@@ -25,13 +14,46 @@ import TransferModal from "@/components/modals/TransferModal";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
+interface Asset {
+  name: string;
+  symbol: string;
+  price: string;
+  change: string;
+  isPositive: boolean;
+  icon: string;
+  description: string;
+  balance: string;
+  value: string;
+  isLive: boolean;
+  category: "funding" | "trading";
+}
+
+// Separate typing for legacy display-only sections (not used by funding/trading logic)
+type LegacyCategory = "FX Assets" | "Mineral Assets" | "Crypto Assets" | "Titled Assets";
+interface LegacyAsset {
+  name: string;
+  symbol: string;
+  price: string;
+  change: string;
+  isPositive: boolean;
+  icon: string;
+  description: string;
+  balance: string;
+  value: string;
+  isLive: boolean;
+  category: LegacyCategory;
+  remainingBalance?: string; // titled-only
+  debtAmount?: string;       // titled-only
+  actions?: string[];        // titled-only
+}
+
 const MyAssets = () => {
   const [buyModalOpen, setBuyModalOpen] = useState(false);
   const [realizeModalOpen, setRealizeModalOpen] = useState(false);
   const [borrowingModalOpen, setBorrowingModalOpen] = useState(false);
   const [transferModalOpen, setTransferModalOpen] = useState(false);
   const [transferDirection, setTransferDirection] = useState<"funding-to-trading" | "trading-to-funding">("funding-to-trading");
-  const [selectedAsset, setSelectedAsset] = useState<any>(null);
+  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const navigate = useNavigate();
 
   // Function to determine asset badge type and category
@@ -48,7 +70,7 @@ const MyAssets = () => {
   };
 
   // Funding Assets (Spot/Vault)
-  const fundingAssets = [
+  const fundingAssets: Asset[] = [
     {
       name: "USD",
       symbol: "USD",
@@ -104,7 +126,7 @@ const MyAssets = () => {
   ];
 
   // Trading Assets (Synthetic)
-  const tradingAssets = [
+  const tradingAssets: Asset[] = [
     {
       name: "Gold Synthetic",
       symbol: "XAU-s",
@@ -139,41 +161,15 @@ const MyAssets = () => {
       isPositive: true,
       icon: "⚪",
       description: "Synthetic Platinum Token",
-      balance: "1.8 oz",
-      value: "$1,664.64",
-      isLive: true,
-      category: "trading"
-    },
-    {
-      name: "Palladium Synthetic",
-      symbol: "XPD-s",
-      price: "$1,280.40",
-      change: "-0.2%",
-      isPositive: false,
-      icon: "⚫",
-      description: "Synthetic Palladium Token",
-      balance: "0.9 oz",
-      value: "$1,152.36",
-      isLive: true,
-      category: "trading"
-    },
-    {
-      name: "Copper Synthetic",
-      symbol: "XCU-s",
-      price: "$8,420.00",
-      change: "+2.1%",
-      isPositive: true,
-      icon: "🟤",
-      description: "Synthetic Copper Token",
-      balance: "2.1 tons",
-      value: "$17,682.00",
+      balance: "0.8 oz",
+      value: "$739.84",
       isLive: true,
       category: "trading"
     }
   ];
 
   // Legacy asset categories for compatibility
-  const fxAssets = [
+  const fxAssets: LegacyAsset[] = [
     {
       name: "USD",
       symbol: "USD",
@@ -215,7 +211,7 @@ const MyAssets = () => {
     }
   ];
 
-  const mineralAssets = [
+  const mineralAssets: LegacyAsset[] = [
     {
       name: "Gold (XAU)",
       symbol: "AU",
@@ -257,7 +253,7 @@ const MyAssets = () => {
     }
   ];
 
-  const cryptoAssets = [
+  const cryptoAssets: LegacyAsset[] = [
     {
       name: "Bitcoin",
       symbol: "BTC",
@@ -286,7 +282,7 @@ const MyAssets = () => {
     }
   ];
 
-  const titledAssets = [
+  const titledAssets: LegacyAsset[] = [
     {
       name: "Tesla Model Y",
       symbol: "TESLA",
@@ -368,11 +364,11 @@ const MyAssets = () => {
     'Titled': '#6B7280'
   };
 
-  const handleTradingChart = (asset: any) => {
+  const handleTradingChart = (asset: Asset) => {
     navigate(`/trading?symbol=${asset.symbol}`);
   };
 
-  const handleTitledAssetClick = (asset: any) => {
+  const handleTitledAssetClick = (asset: { symbol: string }) => {
     if (asset.symbol === "HOME") {
       navigate("/titled-asset/1987-future-drive-pittsburgh-pa");
     }
@@ -469,7 +465,7 @@ const MyAssets = () => {
                       `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
                       name
                     ]}
-                    labelFormatter={(name: string) => `${name} (${((chartData.find(d => d.name === name)?.value || 0) / totalPortfolioValue * 100).toFixed(1)}%)`}
+                    labelFormatter={(name: string) => `${name} (${totalPortfolioValue > 0 ? (((chartData.find(d => d.name === name)?.value || 0) / totalPortfolioValue) * 100).toFixed(1) : '0.0'}%)`}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -535,7 +531,7 @@ const MyAssets = () => {
                             <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
                             {getAssetBadge(asset.symbol, "funding") && (
                               <TooltipProvider>
-                                <Tooltip>
+                                <TooltipComponent>
                                   <TooltipTrigger>
                                     <Badge variant={getAssetBadge(asset.symbol, "funding")!.variant} className="text-xs">
                                       {getAssetBadge(asset.symbol, "funding")!.text}
@@ -544,7 +540,7 @@ const MyAssets = () => {
                                   <TooltipContent>
                                     <p className="max-w-xs">{getAssetBadge(asset.symbol, "funding")!.tooltip}</p>
                                   </TooltipContent>
-                                </Tooltip>
+                                </TooltipComponent>
                               </TooltipProvider>
                             )}
                           </div>
@@ -636,7 +632,7 @@ const MyAssets = () => {
                           <div className="flex items-center gap-2">
                             <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
                             <TooltipProvider>
-                              <Tooltip>
+                              <TooltipComponent>
                                 <TooltipTrigger>
                                   <Badge variant="secondary" className="text-xs">
                                     Trade-Only (Internal)
@@ -645,7 +641,7 @@ const MyAssets = () => {
                                 <TooltipContent>
                                   <p className="max-w-xs">Internal PBcex token; secure, freeze/burn capable; not transferable off PBcex.</p>
                                 </TooltipContent>
-                              </Tooltip>
+                              </TooltipComponent>
                             </TooltipProvider>
                           </div>
                           <p className="text-sm text-muted-foreground">{asset.description}</p>
@@ -821,7 +817,7 @@ const MyAssets = () => {
                           <div className="flex items-center gap-2">
                             <h3 className="font-semibold text-foreground text-lg">{asset.name}</h3>
                             <TooltipProvider>
-                              <Tooltip>
+                              <TooltipComponent>
                                 <TooltipTrigger>
                                   <Badge variant="secondary" className="text-xs">
                                     Trade-Only (Internal)
@@ -830,7 +826,7 @@ const MyAssets = () => {
                                 <TooltipContent>
                                   <p className="max-w-xs">Internal PBcex token; secure, freeze/burn capable; not transferable off PBcex.</p>
                                 </TooltipContent>
-                              </Tooltip>
+                              </TooltipComponent>
                             </TooltipProvider>
                           </div>
                           <p className="text-sm text-muted-foreground">{asset.description}</p>

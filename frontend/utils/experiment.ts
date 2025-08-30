@@ -2,14 +2,14 @@ import { createHash } from 'crypto';
 
 /**
  * Frontend A/B Experimentation Utilities for PBCEx
- * 
+ *
  * Features:
  * - Client-side experiment variant assignment
  * - Consistent hashing for deterministic results
  * - Local storage caching for performance
  * - Analytics integration
  * - TypeScript support
- * 
+ *
  * Usage:
  * ```typescript
  * const variant = useExperiment('onboarding_form_length', ['multi_step', 'single_page']);
@@ -45,7 +45,7 @@ const DEFAULT_EXPERIMENTS: ExperimentConfig[] = [
     variants: ['multi_step', 'single_page'],
     traffic: [50, 50],
     enabled: true,
-    description: 'Test single-page vs multi-step onboarding flow'
+    description: 'Test single-page vs multi-step onboarding flow',
   },
   {
     key: 'order_form_layout',
@@ -53,7 +53,7 @@ const DEFAULT_EXPERIMENTS: ExperimentConfig[] = [
     variants: ['standard', 'compact'],
     traffic: [70, 30],
     enabled: true,
-    description: 'Test compact vs standard order form layout'
+    description: 'Test compact vs standard order form layout',
   },
   {
     key: 'spread_hint_tooltip',
@@ -61,7 +61,7 @@ const DEFAULT_EXPERIMENTS: ExperimentConfig[] = [
     variants: ['show', 'hide'],
     traffic: [50, 50],
     enabled: true,
-    description: 'Test showing vs hiding spread information tooltip'
+    description: 'Test showing vs hiding spread information tooltip',
   },
   {
     key: 'price_refresh_frequency',
@@ -69,7 +69,7 @@ const DEFAULT_EXPERIMENTS: ExperimentConfig[] = [
     variants: ['fast_5s', 'standard_10s', 'slow_30s'],
     traffic: [20, 60, 20],
     enabled: false,
-    description: 'Test different price update frequencies'
+    description: 'Test different price update frequencies',
   },
   {
     key: 'checkout_flow_steps',
@@ -77,8 +77,8 @@ const DEFAULT_EXPERIMENTS: ExperimentConfig[] = [
     variants: ['streamlined', 'detailed'],
     traffic: [40, 60],
     enabled: true,
-    description: 'Test streamlined vs detailed checkout process'
-  }
+    description: 'Test streamlined vs detailed checkout process',
+  },
 ];
 
 class ExperimentClient {
@@ -94,7 +94,10 @@ class ExperimentClient {
   /**
    * Initialize with user context and optional remote config
    */
-  async initialize(userId: string, remoteConfig?: ExperimentConfig[]): Promise<void> {
+  async initialize(
+    userId: string,
+    remoteConfig?: ExperimentConfig[]
+  ): Promise<void> {
     this.userId = userId;
 
     // Load experiments from config or defaults
@@ -118,8 +121,8 @@ class ExperimentClient {
    * Get variant assignment for an experiment
    */
   assignVariant(
-    experimentKey: string, 
-    variants?: string[], 
+    experimentKey: string,
+    variants?: string[],
     traffic?: number[]
   ): string {
     if (!this.initialized || !this.userId) {
@@ -136,8 +139,12 @@ class ExperimentClient {
 
     // Get experiment configuration
     const experiment = this.experiments.get(experimentKey);
-    const effectiveVariants = variants || experiment?.variants || ['control', 'treatment'];
-    const effectiveTraffic = traffic || experiment?.traffic || this.generateEvenTraffic(effectiveVariants.length);
+    const effectiveVariants = variants ||
+      experiment?.variants || ['control', 'treatment'];
+    const effectiveTraffic =
+      traffic ||
+      experiment?.traffic ||
+      this.generateEvenTraffic(effectiveVariants.length);
 
     // Check if experiment is enabled
     if (experiment && !experiment.enabled) {
@@ -167,7 +174,7 @@ class ExperimentClient {
       userId: this.userId,
       assignedAt: new Date().toISOString(),
       bucketHash,
-      cached: false
+      cached: false,
     };
 
     this.cache.set(cacheKey, assignment);
@@ -186,7 +193,7 @@ class ExperimentClient {
    */
   isEnabled(experimentKey: string, variant?: string): boolean {
     const assignedVariant = this.assignVariant(experimentKey);
-    
+
     if (variant) {
       return assignedVariant === variant;
     }
@@ -211,19 +218,31 @@ class ExperimentClient {
   /**
    * Track experiment view/interaction
    */
-  async trackView(experimentKey: string, additionalProperties?: Record<string, any>): Promise<void> {
+  async trackView(
+    experimentKey: string,
+    additionalProperties?: Record<string, unknown>
+  ): Promise<void> {
     const variant = this.assignVariant(experimentKey);
-    await this.logExperimentEvent(experimentKey, variant, 'view', additionalProperties);
+    await this.logExperimentEvent(
+      experimentKey,
+      variant,
+      'view',
+      additionalProperties
+    );
   }
 
   /**
    * Track experiment conversion
    */
-  async trackConversion(experimentKey: string, conversionType?: string, value?: number): Promise<void> {
+  async trackConversion(
+    experimentKey: string,
+    conversionType?: string,
+    value?: number
+  ): Promise<void> {
     const variant = this.assignVariant(experimentKey);
     await this.logExperimentEvent(experimentKey, variant, 'conversion', {
       conversionType,
-      value
+      value,
     });
   }
 
@@ -241,7 +260,10 @@ class ExperimentClient {
       if (cached) {
         const assignments = JSON.parse(cached);
         Object.entries(assignments).forEach(([key, assignment]) => {
-          this.cache.set(key, { ...(assignment as ExperimentAssignment), cached: true });
+          this.cache.set(key, {
+            ...(assignment as ExperimentAssignment),
+            cached: true,
+          });
         });
       }
     } catch (error) {
@@ -263,13 +285,17 @@ class ExperimentClient {
 
   private generateBucketHash(userId: string, experimentKey: string): string {
     const input = `${userId}:${experimentKey}:pbcex-experiments`;
-    
+
     // Use Web Crypto API if available, otherwise use a simple hash function
-    if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+    if (
+      typeof window !== 'undefined' &&
+      window.crypto &&
+      window.crypto.subtle
+    ) {
       // For production, use Web Crypto API
       const encoder = new TextEncoder();
       const data = encoder.encode(input);
-      
+
       // Fallback to simple hash for client-side compatibility
       return this.simpleHash(input);
     } else {
@@ -281,7 +307,7 @@ class ExperimentClient {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(16).padStart(8, '0');
@@ -295,22 +321,22 @@ class ExperimentClient {
   private generateEvenTraffic(variantCount: number): number[] {
     const traffic = Math.floor(100 / variantCount);
     const remainder = 100 % variantCount;
-    
+
     const allocation = new Array(variantCount).fill(traffic);
-    
+
     // Distribute remainder
     for (let i = 0; i < remainder; i++) {
       allocation[i]++;
     }
-    
+
     return allocation;
   }
 
   private async logExperimentEvent(
-    experimentKey: string, 
-    variant: string, 
+    experimentKey: string,
+    variant: string,
     eventType: 'assignment' | 'view' | 'conversion',
-    additionalProperties?: Record<string, any>
+    additionalProperties?: Record<string, unknown>
   ): Promise<void> {
     try {
       // In a real implementation, this would call your analytics API
@@ -320,9 +346,9 @@ class ExperimentClient {
         timestamp: new Date().toISOString(),
         experimentData: {
           experimentKey,
-          variant
+          variant,
         },
-        properties: additionalProperties || {}
+        properties: additionalProperties || {},
       };
 
       // Send to analytics API (implement based on your backend)
@@ -335,7 +361,6 @@ class ExperimentClient {
       if (process.env.NODE_ENV === 'development') {
         console.log('🧪 Experiment Event:', event);
       }
-
     } catch (error) {
       console.warn('Failed to log experiment event:', error);
     }
@@ -346,23 +371,40 @@ class ExperimentClient {
 const experimentClient = new ExperimentClient();
 
 // Export utility functions
-export async function initializeExperiments(userId: string, remoteConfig?: ExperimentConfig[]): Promise<void> {
+export async function initializeExperiments(
+  userId: string,
+  remoteConfig?: ExperimentConfig[]
+): Promise<void> {
   await experimentClient.initialize(userId, remoteConfig);
 }
 
-export function useExperiment(experimentKey: string, variants?: string[], traffic?: number[]): string {
+export function useExperiment(
+  experimentKey: string,
+  variants?: string[],
+  traffic?: number[]
+): string {
   return experimentClient.assignVariant(experimentKey, variants, traffic);
 }
 
-export function isExperimentEnabled(experimentKey: string, variant?: string): boolean {
+export function isExperimentEnabled(
+  experimentKey: string,
+  variant?: string
+): boolean {
   return experimentClient.isEnabled(experimentKey, variant);
 }
 
-export function trackExperimentView(experimentKey: string, properties?: Record<string, any>): Promise<void> {
+export function trackExperimentView(
+  experimentKey: string,
+  properties?: Record<string, unknown>
+): Promise<void> {
   return experimentClient.trackView(experimentKey, properties);
 }
 
-export function trackExperimentConversion(experimentKey: string, conversionType?: string, value?: number): Promise<void> {
+export function trackExperimentConversion(
+  experimentKey: string,
+  conversionType?: string,
+  value?: number
+): Promise<void> {
   return experimentClient.trackConversion(experimentKey, conversionType, value);
 }
 
@@ -377,8 +419,11 @@ export function useExperimentVariant(experimentKey: string): string {
 }
 
 // Utility for CSS classes based on experiment variants
-export function experimentClass(experimentKey: string, variantClasses: Record<string, string>): string {
-  const variant = useExperiment(experimentKey);
+export function experimentClass(
+  experimentKey: string,
+  variantClasses: Record<string, string>
+): string {
+  const variant = experimentClient.assignVariant(experimentKey);
   return variantClasses[variant] || '';
 }
 
@@ -392,7 +437,9 @@ export { experimentClient as ExperimentClient };
  */
 export const OnboardingExperiment = {
   getFormType(): 'multi_step' | 'single_page' {
-    return useExperiment('onboarding_form_length') as 'multi_step' | 'single_page';
+    return experimentClient.assignVariant('onboarding_form_length') as
+      | 'multi_step'
+      | 'single_page';
   },
 
   isMultiStep(): boolean {
@@ -404,12 +451,17 @@ export const OnboardingExperiment = {
   },
 
   trackFormStart(): Promise<void> {
-    return trackExperimentView('onboarding_form_length', { action: 'form_start' });
+    return trackExperimentView('onboarding_form_length', {
+      action: 'form_start',
+    });
   },
 
   trackFormComplete(): Promise<void> {
-    return trackExperimentConversion('onboarding_form_length', 'registration_complete');
-  }
+    return trackExperimentConversion(
+      'onboarding_form_length',
+      'registration_complete'
+    );
+  },
 };
 
 /**
@@ -417,7 +469,9 @@ export const OnboardingExperiment = {
  */
 export const TradingExperiment = {
   getLayoutType(): 'standard' | 'compact' {
-    return useExperiment('order_form_layout') as 'standard' | 'compact';
+    return experimentClient.assignVariant('order_form_layout') as
+      | 'standard'
+      | 'compact';
   },
 
   isCompactLayout(): boolean {
@@ -427,17 +481,23 @@ export const TradingExperiment = {
   getLayoutClass(): string {
     return experimentClass('order_form_layout', {
       standard: 'order-form-standard',
-      compact: 'order-form-compact'
+      compact: 'order-form-compact',
     });
   },
 
   trackOrderInitiate(): Promise<void> {
-    return trackExperimentView('order_form_layout', { action: 'order_initiate' });
+    return trackExperimentView('order_form_layout', {
+      action: 'order_initiate',
+    });
   },
 
   trackOrderComplete(orderValue: number): Promise<void> {
-    return trackExperimentConversion('order_form_layout', 'order_complete', orderValue);
-  }
+    return trackExperimentConversion(
+      'order_form_layout',
+      'order_complete',
+      orderValue
+    );
+  },
 };
 
 /**
@@ -445,10 +505,12 @@ export const TradingExperiment = {
  */
 export const TooltipExperiment = {
   shouldShowSpreadHint(): boolean {
-    return useExperiment('spread_hint_tooltip') === 'show';
+    return experimentClient.assignVariant('spread_hint_tooltip') === 'show';
   },
 
   trackTooltipView(tooltipType: string): Promise<void> {
-    return trackExperimentView('spread_hint_tooltip', { tooltip_type: tooltipType });
-  }
+    return trackExperimentView('spread_hint_tooltip', {
+      tooltip_type: tooltipType,
+    });
+  },
 };

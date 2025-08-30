@@ -4,7 +4,8 @@ import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
  * API client configuration for PBCEx frontend
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
 
 // Create axios instance with default config
 export const apiClient: AxiosInstance = axios.create({
@@ -17,14 +18,14 @@ export const apiClient: AxiosInstance = axios.create({
 
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
-  (config) => {
+  config => {
     const token = getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 );
 
 // Response interceptor for error handling
@@ -39,7 +40,7 @@ apiClient.interceptors.response.use(
         window.location.href = '/account/login';
       }
     }
-    
+
     return Promise.reject(error);
   }
 );
@@ -63,7 +64,7 @@ export function removeAuthToken(): void {
 }
 
 // API response wrapper
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   code: string;
   message?: string;
   data?: T;
@@ -74,79 +75,80 @@ export interface ApiResponse<T = any> {
 export const api = {
   // Authentication
   auth: {
-    register: (data: RegisterData) => 
+    register: (data: RegisterData) =>
       apiClient.post<ApiResponse<AuthResponse>>('/api/auth/register', data),
-    login: (data: LoginData) => 
+    login: (data: LoginData) =>
       apiClient.post<ApiResponse<AuthResponse>>('/api/auth/login', data),
-    logout: () => 
-      apiClient.post<ApiResponse>('/api/auth/logout'),
-    me: () => 
-      apiClient.get<ApiResponse<{ user: User }>>('/api/auth/me'),
-    changePassword: (data: ChangePasswordData) => 
+    logout: () => apiClient.post<ApiResponse>('/api/auth/logout'),
+    me: () => apiClient.get<ApiResponse<{ user: User }>>('/api/auth/me'),
+    changePassword: (data: ChangePasswordData) =>
       apiClient.post<ApiResponse>('/api/auth/change-password', data),
-    forgotPassword: (email: string) => 
+    forgotPassword: (email: string) =>
       apiClient.post<ApiResponse>('/api/auth/forgot-password', { email }),
   },
 
   // KYC
   kyc: {
-    submitPersonal: (data: PersonalKycData) => 
+    submitPersonal: (data: PersonalKycData) =>
       apiClient.post<ApiResponse>('/api/kyc/submit', data),
-    submitBusiness: (data: BusinessKycData) => 
+    submitBusiness: (data: BusinessKycData) =>
       apiClient.post<ApiResponse>('/api/kyc/kyb/submit', data),
-    getStatus: () => 
-      apiClient.get<ApiResponse<KycStatus>>('/api/kyc/status'),
+    getStatus: () => apiClient.get<ApiResponse<KycStatus>>('/api/kyc/status'),
   },
 
   // Wallet
   wallet: {
-    getBalances: () => 
+    getBalances: () =>
       apiClient.get<ApiResponse<BalancesResponse>>('/api/wallet/balances'),
-    transfer: (data: TransferData) => 
+    transfer: (data: TransferData) =>
       apiClient.post<ApiResponse>('/api/wallet/transfer', data),
-    deposit: (data: DepositData) => 
+    deposit: (data: DepositData) =>
       apiClient.post<ApiResponse>('/api/wallet/deposit', data),
-    withdraw: (data: WithdrawData) => 
+    withdraw: (data: WithdrawData) =>
       apiClient.post<ApiResponse>('/api/wallet/withdraw', data),
   },
 
   // Trading
   trade: {
-    getPrices: (asset?: string) => 
-      apiClient.get<ApiResponse<PricesResponse>>('/api/trade/prices', { 
-        params: asset ? { asset } : {} 
+    getPrices: (asset?: string) =>
+      apiClient.get<ApiResponse<PricesResponse>>('/api/trade/prices', {
+        params: asset ? { asset } : {},
       }),
-    placeOrder: (data: TradeOrderData) => 
+    placeOrder: (data: TradeOrderData) =>
       apiClient.post<ApiResponse<{ trade: Trade }>>('/api/trade/order', data),
-    getHistory: (limit?: number, offset?: number) => 
+    getHistory: (limit?: number, offset?: number) =>
       apiClient.get<ApiResponse<TradeHistoryResponse>>('/api/trade/history', {
-        params: { limit, offset }
+        params: { limit, offset },
       }),
-    getPairs: () => 
+    getPairs: () =>
       apiClient.get<ApiResponse<{ pairs: TradingPair[] }>>('/api/trade/pairs'),
   },
 
   // Shop
   shop: {
-    getProducts: (params?: ProductQuery) => 
-      apiClient.get<ApiResponse<ProductsResponse>>('/api/shop/products', { params }),
-    lockQuote: (data: LockQuoteData) => 
-      apiClient.post<ApiResponse<{ quote: Quote }>>('/api/shop/lock-quote', data),
-    checkout: (data: CheckoutData) => 
+    getProducts: (params?: ProductQuery) =>
+      apiClient.get<ApiResponse<ProductsResponse>>('/api/shop/products', {
+        params,
+      }),
+    lockQuote: (data: LockQuoteData) =>
+      apiClient.post<ApiResponse<{ quote: Quote }>>(
+        '/api/shop/lock-quote',
+        data
+      ),
+    checkout: (data: CheckoutData) =>
       apiClient.post<ApiResponse<{ order: Order }>>('/api/shop/checkout', data),
-    getOrders: () => 
+    getOrders: () =>
       apiClient.get<ApiResponse<{ orders: Order[] }>>('/api/shop/orders'),
   },
 
   // Admin (requires admin role)
   admin: {
-    getExposure: () => 
+    getExposure: () =>
       apiClient.get<ApiResponse<ExposureData>>('/api/admin/exposure'),
-    rebalanceHedge: (data: RebalanceData) => 
+    rebalanceHedge: (data: RebalanceData) =>
       apiClient.post<ApiResponse>('/api/admin/hedge/rebalance', data),
-    getUsers: () => 
-      apiClient.get<ApiResponse<UserStats>>('/api/admin/users'),
-    getTrades: () => 
+    getUsers: () => apiClient.get<ApiResponse<UserStats>>('/api/admin/users'),
+    getTrades: () =>
       apiClient.get<ApiResponse<TradeStats>>('/api/admin/trades'),
   },
 };
@@ -295,26 +297,26 @@ export interface LockQuoteData {
 export interface CheckoutData {
   quoteId: string;
   paymentMethod: string;
-  shippingAddress: any;
-  billingAddress?: any;
+  shippingAddress: Address;
+  billingAddress?: Address;
   specialInstructions?: string;
 }
 
 export interface PersonalKycData {
-  personal: any;
-  address: any;
-  documents: any;
-  consent: any;
+  personal: PersonalInfo;
+  address: Address;
+  documents: DocumentInfo[];
+  consent: ConsentInfo;
 }
 
 export interface BusinessKycData {
-  company: any;
-  documents: any;
-  ownership: any;
-  licenses: any[];
-  contacts: any;
-  shippingProfile: any;
-  consent: any;
+  company: CompanyInfo;
+  documents: DocumentInfo[];
+  ownership: OwnershipInfo[];
+  licenses: Record<string, string>[];
+  contacts: ContactInfo[];
+  shippingProfile: ShippingProfile;
+  consent: ConsentInfo;
 }
 
 export interface KycStatus {

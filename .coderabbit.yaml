@@ -1,103 +1,31 @@
-# CodeRabbit Configuration for PBCEx
-# Automated code review and PR management
+version: 1
 
-review:
-  # Enable automated code review
+reviews:
   enabled: true
-  
-  # Review all PRs automatically
-  auto_review: true
-  
-  # Require at least one human reviewer
-  require_human_review: true
-  
-  # Auto-approve documentation and minor changes
-  auto_approve:
-    - "docs/**"
-    - "*.md"
-    - "*.txt"
-    - "*.yml"
-    - "*.yaml"
-    - ".github/**"
-    - "scripts/**"
-    - "tooling/**"
+  summary: true
+  explain_changes: true
+  max_comments: 100
+  # Treat findings as advisory in UI; CI status will be controlled by branch protection.
+  severity_threshold: "info"   # info | minor | major | critical
 
-# Labeling configuration
-labeling:
-  enabled: true
-  
-  # Auto-label based on file changes
-  auto_label:
-    - "frontend" when "frontend/**" files changed
-    - "backend" when "backend/**" files changed
-    - "mobile" when "mobile/**" files changed
-    - "onchain" when "onchain/**" files changed
-    - "docs" when "docs/**" or "*.md" files changed
-    - "scripts" when "scripts/**" files changed
-    - "tooling" when "tooling/**" files changed
-    - "ci-cd" when ".github/**" or "docker-compose.yml" files changed
-    - "security" when security-related files changed
-    - "testing" when test files changed
-    - "dependencies" when "package*.json" or "yarn.lock" files changed
+filters:
+  paths:
+    include:
+      - "src/**"
+      - "apps/**"
+      - "packages/**"
+    exclude:
+      - "node_modules/**"
+      - "dist/**"
+      - "build/**"
+      - ".next/**"
+      - "coverage/**"
 
-# Pre-review analysis
-pre_review:
-  enabled: true
-  
-  # Analyze code quality
-  code_quality: true
-  
-  # Check for security issues
-  security: true
-  
-  # Performance analysis
-  performance: true
-  
-  # Documentation coverage
-  documentation: true
-  
-  # Test coverage analysis
-  test_coverage: true
+formatting:
+  max_suggestions: 80
+  label_non_blocking: "non-blocking"
 
-# Comment templates
-comments:
-  # Welcome message for new contributors
-  welcome: |
-    🎉 Welcome to PBCEx! Thanks for contributing!
-    
-    This PR will be automatically reviewed by CodeRabbit. Please ensure:
-    - [ ] Tests pass locally
-    - [ ] Environment validation passes (`npm run env:doctor:strict`)
-    - [ ] Code follows PBCEx style guidelines
-    
-    🚀 Building the future of commodity trading together!
-
-# Ignore patterns
-ignore:
-  - "node_modules/**"
-  - "dist/**"
-  - "build/**"
-  - "coverage/**"
-  - ".git/**"
-  - "*.log"
-  - "*.lock"
-  - "*.min.js"
-  - "*.min.css"
-
-# Custom rules for PBCEx
-custom_rules:
-  - name: "Environment Variables"
-    pattern: "*.env*"
-    message: "⚠️ Environment file changed - ensure no secrets are committed"
-    
-  - name: "Database Migrations"
-    pattern: "db/migrations/*.sql"
-    message: "🗄️ Database migration detected - ensure backward compatibility"
-    
-  - name: "API Changes"
-    pattern: "backend/src/openapi/*.yaml"
-    message: "🔌 OpenAPI spec changed - ensure API documentation is updated"
-    
-  - name: "Feature Flags"
-    pattern: "**/env.ts"
-    message: "🚩 Feature flag changes detected - ensure proper gating"
+behavior:
+  fail_on_errors: false          # CodeRabbit itself won't fail builds; branch protection decides merge rules.
+  approve_on_no_issues: true
+  suggest_fixes: true

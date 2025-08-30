@@ -23,6 +23,20 @@ interface RealizeAssetModalProps {
   };
 }
 
+interface Branch {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  phone: string;
+  hours: string;
+  vaultSize: string;
+  spread: string;
+  distance: string;
+}
+
 const RealizeAssetModal = ({ isOpen, onClose, asset }: RealizeAssetModalProps) => {
   const [step, setStep] = useState(1);
   const [format, setFormat] = useState("bar");
@@ -43,7 +57,7 @@ const RealizeAssetModal = ({ isOpen, onClose, asset }: RealizeAssetModalProps) =
     routingNumber: "",
     bankName: ""
   });
-  const [selectedBranch, setSelectedBranch] = useState<any>(null);
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const { toast } = useToast();
 
@@ -69,7 +83,7 @@ const RealizeAssetModal = ({ isOpen, onClose, asset }: RealizeAssetModalProps) =
       setPriceLockedUntil(new Date(Date.now() + 10 * 60 * 1000));
       setTimeLeft(600);
     }
-  }, [amount]);
+  }, [amount, priceLockedUntil]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
