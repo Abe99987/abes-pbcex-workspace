@@ -166,6 +166,10 @@ if (env.NODE_ENV === 'development') {
     .filter(([_, configured]) => !configured)
     .map(([name]) => name);
 
+  // Check if vendor placeholders are enabled
+  const vendorPlaceholdersEnabled =
+    env.INTEGRATION_VENDOR_PLACEHOLDERS === 'true';
+
   console.log('🔧 Integration Status:');
   console.log(
     '  ✅ Configured:',
@@ -173,12 +177,20 @@ if (env.NODE_ENV === 'development') {
       ? configuredIntegrations.join(', ')
       : 'none'
   );
-  console.log(
-    '  ❌ Missing:',
-    unconfiguredIntegrations.length > 0
-      ? unconfiguredIntegrations.join(', ')
-      : 'none'
-  );
+
+  if (vendorPlaceholdersEnabled) {
+    console.log(
+      '  🔧 Missing integrations: SUPPRESSED (vendor placeholders enabled)'
+    );
+    console.log('  📝 Note: Using mock implementations for development');
+  } else {
+    console.log(
+      '  ❌ Missing:',
+      unconfiguredIntegrations.length > 0
+        ? unconfiguredIntegrations.join(', ')
+        : 'none'
+    );
+  }
 
   console.log('🚀 Phase-3 Features:');
   console.log(`  📊 Phase: ${env.PHASE}`);
@@ -187,4 +199,8 @@ if (env.NODE_ENV === 'development') {
     `  🏛️  Vault Redemption: ${env.ENABLE_VAULT_REDEMPTION ? 'ENABLED' : 'DISABLED'}`
   );
   console.log(`  📦 Fulfillment: ${env.FULFILLMENT_STRATEGY}`);
+
+  if (vendorPlaceholdersEnabled) {
+    console.log('  🛠️  Development Mode: Vendor placeholders enabled');
+  }
 }

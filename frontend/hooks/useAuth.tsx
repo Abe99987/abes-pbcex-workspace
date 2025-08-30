@@ -12,6 +12,7 @@ import {
   getAuthToken,
   User,
 } from '@/utils/api';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import toast from 'react-hot-toast';
 
 /**
@@ -27,6 +28,9 @@ interface AuthContextType {
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   updateUser: (updates: Partial<User>) => void;
+  // Supabase integration status
+  isSupabaseEnabled: boolean;
+  isSupabaseReady: boolean;
 }
 
 interface RegisterData {
@@ -42,6 +46,9 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Initialize Supabase auth hook
+  const supabaseAuth = useSupabaseAuth();
 
   const isAuthenticated = !!user;
 
@@ -191,6 +198,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     logout,
     refreshUser,
     updateUser,
+    isSupabaseEnabled: supabaseAuth.isSupabaseEnabled,
+    isSupabaseReady: supabaseAuth.isSupabaseReady,
   };
 
   return (

@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { api } from '@/utils/api';
-import type { Transaction } from '@/types/wallet';
+import type {
+  Transaction,
+  TransactionFilters,
+  TransactionResponse,
+} from '@/types/wallet';
 import Navigation from '@/components/Navigation';
 import toast from 'react-hot-toast';
 import {
@@ -19,7 +23,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 
-interface TransactionFilters {
+interface TransactionFiltersState {
   search: string;
   type: string;
   status: string;
@@ -32,9 +36,11 @@ const TRANSACTION_TYPES = [
   { value: '', label: 'All Types' },
   { value: 'DEPOSIT', label: 'Deposit' },
   { value: 'WITHDRAWAL', label: 'Withdrawal' },
-  { value: 'TRANSFER', label: 'Transfer' },
+  { value: 'TRANSFER_IN', label: 'Transfer In' },
+  { value: 'TRANSFER_OUT', label: 'Transfer Out' },
   { value: 'TRADE', label: 'Trade' },
   { value: 'CONVERSION', label: 'Conversion' },
+  { value: 'SPENDING', label: 'Spending' },
 ];
 
 const TRANSACTION_STATUSES = [
@@ -42,7 +48,6 @@ const TRANSACTION_STATUSES = [
   { value: 'PENDING', label: 'Pending' },
   { value: 'COMPLETED', label: 'Completed' },
   { value: 'FAILED', label: 'Failed' },
-  { value: 'CANCELLED', label: 'Cancelled' },
 ];
 
 const ASSETS = [
@@ -53,6 +58,8 @@ const ASSETS = [
   { value: 'XAU-s', label: 'XAU-s (Gold Synthetic)' },
   { value: 'XAG-s', label: 'XAG-s (Silver Synthetic)' },
   { value: 'XPT-s', label: 'XPT-s (Platinum Synthetic)' },
+  { value: 'XPD-s', label: 'XPD-s (Palladium Synthetic)' },
+  { value: 'XCU-s', label: 'XCU-s (Copper Synthetic)' },
 ];
 
 // Mock transaction data (replace with real API data)
@@ -113,7 +120,9 @@ export default function TransactionHistory() {
   const { user, isLoading: authLoading } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<TransactionFilters>({
+  const [total, setTotal] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [filters, setFilters] = useState<TransactionFiltersState>({
     search: '',
     type: '',
     status: '',
@@ -129,19 +138,54 @@ export default function TransactionHistory() {
 
     const fetchTransactions = async () => {
       try {
-        const response = await api.wallet.getTransactions(100); // Fetch more transactions
-        if (response.data.code === 'SUCCESS') {
-          // Use API data if available, otherwise fall back to mock data
-          const apiTransactions = response.data.data?.transactions || [];
-          setTransactions(apiTransactions.length > 0 ? apiTransactions : MOCK_TRANSACTIONS);
+        setLoading(true);
+
+        // Build API filters
+        const apiFilters: TransactionFilters = {
+          q: filters.search || undefined,
+          asset: filters.asset || undefined,
+          type: filters.type || undefined,
+          status: filters.status || undefined,
+          date_from: filters.dateFrom || undefined,
+          date_to: filters.dateTo || undefined,
+          limit: itemsPerPage,
+          offset: (currentPage - 1) * itemsPerPage,
+        };
+
+        // Remove undefined values
+        const cleanFilters = Object.fromEntries(
+          Object.entries(apiFilters).filter(([_, v]) => v !== undefined)
+        );
+
+        const response = await fetch(
+          '/api/wallet/transactions?' + new URLSearchParams(cleanFilters),
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.code === 'SUCCESS') {
+            const transactionData: TransactionResponse = data.data;
+            setTransactions(transactionData.transactions);
+            setTotal(transactionData.total);
+            setHasMore(transactionData.hasMore);
+          } else {
+            throw new Error(data.message || 'Failed to fetch transactions');
+          }
         } else {
-          // Use mock data if API fails
-          setTransactions(MOCK_TRANSACTIONS);
+          throw new Error('API request failed');
         }
       } catch (error) {
         console.error('Failed to fetch transactions:', error);
         // Use mock data as fallback
         setTransactions(MOCK_TRANSACTIONS);
+        setTotal(MOCK_TRANSACTIONS.length);
+        setHasMore(false);
         toast.error('Using mock transaction data');
       } finally {
         setLoading(false);
@@ -149,22 +193,26 @@ export default function TransactionHistory() {
     };
 
     fetchTransactions();
-  }, [user]);
+  }, [user, filters, currentPage, itemsPerPage]);
 
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'DEPOSIT':
-        return <ArrowDownCircle className="h-5 w-5 text-green-500" />;
+        return <ArrowDownCircle className='h-5 w-5 text-green-500' />;
       case 'WITHDRAWAL':
-        return <ArrowUpCircle className="h-5 w-5 text-red-500" />;
-      case 'TRANSFER':
-        return <Send className="h-5 w-5 text-blue-500" />;
+        return <ArrowUpCircle className='h-5 w-5 text-red-500' />;
+      case 'TRANSFER_IN':
+        return <ArrowDownCircle className='h-5 w-5 text-blue-500' />;
+      case 'TRANSFER_OUT':
+        return <ArrowUpCircle className='h-5 w-5 text-blue-500' />;
       case 'TRADE':
-        return <RefreshCw className="h-5 w-5 text-purple-500" />;
+        return <RefreshCw className='h-5 w-5 text-purple-500' />;
       case 'CONVERSION':
-        return <RefreshCw className="h-5 w-5 text-orange-500" />;
+        return <RefreshCw className='h-5 w-5 text-orange-500' />;
+      case 'SPENDING':
+        return <Send className='h-5 w-5 text-orange-600' />;
       default:
-        return <Clock className="h-5 w-5 text-gray-500" />;
+        return <Clock className='h-5 w-5 text-gray-500' />;
     }
   };
 
@@ -172,81 +220,125 @@ export default function TransactionHistory() {
     switch (status) {
       case 'COMPLETED':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <CheckCircle className="h-3 w-3 mr-1" />
+          <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'>
+            <CheckCircle className='h-3 w-3 mr-1' />
             Completed
           </span>
         );
       case 'PENDING':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            <Clock className="h-3 w-3 mr-1" />
+          <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800'>
+            <Clock className='h-3 w-3 mr-1' />
             Pending
           </span>
         );
       case 'FAILED':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            <XCircle className="h-3 w-3 mr-1" />
+          <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800'>
+            <XCircle className='h-3 w-3 mr-1' />
             Failed
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            <Clock className="h-3 w-3 mr-1" />
+          <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800'>
+            <Clock className='h-3 w-3 mr-1' />
             Unknown
           </span>
         );
     }
   };
 
-  const filteredTransactions = transactions.filter((tx) => {
-    if (filters.search && !tx.description.toLowerCase().includes(filters.search.toLowerCase()) && 
-        !tx.reference?.toLowerCase().includes(filters.search.toLowerCase())) {
-      return false;
+  // Pagination is handled by the API
+  const totalPages = Math.ceil(total / itemsPerPage);
+
+  const exportTransactions = async () => {
+    try {
+      // Build API filters (same as fetch)
+      const apiFilters: TransactionFilters = {
+        q: filters.search || undefined,
+        asset: filters.asset || undefined,
+        type: filters.type || undefined,
+        status: filters.status || undefined,
+        date_from: filters.dateFrom || undefined,
+        date_to: filters.dateTo || undefined,
+      };
+
+      // Remove undefined values
+      const cleanFilters = Object.fromEntries(
+        Object.entries(apiFilters).filter(([_, v]) => v !== undefined)
+      );
+
+      const response = await fetch(
+        '/api/wallet/transactions/export.csv?' +
+          new URLSearchParams(cleanFilters),
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        toast.success('Transactions exported successfully');
+      } else {
+        throw new Error('Export failed');
+      }
+    } catch (error) {
+      console.error('Export failed:', error);
+
+      // Fallback to client-side CSV generation
+      const csv = [
+        [
+          'Date',
+          'Type',
+          'Asset',
+          'Amount',
+          'USD Value',
+          'Status',
+          'Fee',
+          'Description',
+          'Reference',
+        ],
+        ...transactions.map(tx => [
+          new Date(tx.timestamp).toLocaleDateString(),
+          tx.type,
+          tx.asset,
+          tx.amount,
+          tx.usdValue,
+          tx.status,
+          tx.fee,
+          tx.description,
+          tx.reference,
+        ]),
+      ]
+        .map(row => row.join(','))
+        .join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success('Transactions exported successfully (fallback)');
     }
-    if (filters.type && tx.type !== filters.type) return false;
-    if (filters.asset && tx.asset !== filters.asset) return false;
-    // Add date filtering logic here
-    return true;
-  });
-
-  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedTransactions = filteredTransactions.slice(startIndex, startIndex + itemsPerPage);
-
-  const exportTransactions = () => {
-    const csv = [
-      ['Date', 'Type', 'Asset', 'Amount', 'Account', 'Status', 'Description', 'Reference'],
-      ...filteredTransactions.map(tx => [
-        new Date(tx.createdAt).toLocaleDateString(),
-        tx.type,
-        tx.asset,
-        tx.amount,
-        tx.accountType,
-        'COMPLETED', // Default status since our current Transaction type doesn't include status
-        tx.description,
-        tx.reference || '',
-      ])
-    ].map(row => row.join(',')).join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    toast.success('Transactions exported successfully');
   };
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className='min-h-screen bg-slate-50'>
         <Navigation />
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+        <div className='flex items-center justify-center h-96'>
+          <div className='animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500'></div>
         </div>
       </div>
     );
@@ -254,11 +346,11 @@ export default function TransactionHistory() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className='min-h-screen bg-slate-50'>
         <Navigation />
-        <div className="flex items-center justify-center h-96">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+        <div className='flex items-center justify-center h-96'>
+          <div className='text-center'>
+            <h1 className='text-2xl font-bold text-gray-800 mb-4'>
               Please log in to view your transaction history
             </h1>
           </div>
@@ -268,25 +360,27 @@ export default function TransactionHistory() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className='min-h-screen bg-slate-50'>
       <Navigation />
-      
+
       {/* Page Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
+      <div className='bg-white shadow-sm border-b'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
+          <div className='flex justify-between items-center'>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Transaction History</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 className='text-3xl font-bold text-gray-900'>
+                Transaction History
+              </h1>
+              <p className='text-gray-600 mt-1'>
                 View all your deposits, withdrawals, and transfers
               </p>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className='flex items-center space-x-3'>
               <button
                 onClick={exportTransactions}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className='flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700'
               >
-                <Download className="h-4 w-4" />
+                <Download className='h-4 w-4' />
                 <span>Export CSV</span>
               </button>
             </div>
@@ -294,87 +388,134 @@ export default function TransactionHistory() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className='bg-white rounded-lg shadow-sm border p-6 mb-8'>
+          <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-8 gap-4'>
             {/* Search */}
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className='lg:col-span-2'>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
                 Search
               </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <div className='relative'>
+                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400' />
                 <input
-                  type="text"
-                  placeholder="Search transactions..."
+                  type='text'
+                  placeholder='Search transactions...'
                   value={filters.search}
-                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                  className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  onChange={e =>
+                    setFilters(prev => ({ ...prev, search: e.target.value }))
+                  }
+                  className='pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                 />
               </div>
             </div>
 
             {/* Type Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
                 Type
               </label>
               <select
                 value={filters.type}
-                onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                onChange={e =>
+                  setFilters(prev => ({ ...prev, type: e.target.value }))
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
               >
                 {TRANSACTION_TYPES.map(type => (
-                  <option key={type.value} value={type.value}>{type.label}</option>
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
                 Status
               </label>
               <select
                 value={filters.status}
-                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                onChange={e =>
+                  setFilters(prev => ({ ...prev, status: e.target.value }))
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
               >
                 {TRANSACTION_STATUSES.map(status => (
-                  <option key={status.value} value={status.value}>{status.label}</option>
+                  <option key={status.value} value={status.value}>
+                    {status.label}
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Asset Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
                 Asset
               </label>
               <select
                 value={filters.asset}
-                onChange={(e) => setFilters(prev => ({ ...prev, asset: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                onChange={e =>
+                  setFilters(prev => ({ ...prev, asset: e.target.value }))
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
               >
                 {ASSETS.map(asset => (
-                  <option key={asset.value} value={asset.value}>{asset.label}</option>
+                  <option key={asset.value} value={asset.value}>
+                    {asset.label}
+                  </option>
                 ))}
               </select>
             </div>
 
+            {/* Date From */}
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                From Date
+              </label>
+              <input
+                type='date'
+                value={filters.dateFrom}
+                onChange={e =>
+                  setFilters(prev => ({ ...prev, dateFrom: e.target.value }))
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              />
+            </div>
+
+            {/* Date To */}
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                To Date
+              </label>
+              <input
+                type='date'
+                value={filters.dateTo}
+                onChange={e =>
+                  setFilters(prev => ({ ...prev, dateTo: e.target.value }))
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              />
+            </div>
+
             {/* Clear Filters */}
-            <div className="flex items-end">
+            <div className='flex items-end'>
               <button
-                onClick={() => setFilters({
-                  search: '',
-                  type: '',
-                  status: '',
-                  asset: '',
-                  dateFrom: '',
-                  dateTo: '',
-                })}
-                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                onClick={() => {
+                  setFilters({
+                    search: '',
+                    type: '',
+                    status: '',
+                    asset: '',
+                    dateFrom: '',
+                    dateTo: '',
+                  });
+                  setCurrentPage(1);
+                }}
+                className='w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200'
               >
                 Clear Filters
               </button>
@@ -383,87 +524,96 @@ export default function TransactionHistory() {
         </div>
 
         {/* Transaction Table */}
-        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+        <div className='bg-white rounded-lg shadow-sm border overflow-hidden'>
+          <div className='overflow-x-auto'>
+            <table className='min-w-full divide-y divide-gray-200'>
+              <thead className='bg-gray-50'>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Date/Time
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Type
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                     Asset
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                     Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Account
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Type
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Fee (USD)
+                  </th>
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Reference
+                  </th>
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                     Description
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    TxID
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedTransactions.map((transaction) => (
-                  <tr key={transaction.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(transaction.createdAt).toLocaleDateString()}
+              <tbody className='bg-white divide-y divide-gray-200'>
+                {transactions.map(transaction => (
+                  <tr key={transaction.id} className='hover:bg-gray-50'>
+                    <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+                      {new Date(transaction.timestamp).toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
-                        {getTypeIcon(transaction.type)}
-                        <span className="text-sm font-medium text-gray-900">
-                          {transaction.type}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-gray-900">
+                    <td className='px-6 py-4 whitespace-nowrap'>
+                      <span className='text-sm font-medium text-gray-900'>
                         {transaction.asset}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {transaction.amount}
+                    <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+                      <div className='flex flex-col'>
+                        <span className='font-medium'>
+                          {transaction.amount}
+                        </span>
+                        <span className='text-xs text-gray-500'>
+                          ${transaction.usdValue}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                        transaction.accountType === 'FUNDING' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
-                        {transaction.accountType}
+                    <td className='px-6 py-4 whitespace-nowrap'>
+                      <div className='flex items-center space-x-2'>
+                        {getTypeIcon(transaction.type)}
+                        <span className='text-sm font-medium text-gray-900'>
+                          {transaction.type.replace('_', ' ')}
+                        </span>
+                      </div>
+                    </td>
+                    <td className='px-6 py-4 whitespace-nowrap'>
+                      {getStatusBadge(transaction.status)}
+                    </td>
+                    <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+                      ${transaction.fee}
+                    </td>
+                    <td className='px-6 py-4 whitespace-nowrap'>
+                      <span className='text-sm text-gray-500 font-mono'>
+                        {transaction.reference}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge()}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                    <td className='px-6 py-4 text-sm text-gray-900 max-w-xs truncate'>
                       {transaction.description}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-500 font-mono">
-                          {transaction.reference || transaction.id}
-                        </span>
+                    <td className='px-6 py-4 whitespace-nowrap'>
+                      <div className='flex items-center space-x-2'>
                         <button
                           onClick={() => {
-                            navigator.clipboard.writeText(transaction.reference || transaction.id);
-                            toast.success('Transaction ID copied');
+                            navigator.clipboard.writeText(
+                              transaction.reference || transaction.id
+                            );
+                            toast.success('Reference copied');
                           }}
-                          className="text-gray-400 hover:text-gray-600"
+                          className='text-gray-400 hover:text-gray-600'
+                          title='Copy Reference'
                         >
-                          <ExternalLink className="h-4 w-4" />
+                          <ExternalLink className='h-4 w-4' />
                         </button>
                       </div>
                     </td>
@@ -475,63 +625,78 @@ export default function TransactionHistory() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 flex justify-between sm:hidden">
+            <div className='bg-white px-4 py-3 border-t border-gray-200 sm:px-6'>
+              <div className='flex items-center justify-between'>
+                <div className='flex-1 flex justify-between sm:hidden'>
                   <button
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage(prev => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className='relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50'
                   >
                     Previous
                   </button>
                   <button
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                      setCurrentPage(prev => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className='ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50'
                   >
                     Next
                   </button>
                 </div>
-                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div className='hidden sm:flex-1 sm:flex sm:items-center sm:justify-between'>
                   <div>
-                    <p className="text-sm text-gray-700">
-                      Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
-                      <span className="font-medium">
-                        {Math.min(startIndex + itemsPerPage, filteredTransactions.length)}
+                    <p className='text-sm text-gray-700'>
+                      Showing{' '}
+                      <span className='font-medium'>
+                        {(currentPage - 1) * itemsPerPage + 1}
                       </span>{' '}
-                      of <span className="font-medium">{filteredTransactions.length}</span> results
+                      to{' '}
+                      <span className='font-medium'>
+                        {Math.min(currentPage * itemsPerPage, total)}
+                      </span>{' '}
+                      of <span className='font-medium'>{total}</span> results
                     </p>
                   </div>
                   <div>
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                    <nav className='relative z-0 inline-flex rounded-md shadow-sm -space-x-px'>
                       <button
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        onClick={() =>
+                          setCurrentPage(prev => Math.max(prev - 1, 1))
+                        }
                         disabled={currentPage === 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className='relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50'
                       >
                         Previous
                       </button>
-                      {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                        const page = i + 1;
-                        return (
-                          <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                              currentPage === page
-                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                            }`}
-                          >
-                            {page}
-                          </button>
-                        );
-                      })}
+                      {Array.from(
+                        { length: Math.min(totalPages, 5) },
+                        (_, i) => {
+                          const page = i + 1;
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => setCurrentPage(page)}
+                              className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                currentPage === page
+                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          );
+                        }
+                      )}
                       <button
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        onClick={() =>
+                          setCurrentPage(prev => Math.min(prev + 1, totalPages))
+                        }
                         disabled={currentPage === totalPages}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className='relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50'
                       >
                         Next
                       </button>
@@ -544,12 +709,15 @@ export default function TransactionHistory() {
         </div>
 
         {/* Empty State */}
-        {filteredTransactions.length === 0 && (
-          <div className="bg-white rounded-lg shadow-sm border p-12 text-center">
-            <Clock className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No transactions found</h3>
-            <p className="text-gray-600 mb-6">
-              Try adjusting your filters or check back later for new transactions.
+        {transactions.length === 0 && !loading && (
+          <div className='bg-white rounded-lg shadow-sm border p-12 text-center'>
+            <Clock className='h-12 w-12 text-gray-300 mx-auto mb-4' />
+            <h3 className='text-lg font-medium text-gray-900 mb-2'>
+              No transactions found
+            </h3>
+            <p className='text-gray-600 mb-6'>
+              Try adjusting your filters or check back later for new
+              transactions.
             </p>
           </div>
         )}

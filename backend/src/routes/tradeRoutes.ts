@@ -5,6 +5,7 @@ import { validateBody, validateQuery } from '@/utils/validators';
 import { tradeOrderSchema } from '@/utils/validators';
 import { RATE_LIMITS } from '@/utils/constants';
 import { TradeController } from '@/controllers/TradeController';
+import { TradeControllerDb } from '@/controllers/TradeControllerDb';
 import { z } from 'zod';
 
 const router = Router();
@@ -25,20 +26,24 @@ router.use(authenticate);
 
 /**
  * GET /api/trade/prices
- * Get current spot prices for assets
+ * Get current spot prices for assets (Enhanced with caching)
  */
-router.get('/prices',
-  validateQuery(z.object({
-    asset: z.enum(['AU', 'AG', 'PT', 'PD', 'CU']).optional(),
-  })),
-  TradeController.getPrices
+router.get(
+  '/prices',
+  validateQuery(
+    z.object({
+      asset: z.enum(['AU', 'AG', 'PT', 'PD', 'CU']).optional(),
+    })
+  ),
+  TradeControllerDb.getPrices
 );
 
 /**
  * POST /api/trade/order
  * Place a market conversion order
  */
-router.post('/order',
+router.post(
+  '/order',
   requireKyc(['APPROVED']),
   tradeLimiter,
   validateBody(tradeOrderSchema),
@@ -49,36 +54,84 @@ router.post('/order',
  * POST /api/trade/quote
  * Get a trading quote without executing
  */
-router.post('/quote',
+router.post(
+  '/quote',
   requireKyc(['APPROVED']),
-  validateBody(z.object({
-    fromAsset: z.string().min(1),
-    toAsset: z.string().min(1),
-    amount: z.string().regex(/^\d+\.?\d*$/, 'Amount must be a valid decimal number'),
-  })),
+  validateBody(
+    z.object({
+      fromAsset: z.string().min(1),
+      toAsset: z.string().min(1),
+      amount: z
+        .string()
+        .regex(/^\d+\.?\d*$/, 'Amount must be a valid decimal number'),
+    })
+  ),
   TradeController.getQuote
 );
 
 /**
  * GET /api/trade/history
- * Get user's trade history
+ * Get user's trade history with filters and KPIs
  */
-router.get('/history',
-  validateQuery(z.object({
-    limit: z.string().optional().transform(val => val ? Math.min(parseInt(val), 100) : 50),
-    offset: z.string().optional().transform(val => val ? Math.max(parseInt(val), 0) : 0),
-    pair: z.string().optional(),
-    status: z.enum(['PENDING', 'FILLED', 'CANCELLED', 'FAILED']).optional(),
-  })),
-  TradeController.getTradeHistory
+router.get(
+  '/history',
+  validateQuery(
+    z.object({
+      pair: z.string().optional(),
+      side: z.string().optional(),
+      order_type: z.string().optional(),
+      status: z.string().optional(),
+      date_from: z.string().optional(),
+      date_to: z.string().optional(),
+      limit: z.string().optional(),
+      offset: z.string().optional(),
+    })
+  ),
+  TradeControllerDb.getTradeHistory
+);
+
+/**
+ * GET /api/trade/history/export.csv
+ * Export trade history as CSV
+ */
+router.get(
+  '/history/export.csv',
+  validateQuery(
+    z.object({
+      pair: z.string().optional(),
+      side: z.string().optional(),
+      order_type: z.string().optional(),
+      status: z.string().optional(),
+      date_from: z.string().optional(),
+      date_to: z.string().optional(),
+    })
+  ),
+  TradeControllerDb.exportTradeHistoryCsv
+);
+
+/**
+ * GET /api/trade/history/export.xlsx
+ * Export trade history as Excel
+ */
+router.get(
+  '/history/export.xlsx',
+  validateQuery(
+    z.object({
+      pair: z.string().optional(),
+      side: z.string().optional(),
+      order_type: z.string().optional(),
+      status: z.string().optional(),
+      date_from: z.string().optional(),
+      date_to: z.string().optional(),
+    })
+  ),
+  TradeControllerDb.exportTradeHistoryExcel
 );
 
 /**
  * GET /api/trade/pairs
  * Get available trading pairs and their stats
  */
-router.get('/pairs',
-  TradeController.getTradingPairs
-);
+router.get('/pairs', TradeController.getTradingPairs);
 
 export default router;

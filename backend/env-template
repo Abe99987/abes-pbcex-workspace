@@ -2,9 +2,19 @@
 # Core Application
 NODE_ENV=development
 PORT=4001
-# For development, we'll use in-memory storage instead of real databases
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/pbcex_dev
-REDIS_URL=redis://localhost:6379
+
+# Supabase (provided)
+NEXT_PUBLIC_SUPABASE_URL=https://arjrtbhuzftydzblttoa.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyanJ0Ymh1emZ0eWR6Ymx0dG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NzIxNDMsImV4cCI6MjA3MjE0ODE0M30.S22Ttb8jgHjxfrhgDZHWEIbt0fpzzomC-r67jqeIRSA
+
+# Postgres (Supabase) - Replace [YOUR-PASSWORD] with actual password from Supabase dashboard
+DATABASE_URL="postgresql://postgres.arjrtbhuzftydzblttoa:[YOUR-PASSWORD]@aws-1-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.arjrtbhuzftydzblttoa:[YOUR-PASSWORD]@aws-1-us-east-1.pooler.supabase.com:5432/postgres"
+
+# Redis (Upstash) - Get from Upstash dashboard
+REDIS_URL="rediss://:[YOUR_UPSTASH_TOKEN]@[YOUR_UPSTASH_HOST]:443"
+UPSTASH_REST_URL="https://[YOUR_UPSTASH_REST_HOST]"
+UPSTASH_REST_TOKEN="[YOUR_UPSTASH_REST_TOKEN]"
 
 # Authentication & Security (DEV DEFAULTS - CHANGE IN PRODUCTION)
 JWT_SECRET=dev_jwt_secret_32_characters_minimum_length
@@ -57,3 +67,7 @@ PHASE=1
 ENABLE_ONCHAIN=false
 ENABLE_VAULT_REDEMPTION=false
 FULFILLMENT_STRATEGY=JM
+
+# Integration Feature Flags
+INTEGRATION_TRADINGVIEW=true
+INTEGRATION_VENDOR_PLACEHOLDERS=true

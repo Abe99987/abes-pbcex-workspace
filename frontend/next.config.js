@@ -24,7 +24,7 @@ const nextConfig = {
         headers: [
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'SAMEORIGIN',
           },
           {
             key: 'X-Content-Type-Options',
@@ -38,17 +38,18 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://s3.tradingview.com https://charting-library.tradingview.com",
-              "style-src 'self' 'unsafe-inline' https://charting-library.tradingview.com",
-              "img-src 'self' data: blob: https: https://s3.tradingview.com https://static.tradingview.com",
-              "connect-src 'self' https://api.tradingview.com https://prodata.tradingview.com https://pushstream.tradingview.com wss://data.tradingview.com wss://prodata.tradingview.com",
-              "frame-src 'self' https://www.tradingview.com https://charting-library.tradingview.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://s3.tradingview.com https://charting-library.tradingview.com https://widget.tradingview.com https://static.tradingview.com https://cdn.tradingview.com",
+              "style-src 'self' 'unsafe-inline' https://charting-library.tradingview.com https://widget.tradingview.com https://static.tradingview.com https://cdn.tradingview.com",
+              "img-src 'self' data: blob: https: https://s3.tradingview.com https://static.tradingview.com https://cdn.tradingview.com https://widget.tradingview.com",
+              "connect-src 'self' https://api.tradingview.com https://prodata.tradingview.com https://pushstream.tradingview.com https://scanner.tradingview.com https://symbol-search.tradingview.com wss://data.tradingview.com wss://prodata.tradingview.com ws://localhost:* http://localhost:*",
+              "frame-src 'self' https://www.tradingview.com https://charting-library.tradingview.com https://widget.tradingview.com https://s.tradingview.com",
+              "frame-ancestors 'self'",
               "worker-src 'self' blob:",
               "child-src 'self' blob:",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
-              "font-src 'self' data: https://fonts.gstatic.com",
+              "font-src 'self' data: https://fonts.gstatic.com https://static.tradingview.com",
               "media-src 'self'",
             ].join('; '),
           },
