@@ -148,7 +148,7 @@ class ExperimentClient {
 
     // Check if experiment is enabled
     if (experiment && !experiment.enabled) {
-      return effectiveVariants[0]; // Return control variant
+      return effectiveVariants[0] || 'control'; // Return control variant
     }
 
     // Generate consistent hash
@@ -157,12 +157,12 @@ class ExperimentClient {
 
     // Assign variant based on traffic allocation
     let cumulativeTraffic = 0;
-    let assignedVariant = effectiveVariants[0];
+    let assignedVariant = effectiveVariants[0] || 'control';
 
     for (let i = 0; i < effectiveVariants.length; i++) {
       cumulativeTraffic += effectiveTraffic[i] || 0;
       if (bucket < cumulativeTraffic) {
-        assignedVariant = effectiveVariants[i];
+        assignedVariant = effectiveVariants[i] || 'control';
         break;
       }
     }

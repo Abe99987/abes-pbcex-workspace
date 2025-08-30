@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       try {
         const response = await api.auth.me();
-        if (response.data.code === 'SUCCESS') {
+        if (response.data.code === 'SUCCESS' && response.data.data?.user) {
           setUser(response.data.data.user);
         } else {
           removeAuthToken();
@@ -89,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           kycStatus: 'APPROVED',
           emailVerified: true,
           phoneVerified: true,
+          twoFactorEnabled: false,
           role: 'USER',
         };
         setUser(devUser);
@@ -98,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const response = await api.auth.login({ email, password });
 
-      if (response.data.code === 'SUCCESS') {
+      if (response.data.code === 'SUCCESS' && response.data.data) {
         const { user: userData, accessToken } = response.data.data;
 
         setAuthToken(accessToken);
@@ -127,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       const response = await api.auth.register(data);
 
-      if (response.data.code === 'SUCCESS') {
+      if (response.data.code === 'SUCCESS' && response.data.data) {
         const { user: userData, accessToken } = response.data.data;
 
         setAuthToken(accessToken);
@@ -166,7 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUser = async (): Promise<void> => {
     try {
       const response = await api.auth.me();
-      if (response.data.code === 'SUCCESS') {
+      if (response.data.code === 'SUCCESS' && response.data.data?.user) {
         setUser(response.data.data.user);
       }
     } catch (error) {
@@ -268,5 +269,9 @@ export function getUserDisplayName(user: User | null): string {
   if (!user) return 'User';
 
   const parts = [user.firstName, user.lastName].filter(Boolean);
-  return parts.length > 0 ? parts.join(' ') : user.email.split('@')[0];
+  if (parts.length > 0) {
+    return parts.join(' ');
+  }
+  const emailName = user.email?.split('@')[0];
+  return emailName || 'User';
 }

@@ -7,15 +7,13 @@ import {
   formatPriceChange,
   getAssetDisplayName,
 } from '@/hooks/usePrices';
-import { api, BalancesResponse } from '@/utils/api';
+import { api } from '@/utils/api';
+import type { BalancesResponse, Transaction } from '@/types/wallet';
 import toast from 'react-hot-toast';
 
 /**
  * Dashboard page showing balances, portfolio value, and market overview
  */
-
-import { Transaction } from '../src/types/wallet';
-import { api } from '../utils/api';
 
 export default function Dashboard() {
   const { user, isLoading: authLoading } = useAuth();
@@ -34,7 +32,7 @@ export default function Dashboard() {
     const fetchBalances = async () => {
       try {
         const response = await api.wallet.getBalances();
-        if (response.data.code === 'SUCCESS') {
+        if (response.data.code === 'SUCCESS' && response.data.data) {
           setBalances(response.data.data);
         }
       } catch (error: unknown) {

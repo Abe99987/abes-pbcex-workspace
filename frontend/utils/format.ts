@@ -94,7 +94,7 @@ export function formatDate(
 
   if (isNaN(d.getTime())) return 'Invalid date';
 
-  const options: Intl.DateTimeFormatOptions = {
+  const formatOptions: Record<string, Intl.DateTimeFormatOptions> = {
     short: { month: 'short', day: 'numeric', year: 'numeric' },
     medium: {
       month: 'short',
@@ -111,7 +111,8 @@ export function formatDate(
       hour: 'numeric',
       minute: '2-digit',
     },
-  }[format];
+  };
+  const options = formatOptions[format];
 
   return new Intl.DateTimeFormat('en-US', options).format(d);
 }

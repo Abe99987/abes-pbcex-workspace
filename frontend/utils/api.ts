@@ -169,7 +169,9 @@ export interface User {
   role: string;
   kycStatus: string;
   emailVerified: boolean;
+  phoneVerified?: boolean;
   twoFactorEnabled: boolean;
+  phone?: string;
 }
 
 export interface RegisterData {
@@ -243,6 +245,7 @@ export interface PricesResponse {
   [key: string]: {
     price: string;
     change24h: string;
+    lastUpdated?: string;
   };
 }
 
@@ -317,6 +320,14 @@ export interface Order {
   estimatedDelivery: string;
 }
 
+export interface Address {
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
+
 export interface LockQuoteData {
   productId: string;
   quantity: number;
@@ -328,6 +339,47 @@ export interface CheckoutData {
   shippingAddress: Address;
   billingAddress?: Address;
   specialInstructions?: string;
+}
+
+export interface PersonalInfo {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  ssn: string;
+}
+
+export interface DocumentInfo {
+  type: string;
+  url: string;
+}
+
+export interface ConsentInfo {
+  termsAccepted: boolean;
+  privacyAccepted: boolean;
+}
+
+export interface CompanyInfo {
+  name: string;
+  taxId: string;
+  incorporationDate: string;
+  businessType: string;
+}
+
+export interface OwnershipInfo {
+  name: string;
+  percentage: number;
+}
+
+export interface ContactInfo {
+  name: string;
+  role: string;
+  email: string;
+  phone: string;
+}
+
+export interface ShippingProfile {
+  name: string;
+  address: Address;
 }
 
 export interface PersonalKycData {

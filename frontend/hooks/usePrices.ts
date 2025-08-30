@@ -50,7 +50,12 @@ export function usePrices(options: UsePricesOptions = {}): UsePricesReturn {
 
       responses.forEach((response, index) => {
         const asset = assets[index];
-        if (response.data.code === 'SUCCESS' && response.data.data[asset]) {
+        if (
+          asset &&
+          response.data.code === 'SUCCESS' &&
+          response.data.data &&
+          response.data.data[asset]
+        ) {
           newPrices[asset] = {
             price: response.data.data[asset].price,
             change24h: response.data.data[asset].change24h,

@@ -4,20 +4,10 @@
 
 export interface Transaction {
   id: string;
-  type:
-    | 'CREDIT'
-    | 'DEBIT'
-    | 'LOCK'
-    | 'UNLOCK'
-    | 'TRANSFER_IN'
-    | 'TRANSFER_OUT'
-    | 'TRADE'
-    | 'FEE'
-    | 'MINT'
-    | 'BURN';
+  type: string; // Flexible to handle backend variations
   asset: string;
   amount: string;
-  accountType: 'FUNDING' | 'TRADING';
+  accountType: string; // Flexible to handle backend variations
   description: string;
   reference?: string;
   createdAt: string;
@@ -42,6 +32,24 @@ export interface Account {
 export interface WalletBalances {
   funding: Account;
   trading: Account;
+  totalUsdValue: string;
+}
+
+export interface BalancesResponse {
+  funding: {
+    id: string;
+    type: string;
+    name: string;
+    balances: Balance[];
+    totalUsdValue: string;
+  };
+  trading: {
+    id: string;
+    type: string;
+    name: string;
+    balances: Balance[];
+    totalUsdValue: string;
+  };
   totalUsdValue: string;
 }
 
