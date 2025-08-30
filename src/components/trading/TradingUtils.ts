@@ -1,7 +1,7 @@
 // Utility functions for trading components
 
 export interface CandlestickData {
-  time: string;
+  time: number;
   open: number;
   high: number;
   low: number;
@@ -43,7 +43,7 @@ export const generateCandlestickData = (count: number, timeframe: string): Candl
     const volume = Math.random() * 1000 + 100;
 
     data.push({
-      time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: time.getTime(),
       open: parseFloat(open.toFixed(2)),
       high: parseFloat(high.toFixed(2)),
       low: parseFloat(low.toFixed(2)),

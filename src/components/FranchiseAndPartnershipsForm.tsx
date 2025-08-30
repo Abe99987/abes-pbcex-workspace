@@ -356,9 +356,9 @@ const FranchiseAndPartnershipsForm = () => {
     const countFranchiseAsFive = (window as { countFranchiseAsFive?: unknown })
       .countFranchiseAsFive;
 
-    if (store) {
+    if (store && typeof store === 'object' && 'addRecord' in store && typeof store.addRecord === 'function') {
       if (formType === 'customer_vote') {
-        const result = store.addRecord({
+        const result = (store as any).addRecord({
           city: formData.cityWanted,
           country: formData.countryWanted,
           weight: 1,
@@ -376,7 +376,7 @@ const FranchiseAndPartnershipsForm = () => {
           return;
         }
       } else if (formType === 'franchise_applicant' && countFranchiseAsFive) {
-        store.addRecord({
+        (store as any).addRecord({
           city: formData.city,
           country: formData.country,
           weight: 5,

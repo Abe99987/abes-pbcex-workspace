@@ -235,6 +235,7 @@ interface CategorizationRule {
   merchant: string;
   categoryId: CategoryId;
   description?: string;
+  confidence?: number;
 }
 
 // API stubs

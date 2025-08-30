@@ -24,6 +24,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Branch } from "@/types/branch";
 import BranchLocator from './BranchLocator';
 
 interface BuyPhysicalModalProps {
@@ -35,17 +36,6 @@ interface BuyPhysicalModalProps {
     symbol: string;
     icon: string;
   };
-}
-
-interface Branch {
-  id: string;
-  name: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-  phone: string;
-  hours: string;
 }
 
 const BuyPhysicalModal = ({

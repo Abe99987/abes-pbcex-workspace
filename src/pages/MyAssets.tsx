@@ -756,15 +756,36 @@ const MyAssets = () => {
                       {/* Action Buttons */}
                       <div className="lg:col-span-3">
                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                          <Button size="default" variant="outline" onClick={() => { setSelectedAsset(asset); setBuyModalOpen(true); }}>
+                          <Button size="default" variant="outline" onClick={() => { 
+                            const compatibleAsset: Asset = {
+                              ...asset,
+                              category: asset.category === "FX Assets" ? "trading" : "trading"
+                            };
+                            setSelectedAsset(compatibleAsset); 
+                            setBuyModalOpen(true); 
+                          }}>
                             <ShoppingCart className="w-4 h-4 mr-2" />
                             <span>Buy</span>
                           </Button>
-                          <Button size="default" variant="outline" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
+                          <Button size="default" variant="outline" onClick={() => { 
+                            const compatibleAsset: Asset = {
+                              ...asset,
+                              category: asset.category === "FX Assets" ? "trading" : "trading"
+                            };
+                            setSelectedAsset(compatibleAsset); 
+                            setRealizeModalOpen(true); 
+                          }}>
                             <Package className="w-4 h-4 mr-2" />
                             <span>Sell</span>
                           </Button>
-                          <Button size="default" variant="premium" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
+                          <Button size="default" variant="premium" onClick={() => { 
+                            const compatibleAsset: Asset = {
+                              ...asset,
+                              category: asset.category === "FX Assets" ? "trading" : "trading"
+                            };
+                            setSelectedAsset(compatibleAsset); 
+                            setRealizeModalOpen(true); 
+                          }}>
                             <Package className="w-4 h-4 mr-2" />
                             <span>Realize</span>
                           </Button>
@@ -867,15 +888,36 @@ const MyAssets = () => {
                       {/* Action Buttons */}
                       <div className="lg:col-span-3">
                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                          <Button size="default" variant="outline" onClick={() => { setSelectedAsset(asset); setBuyModalOpen(true); }}>
+                          <Button size="default" variant="outline" onClick={() => { 
+                            const compatibleAsset: Asset = {
+                              ...asset,
+                              category: asset.category === "Mineral Assets" ? "trading" : "trading"
+                            };
+                            setSelectedAsset(compatibleAsset); 
+                            setBuyModalOpen(true); 
+                          }}>
                             <ShoppingCart className="w-4 h-4 mr-2" />
                             <span>Buy</span>
                           </Button>
-                          <Button size="default" variant="outline" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
+                          <Button size="default" variant="outline" onClick={() => { 
+                            const compatibleAsset: Asset = {
+                              ...asset,
+                              category: asset.category === "Mineral Assets" ? "trading" : "trading"
+                            };
+                            setSelectedAsset(compatibleAsset); 
+                            setRealizeModalOpen(true); 
+                          }}>
                             <Package className="w-4 h-4 mr-2" />
                             <span>Sell</span>
                           </Button>
-                          <Button size="default" variant="premium" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
+                          <Button size="default" variant="premium" onClick={() => { 
+                            const compatibleAsset: Asset = {
+                              ...asset,
+                              category: asset.category === "Mineral Assets" ? "trading" : "trading"
+                            };
+                            setSelectedAsset(compatibleAsset); 
+                            setRealizeModalOpen(true); 
+                          }}>
                             <Package className="w-4 h-4 mr-2" />
                             <span>Realize</span>
                           </Button>
@@ -966,15 +1008,36 @@ const MyAssets = () => {
                       {/* Action Buttons */}
                       <div className="lg:col-span-3">
                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                          <Button size="default" variant="outline" onClick={() => { setSelectedAsset(asset); setBuyModalOpen(true); }}>
+                          <Button size="default" variant="outline" onClick={() => { 
+                            const compatibleAsset: Asset = {
+                              ...asset,
+                              category: asset.category === "Crypto Assets" ? "trading" : "trading"
+                            };
+                            setSelectedAsset(compatibleAsset); 
+                            setBuyModalOpen(true); 
+                          }}>
                             <ShoppingCart className="w-4 h-4 mr-2" />
                             <span>Buy</span>
                           </Button>
-                          <Button size="default" variant="outline" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
+                          <Button size="default" variant="outline" onClick={() => { 
+                            const compatibleAsset: Asset = {
+                              ...asset,
+                              category: asset.category === "Crypto Assets" ? "trading" : "trading"
+                            };
+                            setSelectedAsset(compatibleAsset); 
+                            setRealizeModalOpen(true); 
+                          }}>
                             <Package className="w-4 h-4 mr-2" />
                             <span>Sell</span>
                           </Button>
-                          <Button size="default" variant="premium" onClick={() => { setSelectedAsset(asset); setRealizeModalOpen(true); }}>
+                          <Button size="default" variant="premium" onClick={() => { 
+                            const compatibleAsset: Asset = {
+                              ...asset,
+                              category: asset.category === "Crypto Assets" ? "trading" : "trading"
+                            };
+                            setSelectedAsset(compatibleAsset); 
+                            setRealizeModalOpen(true); 
+                          }}>
                             <Package className="w-4 h-4 mr-2" />
                             <span>Realize</span>
                           </Button>
