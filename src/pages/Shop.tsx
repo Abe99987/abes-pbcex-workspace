@@ -145,9 +145,16 @@ const Shop = () => {
     navigate(toCommodityPath(asset.symbol, { action }));
   };
 
-  const handleRowLeftClick = (asset: Asset) => {
+  const handleRowCardClick = (asset: Asset) => {
     track('shop_row_open_details', { symbol: asset.symbol, source_page: '/shop' });
     navigate(toCommodityPath(asset.symbol));
+  };
+
+  const handleTickerClick = (asset: Asset, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    track('shop_row_open_trading', { symbol: asset.symbol, route: toTradingPath(asset.symbol) });
+    navigate(toTradingPath(asset.symbol));
   };
 
   return (
@@ -174,34 +181,37 @@ const Shop = () => {
               className='group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30'
             >
               <CardContent className='p-6'>
-                <div className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-center'>
+                <div 
+                  className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/60 rounded-2xl -m-2 p-2'
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => handleRowCardClick(asset)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleRowCardClick(asset);
+                    }
+                  }}
+                  data-testid="row-card-link"
+                  aria-label={`Open ${asset.name} details`}
+                >
                   {/* Asset Info - Left Side */}
-                  <Link 
-                    to={toCommodityPath(asset.symbol)}
-                    className='lg:col-span-3 flex items-center space-x-4 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/60 rounded-xl p-2 -m-2'
-                    aria-label={`Open ${asset.name} details`}
-                    data-testid="row-left-link"
-                  >
+                  <div className='lg:col-span-3 flex items-center space-x-4'>
                     <div className='text-3xl group-hover:scale-110 transition-transform'>
                       {asset.icon}
                     </div>
                     <div>
                       <div className='font-semibold text-foreground text-lg group-hover:text-primary transition-colors'>
                         {asset.name}
-                        <Link 
-                          to={toTradingPath(asset.symbol)}
+                        <button
                           className='ml-2 text-sm font-normal text-muted-foreground hover:text-primary transition-colors z-10 relative'
                           aria-label={`Open ${asset.name} trading`}
                           data-testid="row-ticker-link"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            track('shop_row_open_trading', { symbol: asset.symbol, route: toTradingPath(asset.symbol) });
-                            window.location.href = toTradingPath(asset.symbol);
-                          }}
+                          onClick={(e) => handleTickerClick(asset, e)}
+                          onMouseDown={(e) => e.stopPropagation()}
                         >
                           ({asset.symbol})
-                        </Link>
+                        </button>
                       </div>
                       <p className='text-sm text-muted-foreground'>
                         {asset.description}
@@ -212,7 +222,7 @@ const Shop = () => {
                         </p>
                       )}
                     </div>
-                  </Link>
+                  </div>
 
                   {/* Price & Change */}
                   <div className='lg:col-span-2 text-center lg:text-left'>
@@ -244,7 +254,7 @@ const Shop = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className='lg:col-span-4' data-row-actions onClick={(e) => e.stopPropagation()}>
+                  <div className='lg:col-span-4' data-row-actions onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
                     <div className='grid grid-cols-2 lg:grid-cols-5 gap-3'>
                         <TooltipProvider>
                         <Tooltip>

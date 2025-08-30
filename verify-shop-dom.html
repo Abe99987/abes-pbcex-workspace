@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shop DOM Verification</title>
+</head>
+<body>
+    <h1>Shop DOM Verification Results</h1>
+    
+    <h2>Expected DOM Structure on /shop:</h2>
+    
+    <h3>Gold Row Elements:</h3>
+    <ul>
+        <li><strong>[data-testid="row-card-link"]</strong> - Should be a div with role="link", tabindex="0", cursor-pointer</li>
+        <li><strong>[data-testid="row-ticker-link"]</strong> - Should be a button inside the card that opens trading</li>
+        <li><strong>Action buttons</strong> - Details, Buy, Sell, Order, Send, Deposit with stopPropagation</li>
+    </ul>
+    
+    <h3>Expected Interactions:</h3>
+    <ol>
+        <li><strong>Card Click</strong>: Clicking anywhere on the row card → /shop/XAU</li>
+        <li><strong>Ticker Click</strong>: Clicking (XAU) → /coin-trading?symbol=XAUUSD</li>
+        <li><strong>Action Buttons</strong>: Continue to work as before with ?action= params</li>
+    </ol>
+    
+    <h2>Verification Script (Run in Browser Console on /shop):</h2>
+    <pre><code>
+// Check DOM elements
+const cardLink = document.querySelector('[data-testid="row-card-link"]');
+const tickerLink = document.querySelector('[data-testid="row-ticker-link"]');
+
+console.log('Card Link:', {
+  exists: !!cardLink,
+  role: cardLink?.getAttribute('role'),
+  tabindex: cardLink?.getAttribute('tabindex'),
+  ariaLabel: cardLink?.getAttribute('aria-label'),
+  classList: cardLink?.className
+});
+
+console.log('Ticker Link:', {
+  exists: !!tickerLink,
+  tagName: tickerLink?.tagName,
+  ariaLabel: tickerLink?.getAttribute('aria-label'),
+  classList: tickerLink?.className
+});
+
+// Test clicks (run one at a time)
+console.log('Test card click with: cardLink.click()');
+console.log('Test ticker click with: tickerLink.click()');
+    </code></pre>
+    
+    <h2>Expected Results:</h2>
+    <ul>
+        <li>Card click should navigate to /shop/XAU</li>
+        <li>Ticker click should navigate to /coin-trading?symbol=XAUUSD</li>
+        <li>Mini chart should have pointer-events: none</li>
+        <li>Action buttons should stop propagation</li>
+    </ul>
+    
+</body>
+</html>
