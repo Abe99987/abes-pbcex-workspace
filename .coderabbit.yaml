@@ -4,20 +4,21 @@ reviews:
   enabled: true
   summary: true
   explain_changes: true
-  max_comments: 100
+  max_comments: 50
   path_filters:
     include:
       - "src/**"
-      - "apps/**"
-      - "packages/**"
+      - "frontend/**"
     exclude:
       - "node_modules/**"
       - "dist/**"
       - "build/**"
       - ".next/**"
       - "coverage/**"
+      - "backend/**"
+      - "onchain/**"
+      - "scripts/**"
 
 behavior:
   fail_on_errors: false
   approve_on_no_issues: true
-  suggest_fixes: true
