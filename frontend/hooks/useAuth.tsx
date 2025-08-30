@@ -12,7 +12,7 @@ import {
   getAuthToken,
   User,
 } from '@/utils/api';
-import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { useSupabaseAuth } from '@/src/hooks/useSupabaseAuth';
 import toast from 'react-hot-toast';
 
 /**

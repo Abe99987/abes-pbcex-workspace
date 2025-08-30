@@ -100,6 +100,25 @@ export interface TradeKPIs {
   totalFees: string;
 }
 
+export interface BalancesResponse {
+  funding: {
+    totalValue: string;
+    balances: Array<{
+      asset: string;
+      available: string;
+      totalValue: string;
+    }>;
+  };
+  trading: {
+    totalValue: string;
+    balances: Array<{
+      asset: string;
+      available: string;
+      totalValue: string;
+    }>;
+  };
+}
+
 export interface TradeHistoryResponse {
   kpis: TradeKPIs;
   trades: Trade[];

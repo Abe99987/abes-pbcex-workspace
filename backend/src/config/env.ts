@@ -87,6 +87,18 @@ const envSchema = z.object({
     .default('false'),
   FULFILLMENT_STRATEGY: z.enum(['JM', 'BRINKS']).default('JM'),
 
+  // Integration Feature Flags
+  INTEGRATION_TRADINGVIEW: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('true'),
+  INTEGRATION_VENDOR_PLACEHOLDERS: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('true'),
+
   // A/B Testing Configuration
   EXPERIMENTS_JSON: z.string().optional(),
 });
@@ -167,8 +179,7 @@ if (env.NODE_ENV === 'development') {
     .map(([name]) => name);
 
   // Check if vendor placeholders are enabled
-  const vendorPlaceholdersEnabled =
-    env.INTEGRATION_VENDOR_PLACEHOLDERS === 'true';
+  const vendorPlaceholdersEnabled = env.INTEGRATION_VENDOR_PLACEHOLDERS;
 
   console.log('🔧 Integration Status:');
   console.log(

@@ -20,7 +20,6 @@ export { default as Screener } from './Screener';
 export { default as EconomicCalendar } from './EconomicCalendar';
 export {
   default as StockHeatmap,
-  StockHeatmap,
   CryptoHeatmap,
   ForexHeatmap,
 } from './Heatmaps';
