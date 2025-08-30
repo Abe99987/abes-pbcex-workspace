@@ -349,7 +349,7 @@ const MyAssets = () => {
     navigate(`/trading?symbol=${asset.symbol}`);
   };
 
-  const handleTitledAssetClick = (asset: any) => {
+  const handleTitledAssetClick = (asset: { symbol: string }) => {
     if (asset.symbol === "HOME") {
       navigate("/titled-asset/1987-future-drive-pittsburgh-pa");
     }

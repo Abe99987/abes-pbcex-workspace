@@ -83,7 +83,7 @@ const RealizeAssetModal = ({ isOpen, onClose, asset }: RealizeAssetModalProps) =
       setPriceLockedUntil(new Date(Date.now() + 10 * 60 * 1000));
       setTimeLeft(600);
     }
-  }, [amount, priceLockedUntil]); // eslint-disable-line react-hooks/exhaustive-deps -- Reason: priceLockedUntil is intentionally excluded to prevent infinite loops
+  }, [amount, priceLockedUntil]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
