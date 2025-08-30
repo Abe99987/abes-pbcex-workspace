@@ -3,22 +3,37 @@ version: 1
 reviews:
   enabled: true
   summary: true
-  explain_changes: true
-  max_comments: 50
+  suggestions: true
+  test_coverage: true
+  security: true
+  performance: true
+  style: true
+  max_context: 50
   path_filters:
     include:
-      - "src/**"
-      - "frontend/**"
-    exclude:
-      - "node_modules/**"
-      - "dist/**"
-      - "build/**"
-      - ".next/**"
-      - "coverage/**"
       - "backend/**"
-      - "onchain/**"
+      - "frontend/**"
+      - "src/**"
+      - ".github/**"
       - "scripts/**"
+    exclude:
+      - "**/node_modules/**"
+      - "**/dist/**"
+      - "**/.next/**"
+      - "**/build/**"
+      - "**/*.png"
+      - "**/*.jpg"
+      - "**/*.svg"
+      - "**/*.css"
+      - "**/*.md"
+      - "**/*.lock"
+      - "**/*.snap"
+      - "**/*.snapshots"
+      - "**/*.spec.ts"
+      - "**/*.test.ts"
+      - "**/e2e/**"
 
 behavior:
   fail_on_errors: false
-  approve_on_no_issues: true
+  approve_when_consistent: true
+  enable_status_check: true
