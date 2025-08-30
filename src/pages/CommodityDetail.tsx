@@ -1,5 +1,7 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
 import { useCommodityMeta } from '@/hooks/useCommodityMeta';
+import { track } from '@/lib/analytics';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,9 +22,21 @@ const mockPrices: Record<string, { price: string; change: string; isPositive: bo
 
 const CommodityDetail = () => {
   const { symbol } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [activeAction, setActiveAction] = useState<string | null>(null);
+  const actionRowRef = useRef<HTMLDivElement>(null);
   
   if (!symbol) {
-    return <div>Invalid commodity symbol</div>;
+    navigate('/shop');
+    return null;
+  }
+
+  // Redirect invalid symbols to shop
+  const validSymbols = ['XAU', 'XAG', 'XPT', 'XPD', 'XCU'];
+  if (!validSymbols.includes(symbol.toUpperCase())) {
+    navigate('/shop');
+    return null;
   }
 
   let meta;
@@ -48,6 +62,48 @@ const CommodityDetail = () => {
   if (!priceData) {
     priceData = { price: 'N/A', change: '0%', isPositive: true, icon: '📦' };
   }
+
+  // Handle action selection on mount
+  useEffect(() => {
+    const action = searchParams.get('action');
+    if (action) {
+      setActiveAction(action);
+      track('shop_action_selected', { symbol, action, via: 'query' });
+      
+      // Scroll to action row
+      setTimeout(() => {
+        actionRowRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'nearest' 
+        });
+      }, 100);
+    }
+
+    // Determine source and track page open
+    const referrer = document.referrer;
+    const source = referrer.includes('/shop') ? 'catalog' : 
+                   referrer.includes('dropdown') || referrer.includes('menu') ? 'dropdown' : 
+                   'deeplink';
+    
+    track('shop_detail_opened', { symbol, source });
+  }, [searchParams, symbol]);
+
+  const handleActionClick = (action: string) => {
+    setActiveAction(action);
+    track('shop_action_selected', { symbol, action, via: 'click' });
+    // TODO: Open appropriate modal/flow
+  };
+
+  const getActionButtonClass = (action: string) => {
+    const baseClass = "h-12";
+    const isActive = activeAction === action;
+    
+    if (action === 'order') {
+      return `${baseClass} bg-black text-white hover:bg-black/90 ${isActive ? 'ring-2 ring-primary ring-offset-2 bg-opacity-90' : ''}`;
+    }
+    
+    return `${baseClass} ${isActive ? 'bg-primary/10 border-primary border-2 ring-2 ring-primary ring-offset-2' : ''}`;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -91,24 +147,49 @@ const CommodityDetail = () => {
         <Card>
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">Actions</h3>
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-              <Button variant="outline" className="h-12">
+            <div ref={actionRowRef} className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+              <Button 
+                variant="outline" 
+                className={getActionButtonClass('buy')}
+                onClick={() => handleActionClick('buy')}
+                aria-label={`Buy ${meta.displayName}`}
+              >
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 Buy
               </Button>
-              <Button variant="outline" className="h-12">
+              <Button 
+                variant="outline" 
+                className={getActionButtonClass('sell')}
+                onClick={() => handleActionClick('sell')}
+                aria-label={`Sell ${meta.displayName}`}
+              >
                 <Package className="w-5 h-5 mr-2" />
                 Sell
               </Button>
-              <Button variant="premium" className="h-12 bg-black text-white hover:bg-black/90">
+              <Button 
+                variant="premium" 
+                className={getActionButtonClass('order')}
+                onClick={() => handleActionClick('order')}
+                aria-label={`Order ${meta.displayName}`}
+              >
                 <Truck className="w-5 h-5 mr-2" />
                 Order
               </Button>
-              <Button variant="outline" className="h-12">
+              <Button 
+                variant="outline" 
+                className={getActionButtonClass('send')}
+                onClick={() => handleActionClick('send')}
+                aria-label={`Send ${meta.displayName}`}
+              >
                 <Send className="w-5 h-5 mr-2" />
                 Send
               </Button>
-              <Button variant="outline" className="h-12">
+              <Button 
+                variant="outline" 
+                className={getActionButtonClass('deposit')}
+                onClick={() => handleActionClick('deposit')}
+                aria-label={`Deposit ${meta.displayName}`}
+              >
                 <Upload className="w-5 h-5 mr-2" />
                 Deposit
               </Button>
