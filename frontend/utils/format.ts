@@ -3,9 +3,13 @@
  */
 
 // Number formatting
-export function formatCurrency(amount: string | number, currency = 'USD', decimals?: number): string {
+export function formatCurrency(
+  amount: string | number,
+  currency = 'USD',
+  decimals?: number
+): string {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  
+
   if (isNaN(num)) return '$0.00';
 
   const options: Intl.NumberFormatOptions = {
@@ -23,7 +27,7 @@ export function formatCurrency(amount: string | number, currency = 'USD', decima
 
 export function formatNumber(amount: string | number, decimals = 2): string {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  
+
   if (isNaN(num)) return '0';
 
   return new Intl.NumberFormat('en-US', {
@@ -32,14 +36,18 @@ export function formatNumber(amount: string | number, decimals = 2): string {
   }).format(num);
 }
 
-export function formatAssetAmount(amount: string | number, asset: string, showAsset = true): string {
+export function formatAssetAmount(
+  amount: string | number,
+  asset: string,
+  showAsset = true
+): string {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  
+
   if (isNaN(num)) return showAsset ? `0 ${asset}` : '0';
 
   // Different precision for different assets
   let decimals = 8; // Default for precious metals
-  
+
   if (['USD', 'USDC'].includes(asset)) {
     decimals = 2;
   } else if (asset.includes('XCU')) {
@@ -50,9 +58,13 @@ export function formatAssetAmount(amount: string | number, asset: string, showAs
   return showAsset ? `${formatted} ${asset}` : formatted;
 }
 
-export function formatPercentage(value: string | number, decimals = 2, showSign = true): string {
+export function formatPercentage(
+  value: string | number,
+  decimals = 2,
+  showSign = true
+): string {
   const num = typeof value === 'string' ? parseFloat(value) : value;
-  
+
   if (isNaN(num)) return '0%';
 
   const sign = showSign && num > 0 ? '+' : '';
@@ -62,7 +74,7 @@ export function formatPercentage(value: string | number, decimals = 2, showSign 
 
 export function formatCompactNumber(amount: string | number): string {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  
+
   if (isNaN(num)) return '0';
 
   const formatter = new Intl.NumberFormat('en-US', {
@@ -74,15 +86,31 @@ export function formatCompactNumber(amount: string | number): string {
 }
 
 // Date formatting
-export function formatDate(date: string | Date, format: 'short' | 'medium' | 'long' = 'medium'): string {
+export function formatDate(
+  date: string | Date,
+  format: 'short' | 'medium' | 'long' = 'medium'
+): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  
+
   if (isNaN(d.getTime())) return 'Invalid date';
 
   const options: Intl.DateTimeFormatOptions = {
     short: { month: 'short', day: 'numeric', year: 'numeric' },
-    medium: { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' },
-    long: { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' },
+    medium: {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    },
+    long: {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    },
   }[format];
 
   return new Intl.DateTimeFormat('en-US', options).format(d);
@@ -90,7 +118,7 @@ export function formatDate(date: string | Date, format: 'short' | 'medium' | 'lo
 
 export function formatRelativeTime(date: string | Date): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  
+
   if (isNaN(d.getTime())) return 'Invalid date';
 
   const now = new Date();
@@ -103,53 +131,53 @@ export function formatRelativeTime(date: string | Date): string {
   if (diffMinutes < 60) return `${diffMinutes}m ago`;
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays < 7) return `${diffDays}d ago`;
-  
+
   return formatDate(d, 'short');
 }
 
 // Asset formatting
 export function getAssetDisplayName(asset: string): string {
   const displayNames: Record<string, string> = {
-    'PAXG': 'Gold',
-    'USD': 'US Dollar',
-    'USDC': 'USD Coin',
+    PAXG: 'Gold',
+    USD: 'US Dollar',
+    USDC: 'USD Coin',
     'XAU-s': 'Gold Synthetic',
     'XAG-s': 'Silver Synthetic',
     'XPT-s': 'Platinum Synthetic',
     'XPD-s': 'Palladium Synthetic',
     'XCU-s': 'Copper Synthetic',
   };
-  
+
   return displayNames[asset] || asset;
 }
 
 export function getAssetSymbol(asset: string): string {
   const symbols: Record<string, string> = {
-    'PAXG': '🥇',
+    PAXG: '🥇',
     'XAU-s': '🥇',
     'XAG-s': '🥈',
     'XPT-s': '⚪',
     'XPD-s': '⚫',
     'XCU-s': '🟤',
-    'USD': '$',
-    'USDC': '$',
+    USD: '$',
+    USDC: '$',
   };
-  
+
   return symbols[asset] || '';
 }
 
 export function getAssetColor(asset: string): string {
   const colors: Record<string, string> = {
-    'PAXG': 'text-yellow-600',
+    PAXG: 'text-yellow-600',
     'XAU-s': 'text-yellow-600',
     'XAG-s': 'text-slate-500',
     'XPT-s': 'text-slate-700',
     'XPD-s': 'text-slate-800',
     'XCU-s': 'text-orange-600',
-    'USD': 'text-green-600',
-    'USDC': 'text-blue-600',
+    USD: 'text-green-600',
+    USDC: 'text-blue-600',
   };
-  
+
   return colors[asset] || 'text-slate-600';
 }
 
@@ -157,30 +185,30 @@ export function getAssetColor(asset: string): string {
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
     // KYC statuses
-    'NOT_STARTED': 'text-slate-500 bg-slate-100',
-    'IN_PROGRESS': 'text-blue-700 bg-blue-100',
-    'PENDING_REVIEW': 'text-amber-700 bg-amber-100',
-    'APPROVED': 'text-green-700 bg-green-100',
-    'REJECTED': 'text-red-700 bg-red-100',
-    'EXPIRED': 'text-red-700 bg-red-100',
-    
+    NOT_STARTED: 'text-slate-500 bg-slate-100',
+    IN_PROGRESS: 'text-blue-700 bg-blue-100',
+    PENDING_REVIEW: 'text-amber-700 bg-amber-100',
+    APPROVED: 'text-green-700 bg-green-100',
+    REJECTED: 'text-red-700 bg-red-100',
+    EXPIRED: 'text-red-700 bg-red-100',
+
     // Trade statuses
-    'PENDING': 'text-amber-700 bg-amber-100',
-    'FILLED': 'text-green-700 bg-green-100',
-    'CANCELLED': 'text-slate-700 bg-slate-100',
-    'FAILED': 'text-red-700 bg-red-100',
-    
+    PENDING: 'text-amber-700 bg-amber-100',
+    FILLED: 'text-green-700 bg-green-100',
+    CANCELLED: 'text-slate-700 bg-slate-100',
+    FAILED: 'text-red-700 bg-red-100',
+
     // Order statuses
-    'DRAFT': 'text-slate-500 bg-slate-100',
-    'QUOTE_LOCKED': 'text-blue-700 bg-blue-100',
-    'PAYMENT_PENDING': 'text-amber-700 bg-amber-100',
-    'PAYMENT_CONFIRMED': 'text-green-700 bg-green-100',
-    'PROCESSING': 'text-blue-700 bg-blue-100',
-    'SHIPPED': 'text-purple-700 bg-purple-100',
-    'DELIVERED': 'text-green-700 bg-green-100',
-    'REFUNDED': 'text-red-700 bg-red-100',
+    DRAFT: 'text-slate-500 bg-slate-100',
+    QUOTE_LOCKED: 'text-blue-700 bg-blue-100',
+    PAYMENT_PENDING: 'text-amber-700 bg-amber-100',
+    PAYMENT_CONFIRMED: 'text-green-700 bg-green-100',
+    PROCESSING: 'text-blue-700 bg-blue-100',
+    SHIPPED: 'text-purple-700 bg-purple-100',
+    DELIVERED: 'text-green-700 bg-green-100',
+    REFUNDED: 'text-red-700 bg-red-100',
   };
-  
+
   return colors[status] || 'text-slate-600 bg-slate-100';
 }
 
@@ -216,13 +244,13 @@ export function formatAddress(address: {
 // Phone formatting
 export function formatPhone(phone: string): string {
   const cleaned = phone.replace(/\D/g, '');
-  
+
   if (cleaned.length === 10) {
     return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
   } else if (cleaned.length === 11 && cleaned.startsWith('1')) {
     return `+1 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7)}`;
   }
-  
+
   return phone;
 }
 
@@ -250,12 +278,15 @@ export function isValidEmail(email: string): boolean {
 }
 
 export function isValidPhoneNumber(phone: string): boolean {
-  const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/;
+  const phoneRegex = /^\+?[\d\s\-()]{10,}$/;
   return phoneRegex.test(phone);
 }
 
 // Math utilities for financial calculations
-export function calculatePercentageChange(oldValue: number, newValue: number): number {
+export function calculatePercentageChange(
+  oldValue: number,
+  newValue: number
+): number {
   if (oldValue === 0) return 0;
   return ((newValue - oldValue) / oldValue) * 100;
 }

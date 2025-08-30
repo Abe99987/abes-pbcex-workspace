@@ -54,7 +54,8 @@ export function usePrices(options: UsePricesOptions = {}): UsePricesReturn {
           newPrices[asset] = {
             price: response.data.data[asset].price,
             change24h: response.data.data[asset].change24h,
-            lastUpdated: response.data.data[asset].lastUpdated || new Date().toISOString(),
+            lastUpdated:
+              response.data.data[asset].lastUpdated || new Date().toISOString(),
           };
         }
       });
@@ -62,9 +63,13 @@ export function usePrices(options: UsePricesOptions = {}): UsePricesReturn {
       setPrices(prevPrices => ({ ...prevPrices, ...newPrices }));
       setLastUpdated(new Date());
       setError(null);
-
-    } catch (err: any) {
-      const message = err.response?.data?.message || err.message || 'Failed to fetch prices';
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to fetch prices';
+      const responseError = err as {
+        response?: { data?: { message?: string } };
+      };
+      const message = responseError.response?.data?.message || errorMessage;
       setError(message);
       console.error('Price fetch error:', err);
     } finally {
@@ -105,7 +110,8 @@ export function usePrices(options: UsePricesOptions = {}): UsePricesReturn {
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    return () =>
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [autoRefresh, fetchPrices]);
 
   return {
@@ -118,7 +124,10 @@ export function usePrices(options: UsePricesOptions = {}): UsePricesReturn {
 }
 
 // Hook for a single asset price
-export function useAssetPrice(asset: string, options: Omit<UsePricesOptions, 'assets'> = {}) {
+export function useAssetPrice(
+  asset: string,
+  options: Omit<UsePricesOptions, 'assets'> = {}
+) {
   const { prices, isLoading, error, lastUpdated, refreshPrices } = usePrices({
     ...options,
     assets: [asset],
@@ -134,9 +143,14 @@ export function useAssetPrice(asset: string, options: Omit<UsePricesOptions, 'as
 }
 
 // Hook for price changes and alerts
-export function usePriceAlerts(asset: string, thresholds: { high?: number; low?: number }) {
+export function usePriceAlerts(
+  asset: string,
+  thresholds: { high?: number; low?: number }
+) {
   const { price } = useAssetPrice(asset);
-  const [alerts, setAlerts] = useState<Array<{ type: 'high' | 'low'; price: string; timestamp: Date }>>([]);
+  const [alerts, setAlerts] = useState<
+    Array<{ type: 'high' | 'low'; price: string; timestamp: Date }>
+  >([]);
 
   useEffect(() => {
     if (!price) return;
@@ -178,10 +192,12 @@ export function usePriceAlerts(asset: string, thresholds: { high?: number; low?:
 
 // Hook for price history (mock data for now)
 export function usePriceHistory(
-  asset: string, 
+  asset: string,
   period: '1h' | '1d' | '1w' | '1m' = '1d'
 ) {
-  const [history, setHistory] = useState<Array<{ timestamp: Date; price: number; volume: number }>>([]);
+  const [history, setHistory] = useState<
+    Array<{ timestamp: Date; price: number; volume: number }>
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -189,7 +205,7 @@ export function usePriceHistory(
     const fetchHistory = async () => {
       try {
         setIsLoading(true);
-        
+
         // Mock historical data generation (replace with API call)
         const points = 100;
         const currentPrice = 2050; // Mock current gold price
@@ -206,8 +222,8 @@ export function usePriceHistory(
         const now = new Date();
 
         for (let i = points - 1; i >= 0; i--) {
-          const timestamp = new Date(now.getTime() - (i * intervalMs));
-          
+          const timestamp = new Date(now.getTime() - i * intervalMs);
+
           // Generate mock price with some volatility
           const volatility = 0.02; // 2% volatility
           const randomChange = (Math.random() - 0.5) * volatility;
@@ -219,9 +235,10 @@ export function usePriceHistory(
 
         setHistory(mockHistory);
         setError(null);
-
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch price history');
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to fetch price history';
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -240,7 +257,7 @@ export function usePriceHistory(
 // Utility functions for price formatting and calculations
 export function formatPrice(price: string | number, asset: string): string {
   const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-  
+
   if (isNaN(numPrice)) return '$0.00';
 
   // Different precision for different assets
@@ -259,34 +276,38 @@ export function formatPrice(price: string | number, asset: string): string {
   }).format(numPrice);
 }
 
-export function formatPriceChange(change: string): { text: string; isPositive: boolean } {
+export function formatPriceChange(change: string): {
+  text: string;
+  isPositive: boolean;
+} {
   const isPositive = change.startsWith('+');
-  const text = change.startsWith('+') || change.startsWith('-') ? change : `+${change}`;
-  
+  const text =
+    change.startsWith('+') || change.startsWith('-') ? change : `+${change}`;
+
   return { text, isPositive };
 }
 
 export function getAssetDisplayName(asset: string): string {
   const names: Record<string, string> = {
-    'AU': 'Gold',
-    'AG': 'Silver',
-    'PT': 'Platinum',
-    'PD': 'Palladium',
-    'CU': 'Copper',
+    AU: 'Gold',
+    AG: 'Silver',
+    PT: 'Platinum',
+    PD: 'Palladium',
+    CU: 'Copper',
   };
-  
+
   return names[asset] || asset;
 }
 
 export function getAssetSymbol(asset: string): string {
   const symbols: Record<string, string> = {
-    'AU': '🥇',
-    'AG': '🥈',
-    'PT': '⚪',
-    'PD': '⚫',
-    'CU': '🟤',
+    AU: '🥇',
+    AG: '🥈',
+    PT: '⚪',
+    PD: '⚫',
+    CU: '🟤',
   };
-  
+
   return symbols[asset] || '';
 }
 
@@ -301,10 +322,10 @@ export function useMarketStatus() {
     // But major trading hours are typically 9 AM - 5 PM ET
     const now = new Date();
     const etHour = now.getUTCHours() - 5; // Rough ET conversion
-    
+
     const marketHours = {
-      start: 9,  // 9 AM ET
-      end: 17,   // 5 PM ET
+      start: 9, // 9 AM ET
+      end: 17, // 5 PM ET
     };
 
     const isMainHours = etHour >= marketHours.start && etHour < marketHours.end;

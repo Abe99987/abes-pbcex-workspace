@@ -1,5 +1,17 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { api, setAuthToken, removeAuthToken, getAuthToken, User } from '@/utils/api';
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  ReactNode,
+} from 'react';
+import {
+  api,
+  setAuthToken,
+  removeAuthToken,
+  getAuthToken,
+  User,
+} from '@/utils/api';
 import toast from 'react-hot-toast';
 
 /**
@@ -64,19 +76,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       const response = await api.auth.login({ email, password });
-      
+
       if (response.data.code === 'SUCCESS') {
         const { user: userData, accessToken } = response.data.data;
-        
+
         setAuthToken(accessToken);
         setUser(userData);
-        
+
         toast.success(`Welcome back, ${userData.firstName || 'User'}!`);
       } else {
         throw new Error(response.data.message || 'Login failed');
       }
-    } catch (error: any) {
-      const message = error.response?.data?.message || error.message || 'Login failed';
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Login failed';
+      const responseError = error as {
+        response?: { data?: { message?: string } };
+      };
+      const message = responseError.response?.data?.message || errorMessage;
       toast.error(message);
       throw error;
     } finally {
@@ -88,19 +105,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       const response = await api.auth.register(data);
-      
+
       if (response.data.code === 'SUCCESS') {
         const { user: userData, accessToken } = response.data.data;
-        
+
         setAuthToken(accessToken);
         setUser(userData);
-        
+
         toast.success(`Welcome to PBCEx, ${userData.firstName || 'User'}!`);
       } else {
         throw new Error(response.data.message || 'Registration failed');
       }
-    } catch (error: any) {
-      const message = error.response?.data?.message || error.message || 'Registration failed';
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Registration failed';
+      const responseError = error as {
+        response?: { data?: { message?: string } };
+      };
+      const message = responseError.response?.data?.message || errorMessage;
       toast.error(message);
       throw error;
     } finally {
@@ -150,12 +172,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- Reason: exports include non-React hooks used by other modules
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (!context) {
@@ -165,9 +186,10 @@ export function useAuth(): AuthContextType {
 }
 
 // Custom hooks for specific auth states
+// eslint-disable-next-line react-refresh/only-export-components -- Reason: exports include non-React hooks used by other modules
 export function useRequireAuth() {
   const { user, isAuthenticated, isLoading } = useAuth();
-  
+
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       // Redirect to login page
@@ -178,10 +200,11 @@ export function useRequireAuth() {
   return { user, isAuthenticated, isLoading };
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- Reason: exports include non-React hooks used by other modules
 export function useRequireAdmin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
-  
+
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
@@ -196,11 +219,14 @@ export function useRequireAdmin() {
   return { user, isAuthenticated, isAdmin, isLoading };
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- Reason: exports include non-React hooks used by other modules
 export function useKycStatus() {
   const { user } = useAuth();
-  
-  const needsKyc = !user || ['NOT_STARTED', 'REJECTED', 'EXPIRED'].includes(user.kycStatus);
-  const kycPending = user && ['IN_PROGRESS', 'PENDING_REVIEW'].includes(user.kycStatus);
+
+  const needsKyc =
+    !user || ['NOT_STARTED', 'REJECTED', 'EXPIRED'].includes(user.kycStatus);
+  const kycPending =
+    user && ['IN_PROGRESS', 'PENDING_REVIEW'].includes(user.kycStatus);
   const kycApproved = user?.kycStatus === 'APPROVED';
   const canTrade = kycApproved && user?.emailVerified;
   const canWithdraw = canTrade && user?.phoneVerified;
@@ -216,9 +242,10 @@ export function useKycStatus() {
 }
 
 // Utility function to format user display name
+// eslint-disable-next-line react-refresh/only-export-components -- Reason: exports include non-React utility function used by other modules
 export function getUserDisplayName(user: User | null): string {
   if (!user) return 'User';
-  
+
   const parts = [user.firstName, user.lastName].filter(Boolean);
   return parts.length > 0 ? parts.join(' ') : user.email.split('@')[0];
 }
