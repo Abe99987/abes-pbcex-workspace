@@ -26,6 +26,11 @@ const envSchema = z.object({
   ENCRYPTION_KEY: z
     .string()
     .min(32, 'ENCRYPTION_KEY must be at least 32 characters'),
+  DEV_FAKE_LOGIN: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
 
   // Market Data
   TRADINGVIEW_API_KEY: z.string().optional(),

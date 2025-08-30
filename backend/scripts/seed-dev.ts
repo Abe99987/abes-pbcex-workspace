@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcrypt';
 import { AuthController } from '@/controllers/AuthController';
 import { WalletController } from '@/controllers/WalletController';
 import { TradeController } from '@/controllers/TradeController';
@@ -25,10 +26,13 @@ async function seedDevData() {
   try {
     // 1. Create dev user
     logInfo('Creating dev user...');
+    const devPassword = 'pbcextest1';
+    const devPasswordHash = bcrypt.hashSync(devPassword, 10);
+
     const devUser: User = {
       id: 'dev-user-id', // Fixed ID to match auth middleware
       email: 'dev@local.test',
-      passwordHash: 'dev_password_hash', // Not used in dev mode
+      passwordHash: devPasswordHash, // Properly hashed password
       firstName: 'Dev',
       lastName: 'User',
       role: USER_ROLES.USER,
@@ -309,7 +313,9 @@ async function seedDevData() {
 
     console.log('\n🎯 Ready for dashboard testing:');
     console.log('  • Visit http://localhost:3000/dashboard');
-    console.log('  • Login as: dev@local.test');
+    console.log('  • Login with:');
+    console.log('    Email: dev@local.test');
+    console.log('    Password: pbcextest1');
     console.log('  • Check balances, prices, and activity');
 
     console.log('\n✅ Development data seeded successfully!\n');

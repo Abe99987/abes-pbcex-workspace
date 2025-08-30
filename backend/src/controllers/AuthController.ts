@@ -10,6 +10,7 @@ import { logInfo, logWarn, logError } from '@/utils/logger';
 import { User, CreateUserInput, UserUtils } from '@/models/User';
 import { Account } from '@/models/Account';
 import { USER_ROLES, KYC_STATUS, ACCOUNT_TYPES } from '@/utils/constants';
+import { env } from '@/config/env';
 
 /**
  * Authentication Controller for PBCEx
@@ -130,7 +131,98 @@ export class AuthController {
   static login = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    logInfo('User login attempt', { email });
+    logInfo('User login attempt', { email, devFakeLogin: env.DEV_FAKE_LOGIN });
+
+    // Dev bypass for testing
+    if (
+      env.DEV_FAKE_LOGIN &&
+      email === 'dev@local.test' &&
+      password === 'pbcextest1'
+    ) {
+      logInfo('Dev bypass triggered', { email });
+
+      // Find or create dev user
+      let devUser = users.find(u => u.email === 'dev@local.test');
+      if (!devUser) {
+        // Create dev user on the fly
+        devUser = {
+          id: 'dev-user-id',
+          email: 'dev@local.test',
+          passwordHash: 'dev-bypass-hash', // Not used in bypass
+          firstName: 'Dev',
+          lastName: 'User',
+          role: USER_ROLES.USER,
+          kycStatus: KYC_STATUS.APPROVED,
+          emailVerified: true,
+          phoneVerified: true,
+          twoFactorEnabled: false,
+          phone: '+1-555-0123',
+          loginCount: 0,
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        users.push(devUser);
+
+        // Create default accounts for dev user
+        const fundingAccount: Account = {
+          id: uuidv4(),
+          userId: devUser.id,
+          type: ACCOUNT_TYPES.FUNDING,
+          name: 'Funding Account',
+          description: 'Real assets held in custody (PAXG, USD, USDC)',
+          custodyProvider: 'PAXOS',
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        const tradingAccount: Account = {
+          id: uuidv4(),
+          userId: devUser.id,
+          type: ACCOUNT_TYPES.TRADING,
+          name: 'Trading Account',
+          description:
+            'Synthetic assets for active trading (XAU-s, XAG-s, etc.)',
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        accounts.push(fundingAccount, tradingAccount);
+        logInfo('Dev user created on-the-fly with accounts', {
+          userId: devUser.id,
+          fundingAccountId: fundingAccount.id,
+          tradingAccountId: tradingAccount.id,
+        });
+      }
+
+      // Generate tokens for dev user
+      const accessToken = generateToken({
+        id: devUser.id,
+        email: devUser.email,
+        role: devUser.role,
+        kycStatus: devUser.kycStatus,
+      });
+
+      const refreshToken = generateRefreshToken(devUser.id);
+      refreshTokens.add(refreshToken);
+
+      logInfo('Dev user logged in via bypass', {
+        userId: devUser.id,
+        email: devUser.email,
+      });
+
+      return res.json({
+        code: 'SUCCESS',
+        message: 'Login successful (dev mode)',
+        data: {
+          user: UserUtils.toProfile(devUser),
+          accessToken,
+          refreshToken,
+        },
+      });
+    }
 
     // Find user by email
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -174,7 +266,7 @@ export class AuthController {
       email: user.email,
     });
 
-    res.json({
+    return res.json({
       code: 'SUCCESS',
       message: 'Login successful',
       data: {
