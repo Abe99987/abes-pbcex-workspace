@@ -54,7 +54,7 @@ app.use(helmet({
 // CORS configuration
 const corsOrigins = env.NODE_ENV === 'production' 
   ? ['https://app.pbcex.com', 'https://pbcex.com'] 
-  : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+  : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004', 'http://localhost:3005', 'http://127.0.0.1:3000'];
 
 app.use(cors({
   origin: corsOrigins,

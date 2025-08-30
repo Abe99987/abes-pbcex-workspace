@@ -17,7 +17,7 @@ interface EmailOptions {
   text?: string;
   html?: string;
   template?: string;
-  templateData?: Record<string, any>;
+  templateData?: Record<string, unknown>;
   attachments?: Array<{
     filename: string;
     content: string;
@@ -423,7 +423,7 @@ export class NotificationService {
   private static async initializeEmail(): Promise<void> {
     if (integrations.sendgrid && env.SENDGRID_API_KEY) {
       // Use SendGrid SMTP
-      NotificationService.emailTransporter = nodemailer.createTransporter({
+      NotificationService.emailTransporter = nodemailer.createTransport({
         host: 'smtp.sendgrid.net',
         port: 587,
         secure: false,
@@ -439,7 +439,7 @@ export class NotificationService {
 
     } else {
       // Use local SMTP for development (MailDev)
-      NotificationService.emailTransporter = nodemailer.createTransporter({
+      NotificationService.emailTransporter = nodemailer.createTransport({
         host: 'localhost',
         port: 1025,
         secure: false,

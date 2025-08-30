@@ -1,7 +1,7 @@
 # Copy this to .env and fill in actual values
 # Core Application
 NODE_ENV=development
-PORT=4000
+PORT=4001
 # For development, we'll use in-memory storage instead of real databases
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/pbcex_dev
 REDIS_URL=redis://localhost:6379

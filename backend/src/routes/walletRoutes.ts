@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate, requireKyc } from '@/middlewares/authMiddleware';
-import { validateBody } from '@/utils/validators';
+import { validateBody, validateQuery } from '@/utils/validators';
 import { transferSchema, depositSchema, withdrawalSchema } from '@/utils/validators';
 import { WalletController } from '@/controllers/WalletController';
 import { z } from 'zod';
@@ -52,7 +52,7 @@ router.post('/withdraw',
  * Get transaction history
  */
 router.get('/transactions',
-  validateBody(z.object({
+  validateQuery(z.object({
     limit: z.string().optional().transform(val => val ? parseInt(val) : 50),
     offset: z.string().optional().transform(val => val ? parseInt(val) : 0),
     type: z.enum(['CREDIT', 'DEBIT', 'LOCK', 'UNLOCK', 'TRANSFER_IN', 'TRANSFER_OUT', 'TRADE', 'FEE', 'MINT', 'BURN']).optional(),
