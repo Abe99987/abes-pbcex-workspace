@@ -107,8 +107,16 @@ const Navigation = () => {
           description: 'Track expenses, categories, and savings goals',
           onClick: () => navigate('/my-spending'),
         },
-        { label: 'Transaction History' },
-        { label: 'Order History' },
+        {
+          label: 'Transaction History',
+          description: 'View all account transactions and transfers',
+          onClick: () => navigate('/transaction-history'),
+        },
+        {
+          label: 'Order History',
+          description: 'Track all trading orders and execution',
+          onClick: () => navigate('/order-history'),
+        },
         {
           label: 'PnL',
           description: 'Profit and Loss',
