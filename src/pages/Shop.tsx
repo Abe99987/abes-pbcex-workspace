@@ -174,16 +174,18 @@ const Shop = () => {
                   <div className='lg:col-span-3 flex items-center space-x-4'>
                     <Link 
                       to={toCommodityPath(asset.symbol)} 
-                      className='text-3xl hover:scale-110 transition-transform'
-                      aria-label={`Open ${asset.name} details`}
+                      className='text-3xl hover:scale-110 transition-transform cursor-pointer'
+                      aria-label={`Open ${asset.name} details (thumbnail)`}
+                      data-testid="row-thumb-link"
                     >
                       {asset.icon}
                     </Link>
                     <div>
                       <Link 
                         to={toCommodityPath(asset.symbol)}
-                        className='font-semibold text-foreground text-lg hover:text-primary transition-colors'
+                        className='font-semibold text-foreground text-lg hover:text-primary transition-colors cursor-pointer'
                         aria-label={`Open ${asset.name} details`}
+                        data-testid="row-title-link"
                       >
                         {asset.name}
                       </Link>
@@ -218,17 +220,22 @@ const Shop = () => {
 
                   {/* Simplified Price Chart */}
                   <div className='lg:col-span-3 flex justify-center'>
-                    <div className='w-32 h-16 bg-muted rounded-lg flex items-center justify-center relative overflow-hidden'>
-                      <div className='absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent'></div>
-                      <BarChart3 className='w-6 h-6 text-primary z-10' />
-                      <span className='text-xs text-muted-foreground absolute bottom-1 right-1'>
+                    <Link 
+                      to={toCommodityPath(asset.symbol)} 
+                      className='w-32 h-16 bg-muted rounded-lg flex items-center justify-center relative overflow-hidden hover:bg-muted/80 transition-colors cursor-pointer'
+                      aria-label={`Open ${asset.name} details (chart)`}
+                      data-testid="row-chart-link"
+                    >
+                      <div className='absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent pointer-events-none'></div>
+                      <BarChart3 className='w-6 h-6 text-primary z-10 pointer-events-none' />
+                      <span className='text-xs text-muted-foreground absolute bottom-1 right-1 pointer-events-none'>
                         1Y
                       </span>
-                    </div>
+                    </Link>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className='lg:col-span-4'>
+                  <div className='lg:col-span-4' data-row-actions>
                     <div className='grid grid-cols-2 lg:grid-cols-5 gap-3'>
                         <TooltipProvider>
                         <Tooltip>
