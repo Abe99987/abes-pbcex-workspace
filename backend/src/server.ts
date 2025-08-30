@@ -8,7 +8,12 @@ import path from 'path';
 
 import { env } from '@/config/env';
 import logger, { logInfo, logError } from '@/utils/logger';
-import { errorHandler, notFoundHandler, setupGlobalErrorHandling, gracefulShutdown } from '@/middlewares/errorMiddleware';
+import {
+  errorHandler,
+  notFoundHandler,
+  setupGlobalErrorHandling,
+  gracefulShutdown,
+} from '@/middlewares/errorMiddleware';
 import { RATE_LIMITS } from '@/utils/constants';
 
 // Import services
@@ -25,7 +30,13 @@ import adminRoutes from '@/routes/adminRoutes';
 import redemptionRoutes from '@/routes/redemptionRoutes';
 import vaultRoutes from '@/routes/vaultRoutes';
 import supportRoutes from '@/routes/supportRoutes';
-import { analyticsRoutes } from '@/routes/analyticsRoutes';
+import analyticsRoutes from '@/routes/analyticsRoutes';
+
+// Import controllers for direct endpoints
+import { TradeControllerDb } from '@/controllers/TradeControllerDb';
+import { db } from '@/db';
+import { cache } from '@/cache/redis';
+import { getIntegrationStatus } from '@/config/features';
 
 /**
  * PBCEx API Server
@@ -39,39 +50,54 @@ const app = express();
 app.set('trust proxy', 1);
 
 // Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"], // For Swagger UI
-      scriptSrc: ["'self'"], 
-      imgSrc: ["'self'", "data:", "https:"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"], // For Swagger UI
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
     },
-  },
-  crossOriginEmbedderPolicy: false, // Disable for API server
-}));
+    crossOriginEmbedderPolicy: false, // Disable for API server
+  })
+);
 
 // CORS configuration
-const corsOrigins = env.NODE_ENV === 'production' 
-  ? ['https://app.pbcex.com', 'https://pbcex.com'] 
-  : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+const corsOrigins =
+  env.NODE_ENV === 'production'
+    ? ['https://app.pbcex.com', 'https://pbcex.com']
+    : [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:3002',
+        'http://localhost:3003',
+        'http://localhost:3004',
+        'http://localhost:3005',
+        'http://127.0.0.1:3000',
+      ];
 
-app.use(cors({
-  origin: corsOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['X-Rate-Limit-Remaining', 'X-Rate-Limit-Reset'],
-}));
+app.use(
+  cors({
+    origin: corsOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['X-Rate-Limit-Remaining', 'X-Rate-Limit-Reset'],
+  })
+);
 
 // Body parsing middleware
-app.use(express.json({ 
-  limit: '10mb',
-  verify: (req, res, buf) => {
-    // Store raw body for webhook verification if needed
-    (req as any).rawBody = buf;
-  }
-}));
+app.use(
+  express.json({
+    limit: '10mb',
+    verify: (req, res, buf) => {
+      // Store raw body for webhook verification if needed
+      (req as { rawBody?: Buffer }).rawBody = buf;
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // General rate limiting
@@ -85,12 +111,18 @@ const generalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   // Skip rate limiting for admin users in development
-  skip: (req) => {
-    return env.NODE_ENV === 'development' && req.headers['x-admin-bypass'] === 'true';
+  skip: req => {
+    return (
+      env.NODE_ENV === 'development' && req.headers['x-admin-bypass'] === 'true'
+    );
   },
   // Custom key generator for better distributed rate limiting
-  keyGenerator: (req) => {
-    return req.headers['x-forwarded-for'] as string || req.connection.remoteAddress || req.ip;
+  keyGenerator: req => {
+    return (
+      (req.headers['x-forwarded-for'] as string) ||
+      req.connection.remoteAddress ||
+      req.ip
+    );
   },
 });
 
@@ -100,10 +132,10 @@ app.use('/api', generalLimiter);
 app.use('/api', (req, res, next) => {
   const start = Date.now();
   const requestId = Math.random().toString(36).substr(2, 9);
-  
+
   // Add request ID to request object for correlation
-  (req as any).requestId = requestId;
-  
+  (req as { requestId?: string }).requestId = requestId;
+
   res.on('finish', () => {
     const duration = Date.now() - start;
     const logData = {
@@ -114,10 +146,10 @@ app.use('/api', (req, res, next) => {
       duration,
       userAgent: req.get('User-Agent'),
       ip: req.ip,
-      userId: (req as any).user?.id,
+      userId: (req as { user?: { id?: string } }).user?.id,
       contentLength: res.get('Content-Length'),
     };
-    
+
     // Log successful requests as info, errors as error
     if (res.statusCode >= 400) {
       logError(`HTTP ${res.statusCode} ${req.method} ${req.url}`, logData);
@@ -125,12 +157,19 @@ app.use('/api', (req, res, next) => {
       logInfo(`HTTP ${res.statusCode} ${req.method} ${req.url}`, logData);
     }
   });
-  
+
   next();
 });
 
 // Health check endpoint with service status
 app.get('/health', async (req, res) => {
+  const [dbHealth, redisHealth] = await Promise.all([
+    db.healthCheck(),
+    cache.healthCheck(),
+  ]);
+
+  const integrationStatus = getIntegrationStatus();
+
   const healthData = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -141,15 +180,24 @@ app.get('/health', async (req, res) => {
     services: {
       priceFeed: PriceFeedService.getHealthStatus(),
       notifications: NotificationService.getHealthStatus(),
-      database: { status: 'mock' }, // Would check actual DB connection
-      redis: { status: 'mock' }, // Would check actual Redis connection
+      database: dbHealth,
+      redis: redisHealth,
+    },
+    integrations: {
+      phase: integrationStatus.phase,
+      configured: integrationStatus.configured,
+      total: integrationStatus.totalIntegrations,
+      readyPercentage: integrationStatus.readyPercentage,
+      placeholdersEnabled:
+        process.env.INTEGRATION_VENDOR_PLACEHOLDERS === 'true',
     },
   };
 
   // Determine overall health
   const serviceStatuses = Object.values(healthData.services);
-  const hasUnhealthyService = serviceStatuses.some((service: any) => 
-    service.status === 'unhealthy'
+  const hasUnhealthyService = serviceStatuses.some(
+    (service: { status?: string }) =>
+      service?.status === 'unhealthy' || service?.status === 'error'
   );
 
   if (hasUnhealthyService) {
@@ -167,15 +215,15 @@ app.get('/metrics', (req, res) => {
     `# HELP pbcex_http_requests_total Total HTTP requests`,
     `# TYPE pbcex_http_requests_total counter`,
     `pbcex_http_requests_total 0`, // Would track actual metrics
-    
+
     `# HELP pbcex_active_users Active users count`,
     `# TYPE pbcex_active_users gauge`,
     `pbcex_active_users 0`, // Would track from auth service
-    
+
     `# HELP pbcex_price_updates_total Total price updates`,
     `# TYPE pbcex_price_updates_total counter`,
     `pbcex_price_updates_total 0`, // Would track from price service
-    
+
     `# HELP pbcex_trades_total Total trades executed`,
     `# TYPE pbcex_trades_total counter`,
     `pbcex_trades_total 0`, // Would track from trading service
@@ -187,16 +235,25 @@ app.get('/metrics', (req, res) => {
 
 // API Documentation
 try {
-  const openApiSpec = YAML.load(path.join(__dirname, 'openapi', 'openapi.yaml'));
-  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec, {
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'PBCEx API Documentation',
-    customfavIcon: '/favicon.ico',
-  }));
+  const openApiSpec = YAML.load(
+    path.join(__dirname, 'openapi', 'openapi.yaml')
+  );
+  app.use(
+    '/api/docs',
+    swaggerUi.serve,
+    swaggerUi.setup(openApiSpec, {
+      customCss: '.swagger-ui .topbar { display: none }',
+      customSiteTitle: 'PBCEx API Documentation',
+      customfavIcon: '/favicon.ico',
+    })
+  );
   logInfo('API documentation available at /api/docs');
 } catch (error) {
   logError('Failed to load OpenAPI specification', error as Error);
 }
+
+// Public endpoints (no auth required)
+app.get('/api/prices', TradeControllerDb.getPrices);
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -210,8 +267,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/redeem', redemptionRoutes);
 app.use('/api/vault', vaultRoutes);
 app.use('/api/support', supportRoutes);
-
-// Analytics & A/B Testing Routes
 app.use('/api/analytics', analyticsRoutes);
 
 // WebSocket endpoint for real-time price updates
@@ -272,7 +327,6 @@ async function initializeServices(): Promise<void> {
     // await BlockchainService.initialize();
 
     logInfo('🎉 All services initialized successfully');
-
   } catch (error) {
     logError('❌ Service initialization failed', error as Error);
     throw error;
@@ -287,7 +341,7 @@ async function shutdownServices(): Promise<void> {
     await PriceFeedService.shutdown();
     // await DatabaseService.shutdown();
     // await RedisService.shutdown();
-    
+
     logInfo('✅ All services shut down gracefully');
   } catch (error) {
     logError('Error during service shutdown', error as Error);
@@ -309,7 +363,7 @@ async function startServer(): Promise<void> {
         pid: process.pid,
         corsOrigins,
       });
-      
+
       // Log integration status
       const integrationStatus = {
         database: !!env.DATABASE_URL,
@@ -322,24 +376,27 @@ async function startServer(): Promise<void> {
         tradingView: !!env.TRADINGVIEW_API_KEY,
         datadog: !!env.DATADOG_API_KEY,
       };
-      
+
       logInfo('📊 Integration Status:', integrationStatus);
-      
-      const configuredCount = Object.values(integrationStatus).filter(Boolean).length;
+
+      const configuredCount =
+        Object.values(integrationStatus).filter(Boolean).length;
       const totalCount = Object.keys(integrationStatus).length;
-      
+
       if (configuredCount < totalCount) {
-        logInfo(`💡 ${totalCount - configuredCount} integrations need configuration for full functionality`);
+        logInfo(
+          `💡 ${totalCount - configuredCount} integrations need configuration for full functionality`
+        );
       }
     });
 
     // Graceful shutdown handling
     const gracefulShutdownHandler = (signal: string) => {
       logInfo(`Received ${signal}. Starting graceful shutdown...`);
-      
+
       server.close(async () => {
         logInfo('HTTP server closed.');
-        
+
         try {
           await shutdownServices();
           process.exit(0);
@@ -351,7 +408,9 @@ async function startServer(): Promise<void> {
 
       // Force close after 15 seconds
       setTimeout(() => {
-        logError('Could not close connections in time, forcefully shutting down');
+        logError(
+          'Could not close connections in time, forcefully shutting down'
+        );
         process.exit(1);
       }, 15000);
     };
@@ -375,7 +434,6 @@ async function startServer(): Promise<void> {
       const address = server.address();
       logInfo('Server is listening', { address });
     });
-
   } catch (error) {
     logError('Failed to start server', error as Error);
     process.exit(1);

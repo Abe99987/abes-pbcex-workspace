@@ -5,7 +5,7 @@ import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
  */
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+  process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4001';
 
 // Create axios instance with default config
 export const apiClient: AxiosInstance = axios.create({
@@ -37,7 +37,7 @@ apiClient.interceptors.response.use(
       // Token expired or invalid
       removeAuthToken();
       if (typeof window !== 'undefined') {
-        window.location.href = '/account/login';
+        window.location.href = '/login';
       }
     }
 
@@ -100,6 +100,13 @@ export const api = {
   wallet: {
     getBalances: () =>
       apiClient.get<ApiResponse<BalancesResponse>>('/api/wallet/balances'),
+    getTransactions: (limit?: number, offset?: number, type?: string) =>
+      apiClient.get<ApiResponse<TransactionHistoryResponse>>(
+        '/api/wallet/transactions',
+        {
+          params: { limit, offset, type },
+        }
+      ),
     transfer: (data: TransferData) =>
       apiClient.post<ApiResponse>('/api/wallet/transfer', data),
     deposit: (data: DepositData) =>
@@ -162,7 +169,9 @@ export interface User {
   role: string;
   kycStatus: string;
   emailVerified: boolean;
+  phoneVerified?: boolean;
   twoFactorEnabled: boolean;
+  phone?: string;
 }
 
 export interface RegisterData {
@@ -192,6 +201,8 @@ export interface ChangePasswordData {
 export interface Balance {
   asset: string;
   amount: string;
+  lockedAmount: string;
+  availableAmount: string;
   usdValue: string;
 }
 
@@ -199,15 +210,18 @@ export interface BalancesResponse {
   funding: {
     id: string;
     type: string;
+    name: string;
     balances: Balance[];
     totalUsdValue: string;
   };
   trading: {
     id: string;
     type: string;
+    name: string;
     balances: Balance[];
     totalUsdValue: string;
   };
+  totalUsdValue: string;
 }
 
 export interface Trade {
@@ -231,6 +245,7 @@ export interface PricesResponse {
   [key: string]: {
     price: string;
     change24h: string;
+    lastUpdated?: string;
   };
 }
 
@@ -239,6 +254,22 @@ export interface TradingPair {
   price: string;
   change24h: string;
   volume24h: string;
+}
+
+export interface TransactionHistoryResponse {
+  transactions: Array<{
+    id: string;
+    type: string;
+    asset: string;
+    amount: string;
+    accountType: string;
+    description: string;
+    reference?: string;
+    createdAt: string;
+  }>;
+  total: number;
+  limit: number;
+  offset: number;
 }
 
 export interface TradeHistoryResponse {
@@ -289,6 +320,14 @@ export interface Order {
   estimatedDelivery: string;
 }
 
+export interface Address {
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
+
 export interface LockQuoteData {
   productId: string;
   quantity: number;
@@ -300,6 +339,47 @@ export interface CheckoutData {
   shippingAddress: Address;
   billingAddress?: Address;
   specialInstructions?: string;
+}
+
+export interface PersonalInfo {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  ssn: string;
+}
+
+export interface DocumentInfo {
+  type: string;
+  url: string;
+}
+
+export interface ConsentInfo {
+  termsAccepted: boolean;
+  privacyAccepted: boolean;
+}
+
+export interface CompanyInfo {
+  name: string;
+  taxId: string;
+  incorporationDate: string;
+  businessType: string;
+}
+
+export interface OwnershipInfo {
+  name: string;
+  percentage: number;
+}
+
+export interface ContactInfo {
+  name: string;
+  role: string;
+  email: string;
+  phone: string;
+}
+
+export interface ShippingProfile {
+  name: string;
+  address: Address;
 }
 
 export interface PersonalKycData {

@@ -12,6 +12,7 @@ import {
   getAuthToken,
   User,
 } from '@/utils/api';
+import { useSupabaseAuth } from '@/src/hooks/useSupabaseAuth';
 import toast from 'react-hot-toast';
 
 /**
@@ -27,6 +28,9 @@ interface AuthContextType {
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   updateUser: (updates: Partial<User>) => void;
+  // Supabase integration status
+  isSupabaseEnabled: boolean;
+  isSupabaseReady: boolean;
 }
 
 interface RegisterData {
@@ -43,6 +47,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Initialize Supabase auth hook
+  const supabaseAuth = useSupabaseAuth();
+
   const isAuthenticated = !!user;
 
   // Initialize auth state on mount
@@ -56,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       try {
         const response = await api.auth.me();
-        if (response.data.code === 'SUCCESS') {
+        if (response.data.code === 'SUCCESS' && response.data.data?.user) {
           setUser(response.data.data.user);
         } else {
           removeAuthToken();
@@ -75,9 +82,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<void> => {
     try {
       setIsLoading(true);
+
+      // Dev shortcut (explicitly gated)
+      if (
+        process.env.NEXT_PUBLIC_ENABLE_DEV_FAKE_LOGIN === 'true' &&
+        email === 'dev@example.com'
+      ) {
+        const devUser = {
+          id: 'dev-user',
+          email: 'dev@example.com',
+          firstName: 'Dev',
+          lastName: 'User',
+          kycStatus: 'APPROVED',
+          emailVerified: true,
+          phoneVerified: true,
+          twoFactorEnabled: false,
+          role: 'USER',
+        };
+        setUser(devUser);
+        toast.success(`Welcome back, Dev User! (Fake login enabled)`);
+        return;
+      }
+
       const response = await api.auth.login({ email, password });
 
-      if (response.data.code === 'SUCCESS') {
+      if (response.data.code === 'SUCCESS' && response.data.data) {
         const { user: userData, accessToken } = response.data.data;
 
         setAuthToken(accessToken);
@@ -106,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       const response = await api.auth.register(data);
 
-      if (response.data.code === 'SUCCESS') {
+      if (response.data.code === 'SUCCESS' && response.data.data) {
         const { user: userData, accessToken } = response.data.data;
 
         setAuthToken(accessToken);
@@ -145,7 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUser = async (): Promise<void> => {
     try {
       const response = await api.auth.me();
-      if (response.data.code === 'SUCCESS') {
+      if (response.data.code === 'SUCCESS' && response.data.data?.user) {
         setUser(response.data.data.user);
       }
     } catch (error) {
@@ -169,6 +198,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     logout,
     refreshUser,
     updateUser,
+    isSupabaseEnabled: supabaseAuth.isSupabaseEnabled,
+    isSupabaseReady: supabaseAuth.isSupabaseReady,
   };
 
   return (
@@ -193,7 +224,7 @@ export function useRequireAuth() {
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       // Redirect to login page
-      window.location.href = '/account/login';
+      window.location.href = '/login';
     }
   }, [isAuthenticated, isLoading]);
 
@@ -208,7 +239,7 @@ export function useRequireAdmin() {
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
-        window.location.href = '/account/login';
+        window.location.href = '/login';
       } else if (!isAdmin) {
         toast.error('Admin access required');
         window.location.href = '/dashboard';
@@ -247,5 +278,9 @@ export function getUserDisplayName(user: User | null): string {
   if (!user) return 'User';
 
   const parts = [user.firstName, user.lastName].filter(Boolean);
-  return parts.length > 0 ? parts.join(' ') : user.email.split('@')[0];
+  if (parts.length > 0) {
+    return parts.join(' ');
+  }
+  const emailName = user.email?.split('@')[0];
+  return emailName || 'User';
 }

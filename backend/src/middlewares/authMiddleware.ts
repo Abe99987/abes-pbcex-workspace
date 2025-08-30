@@ -6,6 +6,7 @@ import { logError, logWarn } from '@/utils/logger';
 
 // Extend Express Request type to include user
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: {
@@ -65,7 +66,24 @@ function verifyToken(token: string): JwtPayload | null {
 /**
  * Authentication middleware - validates JWT token
  */
-export function authenticate(req: Request, res: Response, next: NextFunction): void {
+export function authenticate(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  // DEV_FAKE_LOGIN: Bypass authentication in development mode
+  if (env.NODE_ENV === 'development' && process.env.DEV_FAKE_LOGIN === 'true') {
+    // Use a fake dev user for development
+    req.user = {
+      id: 'dev-user-id', // This should match the seeded user ID
+      email: 'dev@local.test',
+      role: USER_ROLES.USER,
+      kycStatus: 'APPROVED',
+    };
+    next();
+    return;
+  }
+
   const token = extractToken(req.headers.authorization);
 
   if (!token) {
@@ -100,7 +118,11 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
 /**
  * Optional authentication middleware - validates token if present
  */
-export function optionalAuthenticate(req: Request, res: Response, next: NextFunction): void {
+export function optionalAuthenticate(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
   const token = extractToken(req.headers.authorization);
 
   if (token) {
@@ -138,7 +160,9 @@ export function authorize(requiredRole: string | string[]) {
     }
 
     // Check if user role matches required role(s)
-    const requiredRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    const requiredRoles = Array.isArray(requiredRole)
+      ? requiredRole
+      : [requiredRole];
     if (!requiredRoles.includes(req.user.role)) {
       res.status(403).json({
         code: API_CODES.AUTHORIZATION_ERROR,
@@ -235,8 +259,9 @@ export function generateRefreshToken(userId: string): string {
  */
 export function verifyRefreshToken(token: string): { userId: string } | null {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const decoded = jwt.verify(token, env.JWT_SECRET) as any;
-    
+
     if (decoded.type !== 'refresh') {
       logWarn('Invalid refresh token type', { type: decoded.type });
       return null;

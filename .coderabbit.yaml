@@ -1,24 +1,57 @@
 version: 1
+revision: 3
+enabled: true
+public_changes: true
 
 reviews:
   enabled: true
   summary: true
-  explain_changes: true
-  max_comments: 50
-  path_filters:
-    include:
-      - "src/**"
-      - "frontend/**"
-    exclude:
-      - "node_modules/**"
-      - "dist/**"
-      - "build/**"
-      - ".next/**"
-      - "coverage/**"
-      - "backend/**"
-      - "onchain/**"
-      - "scripts/**"
+  suggestions: true
+  test_coverage: true
+  security: true
+  performance: true
+  style: true
+
+path_filters:
+  max_contexts: 50
+  include:
+    - "backend/**"
+    - "frontend/**"
+    - "src/**"
+    - ".github/**"
+    - "scripts/**"
+    - "README.md"
+    - ".eslintrc*"
+    - "tsconfig*.json"
+  exclude:
+    - "**/node_modules/**"
+    - "**/dist/**"
+    - "**/.next/**"
+    - "**/build/**"
+    - "**/.turbo/**"
+    - "**/coverage/**"
+    - "**/public/**"
+    - "**/*.png"
+    - "**/*.jpg"
+    - "**/*.jpeg"
+    - "**/*.gif"
+    - "**/*.ico"
+    - "**/*.svg"
+    - "**/*.css"
+    - "**/*.scss"
+    - "**/*.md"
+    - "**/*.lock"
+    - "**/*.snap"
+    - "**/*.snapshots"
+    - "**/*.spec.ts"
+    - "**/*.test.ts"
+    - "**/*.map"
+    - "**/e2e/**"
+    - "**/__generated__/**"
 
 behavior:
   fail_on_errors: false
-  approve_on_no_issues: true
+  approve_when_consistent: true
+
+ci:
+  enable_status_check: true

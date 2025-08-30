@@ -2,11 +2,15 @@
 
 # App configuration
 NEXT_PUBLIC_APP_NAME=PBCEx
-NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
+NEXT_PUBLIC_API_BASE_URL=http://localhost:4001
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Environment
 NODE_ENV=development
+
+# Supabase (provided)
+NEXT_PUBLIC_SUPABASE_URL=https://arjrtbhuzftydzblttoa.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyanJ0Ymh1emZ0eWR6Ymx0dG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NzIxNDMsImV4cCI6MjA3MjE0ODE0M30.S22Ttb8jgHjxfrhgDZHWEIbt0fpzzomC-r67jqeIRSA
 
 # Feature flags
 NEXT_PUBLIC_ENABLE_2FA=true
