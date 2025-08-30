@@ -4,6 +4,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -46,6 +54,7 @@ const Realize = () => {
   const [realizeModalOpen, setRealizeModalOpen] = useState(false);
   const [buyPhysicalModalOpen, setBuyPhysicalModalOpen] = useState(false);
   const [borrowingModalOpen, setBorrowingModalOpen] = useState(false);
+  const [sendModalOpen, setSendModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const navigate = useNavigate();
 
@@ -285,6 +294,7 @@ const Realize = () => {
                               className='h-10 px-4'
                               onClick={() => {
                                 setSelectedAsset(asset);
+                                setSendModalOpen(true);
                               }}
                             >
                               <Send className='w-4 h-4 mr-2' />
@@ -361,6 +371,22 @@ const Realize = () => {
             onClose={() => setBorrowingModalOpen(false)}
             asset={selectedAsset}
           />
+          <Dialog open={sendModalOpen} onOpenChange={setSendModalOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Send/Receive {selectedAsset?.name}</DialogTitle>
+                <DialogDescription>
+                  This feature is under development. Please use the
+                  corresponding trading page for sending/receiving.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant='outline' onClick={() => setSendModalOpen(false)}>
+                  Close
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </>
       )}
     </div>

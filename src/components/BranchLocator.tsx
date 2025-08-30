@@ -4,20 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, MapPin, Clock, Shield, Building } from "lucide-react";
-
-interface Branch {
-  id: string;
-  name: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-  phone: string;
-  hours: string;
-  vaultSize: string;
-  spread: string;
-  distance: string;
-}
+import { Branch } from "@/types/branch";
 
 interface BranchLocatorProps {
   onSelectBranch: (branch: Branch) => void;

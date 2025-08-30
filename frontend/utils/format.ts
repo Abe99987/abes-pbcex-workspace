@@ -278,8 +278,8 @@ export function isValidEmail(email: string): boolean {
 }
 
 export function isValidPhoneNumber(phone: string): boolean {
-  const phoneRegex = /^\+?[\d\s\-()]{10,}$/;
-  return phoneRegex.test(phone);
+  const digitsOnly = phone.replace(/\D/g, '');
+  return digitsOnly.length >= 10;
 }
 
 // Math utilities for financial calculations
