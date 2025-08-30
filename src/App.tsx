@@ -26,6 +26,8 @@ import GlobalPayments from "./pages/GlobalPayments";
 import MobileApp from "./pages/MobileApp";
 import Contact from "./pages/Contact";
 import ThankYou from "./pages/ThankYou";
+import Shop from "./pages/Shop";
+import CommodityDetail from "./pages/CommodityDetail";
 import HelpCenter from "./pages/support/HelpCenter";
 import Security from "./pages/support/Security";
 import Compliance from "./pages/support/Compliance";
@@ -67,6 +69,8 @@ const App = () => (
           <Route path="/app" element={<MobileApp />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/shop/:symbol" element={<CommodityDetail />} />
           <Route path="/support/help-center" element={<HelpCenter />} />
           <Route path="/support/security" element={<Security />} />
           <Route path="/support/compliance" element={<Compliance />} />

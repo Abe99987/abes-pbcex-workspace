@@ -11,6 +11,7 @@ import OrderHistory from "./OrderHistory";
 import TradingFooter from "./TradingFooter";
 import SettlementDropdown from "./SettlementDropdown";
 import CopperInfoPanel from "./CopperInfoPanel";
+import CommodityInfoPanel from "./CommodityInfoPanel";
 
 const CoinTradingInterface = () => {
   const [selectedPair, setSelectedPair] = useState("GOLD/USD");
@@ -76,7 +77,20 @@ const CoinTradingInterface = () => {
                     {activeTab === "chart" ? (
                       <TradingChart pair={selectedPair} />
                     ) : (
-                      <CopperInfoPanel />
+                      // Check if it's a commodity pair and show appropriate info panel
+                      selectedPair.includes('GOLD') || selectedPair.includes('XAU') ? (
+                        <CommodityInfoPanel symbol="XAU" />
+                      ) : selectedPair.includes('SILVER') || selectedPair.includes('XAG') ? (
+                        <CommodityInfoPanel symbol="XAG" />
+                      ) : selectedPair.includes('PLATINUM') || selectedPair.includes('XPT') ? (
+                        <CommodityInfoPanel symbol="XPT" />
+                      ) : selectedPair.includes('PALLADIUM') || selectedPair.includes('XPD') ? (
+                        <CommodityInfoPanel symbol="XPD" />
+                      ) : selectedPair.includes('COPPER') || selectedPair.includes('XCU') ? (
+                        <CommodityInfoPanel symbol="XCU" />
+                      ) : (
+                        <CopperInfoPanel />
+                      )
                     )}
                   </div>
                 </div>

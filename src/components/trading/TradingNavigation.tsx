@@ -40,7 +40,7 @@ const TradingNavigation = () => {
     {
       label: "Shop",
       icon: Home,
-      items: ["Buy Physical Gold", "Buy Physical Silver", "Buy Physical Platinum", "Buy Physical Palladium", "Buy Physical Copper", "Oil — Coming Soon", "Natural Gas — Coming Soon", "Lithium — Coming Soon"]
+      items: ["Shop All", "Buy Physical Gold", "Buy Physical Silver", "Buy Physical Platinum", "Buy Physical Palladium", "Buy Physical Copper", "Oil — Coming Soon", "Natural Gas — Coming Soon", "Lithium — Coming Soon"]
     },
     {
       label: "Franchise",
