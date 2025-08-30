@@ -100,6 +100,13 @@ export const api = {
   wallet: {
     getBalances: () =>
       apiClient.get<ApiResponse<BalancesResponse>>('/api/wallet/balances'),
+    getTransactions: (limit?: number, offset?: number, type?: string) =>
+      apiClient.get<ApiResponse<TransactionHistoryResponse>>(
+        '/api/wallet/transactions',
+        {
+          params: { limit, offset, type },
+        }
+      ),
     transfer: (data: TransferData) =>
       apiClient.post<ApiResponse>('/api/wallet/transfer', data),
     deposit: (data: DepositData) =>
@@ -192,6 +199,8 @@ export interface ChangePasswordData {
 export interface Balance {
   asset: string;
   amount: string;
+  lockedAmount: string;
+  availableAmount: string;
   usdValue: string;
 }
 
@@ -199,15 +208,18 @@ export interface BalancesResponse {
   funding: {
     id: string;
     type: string;
+    name: string;
     balances: Balance[];
     totalUsdValue: string;
   };
   trading: {
     id: string;
     type: string;
+    name: string;
     balances: Balance[];
     totalUsdValue: string;
   };
+  totalUsdValue: string;
 }
 
 export interface Trade {
@@ -239,6 +251,22 @@ export interface TradingPair {
   price: string;
   change24h: string;
   volume24h: string;
+}
+
+export interface TransactionHistoryResponse {
+  transactions: Array<{
+    id: string;
+    type: string;
+    asset: string;
+    amount: string;
+    accountType: string;
+    description: string;
+    reference?: string;
+    createdAt: string;
+  }>;
+  total: number;
+  limit: number;
+  offset: number;
 }
 
 export interface TradeHistoryResponse {

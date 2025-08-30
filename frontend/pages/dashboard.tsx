@@ -14,15 +14,8 @@ import toast from 'react-hot-toast';
  * Dashboard page showing balances, portfolio value, and market overview
  */
 
-interface Transaction {
-  id: string;
-  type: string;
-  asset: string;
-  amount: string;
-  accountType: string;
-  description: string;
-  createdAt: string;
-}
+import { Transaction } from '../src/types/wallet';
+import { api } from '../utils/api';
 
 export default function Dashboard() {
   const { user, isLoading: authLoading } = useAuth();
@@ -61,24 +54,9 @@ export default function Dashboard() {
 
     const fetchActivity = async () => {
       try {
-        // Use the existing api client method for wallet transactions
-        const apiBaseUrl =
-          process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4001';
-        const response = await fetch(
-          `${apiBaseUrl}/api/wallet/transactions?limit=10`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.code === 'SUCCESS') {
-            setRecentActivity(data.data.transactions || []);
-          }
+        const response = await api.wallet.getTransactions(10);
+        if (response.data.code === 'SUCCESS') {
+          setRecentActivity(response.data.data?.transactions || []);
         }
       } catch (error: unknown) {
         console.error('Activity fetch error:', error);
