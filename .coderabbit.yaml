@@ -5,7 +5,6 @@ reviews:
   summary: true
   explain_changes: true
   max_comments: 100
-  severity_threshold: info
   path_filters:
     include:
       - "src/**"
@@ -17,10 +16,6 @@ reviews:
       - "build/**"
       - ".next/**"
       - "coverage/**"
-
-formatting:
-  max_suggestions: 80
-  label_non_blocking: non-blocking
 
 behavior:
   fail_on_errors: false
