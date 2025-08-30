@@ -4,28 +4,21 @@ reviews:
   enabled: true
   summary: true
   explain_changes: true
-  max_comments: 100
-  # Treat findings as advisory in UI; CI status will be controlled by branch protection.
-  severity_threshold: "info"   # info | minor | major | critical
-
-filters:
-  paths:
+  max_comments: 50
+  path_filters:
     include:
       - "src/**"
-      - "apps/**"
-      - "packages/**"
+      - "frontend/**"
     exclude:
       - "node_modules/**"
       - "dist/**"
       - "build/**"
       - ".next/**"
       - "coverage/**"
-
-formatting:
-  max_suggestions: 80
-  label_non_blocking: "non-blocking"
+      - "backend/**"
+      - "onchain/**"
+      - "scripts/**"
 
 behavior:
-  fail_on_errors: false          # CodeRabbit itself won't fail builds; branch protection decides merge rules.
+  fail_on_errors: false
   approve_on_no_issues: true
-  suggest_fixes: true
