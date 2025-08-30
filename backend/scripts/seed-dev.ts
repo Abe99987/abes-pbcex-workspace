@@ -8,7 +8,7 @@ import {
   USER_ROLES,
   KYC_STATUS,
 } from '@/utils/constants';
-import { logInfo, logSuccess, logError } from '@/utils/logger';
+import { logInfo, logError } from '@/utils/logger';
 import { User } from '@/models/User';
 import { Account } from '@/models/Account';
 import { Balance, BalanceChange } from '@/models/Balance';
@@ -46,7 +46,7 @@ async function seedDevData() {
     // Clear and seed users
     AuthController.clearUsers();
     AuthController.addUser(devUser);
-    logSuccess(`Created dev user: ${devUser.email} (ID: ${devUser.id})`);
+    logInfo(`Created dev user: ${devUser.email} (ID: ${devUser.id})`);
 
     // 2. Create user accounts
     logInfo('Creating user accounts...');
@@ -75,8 +75,8 @@ async function seedDevData() {
 
     AuthController.addUserAccount(devUser.id, fundingAccount);
     AuthController.addUserAccount(devUser.id, tradingAccount);
-    logSuccess(`Created funding account: ${fundingAccount.id}`);
-    logSuccess(`Created trading account: ${tradingAccount.id}`);
+    logInfo(`Created funding account: ${fundingAccount.id}`);
+    logInfo(`Created trading account: ${tradingAccount.id}`);
 
     // 3. Add initial balances
     logInfo('Adding initial balances...');
@@ -109,7 +109,7 @@ async function seedDevData() {
         createdAt: new Date(),
       };
       WalletController.getAllBalances().push(balance);
-      logSuccess(`Added ${amount} ${asset} to funding account`);
+      logInfo(`Added ${amount} ${asset} to funding account`);
     }
 
     // Add trading balances
@@ -124,7 +124,7 @@ async function seedDevData() {
         createdAt: new Date(),
       };
       WalletController.getAllBalances().push(balance);
-      logSuccess(`Added ${amount} ${asset} to trading account`);
+      logInfo(`Added ${amount} ${asset} to trading account`);
     }
 
     // 4. Add sample transactions (balance changes)
@@ -216,7 +216,7 @@ async function seedDevData() {
 
     for (const change of balanceChanges) {
       WalletController.getBalanceChanges().push(change);
-      logSuccess(`Added transaction: ${change.description}`);
+      logInfo(`Added transaction: ${change.description}`);
     }
 
     // 5. Add sample trades
@@ -273,19 +273,19 @@ async function seedDevData() {
 
     for (const trade of sampleTrades) {
       TradeController.getAllTrades().push(trade);
-      logSuccess(`Added trade: ${trade.assetSold} -> ${trade.assetBought}`);
+      logInfo(`Added trade: ${trade.assetSold} -> ${trade.assetBought}`);
     }
 
     // 6. Summary
     console.log('\n📊 Seeding Summary:');
     console.log('===================');
-    logSuccess(`Users: ${AuthController.getAllUsers().length}`);
-    logSuccess(
+    logInfo(`Users: ${AuthController.getAllUsers().length}`);
+    logInfo(
       `Accounts: ${AuthController.getAllUsers().reduce((sum, u) => sum + AuthController.getUserAccounts(u.id).length, 0)}`
     );
-    logSuccess(`Balances: ${WalletController.getAllBalances().length}`);
-    logSuccess(`Transactions: ${WalletController.getBalanceChanges().length}`);
-    logSuccess(`Trades: ${TradeController.getAllTrades().length}`);
+    logInfo(`Balances: ${WalletController.getAllBalances().length}`);
+    logInfo(`Transactions: ${WalletController.getBalanceChanges().length}`);
+    logInfo(`Trades: ${TradeController.getAllTrades().length}`);
 
     // Calculate total portfolio value
     const allBalances = WalletController.getAllBalances();
