@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { toCommodityPath } from '@/lib/routes';
+import { toCommodityPath, toTradingPath } from '@/lib/routes';
 import { track } from '@/lib/analytics';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -145,6 +145,11 @@ const Shop = () => {
     navigate(toCommodityPath(asset.symbol, { action }));
   };
 
+  const handleRowLeftClick = (asset: Asset) => {
+    track('shop_row_open_details', { symbol: asset.symbol, source_page: '/shop' });
+    navigate(toCommodityPath(asset.symbol));
+  };
+
   return (
     <div className='min-h-screen bg-background'>
       <Navigation />
@@ -171,24 +176,33 @@ const Shop = () => {
               <CardContent className='p-6'>
                 <div className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-center'>
                   {/* Asset Info - Left Side */}
-                  <div className='lg:col-span-3 flex items-center space-x-4'>
-                    <Link 
-                      to={toCommodityPath(asset.symbol)} 
-                      className='text-3xl hover:scale-110 transition-transform cursor-pointer'
-                      aria-label={`Open ${asset.name} details (thumbnail)`}
-                      data-testid="row-thumb-link"
-                    >
+                  <Link 
+                    to={toCommodityPath(asset.symbol)}
+                    className='lg:col-span-3 flex items-center space-x-4 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/60 rounded-xl p-2 -m-2'
+                    aria-label={`Open ${asset.name} details`}
+                    data-testid="row-left-link"
+                  >
+                    <div className='text-3xl group-hover:scale-110 transition-transform'>
                       {asset.icon}
-                    </Link>
+                    </div>
                     <div>
-                      <Link 
-                        to={toCommodityPath(asset.symbol)}
-                        className='font-semibold text-foreground text-lg hover:text-primary transition-colors cursor-pointer'
-                        aria-label={`Open ${asset.name} details`}
-                        data-testid="row-title-link"
-                      >
+                      <div className='font-semibold text-foreground text-lg group-hover:text-primary transition-colors'>
                         {asset.name}
-                      </Link>
+                        <Link 
+                          to={toTradingPath(asset.symbol)}
+                          className='ml-2 text-sm font-normal text-muted-foreground hover:text-primary transition-colors z-10 relative'
+                          aria-label={`Open ${asset.name} trading`}
+                          data-testid="row-ticker-link"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            track('shop_row_open_trading', { symbol: asset.symbol, route: toTradingPath(asset.symbol) });
+                            window.location.href = toTradingPath(asset.symbol);
+                          }}
+                        >
+                          ({asset.symbol})
+                        </Link>
+                      </div>
                       <p className='text-sm text-muted-foreground'>
                         {asset.description}
                       </p>
@@ -198,7 +212,7 @@ const Shop = () => {
                         </p>
                       )}
                     </div>
-                  </div>
+                  </Link>
 
                   {/* Price & Change */}
                   <div className='lg:col-span-2 text-center lg:text-left'>
@@ -220,22 +234,17 @@ const Shop = () => {
 
                   {/* Simplified Price Chart */}
                   <div className='lg:col-span-3 flex justify-center'>
-                    <Link 
-                      to={toCommodityPath(asset.symbol)} 
-                      className='w-32 h-16 bg-muted rounded-lg flex items-center justify-center relative overflow-hidden hover:bg-muted/80 transition-colors cursor-pointer'
-                      aria-label={`Open ${asset.name} details (chart)`}
-                      data-testid="row-chart-link"
-                    >
+                    <div className='w-32 h-16 bg-muted rounded-lg flex items-center justify-center relative overflow-hidden pointer-events-none'>
                       <div className='absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent pointer-events-none'></div>
                       <BarChart3 className='w-6 h-6 text-primary z-10 pointer-events-none' />
                       <span className='text-xs text-muted-foreground absolute bottom-1 right-1 pointer-events-none'>
                         1Y
                       </span>
-                    </Link>
+                    </div>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className='lg:col-span-4' data-row-actions>
+                  <div className='lg:col-span-4' data-row-actions onClick={(e) => e.stopPropagation()}>
                     <div className='grid grid-cols-2 lg:grid-cols-5 gap-3'>
                         <TooltipProvider>
                         <Tooltip>
