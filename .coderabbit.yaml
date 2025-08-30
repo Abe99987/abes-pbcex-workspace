@@ -74,11 +74,9 @@ rules:
   - name: TypeScript strictness
     description: Prefer no any/unknown without justification; keep types consistent between API and UI.
     enabled: true
-
   - name: Frontend build sanity
     description: Ensure imports resolve; avoid duplicate exports; confirm pages compile under Next.js with TS.
     enabled: true
-
   - name: Backend safety
     description: DB/Redis code paths must have fallbacks; do not crash when env vars are missing in dev.
     enabled: true
