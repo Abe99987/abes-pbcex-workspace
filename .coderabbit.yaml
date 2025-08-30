@@ -3,7 +3,6 @@ revision: 3
 enabled: true
 public_changes: true
 
-<<<<<<< HEAD
 reviews:
   enabled: true
   summary: true
@@ -12,75 +11,47 @@ reviews:
   security: true
   performance: true
   style: true
-  max_context: 50
-  path_filters:
-    include:
-      - "backend/**"
-      - "frontend/**"
-      - "src/**"
-      - ".github/**"
-      - "scripts/**"
-    exclude:
-      - "**/node_modules/**"
-      - "**/dist/**"
-      - "**/.next/**"
-      - "**/build/**"
-      - "**/*.png"
-      - "**/*.jpg"
-      - "**/*.svg"
-      - "**/*.css"
-      - "**/*.md"
-      - "**/*.lock"
-      - "**/*.snap"
-      - "**/*.snapshots"
-      - "**/*.spec.ts"
-      - "**/*.test.ts"
-      - "**/e2e/**"
-=======
+
 path_filters:
   max_contexts: 50
   include:
-    - 'backend/**'
-    - 'frontend/**'
-    - 'src/**'
-    - '.github/**'
-    - 'scripts/**'
-    - 'package.json'
-    - 'pnpm-lock.yaml'
-    - 'bun.lockb'
-    - 'yarn.lock'
-    - 'README.md'
-    - '.eslintrc*'
-    - 'tsconfig*.json'
->>>>>>> edadfe8 (chore: resolve PR #6 conflicts (.coderabbit.yaml) and restore CodeRabbit config)
+    - "backend/**"
+    - "frontend/**"
+    - "src/**"
+    - ".github/**"
+    - "scripts/**"
+    - "README.md"
+    - ".eslintrc*"
+    - "tsconfig*.json"
+  exclude:
+    - "**/node_modules/**"
+    - "**/dist/**"
+    - "**/.next/**"
+    - "**/build/**"
+    - "**/.turbo/**"
+    - "**/coverage/**"
+    - "**/public/**"
+    - "**/*.png"
+    - "**/*.jpg"
+    - "**/*.jpeg"
+    - "**/*.gif"
+    - "**/*.ico"
+    - "**/*.svg"
+    - "**/*.css"
+    - "**/*.scss"
+    - "**/*.md"
+    - "**/*.lock"
+    - "**/*.snap"
+    - "**/*.snapshots"
+    - "**/*.spec.ts"
+    - "**/*.test.ts"
+    - "**/*.map"
+    - "**/e2e/**"
+    - "**/__generated__/**"
 
 behavior:
   fail_on_errors: false
   approve_when_consistent: true
-<<<<<<< HEAD
-  enable_status_check: true
-=======
-
-review:
-  summary: true
-  suggestions: true
-  test_gaps: true
-  security: true
-  performance: true
-  docs: true
-  style: true
-
-rules:
-  - name: TypeScript strictness
-    description: Prefer no any/unknown without justification; keep types consistent between API and UI.
-    enabled: true
-  - name: Frontend build sanity
-    description: Ensure imports resolve; avoid duplicate exports; confirm pages compile under Next.js with TS.
-    enabled: true
-  - name: Backend safety
-    description: DB/Redis code paths must have fallbacks; do not crash when env vars are missing in dev.
-    enabled: true
 
 ci:
   enable_status_check: true
->>>>>>> edadfe8 (chore: resolve PR #6 conflicts (.coderabbit.yaml) and restore CodeRabbit config)
