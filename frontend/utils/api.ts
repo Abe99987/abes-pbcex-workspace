@@ -37,7 +37,7 @@ apiClient.interceptors.response.use(
       // Token expired or invalid
       removeAuthToken();
       if (typeof window !== 'undefined') {
-        window.location.href = '/account/login';
+        window.location.href = '/login';
       }
     }
 

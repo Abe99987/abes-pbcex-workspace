@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useAuth, useKycStatus, getUserDisplayName } from '@/hooks/useAuth';
 import {
   usePrices,
@@ -57,9 +58,9 @@ export default function Dashboard() {
           <h1 className='text-2xl font-bold text-slate-800 mb-4'>
             Please log in to view your dashboard
           </h1>
-          <a href='/account/login' className='btn-primary'>
-            Log In
-          </a>
+          <Link href='/login?next=/dashboard' className='btn btn-primary'>
+            Log in
+          </Link>
         </div>
       </div>
     );

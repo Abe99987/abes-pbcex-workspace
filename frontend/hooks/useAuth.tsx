@@ -75,6 +75,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<void> => {
     try {
       setIsLoading(true);
+
+      // Dev shortcut (explicitly gated)
+      if (
+        process.env.NEXT_PUBLIC_ENABLE_DEV_FAKE_LOGIN === 'true' &&
+        email === 'dev@example.com'
+      ) {
+        const devUser = {
+          id: 'dev-user',
+          email: 'dev@example.com',
+          firstName: 'Dev',
+          lastName: 'User',
+          kycStatus: 'APPROVED',
+          emailVerified: true,
+          phoneVerified: true,
+          role: 'USER',
+        };
+        setUser(devUser);
+        toast.success(`Welcome back, Dev User! (Fake login enabled)`);
+        return;
+      }
+
       const response = await api.auth.login({ email, password });
 
       if (response.data.code === 'SUCCESS') {
@@ -193,7 +214,7 @@ export function useRequireAuth() {
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       // Redirect to login page
-      window.location.href = '/account/login';
+      window.location.href = '/login';
     }
   }, [isAuthenticated, isLoading]);
 
@@ -208,7 +229,7 @@ export function useRequireAdmin() {
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
-        window.location.href = '/account/login';
+        window.location.href = '/login';
       } else if (!isAdmin) {
         toast.error('Admin access required');
         window.location.href = '/dashboard';

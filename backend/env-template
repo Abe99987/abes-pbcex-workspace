@@ -2,13 +2,19 @@
 # Core Application
 NODE_ENV=development
 PORT=4000
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/pbcex
+# For development, we'll use in-memory storage instead of real databases
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/pbcex_dev
 REDIS_URL=redis://localhost:6379
 
-# Authentication & Security
-JWT_SECRET=replace_me_with_secure_random_string
-SESSION_SECRET=replace_me_with_secure_random_string
-ENCRYPTION_KEY=replace_me_with_32_byte_key
+# Authentication & Security (DEV DEFAULTS - CHANGE IN PRODUCTION)
+JWT_SECRET=dev_jwt_secret_32_characters_minimum_length
+SESSION_SECRET=dev_session_secret_32_characters_minimum
+ENCRYPTION_KEY=dev_encryption_key_32_chars_long
+
+# Development Settings
+DEV_FAKE_LOGIN=true
+PRICE_UPDATE_MS=3000
+LOG_LEVEL=info
 
 # Market Data
 TRADINGVIEW_API_KEY=

@@ -2,7 +2,10 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { createError, asyncHandler } from '@/middlewares/errorMiddleware';
-import { generateToken, generateRefreshToken } from '@/middlewares/authMiddleware';
+import {
+  generateToken,
+  generateRefreshToken,
+} from '@/middlewares/authMiddleware';
 import { logInfo, logWarn, logError } from '@/utils/logger';
 import { User, CreateUserInput, UserUtils } from '@/models/User';
 import { Account } from '@/models/Account';
@@ -30,7 +33,9 @@ export class AuthController {
     logInfo('User registration attempt', { email });
 
     // Check if user already exists
-    const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const existingUser = users.find(
+      u => u.email.toLowerCase() === email.toLowerCase()
+    );
     if (existingUser) {
       throw createError.conflict('User already exists with this email');
     }
@@ -80,7 +85,8 @@ export class AuthController {
       userId,
       type: ACCOUNT_TYPES.TRADING,
       name: 'Trading Account',
-      description: 'Synthetic assets for active trading (XAU-s, XAG-s, XPT-s, XPD-s, XCU-s)',
+      description:
+        'Synthetic assets for active trading (XAU-s, XAG-s, XPT-s, XPD-s, XCU-s)',
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -99,8 +105,8 @@ export class AuthController {
     const refreshToken = generateRefreshToken(user.id);
     refreshTokens.add(refreshToken);
 
-    logInfo('User registered successfully', { 
-      userId: user.id, 
+    logInfo('User registered successfully', {
+      userId: user.id,
       email: user.email,
       fundingAccountId: fundingAccount.id,
       tradingAccountId: tradingAccount.id,
@@ -140,7 +146,10 @@ export class AuthController {
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
-      logWarn('Invalid password attempt', { userId: user.id, email: user.email });
+      logWarn('Invalid password attempt', {
+        userId: user.id,
+        email: user.email,
+      });
       throw createError.authentication('Invalid email or password');
     }
 
@@ -160,7 +169,10 @@ export class AuthController {
     const refreshToken = generateRefreshToken(user.id);
     refreshTokens.add(refreshToken);
 
-    logInfo('User logged in successfully', { userId: user.id, email: user.email });
+    logInfo('User logged in successfully', {
+      userId: user.id,
+      email: user.email,
+    });
 
     res.json({
       code: 'SUCCESS',
@@ -180,7 +192,7 @@ export class AuthController {
   static logout = asyncHandler(async (req: Request, res: Response) => {
     const authHeader = req.headers.authorization;
     const token = authHeader?.split(' ')[1];
-    
+
     if (token) {
       blacklistedTokens.add(token);
       logInfo('Token blacklisted on logout', { userId: req.user?.id });
@@ -232,7 +244,10 @@ export class AuthController {
     }
 
     // Verify current password
-    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    const isCurrentPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.passwordHash
+    );
     if (!isCurrentPasswordValid) {
       throw createError.authentication('Current password is incorrect');
     }
@@ -263,13 +278,16 @@ export class AuthController {
     logInfo('Password reset requested', { email });
 
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
+
     if (user) {
       // Generate reset token (in production, store in Redis with expiration)
       const resetToken = uuidv4();
-      
-      logInfo('Password reset token generated', { userId: user.id, resetToken });
-      
+
+      logInfo('Password reset token generated', {
+        userId: user.id,
+        resetToken,
+      });
+
       // TODO: Send email with reset link
       // await NotificationService.sendEmail({
       //   to: user.email,
@@ -304,11 +322,7 @@ export class AuthController {
       data: {
         secret,
         qrCodeUrl,
-        backupCodes: [
-          '123456-789012',
-          '345678-901234',
-          '567890-123456',
-        ],
+        backupCodes: ['123456-789012', '345678-901234', '567890-123456'],
       },
     });
   });
@@ -387,7 +401,7 @@ export class AuthController {
 
     // TODO: Verify refresh token and get user ID
     // For now, extract from token (in production, use proper JWT verification)
-    
+
     const userId = 'mock-user-id'; // This would come from JWT verification
     const user = users.find(u => u.id === userId);
 
@@ -413,8 +427,26 @@ export class AuthController {
 
   // Utility methods for testing and admin
   static getAllUsers = (): User[] => users;
-  static getUserById = (id: string): User | undefined => users.find(u => u.id === id);
-  static getUserAccounts = (userId: string): Account[] => 
+  static getUserById = (id: string): User | undefined =>
+    users.find(u => u.id === id);
+  static getUserAccounts = (userId: string): Account[] =>
     accounts.filter(a => a.userId === userId);
-  static isTokenBlacklisted = (token: string): boolean => blacklistedTokens.has(token);
+  static isTokenBlacklisted = (token: string): boolean =>
+    blacklistedTokens.has(token);
+
+  // Development seeding methods
+  static clearUsers = (): void => {
+    users.length = 0;
+    accounts.length = 0;
+    refreshTokens.clear();
+    blacklistedTokens.clear();
+  };
+
+  static addUser = (user: User): void => {
+    users.push(user);
+  };
+
+  static addUserAccount = (userId: string, account: Account): void => {
+    accounts.push(account);
+  };
 }
