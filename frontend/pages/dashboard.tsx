@@ -10,6 +10,7 @@ import {
 import { api } from '@/utils/api';
 import type { BalancesResponse, Transaction } from '@/types/wallet';
 import toast from 'react-hot-toast';
+import Navigation from '@/components/Navigation';
 
 /**
  * Dashboard page showing balances, portfolio value, and market overview
@@ -92,10 +93,12 @@ export default function Dashboard() {
 
   return (
     <div className='min-h-screen bg-slate-50'>
-      {/* Header */}
-      <header className='bg-white shadow-sm border-b'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <div className='flex justify-between items-center py-6'>
+      <Navigation />
+      
+      {/* Dashboard Header */}
+      <div className='bg-white shadow-sm border-b'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
+          <div className='flex justify-between items-center'>
             <div>
               <h1 className='text-3xl font-bold text-slate-800'>
                 Welcome back, {getUserDisplayName(user)}
@@ -122,7 +125,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* KYC Alert */}

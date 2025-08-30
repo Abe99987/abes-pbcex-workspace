@@ -25,7 +25,7 @@ import adminRoutes from '@/routes/adminRoutes';
 import redemptionRoutes from '@/routes/redemptionRoutes';
 import vaultRoutes from '@/routes/vaultRoutes';
 import supportRoutes from '@/routes/supportRoutes';
-import { analyticsRoutes } from '@/routes/analyticsRoutes';
+import analyticsRoutes from '@/routes/analyticsRoutes';
 
 /**
  * PBCEx API Server
@@ -210,8 +210,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/redeem', redemptionRoutes);
 app.use('/api/vault', vaultRoutes);
 app.use('/api/support', supportRoutes);
-
-// Analytics & A/B Testing Routes
 app.use('/api/analytics', analyticsRoutes);
 
 // WebSocket endpoint for real-time price updates
