@@ -63,7 +63,7 @@ export default function Dashboard() {
       try {
         // Use the existing api client method for wallet transactions
         const apiBaseUrl =
-          process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+          process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4001';
         const response = await fetch(
           `${apiBaseUrl}/api/wallet/transactions?limit=10`,
           {
