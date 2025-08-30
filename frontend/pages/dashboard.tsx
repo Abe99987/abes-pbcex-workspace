@@ -14,6 +14,16 @@ import toast from 'react-hot-toast';
  * Dashboard page showing balances, portfolio value, and market overview
  */
 
+interface Transaction {
+  id: string;
+  type: string;
+  asset: string;
+  amount: string;
+  accountType: string;
+  description: string;
+  createdAt: string;
+}
+
 export default function Dashboard() {
   const { user, isLoading: authLoading } = useAuth();
   const { kycStatus, canTrade, needsKyc } = useKycStatus();
@@ -21,6 +31,8 @@ export default function Dashboard() {
 
   const [balances, setBalances] = useState<BalancesResponse | null>(null);
   const [balancesLoading, setBalancesLoading] = useState(true);
+  const [recentActivity, setRecentActivity] = useState<Transaction[]>([]);
+  const [activityLoading, setActivityLoading] = useState(true);
 
   // Fetch user balances
   useEffect(() => {
@@ -41,6 +53,42 @@ export default function Dashboard() {
     };
 
     fetchBalances();
+  }, [user]);
+
+  // Fetch recent activity
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchActivity = async () => {
+      try {
+        // Use the existing api client method for wallet transactions
+        const apiBaseUrl =
+          process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+        const response = await fetch(
+          `${apiBaseUrl}/api/wallet/transactions?limit=10`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.code === 'SUCCESS') {
+            setRecentActivity(data.data.transactions || []);
+          }
+        }
+      } catch (error: unknown) {
+        console.error('Activity fetch error:', error);
+        // Don't show error toast for activity - it's not critical
+      } finally {
+        setActivityLoading(false);
+      }
+    };
+
+    fetchActivity();
   }, [user]);
 
   if (authLoading) {
@@ -448,9 +496,64 @@ export default function Dashboard() {
                 <h2 className='card-title'>Recent Activity</h2>
               </div>
               <div className='card-content'>
-                <div className='text-sm text-slate-500 text-center py-8'>
-                  No recent activity
-                </div>
+                {activityLoading ? (
+                  <div className='space-y-3'>
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className='skeleton h-12 w-full'></div>
+                    ))}
+                  </div>
+                ) : recentActivity.length > 0 ? (
+                  <div className='space-y-3'>
+                    {recentActivity.slice(0, 5).map((activity, index) => (
+                      <div
+                        key={activity.id || index}
+                        className='flex items-center justify-between p-3 bg-slate-50 rounded-lg'
+                      >
+                        <div className='flex items-center space-x-3'>
+                          <div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center'>
+                            <span className='text-blue-600 text-sm font-bold'>
+                              {activity.type === 'CREDIT'
+                                ? '+'
+                                : activity.type === 'DEBIT'
+                                  ? '-'
+                                  : activity.type === 'TRADE'
+                                    ? '↔'
+                                    : activity.type === 'MINT'
+                                      ? '⚡'
+                                      : activity.type === 'BURN'
+                                        ? '🔥'
+                                        : '•'}
+                            </span>
+                          </div>
+                          <div>
+                            <div className='text-sm font-medium text-slate-800'>
+                              {activity.description ||
+                                `${activity.type} - ${activity.asset}`}
+                            </div>
+                            <div className='text-xs text-slate-600'>
+                              {new Date(
+                                activity.createdAt
+                              ).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+                        <div className='text-right'>
+                          <div className='text-sm font-medium text-slate-800'>
+                            {activity.type === 'DEBIT' ? '-' : '+'}
+                            {activity.amount} {activity.asset}
+                          </div>
+                          <div className='text-xs text-slate-600'>
+                            {activity.accountType}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className='text-sm text-slate-500 text-center py-8'>
+                    No recent activity
+                  </div>
+                )}
               </div>
             </div>
           </div>
