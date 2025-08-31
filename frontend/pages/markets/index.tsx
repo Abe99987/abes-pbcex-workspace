@@ -11,7 +11,7 @@ import {
 import {
   MARKETS_OVERVIEW_SYMBOLS,
   getSymbolDisplayName,
-} from '@/utils/tradingview';
+} from '@/src/utils/tradingview';
 import {
   TrendingUp,
   Calendar,

@@ -9,34 +9,36 @@ interface CommodityInfoPanelProps {
 }
 
 const CommodityInfoPanel = ({ symbol }: CommodityInfoPanelProps) => {
-  let meta;
-  
-  try {
-    meta = useCommodityMeta(symbol);
-  } catch (error) {
+  const meta = useCommodityMeta(symbol);
+
+  if (!meta) {
     return (
-      <div className="p-4 text-center text-gray-400">
+      <div className='p-4 text-center text-gray-400'>
         <p>Commodity information not available for {symbol}</p>
       </div>
     );
   }
 
   return (
-    <div className="h-full bg-black">
-      <Tabs defaultValue="specs" className="h-full">
-        <TabsList className="grid w-full grid-cols-2 bg-gray-900 border-b border-gray-800">
-          <TabsTrigger value="specs" className="text-xs">Commodity Specs</TabsTrigger>
-          <TabsTrigger value="trade-info" className="text-xs">Trade Info</TabsTrigger>
+    <div className='h-full bg-black'>
+      <Tabs defaultValue='specs' className='h-full'>
+        <TabsList className='grid w-full grid-cols-2 bg-gray-900 border-b border-gray-800'>
+          <TabsTrigger value='specs' className='text-xs'>
+            Commodity Specs
+          </TabsTrigger>
+          <TabsTrigger value='trade-info' className='text-xs'>
+            Trade Info
+          </TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="specs" className="h-full mt-0">
-          <div className="h-full overflow-y-auto">
+
+        <TabsContent value='specs' className='h-full mt-0'>
+          <div className='h-full overflow-y-auto'>
             <CommoditySpecs meta={meta} />
           </div>
         </TabsContent>
-        
-        <TabsContent value="trade-info" className="h-full mt-0">
-          <div className="h-full overflow-y-auto">
+
+        <TabsContent value='trade-info' className='h-full mt-0'>
+          <div className='h-full overflow-y-auto'>
             <CommodityTradeInfo meta={meta} />
           </div>
         </TabsContent>

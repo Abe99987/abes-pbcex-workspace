@@ -1,36 +1,6 @@
-/*
- * BACKEND INTEGRATION REQUIREMENTS:
- * 
- * 1. Real-time Price Feeds:
- *    - Replace mock prices with live data from TradingView/Chainlink
- *    - API: GET /api/prices/realtime for all commodities
- *    - Update frequency: 1-5 seconds for precious metals, 30s for others
- * 
- * 2. User Authentication:
- *    - All actions require valid Supabase auth session
- *    - User balances from: GET /api/wallet/balances/:user_id
- * 
- * 3. Modal Action APIs:
- *    - Buy: POST /api/trades/buy (triggers USDC/bank/card payment flow)
- *    - Sell: POST /api/trades/sell (triggers payout to user wallet)
- *    - Order: POST /api/orders (physical delivery + token burning)
- *    - Deposit: POST /api/wallet/deposit (funding methods integration)
- *    - Send: POST /api/wallet/transfer (peer-to-peer transfers)
- * 
- * 4. Error Handling:
- *    - Show backend error messages in toast notifications
- *    - Retry failed API calls with exponential backoff
- *    - Graceful degradation when price feeds are unavailable
- * 
- * 5. Performance:
- *    - Debounce price calculations by 250ms in modals
- *    - Cache balance checks for 30 seconds
- *    - Show skeleton states while loading
- */
-
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { toCommodityPath, toTradingPath } from '@/lib/routes';
+import { useNavigate } from 'react-router-dom';
+import { toCommodityPath } from '@/lib/routes';
 import { track } from '@/lib/analytics';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -170,89 +140,51 @@ const Shop = () => {
     },
   ];
 
-  // Backend API Integration handlers
-  const handleBuyClick = async (asset: Asset) => {
-    try {
+  const handleActionClick = (asset: Asset, action: string) => {
+    track('shop_action_routed', {
+      symbol: asset.symbol,
+      action,
+      source_page: '/shop',
+    });
+
+    // Open modals for Buy/Sell/Order actions, route for others
+    if (action === 'buy') {
       setSelectedAsset(asset);
       setBuyModalOpen(true);
-      track('shop_action_modal', { symbol: asset.symbol, action: 'buy', source_page: '/shop' });
-      
-      // TODO: API Call - GET /api/prices/:symbol for real-time pricing
-      // TODO: API Call - GET /api/wallet/balances for user wallet balances
-      // TODO: API Call - POST /api/trades/buy (when modal confirms purchase)
-    } catch (error) {
-      console.error('Error opening buy modal:', error);
-    }
-  };
-
-  const handleSellClick = async (asset: Asset) => {
-    try {
+    } else if (action === 'sell') {
       setSelectedAsset(asset);
       setRealizeModalOpen(true);
-      track('shop_action_modal', { symbol: asset.symbol, action: 'sell', source_page: '/shop' });
-      
-      // TODO: API Call - GET /api/wallet/balances/:symbol for available balance
-      // TODO: API Call - POST /api/trades/sell (when modal confirms sale)
-    } catch (error) {
-      console.error('Error opening sell modal:', error);
-    }
-  };
-
-  const handleOrderClick = async (asset: Asset) => {
-    try {
+    } else if (action === 'order') {
       setSelectedAsset(asset);
       setBuyPhysicalModalOpen(true);
-      track('shop_action_modal', { symbol: asset.symbol, action: 'order', source_page: '/shop' });
-      
-      // TODO: API Call - GET /api/wallet/balances for token balances panel
-      // TODO: API Call - POST /api/orders (when modal confirms physical order)
-      // TODO: API Call - POST /api/fulfillment/physical (for shipping logistics)
-    } catch (error) {
-      console.error('Error opening order modal:', error);
-    }
-  };
-
-  const handleDepositClick = async (asset: Asset) => {
-    try {
-      setSelectedAsset(asset);
-      setBorrowingModalOpen(true);
-      track('shop_action_modal', { symbol: asset.symbol, action: 'deposit', source_page: '/shop' });
-      
-      // TODO: API Call - GET /api/wallet/deposit-methods for available methods
-      // TODO: API Call - POST /api/wallet/deposit (when modal confirms deposit)
-    } catch (error) {
-      console.error('Error opening deposit modal:', error);
-    }
-  };
-
-  const handleSendClick = async (asset: Asset) => {
-    try {
+    } else if (action === 'send') {
       setSelectedAsset(asset);
       setSendModalOpen(true);
-      track('shop_action_modal', { symbol: asset.symbol, action: 'send', source_page: '/shop' });
-      
-      // TODO: API Call - GET /api/wallet/balances/:symbol for available balance
-      // TODO: API Call - POST /api/wallet/send (when modal confirms transfer)
-    } catch (error) {
-      console.error('Error opening send modal:', error);
+    } else if (action === 'deposit') {
+      setSelectedAsset(asset);
+      setBorrowingModalOpen(true);
+    } else {
+      // Details and other actions route to commodity pages
+      navigate(toCommodityPath(asset.symbol, { action }));
     }
-  };
-
-  const handleDetailsClick = (asset: Asset) => {
-    track('shop_action_routed', { symbol: asset.symbol, action: 'details', source_page: '/shop' });
-    navigate(toCommodityPath(asset.symbol, { action: 'details' }));
   };
 
   const handleRowCardClick = (asset: Asset) => {
-    track('shop_row_open_details', { symbol: asset.symbol, source_page: '/shop' });
+    track('shop_row_open_details', {
+      symbol: asset.symbol,
+      source_page: '/shop',
+    });
     navigate(toCommodityPath(asset.symbol));
   };
 
   const handleTickerClick = (asset: Asset, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    track('shop_row_open_trading', { symbol: asset.symbol, route: toTradingPath(asset.symbol) });
-    navigate(toTradingPath(asset.symbol));
+    track('shop_row_open_product', {
+      symbol: asset.symbol,
+      route: `/shop/${asset.symbol}`,
+    });
+    navigate(`/shop/${asset.symbol}`);
   };
 
   return (
@@ -279,50 +211,43 @@ const Shop = () => {
               className='group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30'
             >
               <CardContent className='p-6'>
-                <div 
+                <div
                   className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/60 rounded-2xl -m-2 p-2'
-                  role="link"
+                  role='link'
                   tabIndex={0}
                   onClick={() => handleRowCardClick(asset)}
-                  onKeyDown={(e) => {
+                  onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
                       handleRowCardClick(asset);
                     }
                   }}
-                  data-testid="row-card-link"
+                  data-testid='row-card-link'
                   aria-label={`Open ${asset.name} details`}
                 >
                   {/* Asset Info - Left Side */}
-                  <div className='lg:col-span-3 flex items-center space-x-4' data-testid="ticker-click-area">
-                    <div className='text-3xl group-hover:scale-110 transition-transform pointer-events-none'>
+                  <div className='lg:col-span-3 flex items-center space-x-4'>
+                    <div className='text-3xl group-hover:scale-110 transition-transform'>
                       {asset.icon}
                     </div>
                     <div>
                       <div className='font-semibold text-foreground text-lg group-hover:text-primary transition-colors'>
                         {asset.name}
                         <button
-                          className='ml-2 text-sm font-normal text-muted-foreground hover:text-primary transition-colors z-10 relative focus:outline-none focus:ring-2 focus:ring-primary/60 rounded px-1'
+                          className='ml-2 text-sm font-normal text-muted-foreground hover:text-primary transition-colors z-10 relative'
                           aria-label={`Open ${asset.name} trading`}
-                          data-testid="row-ticker-link"
-                          onClick={(e) => handleTickerClick(asset, e)}
-                          onMouseDown={(e) => e.stopPropagation()}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleTickerClick(asset, e as any);
-                            }
-                          }}
+                          data-testid='row-ticker-link'
+                          onClick={e => handleTickerClick(asset, e)}
+                          onMouseDown={e => e.stopPropagation()}
                         >
                           ({asset.symbol})
                         </button>
                       </div>
-                      <p className='text-sm text-muted-foreground pointer-events-none'>
+                      <p className='text-sm text-muted-foreground'>
                         {asset.description}
                       </p>
                       {asset.minimumOrder && (
-                        <p className='text-xs text-muted-foreground mt-1 pointer-events-none'>
+                        <p className='text-xs text-muted-foreground mt-1'>
                           Minimum Order: {asset.minimumOrder}
                         </p>
                       )}
@@ -359,27 +284,31 @@ const Shop = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className='lg:col-span-4' data-row-actions onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
-                    {/* Row 1: Buy, Sell, Order */}
+                  <div
+                    className='lg:col-span-4'
+                    data-row-actions
+                    onClick={e => e.stopPropagation()}
+                    onMouseDown={e => e.stopPropagation()}
+                  >
+                    {/* Row 1: Buy | Sell | Order */}
                     <div className='grid grid-cols-3 gap-3 mb-3'>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-2 md:px-4 min-w-[80px]'
-                              onClick={() => handleBuyClick(asset)}
+                              className='h-10 px-4 min-h-[40px]'
+                              onClick={() => handleActionClick(asset, 'buy')}
                               aria-label={`Buy ${asset.name}`}
-                              data-testid="buy-btn"
                             >
-                              <ShoppingCart className='w-4 h-4 mr-1 md:mr-2' />
-                              <span className='text-xs md:text-sm'>Buy</span>
+                              <ShoppingCart className='w-4 h-4 mr-2' />
+                              Buy
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
-                              Purchase using USDC, PAXG, bank wire, or debit
-                              card
+                              Purchase using USD, USDC, PAXG, bank wire, or
+                              debit card
                             </p>
                           </TooltipContent>
                         </Tooltip>
@@ -390,17 +319,16 @@ const Shop = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-2 md:px-4 min-w-[80px]'
-                              onClick={() => handleSellClick(asset)}
+                              className='h-10 px-4 min-h-[40px]'
+                              onClick={() => handleActionClick(asset, 'sell')}
                               aria-label={`Sell ${asset.name}`}
-                              data-testid="sell-btn"
                             >
-                              <Package className='w-4 h-4 mr-1 md:mr-2' />
-                              <span className='text-xs md:text-sm'>Sell</span>
+                              <CreditCard className='w-4 h-4 mr-2' />
+                              Sell
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Sell {asset.name}</p>
+                            <p>Realize/withdraw {asset.name} holdings</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -410,39 +338,39 @@ const Shop = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='premium'
-                              className='h-10 px-2 md:px-4 min-w-[80px] bg-black text-white hover:bg-black/90'
-                              onClick={() => handleOrderClick(asset)}
+                              className='h-10 px-4 min-h-[40px] bg-black text-white hover:bg-black/90'
+                              onClick={() => handleActionClick(asset, 'order')}
                               aria-label={`Order ${asset.name}`}
-                              data-testid="order-btn"
                             >
-                              <Truck className='w-4 h-4 mr-1 md:mr-2' />
-                              <span className='text-xs md:text-sm'>Order</span>
+                              <Truck className='w-4 h-4 mr-2' />
+                              Order
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
-                              Ship physical asset to your address. Token will be
-                              burned on fulfillment.
+                              Advanced order (bars/coins/Goldbacks) with token
+                              balances
                             </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </div>
 
-                    {/* Row 2: Deposit, Send, Details */}
+                    {/* Row 2: Deposit | Send | Details */}
                     <div className='grid grid-cols-3 gap-3'>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-2 md:px-4 min-w-[80px]'
-                              onClick={() => handleDepositClick(asset)}
+                              className='h-10 px-4 min-h-[40px]'
+                              onClick={() =>
+                                handleActionClick(asset, 'deposit')
+                              }
                               aria-label={`Deposit ${asset.name}`}
-                              data-testid="deposit-btn"
                             >
-                              <Upload className='w-4 h-4 mr-1 md:mr-2' />
-                              <span className='text-xs md:text-sm'>Deposit</span>
+                              <Upload className='w-4 h-4 mr-2' />
+                              Deposit
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -456,13 +384,12 @@ const Shop = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-2 md:px-4 min-w-[80px]'
-                              onClick={() => handleSendClick(asset)}
+                              className='h-10 px-4 min-h-[40px]'
+                              onClick={() => handleActionClick(asset, 'send')}
                               aria-label={`Send ${asset.name}`}
-                              data-testid="send-btn"
                             >
-                              <Send className='w-4 h-4 mr-1 md:mr-2' />
-                              <span className='text-xs md:text-sm'>Send</span>
+                              <Send className='w-4 h-4 mr-2' />
+                              Send
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -476,17 +403,18 @@ const Shop = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-2 md:px-4 min-w-[80px]'
-                              onClick={() => handleDetailsClick(asset)}
+                              className='h-10 px-4 min-h-[40px]'
+                              onClick={() =>
+                                handleActionClick(asset, 'details')
+                              }
                               aria-label={`View ${asset.name} details`}
-                              data-testid="details-btn"
                             >
-                              <Package className='w-4 h-4 mr-1 md:mr-2' />
-                              <span className='text-xs md:text-sm'>Details</span>
+                              <Package className='w-4 h-4 mr-2' />
+                              Details
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>View commodity details and trading options</p>
+                            <p>View commodity details and specs</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -551,7 +479,10 @@ const Shop = () => {
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant='outline' onClick={() => setSendModalOpen(false)}>
+                <Button
+                  variant='outline'
+                  onClick={() => setSendModalOpen(false)}
+                >
                   Close
                 </Button>
               </DialogFooter>

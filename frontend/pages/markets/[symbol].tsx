@@ -11,7 +11,7 @@ import {
   getSymbolDisplayName,
   isValidSymbol,
   SYMBOLS,
-} from '@/utils/tradingview';
+} from '@/src/utils/tradingview';
 import {
   ArrowLeft,
   TrendingUp,

@@ -7,8 +7,11 @@ import {
   formatPriceChange,
   getAssetDisplayName,
 } from '@/hooks/usePrices';
-import { api } from '@/utils/api';
-import type { BalancesResponse, Transaction } from '@/types/wallet';
+import {
+  api,
+  type BalancesResponse,
+  type BackendTransaction,
+} from '@/utils/api';
 import toast from 'react-hot-toast';
 import Navigation from '@/components/Navigation';
 
@@ -23,7 +26,9 @@ export default function Dashboard() {
 
   const [balances, setBalances] = useState<BalancesResponse | null>(null);
   const [balancesLoading, setBalancesLoading] = useState(true);
-  const [recentActivity, setRecentActivity] = useState<Transaction[]>([]);
+  const [recentActivity, setRecentActivity] = useState<BackendTransaction[]>(
+    []
+  );
   const [activityLoading, setActivityLoading] = useState(true);
 
   // Fetch user balances
@@ -94,7 +99,7 @@ export default function Dashboard() {
   return (
     <div className='min-h-screen bg-slate-50'>
       <Navigation />
-      
+
       {/* Dashboard Header */}
       <div className='bg-white shadow-sm border-b'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>

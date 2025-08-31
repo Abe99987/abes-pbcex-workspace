@@ -1,14 +1,19 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { CreditCard, Building2, Wallet, ExternalLink } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { CreditCard, Building2, Wallet, ExternalLink } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface BuyAssetModalProps {
   isOpen: boolean;
@@ -22,9 +27,11 @@ interface BuyAssetModalProps {
 }
 
 const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
-  const [amount, setAmount] = useState("");
-  const [amountType, setAmountType] = useState<"usd" | "grams" | "units">("usd");
-  const [paymentMethod, setPaymentMethod] = useState("wallet");
+  const [amount, setAmount] = useState('');
+  const [amountType, setAmountType] = useState<'usd' | 'grams' | 'units'>(
+    'usd'
+  );
+  const [paymentMethod, setPaymentMethod] = useState('wallet');
   const [isConfirming, setIsConfirming] = useState(false);
   const [showToken, setShowToken] = useState(false);
   const { toast } = useToast();
@@ -32,56 +39,79 @@ const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
   // Token mapping
   const getTokenInfo = () => {
     switch (asset.symbol) {
-      case "AU": return { name: "PAXG", fullName: "Pax Gold", explorer: "https://etherscan.io/token/0x45804880de22913dafe09f4980848ece6ecbaf78" };
-      case "AG": return { name: "PBC-S", fullName: "PBCex Silver Token", explorer: "https://etherscan.io/token/0x..." };
-      case "LYD": return { name: "PBC-L", fullName: "PBCex Libyan Dinar", explorer: "https://etherscan.io/token/0x..." };
-      case "OIL": return { name: "PBC-O", fullName: "PBCex Oil Token", explorer: "https://etherscan.io/token/0x..." };
-      default: return { name: "TOKEN", fullName: "Token", explorer: "#" };
+      case 'AU':
+        return {
+          name: 'PAXG',
+          fullName: 'Pax Gold',
+          explorer:
+            'https://etherscan.io/token/0x45804880de22913dafe09f4980848ece6ecbaf78',
+        };
+      case 'AG':
+        return {
+          name: 'PBC-S',
+          fullName: 'PBCex Silver Token',
+          explorer: 'https://etherscan.io/token/0x...',
+        };
+      case 'LYD':
+        return {
+          name: 'PBC-L',
+          fullName: 'PBCex Libyan Dinar',
+          explorer: 'https://etherscan.io/token/0x...',
+        };
+      case 'OIL':
+        return {
+          name: 'PBC-O',
+          fullName: 'PBCex Oil Token',
+          explorer: 'https://etherscan.io/token/0x...',
+        };
+      default:
+        return { name: 'TOKEN', fullName: 'Token', explorer: '#' };
     }
   };
 
   // Asset-specific pricing and units
   const getAssetConfig = () => {
     switch (asset.symbol) {
-      case "AU": 
-        return { 
-          pricePerUnit: 75.50, 
-          unit: "gram", 
-          unitLabel: "grams",
+      case 'AU':
+        return {
+          pricePerUnit: 75.5,
+          unit: 'gram',
+          unitLabel: 'grams',
           minAmount: 0.001,
-          description: "Pure 24k gold backed by PAXG tokens"
+          description: 'Pure 24k gold backed by PAXG tokens',
         };
-      case "AG": 
-        return { 
-          pricePerUnit: 0.85, 
-          unit: "gram", 
-          unitLabel: "grams",
+      case 'AG':
+        return {
+          pricePerUnit: 0.85,
+          unit: 'gram',
+          unitLabel: 'grams',
           minAmount: 0.1,
-          description: "Pure silver backed by PBC-S tokens"
+          description: 'Pure silver backed by PBC-S tokens',
         };
-      case "LYD": 
-        return { 
-          pricePerUnit: 0.207, 
-          unit: "LYD", 
-          unitLabel: "LYD",
+      case 'LYD':
+        return {
+          pricePerUnit: 0.207,
+          unit: 'LYD',
+          unitLabel: 'LYD',
           minAmount: 1,
-          description: "Tokenized Libyan Dinar for easy cross-border transfers"
+          description: 'Tokenized Libyan Dinar for easy cross-border transfers',
         };
-      case "OIL": 
-        return { 
-          pricePerUnit: 78.20, 
-          unit: "barrel", 
-          unitLabel: "barrels",
+      case 'OIL':
+        return {
+          pricePerUnit: 78.2,
+          unit: 'barrel',
+          unitLabel: 'barrels',
           minAmount: 0.01,
-          description: "Tokenized oil contracts backed by real crude oil futures"
+          description:
+            'Tokenized oil contracts backed by real crude oil futures',
         };
-      default: 
-        return { 
-          pricePerUnit: 1, 
-          unit: "unit", 
-          unitLabel: "units",
+      default:
+        return {
+          pricePerUnit: 1,
+          unit: 'unit',
+          unitLabel: 'units',
           minAmount: 1,
-          description: "Digital asset token"
+          description: 'Digital asset token',
         };
     }
   };
@@ -91,8 +121,8 @@ const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
 
   const calculateConversion = () => {
     if (!amount) return { units: 0, usd: 0 };
-    
-    if (amountType === "usd") {
+
+    if (amountType === 'usd') {
       const usdAmount = parseFloat(amount);
       const units = usdAmount / assetConfig.pricePerUnit;
       return { units: units, usd: usdAmount };
@@ -107,9 +137,9 @@ const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
 
   const handleConfirm = async () => {
     if (!amount || conversion.usd === 0) return;
-    
+
     setIsConfirming(true);
-    
+
     try {
       // Backend API Integration
       // TODO: Replace with actual Supabase client calls
@@ -124,7 +154,7 @@ const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
       //     payment_method: paymentMethod,
       //     status: 'pending'
       //   });
-      
+
       // TODO: Update user wallet balances
       // const { data: walletUpdate } = await supabase
       //   .from('wallet_balances')
@@ -133,22 +163,23 @@ const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
       //     asset_symbol: asset.symbol,
       //     balance: currentBalance + conversion.units
       //   });
-      
+
       // Simulate API call with debounced pricing
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       setShowToken(true);
-      
+
       toast({
-        title: "Purchase Successful!",
-        description: `${conversion.units.toFixed(assetConfig.unit === "barrel" ? 3 : 3)} ${assetConfig.unit}${conversion.units !== 1 ? 's' : ''} of ${asset.name} added to your wallet`,
+        title: 'Purchase Successful!',
+        description: `${conversion.units.toFixed(assetConfig.unit === 'barrel' ? 3 : 3)} ${assetConfig.unit}${conversion.units !== 1 ? 's' : ''} of ${asset.name} added to your wallet`,
       });
     } catch (error) {
       console.error('Purchase failed:', error);
       toast({
-        title: "Purchase Failed",
-        description: "There was an error processing your purchase. Please try again.",
-        variant: "destructive"
+        title: 'Purchase Failed',
+        description:
+          'There was an error processing your purchase. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsConfirming(false);
@@ -156,53 +187,68 @@ const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
   };
 
   const paymentMethods = [
-    { id: "wallet", label: "USD Wallet", icon: Wallet, description: "Instant transfer" },
-    { id: "bank", label: "Bank Transfer", icon: Building2, description: "1-2 business days" },
-    { id: "card", label: "Debit/Credit Card", icon: CreditCard, description: "Instant (2.9% fee)" },
+    {
+      id: 'wallet',
+      label: 'USD Wallet',
+      icon: Wallet,
+      description: 'Instant transfer',
+    },
+    {
+      id: 'bank',
+      label: 'Bank Transfer',
+      icon: Building2,
+      description: '1-2 business days',
+    },
+    {
+      id: 'card',
+      label: 'Debit/Credit Card',
+      icon: CreditCard,
+      description: 'Instant (2.9% fee)',
+    },
   ];
 
   if (showToken) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className='sm:max-w-md'>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <span className="text-2xl">✅</span>
+            <DialogTitle className='flex items-center gap-2'>
+              <span className='text-2xl'>✅</span>
               Purchase Complete
             </DialogTitle>
           </DialogHeader>
-          
-          <div className="space-y-4">
-            <Card className="bg-green-50 border-green-200">
-              <CardContent className="p-4 text-center">
-                <div className="text-lg font-bold text-green-800 mb-2">
+
+          <div className='space-y-4'>
+            <Card className='bg-green-50 border-green-200'>
+              <CardContent className='p-4 text-center'>
+                <div className='text-lg font-bold text-green-800 mb-2'>
                   You now hold {conversion.units.toFixed(3)} {tokenInfo.name}
                 </div>
-                <div className="text-sm text-green-600 mb-3">
+                <div className='text-sm text-green-600 mb-3'>
                   {tokenInfo.fullName}
                 </div>
-                <div className="text-xs text-muted-foreground">
+                <div className='text-xs text-muted-foreground'>
                   Token minted on Ethereum blockchain
                 </div>
               </CardContent>
             </Card>
-            
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                className="flex-1"
+
+            <div className='flex gap-2'>
+              <Button
+                variant='outline'
+                className='flex-1'
                 onClick={() => window.open(tokenInfo.explorer, '_blank')}
               >
-                <ExternalLink className="w-4 h-4 mr-2" />
+                <ExternalLink className='w-4 h-4 mr-2' />
                 View on Blockchain
               </Button>
-              <Button 
+              <Button
                 onClick={() => {
                   onClose();
                   setShowToken(false);
-                  setAmount("");
+                  setAmount('');
                 }}
-                className="flex-1"
+                className='flex-1'
               >
                 Done
               </Button>
@@ -215,70 +261,83 @@ const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className='sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <span className="text-2xl">{asset.icon}</span>
+          <DialogTitle className='flex items-center gap-2'>
+            <span className='text-2xl'>{asset.icon}</span>
             Buy {asset.name}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className='space-y-6'>
           {/* Real-time Price Display */}
           <Card>
-            <CardContent className="p-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Current Price</span>
-                <div className="text-right">
-                  <div className="font-bold text-lg">{asset.price}</div>
-                  <div className="text-sm text-muted-foreground">
-                    ${assetConfig.pricePerUnit.toFixed(asset.symbol === "LYD" ? 3 : 2)}/{assetConfig.unit}
+            <CardContent className='p-4'>
+              <div className='flex justify-between items-center'>
+                <span className='text-sm text-muted-foreground'>
+                  Current Price
+                </span>
+                <div className='text-right'>
+                  <div className='font-bold text-lg'>{asset.price}</div>
+                  <div className='text-sm text-muted-foreground'>
+                    $
+                    {assetConfig.pricePerUnit.toFixed(
+                      asset.symbol === 'LYD' ? 3 : 2
+                    )}
+                    /{assetConfig.unit}
                   </div>
                 </div>
               </div>
-              <div className="text-xs text-muted-foreground mt-2">
+              <div className='text-xs text-muted-foreground mt-2'>
                 {assetConfig.description}
               </div>
             </CardContent>
           </Card>
 
           {/* Amount Input */}
-          <div className="space-y-3">
+          <div className='space-y-3'>
             <Label>Amount</Label>
-            <div className="flex gap-2">
-              <div className="flex-1">
+            <div className='flex gap-2'>
+              <div className='flex-1'>
                 <Input
-                  type="number"
-                  placeholder={amountType === "usd" ? "0.00" : `0.${"0".repeat(asset.symbol === "OIL" ? 3 : 3)}`}
+                  type='number'
+                  placeholder={
+                    amountType === 'usd'
+                      ? '0.00'
+                      : `0.${'0'.repeat(asset.symbol === 'OIL' ? 3 : 3)}`
+                  }
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={e => setAmount(e.target.value)}
                   min={assetConfig.minAmount}
-                  step={asset.symbol === "OIL" ? "0.001" : "0.01"}
-                  className="text-lg"
+                  step={asset.symbol === 'OIL' ? '0.001' : '0.01'}
+                  className='text-lg'
                 />
               </div>
               <RadioGroup
                 value={amountType}
-                onValueChange={(value) => setAmountType(value as "usd" | "units")}
-                className="flex"
+                onValueChange={value => setAmountType(value as 'usd' | 'units')}
+                className='flex'
               >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="usd" id="usd" />
-                  <Label htmlFor="usd" className="text-sm">USD</Label>
+                <div className='flex items-center space-x-2'>
+                  <RadioGroupItem value='usd' id='usd' />
+                  <Label htmlFor='usd' className='text-sm'>
+                    USD
+                  </Label>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="units" id="units" />
-                  <Label htmlFor="units" className="text-sm">{assetConfig.unitLabel}</Label>
+                <div className='flex items-center space-x-2'>
+                  <RadioGroupItem value='units' id='units' />
+                  <Label htmlFor='units' className='text-sm'>
+                    {assetConfig.unitLabel}
+                  </Label>
                 </div>
               </RadioGroup>
             </div>
-            
+
             {amount && (
-              <div className="text-sm text-muted-foreground">
-                {amountType === "usd" 
+              <div className='text-sm text-muted-foreground'>
+                {amountType === 'usd'
                   ? `≈ ${conversion.units.toFixed(3)} ${assetConfig.unitLabel}`
-                  : `≈ $${conversion.usd.toFixed(2)} USD`
-                }
+                  : `≈ $${conversion.usd.toFixed(2)} USD`}
               </div>
             )}
           </div>
@@ -286,19 +345,26 @@ const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
           <Separator />
 
           {/* Payment Method */}
-          <div className="space-y-3">
+          <div className='space-y-3'>
             <Label>Payment Method</Label>
             <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-              {paymentMethods.map((method) => (
-                <div key={method.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+              {paymentMethods.map(method => (
+                <div
+                  key={method.id}
+                  className='flex items-center space-x-3 p-3 border rounded-lg'
+                >
                   <RadioGroupItem value={method.id} id={method.id} />
-                  <method.icon className="w-5 h-5 text-muted-foreground" />
-                  <div className="flex-1">
-                    <Label htmlFor={method.id} className="font-medium">{method.label}</Label>
-                    <div className="text-sm text-muted-foreground">{method.description}</div>
+                  <method.icon className='w-5 h-5 text-muted-foreground' />
+                  <div className='flex-1'>
+                    <Label htmlFor={method.id} className='font-medium'>
+                      {method.label}
+                    </Label>
+                    <div className='text-sm text-muted-foreground'>
+                      {method.description}
+                    </div>
                   </div>
-                  {method.id === "card" && (
-                    <Badge variant="outline">+2.9%</Badge>
+                  {method.id === 'card' && (
+                    <Badge variant='outline'>+2.9%</Badge>
                   )}
                 </div>
               ))}
@@ -307,29 +373,31 @@ const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
 
           {/* Summary */}
           {amount && (
-            <Card className="bg-muted/30">
-              <CardContent className="p-4">
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
+            <Card className='bg-muted/30'>
+              <CardContent className='p-4'>
+                <div className='space-y-2 text-sm'>
+                  <div className='flex justify-between'>
                     <span>You will receive:</span>
-                    <span className="font-medium">
-                      {conversion.units.toFixed(3)} {tokenInfo.name} 
-                      <span className="text-muted-foreground ml-1">
+                    <span className='font-medium'>
+                      {conversion.units.toFixed(3)} {tokenInfo.name}
+                      <span className='text-muted-foreground ml-1'>
                         ({conversion.units.toFixed(3)} {assetConfig.unitLabel})
                       </span>
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className='flex justify-between'>
                     <span>Total cost:</span>
-                    <span className="font-medium">${conversion.usd.toFixed(2)}</span>
+                    <span className='font-medium'>
+                      ${conversion.usd.toFixed(2)}
+                    </span>
                   </div>
-                  {paymentMethod === "card" && (
-                    <div className="flex justify-between text-muted-foreground">
+                  {paymentMethod === 'card' && (
+                    <div className='flex justify-between text-muted-foreground'>
                       <span>Processing fee:</span>
                       <span>${(conversion.usd * 0.029).toFixed(2)}</span>
                     </div>
                   )}
-                  <div className="text-xs text-muted-foreground mt-2 pt-2 border-t">
+                  <div className='text-xs text-muted-foreground mt-2 pt-2 border-t'>
                     Backed by {tokenInfo.fullName} tokens on Ethereum
                   </div>
                 </div>
@@ -338,13 +406,18 @@ const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
           )}
 
           {/* Confirm Button */}
-          <Button 
+          <Button
             onClick={handleConfirm}
-            disabled={!amount || conversion.usd === 0 || isConfirming || parseFloat(amount) < assetConfig.minAmount}
-            className="w-full"
-            size="lg"
+            disabled={
+              !amount ||
+              conversion.usd === 0 ||
+              isConfirming ||
+              parseFloat(amount) < assetConfig.minAmount
+            }
+            className='w-full'
+            size='lg'
           >
-            {isConfirming ? "Processing..." : "Confirm Purchase"}
+            {isConfirming ? 'Processing...' : 'Confirm Purchase'}
           </Button>
         </div>
       </DialogContent>

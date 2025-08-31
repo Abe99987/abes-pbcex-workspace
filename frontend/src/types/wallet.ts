@@ -100,24 +100,7 @@ export interface TradeKPIs {
   totalFees: string;
 }
 
-export interface BalancesResponse {
-  funding: {
-    totalValue: string;
-    balances: Array<{
-      asset: string;
-      available: string;
-      totalValue: string;
-    }>;
-  };
-  trading: {
-    totalValue: string;
-    balances: Array<{
-      asset: string;
-      available: string;
-      totalValue: string;
-    }>;
-  };
-}
+// BalancesResponse removed - use the one from @/utils/api instead to match backend
 
 export interface TradeHistoryResponse {
   kpis: TradeKPIs;

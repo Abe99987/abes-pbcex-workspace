@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePrices, formatPrice } from '@/hooks/usePrices';
-import { api } from '@/utils/api';
-import type { BalancesResponse } from '@/types/wallet';
+import { api, type BalancesResponse } from '@/utils/api';
 import Navigation from '@/components/Navigation';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import toast from 'react-hot-toast';
@@ -19,7 +18,10 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { SymbolOverview, MiniChart } from '@/components/tradingview';
-import { MY_ASSETS_SYMBOLS, getSymbolDisplayName } from '@/utils/tradingview';
+import {
+  MY_ASSETS_SYMBOLS,
+  getSymbolDisplayName,
+} from '@/src/utils/tradingview';
 
 interface AssetPortfolioData {
   name: string;
@@ -300,25 +302,25 @@ export default function MyAssets() {
                   icon={ArrowDownCircle}
                   label='Deposit'
                   variant='success'
-                  onClick={() => toast.info('Deposit feature coming soon')}
+                  onClick={() => toast('Deposit feature coming soon')}
                 />
                 <ActionButton
                   icon={ArrowUpCircle}
                   label='Withdraw'
                   variant='danger'
-                  onClick={() => toast.info('Withdraw feature coming soon')}
+                  onClick={() => toast('Withdraw feature coming soon')}
                 />
                 <ActionButton
                   icon={Send}
                   label='Send'
                   variant='primary'
-                  onClick={() => toast.info('Send feature coming soon')}
+                  onClick={() => toast('Send feature coming soon')}
                 />
                 <ActionButton
                   icon={ShoppingCart}
                   label='Buy'
                   variant='default'
-                  onClick={() => toast.info('Buy feature coming soon')}
+                  onClick={() => toast('Buy feature coming soon')}
                 />
               </div>
             </div>
@@ -453,16 +455,14 @@ export default function MyAssets() {
                             icon={ArrowDownCircle}
                             label='Deposit'
                             variant='success'
-                            onClick={() =>
-                              toast.info('Deposit feature coming soon')
-                            }
+                            onClick={() => toast('Deposit feature coming soon')}
                           />
                           <ActionButton
                             icon={ArrowUpCircle}
                             label='Withdraw'
                             variant='danger'
                             onClick={() =>
-                              toast.info('Withdraw feature coming soon')
+                              toast('Withdraw feature coming soon')
                             }
                           />
                         </div>
@@ -531,17 +531,13 @@ export default function MyAssets() {
                             icon={ShoppingCart}
                             label='Buy'
                             variant='success'
-                            onClick={() =>
-                              toast.info('Buy feature coming soon')
-                            }
+                            onClick={() => toast('Buy feature coming soon')}
                           />
                           <ActionButton
                             icon={RefreshCw}
                             label='Sell'
                             variant='danger'
-                            onClick={() =>
-                              toast.info('Sell feature coming soon')
-                            }
+                            onClick={() => toast('Sell feature coming soon')}
                           />
                         </div>
                       </div>

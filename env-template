@@ -1,16 +1,47 @@
+# PBCEx Environment Configuration
 # Copy this file to .env and fill in the actual values
+
+# =======================
 # Core Application
+# =======================
 NODE_ENV=development
-PORT=4000
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/pbcex
-REDIS_URL=redis://localhost:6379
+PORT=4001
 
-# Authentication & Security
-JWT_SECRET=replace_me_with_secure_random_string
-SESSION_SECRET=replace_me_with_secure_random_string
-ENCRYPTION_KEY=replace_me_with_32_byte_key
+# =======================
+# Frontend Configuration (Vite)
+# =======================
+VITE_API_BASE_URL=http://localhost:3000/api
 
-# Market Data
+# =======================
+# Database & Storage
+# =======================
+# PostgreSQL (Supabase) - Replace [YOUR-PASSWORD] with actual password from Supabase dashboard
+DATABASE_URL="postgresql://postgres.arjrtbhuzftydzblttoa:[YOUR-PASSWORD]@aws-1-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.arjrtbhuzftydzblttoa:[YOUR-PASSWORD]@aws-1-us-east-1.pooler.supabase.com:5432/postgres"
+
+# Redis (Upstash) - Get from Upstash dashboard  
+REDIS_URL="rediss://:[YOUR_UPSTASH_TOKEN]@[YOUR_UPSTASH_HOST]:443"
+UPSTASH_REST_URL="https://[YOUR_UPSTASH_REST_HOST]"
+UPSTASH_REST_TOKEN="[YOUR_UPSTASH_REST_TOKEN]"
+
+# =======================
+# Authentication & Security  
+# =======================
+# DEV DEFAULTS - CHANGE IN PRODUCTION
+JWT_SECRET=dev_jwt_secret_32_characters_minimum_length
+SESSION_SECRET=dev_session_secret_32_characters_minimum
+ENCRYPTION_KEY=dev_encryption_key_32_chars_long
+
+# =======================
+# Development Settings
+# =======================
+DEV_FAKE_LOGIN=true
+PRICE_UPDATE_MS=3000
+LOG_LEVEL=info
+
+# =======================
+# Market Data & Pricing
+# =======================
 TRADINGVIEW_API_KEY=
 
 # Chainlink Oracle Configuration
@@ -57,9 +88,30 @@ INTERCOM_ACCESS_TOKEN=
 DATADOG_API_KEY=
 VANTA_API_KEY=
 
-# Frontend Environment
+# =======================
+# Supabase Configuration (provided for development)
+# =======================
+NEXT_PUBLIC_SUPABASE_URL=https://arjrtbhuzftydzblttoa.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyanJ0Ymh1emZ0eWR6Ymx0dG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NzIxNDMsImV4cCI6MjA3MjE0ODE0M30.S22Ttb8jgHjxfrhgDZHWEIbt0fpzzomC-r67jqeIRSA
+
+# =======================
+# Frontend Environment & Feature Flags
+# =======================
 NEXT_PUBLIC_APP_NAME=PBCEx
-NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
+NEXT_PUBLIC_API_BASE_URL=http://localhost:4001
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+NEXT_PUBLIC_ENABLE_2FA=true
+NEXT_PUBLIC_ENABLE_PHYSICAL_TRADING=true
+NEXT_PUBLIC_ENABLE_SYNTHETIC_TRADING=true
+NEXT_PUBLIC_ENABLE_SHOP=true
+
+# Third-party integrations (public keys only)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
+NEXT_PUBLIC_GOOGLE_ANALYTICS_ID=
+NEXT_PUBLIC_MIXPANEL_TOKEN=
+NEXT_PUBLIC_INTERCOM_APP_ID=
 
 # API Configuration
 API_BASE_URL=http://localhost:3000
