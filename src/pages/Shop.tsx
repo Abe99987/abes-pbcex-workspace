@@ -23,19 +23,18 @@ import {
   TrendingUp,
   TrendingDown,
   ShoppingCart,
-  Package,
-  Send,
   CreditCard,
-  ArrowUpDown,
-  Download,
+  Send,
   Upload,
   BarChart3,
   Truck,
+  Home,
 } from 'lucide-react';
 import BuyAssetModal from '@/components/BuyAssetModal';
 import RealizeAssetModal from '@/components/RealizeAssetModal';
 import BuyPhysicalModal from '@/components/BuyPhysicalModal';
 import BorrowingModal from '@/components/BorrowingModal';
+import CryptoDepositModal from '@/components/modals/CryptoDepositModal';
 import Navigation from '@/components/Navigation';
 
 interface Asset {
@@ -54,8 +53,9 @@ interface Asset {
 const Shop = () => {
   const [buyModalOpen, setBuyModalOpen] = useState(false);
   const [realizeModalOpen, setRealizeModalOpen] = useState(false);
-  const [buyPhysicalModalOpen, setBuyPhysicalModalOpen] = useState(false);
-  const [borrowingModalOpen, setBorrowingModalOpen] = useState(false);
+  const [orderModalOpen, setOrderModalOpen] = useState(false);
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
+  const [mortgageModalOpen, setMortgageModalOpen] = useState(false);
   const [sendModalOpen, setSendModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const navigate = useNavigate();
@@ -140,33 +140,41 @@ const Shop = () => {
     },
   ];
 
-  const handleActionClick = (asset: Asset, action: string) => {
-    track('shop_action_routed', {
-      symbol: asset.symbol,
-      action,
-      source_page: '/shop',
-    });
+  // Specific handlers for each action
+  const handleBuyClick = (asset: Asset) => {
+    track('shop_action_buy', { symbol: asset.symbol, source_page: '/shop' });
+    setSelectedAsset(asset);
+    setBuyModalOpen(true);
+  };
 
-    // Open modals for Buy/Sell/Order actions, route for others
-    if (action === 'buy') {
-      setSelectedAsset(asset);
-      setBuyModalOpen(true);
-    } else if (action === 'sell') {
-      setSelectedAsset(asset);
-      setRealizeModalOpen(true);
-    } else if (action === 'order') {
-      setSelectedAsset(asset);
-      setBuyPhysicalModalOpen(true);
-    } else if (action === 'send') {
-      setSelectedAsset(asset);
-      setSendModalOpen(true);
-    } else if (action === 'deposit') {
-      setSelectedAsset(asset);
-      setBorrowingModalOpen(true);
-    } else {
-      // Details and other actions route to commodity pages
-      navigate(toCommodityPath(asset.symbol, { action }));
-    }
+  const handleSellClick = (asset: Asset) => {
+    track('shop_action_sell', { symbol: asset.symbol, source_page: '/shop' });
+    setSelectedAsset(asset);
+    setRealizeModalOpen(true);
+  };
+
+  const handleOrderClick = (asset: Asset) => {
+    track('shop_action_order', { symbol: asset.symbol, source_page: '/shop' });
+    setSelectedAsset(asset);
+    setOrderModalOpen(true);
+  };
+
+  const handleDepositClick = (asset: Asset) => {
+    track('shop_action_deposit', { symbol: asset.symbol, source_page: '/shop' });
+    setSelectedAsset(asset);
+    setDepositModalOpen(true);
+  };
+
+  const handleSendClick = (asset: Asset) => {
+    track('shop_action_send', { symbol: asset.symbol, source_page: '/shop' });
+    setSelectedAsset(asset);
+    setSendModalOpen(true);
+  };
+
+  const handleMortgageClick = (asset: Asset) => {
+    track('shop_action_mortgage', { symbol: asset.symbol, source_page: '/shop' });
+    setSelectedAsset(asset);
+    setMortgageModalOpen(true);
   };
 
   const handleRowCardClick = (asset: Asset) => {
@@ -222,11 +230,14 @@ const Shop = () => {
                       handleRowCardClick(asset);
                     }
                   }}
-                  data-testid='row-card-link'
-                  aria-label={`Open ${asset.name} details`}
-                >
-                  {/* Asset Info - Left Side */}
-                  <div className='lg:col-span-3 flex items-center space-x-4'>
+                   data-testid='row-card-link'
+                   aria-label={`Open ${asset.name} details`}
+                 >
+                   {/* Asset Info - Left Side (Ticker Click Area) */}
+                   <div 
+                     className='lg:col-span-3 flex items-center space-x-4'
+                     data-testid="ticker-click-area"
+                   >
                     <div className='text-3xl group-hover:scale-110 transition-transform'>
                       {asset.icon}
                     </div>
@@ -298,18 +309,16 @@ const Shop = () => {
                             <Button
                               variant='outline'
                               className='h-10 px-4 min-h-[40px]'
-                              onClick={() => handleActionClick(asset, 'buy')}
+                              onClick={() => handleBuyClick(asset)}
                               aria-label={`Buy ${asset.name}`}
+                              data-testid="buy-btn"
                             >
                               <ShoppingCart className='w-4 h-4 mr-2' />
                               Buy
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>
-                              Purchase using USD, USDC, PAXG, bank wire, or
-                              debit card
-                            </p>
+                            <p>Purchase tokens using USD, USDC, PAXG, bank wire, or debit card</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -320,8 +329,9 @@ const Shop = () => {
                             <Button
                               variant='outline'
                               className='h-10 px-4 min-h-[40px]'
-                              onClick={() => handleActionClick(asset, 'sell')}
+                              onClick={() => handleSellClick(asset)}
                               aria-label={`Sell ${asset.name}`}
+                              data-testid="sell-btn"
                             >
                               <CreditCard className='w-4 h-4 mr-2' />
                               Sell
@@ -339,24 +349,22 @@ const Shop = () => {
                             <Button
                               variant='premium'
                               className='h-10 px-4 min-h-[40px] bg-black text-white hover:bg-black/90'
-                              onClick={() => handleActionClick(asset, 'order')}
+                              onClick={() => handleOrderClick(asset)}
                               aria-label={`Order ${asset.name}`}
+                              data-testid="order-btn"
                             >
                               <Truck className='w-4 h-4 mr-2' />
                               Order
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>
-                              Advanced order (bars/coins/Goldbacks) with token
-                              balances
-                            </p>
+                            <p>Physical delivery (bars/coins/Goldbacks) with format selection</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </div>
 
-                    {/* Row 2: Deposit | Send | Details */}
+                    {/* Row 2: Send | Deposit | Mortgage */}
                     <div className='grid grid-cols-3 gap-3'>
                       <TooltipProvider>
                         <Tooltip>
@@ -364,29 +372,9 @@ const Shop = () => {
                             <Button
                               variant='outline'
                               className='h-10 px-4 min-h-[40px]'
-                              onClick={() =>
-                                handleActionClick(asset, 'deposit')
-                              }
-                              aria-label={`Deposit ${asset.name}`}
-                            >
-                              <Upload className='w-4 h-4 mr-2' />
-                              Deposit
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Deposit {asset.name}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant='outline'
-                              className='h-10 px-4 min-h-[40px]'
-                              onClick={() => handleActionClick(asset, 'send')}
+                              onClick={() => handleSendClick(asset)}
                               aria-label={`Send ${asset.name}`}
+                              data-testid="send-btn"
                             >
                               <Send className='w-4 h-4 mr-2' />
                               Send
@@ -404,17 +392,36 @@ const Shop = () => {
                             <Button
                               variant='outline'
                               className='h-10 px-4 min-h-[40px]'
-                              onClick={() =>
-                                handleActionClick(asset, 'details')
-                              }
-                              aria-label={`View ${asset.name} details`}
+                              onClick={() => handleDepositClick(asset)}
+                              aria-label={`Deposit ${asset.name}`}
+                              data-testid="deposit-btn"
                             >
-                              <Package className='w-4 h-4 mr-2' />
-                              Details
+                              <Upload className='w-4 h-4 mr-2' />
+                              Deposit
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>View commodity details and specs</p>
+                            <p>Crypto deposit: PAXG, USDC, or related tokens</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant='outline'
+                              className='h-10 px-4 min-h-[40px]'
+                              onClick={() => handleMortgageClick(asset)}
+                              aria-label={`Mortgage with ${asset.name}`}
+                              data-testid="mortgage-btn"
+                            >
+                              <Home className='w-4 h-4 mr-2' />
+                              Mortgage
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Asset-backed financing with {asset.name} as collateral</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -449,26 +456,42 @@ const Shop = () => {
       {/* Modals */}
       {selectedAsset && (
         <>
+          {/* Buy = Token Purchase */}
           <BuyAssetModal
             isOpen={buyModalOpen}
             onClose={() => setBuyModalOpen(false)}
             asset={selectedAsset}
           />
+          
+          {/* Sell = Realize/Withdraw */}
           <RealizeAssetModal
             isOpen={realizeModalOpen}
             onClose={() => setRealizeModalOpen(false)}
             asset={selectedAsset}
           />
+          
+          {/* Order = Physical Delivery with Format Selection */}
           <BuyPhysicalModal
-            isOpen={buyPhysicalModalOpen}
-            onClose={() => setBuyPhysicalModalOpen(false)}
+            isOpen={orderModalOpen}
+            onClose={() => setOrderModalOpen(false)}
             asset={selectedAsset}
           />
+          
+          {/* Deposit = Crypto Deposit */}
+          <CryptoDepositModal
+            isOpen={depositModalOpen}
+            onClose={() => setDepositModalOpen(false)}
+            asset={selectedAsset}
+          />
+          
+          {/* Mortgage = Asset-Backed Financing */}
           <BorrowingModal
-            isOpen={borrowingModalOpen}
-            onClose={() => setBorrowingModalOpen(false)}
+            isOpen={mortgageModalOpen}
+            onClose={() => setMortgageModalOpen(false)}
             asset={selectedAsset}
           />
+          
+          {/* Send = Development Modal */}
           <Dialog open={sendModalOpen} onOpenChange={setSendModalOpen}>
             <DialogContent>
               <DialogHeader>
