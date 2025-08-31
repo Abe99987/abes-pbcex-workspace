@@ -140,9 +140,39 @@ const Shop = () => {
     },
   ];
 
-  const handleActionClick = (asset: Asset, action: string) => {
-    track('shop_action_routed', { symbol: asset.symbol, action, source_page: '/shop' });
-    navigate(toCommodityPath(asset.symbol, { action }));
+  const handleBuyClick = (asset: Asset) => {
+    setSelectedAsset(asset);
+    setBuyModalOpen(true);
+    track('shop_action_modal', { symbol: asset.symbol, action: 'buy', source_page: '/shop' });
+  };
+
+  const handleSellClick = (asset: Asset) => {
+    setSelectedAsset(asset);
+    setRealizeModalOpen(true);
+    track('shop_action_modal', { symbol: asset.symbol, action: 'sell', source_page: '/shop' });
+  };
+
+  const handleOrderClick = (asset: Asset) => {
+    setSelectedAsset(asset);
+    setBuyPhysicalModalOpen(true);
+    track('shop_action_modal', { symbol: asset.symbol, action: 'order', source_page: '/shop' });
+  };
+
+  const handleDepositClick = (asset: Asset) => {
+    setSelectedAsset(asset);
+    setBorrowingModalOpen(true);
+    track('shop_action_modal', { symbol: asset.symbol, action: 'deposit', source_page: '/shop' });
+  };
+
+  const handleSendClick = (asset: Asset) => {
+    setSelectedAsset(asset);
+    setSendModalOpen(true);
+    track('shop_action_modal', { symbol: asset.symbol, action: 'send', source_page: '/shop' });
+  };
+
+  const handleDetailsClick = (asset: Asset) => {
+    track('shop_action_routed', { symbol: asset.symbol, action: 'details', source_page: '/shop' });
+    navigate(toCommodityPath(asset.symbol, { action: 'details' }));
   };
 
   const handleRowCardClick = (asset: Asset) => {
@@ -255,33 +285,15 @@ const Shop = () => {
 
                   {/* Action Buttons */}
                   <div className='lg:col-span-4' data-row-actions onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
-                    <div className='grid grid-cols-2 lg:grid-cols-5 gap-3'>
-                        <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant='outline'
-                              className='h-10 px-4'
-                              onClick={() => handleActionClick(asset, 'details')}
-                              aria-label={`View ${asset.name} details`}
-                            >
-                              <Package className='w-4 h-4 mr-2' />
-                              Details
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>View commodity details and trading options</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-
+                    {/* Row 1: Buy, Sell, Order */}
+                    <div className='grid grid-cols-3 gap-3 mb-3'>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
                               className='h-10 px-4'
-                              onClick={() => handleActionClick(asset, 'buy')}
+                              onClick={() => handleBuyClick(asset)}
                               aria-label={`Buy ${asset.name}`}
                             >
                               <ShoppingCart className='w-4 h-4 mr-2' />
@@ -303,7 +315,7 @@ const Shop = () => {
                             <Button
                               variant='outline'
                               className='h-10 px-4'
-                              onClick={() => handleActionClick(asset, 'sell')}
+                              onClick={() => handleSellClick(asset)}
                               aria-label={`Sell ${asset.name}`}
                             >
                               <Package className='w-4 h-4 mr-2' />
@@ -322,7 +334,7 @@ const Shop = () => {
                             <Button
                               variant='premium'
                               className='h-10 px-4 bg-black text-white hover:bg-black/90'
-                              onClick={() => handleActionClick(asset, 'order')}
+                              onClick={() => handleOrderClick(asset)}
                               aria-label={`Order ${asset.name}`}
                             >
                               <Truck className='w-4 h-4 mr-2' />
@@ -337,6 +349,28 @@ const Shop = () => {
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
+                    </div>
+
+                    {/* Row 2: Deposit, Send, Details */}
+                    <div className='grid grid-cols-3 gap-3'>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant='outline'
+                              className='h-10 px-4'
+                              onClick={() => handleDepositClick(asset)}
+                              aria-label={`Deposit ${asset.name}`}
+                            >
+                              <Upload className='w-4 h-4 mr-2' />
+                              Deposit
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Deposit {asset.name}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
 
                       <TooltipProvider>
                         <Tooltip>
@@ -344,7 +378,7 @@ const Shop = () => {
                             <Button
                               variant='outline'
                               className='h-10 px-4'
-                              onClick={() => handleActionClick(asset, 'send')}
+                              onClick={() => handleSendClick(asset)}
                               aria-label={`Send ${asset.name}`}
                             >
                               <Send className='w-4 h-4 mr-2' />
@@ -363,15 +397,15 @@ const Shop = () => {
                             <Button
                               variant='outline'
                               className='h-10 px-4'
-                              onClick={() => handleActionClick(asset, 'deposit')}
-                              aria-label={`Deposit ${asset.name}`}
+                              onClick={() => handleDetailsClick(asset)}
+                              aria-label={`View ${asset.name} details`}
                             >
-                              <Upload className='w-4 h-4 mr-2' />
-                              Deposit
+                              <Package className='w-4 h-4 mr-2' />
+                              Details
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Deposit {asset.name}</p>
+                            <p>View commodity details and trading options</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
