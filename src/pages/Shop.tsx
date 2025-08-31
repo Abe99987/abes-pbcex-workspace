@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { toCommodityPath, toTradingPath } from '@/lib/routes';
+import { useNavigate } from 'react-router-dom';
+import { toCommodityPath } from '@/lib/routes';
 import { track } from '@/lib/analytics';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -141,8 +141,12 @@ const Shop = () => {
   ];
 
   const handleActionClick = (asset: Asset, action: string) => {
-    track('shop_action_routed', { symbol: asset.symbol, action, source_page: '/shop' });
-    
+    track('shop_action_routed', {
+      symbol: asset.symbol,
+      action,
+      source_page: '/shop',
+    });
+
     // Open modals for Buy/Sell/Order actions, route for others
     if (action === 'buy') {
       setSelectedAsset(asset);
@@ -166,14 +170,20 @@ const Shop = () => {
   };
 
   const handleRowCardClick = (asset: Asset) => {
-    track('shop_row_open_details', { symbol: asset.symbol, source_page: '/shop' });
+    track('shop_row_open_details', {
+      symbol: asset.symbol,
+      source_page: '/shop',
+    });
     navigate(toCommodityPath(asset.symbol));
   };
 
   const handleTickerClick = (asset: Asset, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    track('shop_row_open_product', { symbol: asset.symbol, route: `/shop/${asset.symbol}` });
+    track('shop_row_open_product', {
+      symbol: asset.symbol,
+      route: `/shop/${asset.symbol}`,
+    });
     navigate(`/shop/${asset.symbol}`);
   };
 
@@ -201,18 +211,18 @@ const Shop = () => {
               className='group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30'
             >
               <CardContent className='p-6'>
-                <div 
+                <div
                   className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/60 rounded-2xl -m-2 p-2'
-                  role="link"
+                  role='link'
                   tabIndex={0}
                   onClick={() => handleRowCardClick(asset)}
-                  onKeyDown={(e) => {
+                  onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
                       handleRowCardClick(asset);
                     }
                   }}
-                  data-testid="row-card-link"
+                  data-testid='row-card-link'
                   aria-label={`Open ${asset.name} details`}
                 >
                   {/* Asset Info - Left Side */}
@@ -226,9 +236,9 @@ const Shop = () => {
                         <button
                           className='ml-2 text-sm font-normal text-muted-foreground hover:text-primary transition-colors z-10 relative'
                           aria-label={`Open ${asset.name} trading`}
-                          data-testid="row-ticker-link"
-                          onClick={(e) => handleTickerClick(asset, e)}
-                          onMouseDown={(e) => e.stopPropagation()}
+                          data-testid='row-ticker-link'
+                          onClick={e => handleTickerClick(asset, e)}
+                          onMouseDown={e => e.stopPropagation()}
                         >
                           ({asset.symbol})
                         </button>
@@ -274,7 +284,12 @@ const Shop = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className='lg:col-span-4' data-row-actions onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+                  <div
+                    className='lg:col-span-4'
+                    data-row-actions
+                    onClick={e => e.stopPropagation()}
+                    onMouseDown={e => e.stopPropagation()}
+                  >
                     {/* Row 1: Buy | Sell | Order */}
                     <div className='grid grid-cols-3 gap-3 mb-3'>
                       <TooltipProvider>
@@ -292,7 +307,8 @@ const Shop = () => {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
-                              Purchase using USD, USDC, PAXG, bank wire, or debit card
+                              Purchase using USD, USDC, PAXG, bank wire, or
+                              debit card
                             </p>
                           </TooltipContent>
                         </Tooltip>
@@ -332,7 +348,8 @@ const Shop = () => {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
-                              Advanced order (bars/coins/Goldbacks) with token balances
+                              Advanced order (bars/coins/Goldbacks) with token
+                              balances
                             </p>
                           </TooltipContent>
                         </Tooltip>
@@ -347,7 +364,9 @@ const Shop = () => {
                             <Button
                               variant='outline'
                               className='h-10 px-4 min-h-[40px]'
-                              onClick={() => handleActionClick(asset, 'deposit')}
+                              onClick={() =>
+                                handleActionClick(asset, 'deposit')
+                              }
                               aria-label={`Deposit ${asset.name}`}
                             >
                               <Upload className='w-4 h-4 mr-2' />
@@ -385,7 +404,9 @@ const Shop = () => {
                             <Button
                               variant='outline'
                               className='h-10 px-4 min-h-[40px]'
-                              onClick={() => handleActionClick(asset, 'details')}
+                              onClick={() =>
+                                handleActionClick(asset, 'details')
+                              }
                               aria-label={`View ${asset.name} details`}
                             >
                               <Package className='w-4 h-4 mr-2' />
@@ -458,7 +479,10 @@ const Shop = () => {
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant='outline' onClick={() => setSendModalOpen(false)}>
+                <Button
+                  variant='outline'
+                  onClick={() => setSendModalOpen(false)}
+                >
                   Close
                 </Button>
               </DialogFooter>
