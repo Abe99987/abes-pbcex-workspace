@@ -275,7 +275,7 @@ describe('Environment Validation', () => {
 
       const { env } = await import('./env');
       
-      expect(env.PORT).toBe('4001'); // Default port
+      expect(env.PORT).toBe(4001); // Default port
       expect(env.PHASE).toBe('1'); // Default phase
       expect(env.EMAIL_FROM).toBe('contact@pbcex.com'); // Default email
     });
@@ -316,7 +316,7 @@ describe('Environment Validation', () => {
 
       try {
         await import('./env');
-        fail('Should have thrown validation error');
+        throw new Error('Should have thrown validation error');
       } catch (error: any) {
         expect(error.message).toContain('Environment validation failed');
         expect(error.message).toContain('Missing required variables');
@@ -334,7 +334,7 @@ describe('Environment Validation', () => {
 
       try {
         await import('./env');
-        fail('Should have thrown validation error');
+        throw new Error('Should have thrown validation error');
       } catch (error: any) {
         expect(error.message).toContain('Environment validation failed');
         expect(error.message).toContain('Invalid variables');

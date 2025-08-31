@@ -6,8 +6,6 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    '@typescript-eslint/recommended',
-    '@typescript-eslint/recommended-requiring-type-checking',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -84,8 +82,7 @@ module.exports = {
     'no-sequences': 'error',
     'no-throw-literal': 'error',
     'no-unmodified-loop-condition': 'error',
-    'no-unused-expressions': 'off',
-    '@typescript-eslint/no-unused-expressions': 'error',
+
     'no-useless-call': 'error',
     'no-useless-concat': 'error',
     'no-useless-return': 'error',

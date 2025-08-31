@@ -234,17 +234,22 @@ jest.mock('../db/index', () => ({
   },
 }));
 
-jest.mock('redis', () => ({
-  createClient: jest.fn(() => ({
+jest.mock('ioredis', () => {
+  const mockRedis = jest.fn(() => ({
     connect: jest.fn(),
     disconnect: jest.fn(),
     get: jest.fn(),
     set: jest.fn(),
+    setex: jest.fn(),
     del: jest.fn(),
     exists: jest.fn(),
     expire: jest.fn(),
-  })),
-}));
+    flushall: jest.fn(),
+    quit: jest.fn(),
+  }));
+  
+  return mockRedis;
+});
 
 jest.mock('fs/promises', () => ({
   readFile: jest.fn(),
@@ -344,5 +349,13 @@ afterAll(async () => {
 });
 
 jest.setTimeout(30_000);
+
+// Simple test to make Jest happy (setup.ts needs a test)
+describe('Test Setup', () => {
+  it('should initialize test helpers correctly', () => {
+    expect(globalThis.testHelpers).toBeDefined();
+    expect(typeof globalThis.testHelpers.createMockUser).toBe('function');
+  });
+});
 
 export { jest };

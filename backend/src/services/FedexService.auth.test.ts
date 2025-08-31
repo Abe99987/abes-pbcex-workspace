@@ -155,7 +155,7 @@ describe('FedexService - OAuth Authentication', () => {
 
       expect(token).toBe('cached_token_123');
       expect(mockHttpClient.post).not.toHaveBeenCalled();
-      expect(cache.get).toHaveBeenCalledWith(FedexService.TOKEN_CACHE_KEY);
+      expect(cache.get).toHaveBeenCalledWith('fedex:oauth:token');
     });
 
     it('should refresh token when cache is empty', async () => {
@@ -179,7 +179,7 @@ describe('FedexService - OAuth Authentication', () => {
 
       expect(token).toBe('fresh_token_456');
       expect(cache.setex).toHaveBeenCalledWith(
-        FedexService.TOKEN_CACHE_KEY,
+        'fedex:oauth:token',
         expect.any(Number), // TTL with safety margin
         'fresh_token_456'
       );
@@ -206,7 +206,7 @@ describe('FedexService - OAuth Authentication', () => {
       
       // Should cache with safety margin (expires_in - 300 seconds)
       expect(cache.setex).toHaveBeenCalledWith(
-        FedexService.TOKEN_CACHE_KEY,
+        'fedex:oauth:token',
         expect.any(Number),
         'short_lived_token'
       );
