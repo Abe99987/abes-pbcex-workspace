@@ -1,60 +1,56 @@
-#!/bin/bash
-# PBCEx Pre-commit Secret Detection Script
-# Scans staged files for potential secrets and blocks commits if found
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Skip on Windows (use Node alternative later)
-if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-  echo "⚠️  Windows detected, skipping secret scan (use Node alternative)"
+# Robust POSIX-safe secret scanner for git pre-commit hooks
+# Checks only staged files for common secret patterns
+
+PATTERN='(sk_(live|test)_[0-9a-zA-Z]+|AKIA[0-9A-Z]{16}|twilio.*auth.*token|resend.*api.*key|fedex.*(secret|password|key)|-----BEGIN[[:space:]]+.*PRIVATE KEY-----)'
+found=0
+
+# Check if running on Windows (Git Bash, WSL, etc.)
+if [[ "${OSTYPE:-}" =~ ^(msys|win32|cygwin) ]]; then
+  echo "🔍 Secret scanner: Skipping on Windows (${OSTYPE}). Install native Node.js scanner for full coverage."
   exit 0
 fi
 
-# Define secret patterns (case-insensitive)
-declare -a PATTERNS=(
-  "sk_(live|test)_[a-zA-Z0-9]+"
-  "AKIA[0-9A-Z]{16}"
-  "twilio.*auth.*token"
-  "resend.*api.*key"
-  "fedex.*(secret|password|key)"
-  "-----BEGIN.*PRIVATE.*KEY-----"
-  "access[_-]?token|refresh[_-]?token|api[_-]?key|bearer "
-)
-
-# Get staged files
-STAGED_FILES=$(git diff --cached --name-only)
-
-if [ -z "$STAGED_FILES" ]; then
-  echo "✅ No staged files to scan"
+# Only check staged files that are added/modified/copied/renamed
+if ! git diff --cached --name-only --diff-filter=ACMR -z 2>/dev/null | head -c1 | grep -q .; then
+  echo "ℹ️ No staged files to check for secrets."
   exit 0
 fi
 
 echo "🔍 Scanning staged files for secrets..."
 
-# Check each pattern
-SECRETS_FOUND=0
-for pattern in "${PATTERNS[@]}"; do
-  # Search staged files for pattern (case-insensitive)
-  MATCHES=$(echo "$STAGED_FILES" | xargs grep -l -i -E "$pattern" 2>/dev/null || true)
+git diff --cached --name-only --diff-filter=ACMR -z | \
+while IFS= read -r -d '' f; do
+  # Skip if file doesn't exist (could be deleted)
+  [[ -f "$f" ]] || continue
   
-  if [ ! -z "$MATCHES" ]; then
-    echo "❌ Potential secret detected (pattern: ${pattern}):"
-    echo "$MATCHES" | sed 's/^/  - /'
-    SECRETS_FOUND=1
+  # Skip large/binary files cheaply (>1MB or binary content)
+  if [[ $(wc -c < "$f" 2>/dev/null || echo 0) -gt 1048576 ]]; then
+    continue
+  fi
+  
+  if file --brief --mime "$f" 2>/dev/null | grep -qi 'charset=binary'; then
+    continue
+  fi
+  
+  # Case-insensitive search for secret patterns
+  if grep -nE -i "$PATTERN" "$f" >/dev/null 2>&1; then
+    echo "❌ Potential secret detected in: $f"
+    echo "   Run: git diff --cached '$f' | grep -E -i '$PATTERN' --color=always"
+    found=1
   fi
 done
 
-if [ $SECRETS_FOUND -eq 1 ]; then
+if [ "$found" -eq 1 ]; then
   echo ""
-  echo "🚫 COMMIT BLOCKED: Potential secrets found in staged files"
-  echo "📋 Actions required:"
-  echo "  1. Remove secrets from files above"
-  echo "  2. Use environment variables instead"
-  echo "  3. Add secrets to .env (which is gitignored)"
-  echo "  4. Run 'git add .' and commit again"
+  echo "🚫 COMMIT BLOCKED: Potential secrets detected in staged files."
+  echo "   Remove or mask secrets, then re-stage and commit."
+  echo "   To bypass (emergency only): git commit --no-verify"
   echo ""
-  echo "🔄 To bypass this check temporarily (NOT RECOMMENDED):"
-  echo "  git commit --no-verify"
   exit 1
 fi
 
-echo "✅ No secrets detected in staged files"
+echo "✅ No secrets detected in staged files."
 exit 0

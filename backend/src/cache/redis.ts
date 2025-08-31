@@ -31,7 +31,6 @@ class RedisManager {
 
     try {
       this.redis = new Redis(redisUrl, {
-        retryDelayOnFailover: 100,
         maxRetriesPerRequest: 3,
         connectTimeout: 2000,
         lazyConnect: true,

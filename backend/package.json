@@ -104,40 +104,5 @@
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "globalSetup": "<rootDir>/tests/global-setup.ts",
-    "globalTeardown": "<rootDir>/tests/global-teardown.ts",
-    "setupFilesAfterEnv": [
-      "<rootDir>/tests/setup.ts"
-    ],
-    "testMatch": [
-      "<rootDir>/src/**/*.test.ts",
-      "<rootDir>/tests/**/*.test.ts"
-    ],
-    "collectCoverageFrom": [
-      "src/**/*.{ts,js}",
-      "!src/**/*.d.ts",
-      "!src/__tests__/**/*",
-      "!src/server.ts",
-      "!tests/**/*"
-    ],
-    "coverageDirectory": "coverage",
-    "coverageReporters": [
-      "text",
-      "lcov",
-      "html"
-    ],
-    "moduleNameMapping": {
-      "^@/(.*)$": "<rootDir>/src/$1"
-    },
-    "testTimeout": 30000,
-    "maxWorkers": 1,
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/e2e/"
-    ]
   }
 }

@@ -39,7 +39,7 @@ if (!process.env.ENABLE_TEST_LOGS) {
 
 // Mock JWT authentication for testing
 jest.mock('../middlewares/authMiddleware', () => {
-  const originalModule = jest.requireActual('../middlewares/authMiddleware');
+  const originalModule = jest.requireActual('../middlewares/authMiddleware') as any;
   
   return {
     ...originalModule,
@@ -101,7 +101,7 @@ jest.mock('../middlewares/authMiddleware', () => {
       }
     }),
     
-    requireKyc: jest.fn((allowedStatuses = ['APPROVED']) => {
+    requireKyc: jest.fn((allowedStatuses: string[] = ['APPROVED']) => {
       return (req: any, res: any, next: any) => {
         if (req.user && allowedStatuses.includes(req.user.kycStatus)) {
           next();
@@ -178,7 +178,7 @@ jest.mock('../config/database', () => ({
   __esModule: true,
   default: {
     query: jest.fn(),
-    transaction: jest.fn((callback) => callback({
+    transaction: jest.fn((callback: any) => callback({
       query: jest.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
       rollback: jest.fn(),
       commit: jest.fn(),
@@ -224,7 +224,7 @@ declare global {
 }
 
 // Global test helper functions
-global.testHelpers = {
+(global as any).testHelpers = {
   createMockUser: (role: string = 'USER') => ({
     id: `${role.toLowerCase()}-user-id`,
     email: `${role.toLowerCase()}@pbcex.com`,
