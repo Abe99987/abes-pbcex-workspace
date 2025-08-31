@@ -84,64 +84,66 @@ interface MockQueryResult {
 // -----------------------------
 jest.mock('../middlewares/authMiddleware', () => {
   // Use explicit express types for req/res/next
-  const authenticate = jest.fn((req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+  const authenticate = jest.fn(
+    (req: Request, res: Response, next: NextFunction) => {
+      const token = req.headers.authorization?.replace('Bearer ', '');
 
-    const mockUsers: Record<string, MockUser> = {
-      'mock-admin-jwt-token': {
-        id: 'admin-user-id',
-        email: 'admin@pbcex.com',
-        firstName: 'Admin',
-        lastName: 'User',
-        role: 'ADMIN',
-        kycStatus: 'APPROVED',
-      },
-      'mock-support-jwt-token': {
-        id: 'support-user-id',
-        email: 'support@pbcex.com',
-        firstName: 'Support',
-        lastName: 'Agent',
-        role: 'SUPPORT',
-        kycStatus: 'APPROVED',
-      },
-      'mock-teller-jwt-token': {
-        id: 'teller-user-id',
-        email: 'teller@pbcex.com',
-        firstName: 'Bank',
-        lastName: 'Teller',
-        role: 'TELLER',
-        kycStatus: 'APPROVED',
-      },
-      'mock-user-jwt-token': {
-        id: 'regular-user-id',
-        email: 'user@example.com',
-        firstName: 'Regular',
-        lastName: 'User',
-        role: 'USER',
-        kycStatus: 'APPROVED',
-      },
-      'mock-jwt-token-for-testing': {
-        id: 'test-user-id',
-        email: 'test@example.com',
-        firstName: 'Test',
-        lastName: 'User',
-        role: 'USER',
-        kycStatus: 'APPROVED',
-      },
-    };
+      const mockUsers: Record<string, MockUser> = {
+        'mock-admin-jwt-token': {
+          id: 'admin-user-id',
+          email: 'admin@pbcex.com',
+          firstName: 'Admin',
+          lastName: 'User',
+          role: 'ADMIN',
+          kycStatus: 'APPROVED',
+        },
+        'mock-support-jwt-token': {
+          id: 'support-user-id',
+          email: 'support@pbcex.com',
+          firstName: 'Support',
+          lastName: 'Agent',
+          role: 'SUPPORT',
+          kycStatus: 'APPROVED',
+        },
+        'mock-teller-jwt-token': {
+          id: 'teller-user-id',
+          email: 'teller@pbcex.com',
+          firstName: 'Bank',
+          lastName: 'Teller',
+          role: 'TELLER',
+          kycStatus: 'APPROVED',
+        },
+        'mock-user-jwt-token': {
+          id: 'regular-user-id',
+          email: 'user@example.com',
+          firstName: 'Regular',
+          lastName: 'User',
+          role: 'USER',
+          kycStatus: 'APPROVED',
+        },
+        'mock-jwt-token-for-testing': {
+          id: 'test-user-id',
+          email: 'test@example.com',
+          firstName: 'Test',
+          lastName: 'User',
+          role: 'USER',
+          kycStatus: 'APPROVED',
+        },
+      };
 
-    const found = token ? mockUsers[token] : undefined;
-    if (found) {
-      // attach typed user onto req
-      (req as unknown as { user: MockUser }).user = found;
-      next();
-    } else {
-      res.status(401).json({
-        code: 'AUTHENTICATION_ERROR',
-        message: 'Authentication required',
-      });
+      const found = token ? mockUsers[token] : undefined;
+      if (found) {
+        // attach typed user onto req
+        (req as unknown as { user: MockUser }).user = found;
+        next();
+      } else {
+        res.status(401).json({
+          code: 'AUTHENTICATION_ERROR',
+          message: 'Authentication required',
+        });
+      }
     }
-  });
+  );
 
   const requireKyc = jest.fn((allowedStatuses: KycStatus[] = ['APPROVED']) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -159,18 +161,20 @@ jest.mock('../middlewares/authMiddleware', () => {
     };
   });
 
-  const requireAdmin = jest.fn((req: Request, res: Response, next: NextFunction) => {
-    const user = (req as unknown as { user?: MockUser }).user;
-    if (user?.role === 'ADMIN') {
-      next();
-    } else {
-      res.status(403).json({
-        code: 'AUTHORIZATION_ERROR',
-        message: 'Admin access required',
-        userRole: user?.role,
-      });
+  const requireAdmin = jest.fn(
+    (req: Request, res: Response, next: NextFunction) => {
+      const user = (req as unknown as { user?: MockUser }).user;
+      if (user?.role === 'ADMIN') {
+        next();
+      } else {
+        res.status(403).json({
+          code: 'AUTHORIZATION_ERROR',
+          message: 'Admin access required',
+          userRole: user?.role,
+        });
+      }
     }
-  });
+  );
 
   const authorize = jest.fn((requiredRole: Role | Role[]) => {
     const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
@@ -221,7 +225,7 @@ jest.mock('../services/NotificationService', () => ({
 // -----------------------------
 // DB/Redis/File mocks
 // -----------------------------
-jest.mock('../config/database', () => ({
+jest.mock('../db/index', () => ({
   __esModule: true,
   default: {
     query: jest.fn(),
@@ -254,13 +258,20 @@ jest.mock('fs/promises', () => ({
 // -----------------------------
 declare global {
   // augment the NodeJS globalThis with a typed helper (Jest runtime)
-  // eslint-disable-next-line no-var
+   
   var testHelpers: {
     createMockUser: (role?: Role) => MockUser;
     createAuthHeaders: (role?: Role) => Record<string, string>;
-    expectApiError: (response: { body: unknown; status: number }, code: string) => void;
+    expectApiError: (
+      response: { body: unknown; status: number },
+      code: string
+    ) => void;
     expectApiSuccess: (response: { body: unknown; status: number }) => void;
-    withFeatureFlag: (flag: string, value: string, testFn: () => Promise<void>) => Promise<void>;
+    withFeatureFlag: (
+      flag: string,
+      value: string,
+      testFn: () => Promise<void>
+    ) => Promise<void>;
   };
 }
 
@@ -283,7 +294,10 @@ global.testHelpers = {
     'Content-Type': 'application/json',
   }),
 
-  expectApiError: (response: { body: unknown; status: number }, code: string) => {
+  expectApiError: (
+    response: { body: unknown; status: number },
+    code: string
+  ) => {
     expect(response.body).toMatchObject({
       code,
       message: expect.any(String),
@@ -298,7 +312,11 @@ global.testHelpers = {
     expect(response.status).toBeLessThan(400);
   },
 
-  withFeatureFlag: async (flag: string, value: string, testFn: () => Promise<void>) => {
+  withFeatureFlag: async (
+    flag: string,
+    value: string,
+    testFn: () => Promise<void>
+  ) => {
     const original = process.env[flag];
     process.env[flag] = value;
     try {
