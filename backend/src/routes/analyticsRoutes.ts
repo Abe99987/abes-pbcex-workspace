@@ -39,7 +39,7 @@ router.get('/pnl',
 router.get('/portfolio',
   validateQuery(z.object({
     period: z.enum(['day', 'week', 'month', 'quarter', 'year']).default('month'),
-    includeBreakdown: z.string().transform(val => val === 'true').default('true'),
+    includeBreakdown: z.coerce.boolean().default(true),
   })),
   AnalyticsController.getPortfolioAnalytics
 );

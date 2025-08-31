@@ -147,6 +147,30 @@ jest.mock('../middlewares/authMiddleware', () => {
   };
 });
 
+// Define mock interfaces to fix "assignable to never" errors
+interface MockPriceQuote {
+  price: string;
+  timestamp: Date;
+  source: string;
+}
+
+interface MockPriceMap {
+  [symbol: string]: {
+    price: string;
+    change24h: string;
+  };
+}
+
+interface MockSendResult {
+  success: boolean;
+  messageId: string;
+}
+
+interface MockQueryResult {
+  rows: any[];
+  rowCount: number;
+}
+
 // Mock external services to prevent real API calls
 jest.mock('../services/PriceFeedService', () => ({
   __esModule: true,
@@ -155,21 +179,21 @@ jest.mock('../services/PriceFeedService', () => ({
       price: '2150.00',
       timestamp: new Date(),
       source: 'mock',
-    }),
+    } satisfies MockPriceQuote),
     getPrices: jest.fn().mockResolvedValue({
       'PAXG': { price: '2150.00', change24h: '1.2%' },
       'XAU-s': { price: '2150.00', change24h: '1.2%' },
       'XAG-s': { price: '32.50', change24h: '0.8%' },
-    }),
+    } satisfies MockPriceMap),
   },
 }));
 
 jest.mock('../services/NotificationService', () => ({
   __esModule: true,
   default: {
-    sendEmail: jest.fn().mockResolvedValue({ success: true, messageId: 'mock-email-id' }),
-    sendSMS: jest.fn().mockResolvedValue({ success: true, messageId: 'mock-sms-id' }),
-    sendPush: jest.fn().mockResolvedValue({ success: true, messageId: 'mock-push-id' }),
+    sendEmail: jest.fn().mockResolvedValue({ success: true, messageId: 'mock-email-id' } satisfies MockSendResult),
+    sendSMS: jest.fn().mockResolvedValue({ success: true, messageId: 'mock-sms-id' } satisfies MockSendResult),
+    sendPush: jest.fn().mockResolvedValue({ success: true, messageId: 'mock-push-id' } satisfies MockSendResult),
   },
 }));
 
@@ -179,7 +203,7 @@ jest.mock('../config/database', () => ({
   default: {
     query: jest.fn(),
     transaction: jest.fn((callback: any) => callback({
-      query: jest.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+      query: jest.fn().mockResolvedValue({ rows: [], rowCount: 0 } satisfies MockQueryResult),
       rollback: jest.fn(),
       commit: jest.fn(),
     })),

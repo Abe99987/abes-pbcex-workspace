@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { asyncHandler, createError } from '@/middlewares/errorMiddleware';
 import { authenticate, requireKyc } from '@/middlewares/authMiddleware';
 import { validateBody, validateQuery } from '@/utils/validators';
@@ -62,7 +62,7 @@ const checkRedemptionEnabled = (req: any, res: any, next: any) => {
 router.get('/quote',
   checkRedemptionEnabled,
   validateQuery(redemptionQuoteSchema),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { asset, amount, format } = req.query as any;
 
     const quote = await RedemptionService.getRedemptionQuote(asset, amount, format);
@@ -81,7 +81,7 @@ router.get('/quote',
 router.post('/',
   checkRedemptionEnabled,
   validateBody(redemptionRequestSchema),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const redemptionInput = {
       userId: req.user!.id,
       ...req.body,
@@ -106,7 +106,7 @@ router.post('/',
  */
 router.get('/history',
   checkRedemptionEnabled,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
     const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
 
@@ -125,7 +125,7 @@ router.get('/history',
  */
 router.get('/status/:id',
   checkRedemptionEnabled,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
 
     if (!id.match(/^[a-f0-9-]+$/)) {
@@ -155,7 +155,7 @@ router.post('/:id/cancel',
   validateBody(z.object({
     reason: z.string().max(500).optional(),
   })),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const { reason } = req.body;
 
@@ -178,7 +178,7 @@ router.post('/:id/cancel',
  */
 router.get('/stats',
   checkRedemptionEnabled,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     // Check admin role
     if (req.user!.role !== 'ADMIN') {
       throw createError.authorization('Admin access required');

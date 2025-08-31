@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { asyncHandler, createError } from '@/middlewares/errorMiddleware';
 import { authenticate, requireAdmin } from '@/middlewares/authMiddleware';
 import { validateBody, validateQuery } from '@/utils/validators';
@@ -45,9 +45,9 @@ const inventoryQuerySchema = z.object({
   metal: z.enum(['AU', 'AG', 'PT', 'PD', 'CU']).optional(),
   format: z.enum(['BAR', 'COIN', 'SHEET', 'COIL', 'ROUND']).optional(),
   vaultLocation: z.string().optional(),
-  lowStock: z.string().transform(val => val === 'true').pipe(z.boolean()).optional(),
-  limit: z.string().transform(val => Math.min(parseInt(val) || 50, 100)).optional(),
-  offset: z.string().transform(val => Math.max(parseInt(val) || 0, 0)).optional(),
+  lowStock: z.coerce.boolean().optional(),
+  limit: z.coerce.number().min(1).max(100).default(50),
+  offset: z.coerce.number().min(0).default(0),
 });
 
 /**
@@ -57,7 +57,7 @@ const inventoryQuerySchema = z.object({
 router.get('/inventory',
   checkVaultEnabled,
   validateQuery(inventoryQuerySchema),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const balances = await VaultCustodyService.getVaultBalances();
 
     res.json({
@@ -73,7 +73,7 @@ router.get('/inventory',
  */
 router.get('/inventory/summary',
   checkVaultEnabled,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const summary = await VaultCustodyService.getInventorySummary();
 
     res.json({
@@ -89,7 +89,7 @@ router.get('/inventory/summary',
  */
 router.get('/inventory/levels',
   checkVaultEnabled,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const levels = await DillonGageService.checkInventoryLevels();
 
     res.json({
@@ -106,9 +106,9 @@ router.get('/inventory/levels',
 router.get('/inventory/low-stock',
   checkVaultEnabled,
   validateQuery(z.object({
-    threshold: z.string().transform(val => parseInt(val) || 10).pipe(z.number().min(1).max(100)).optional(),
+    threshold: z.coerce.number().min(1).max(100).default(10),
   })),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const threshold = req.query.threshold as number || 10;
     const lowStockItems = await VaultCustodyService.getLowStockItems(threshold);
 
@@ -126,7 +126,7 @@ router.get('/inventory/low-stock',
 router.post('/inventory/restock',
   checkVaultEnabled,
   validateBody(restockRequestSchema),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { sku, quantity, unitCost } = req.body;
 
     await VaultCustodyService.restockInventory(sku, quantity, unitCost);
@@ -145,7 +145,7 @@ router.post('/inventory/restock',
  */
 router.post('/inventory/auto-restock',
   checkVaultEnabled,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const result = await DillonGageService.triggerAutoRestock();
 
     res.json({
@@ -163,11 +163,11 @@ router.post('/inventory/auto-restock',
 router.get('/restock/history',
   checkVaultEnabled,
   validateQuery(z.object({
-    limit: z.string().transform(val => Math.min(parseInt(val) || 50, 100)).optional(),
+    limit: z.coerce.number().min(1).max(100).default(50),
     location: z.string().optional(),
     metal: z.enum(['AU', 'AG', 'PT', 'PD', 'CU']).optional(),
   })),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { limit, location, metal } = req.query as any;
 
     const history = await DillonGageService.getRestockHistory(limit, location, metal);
@@ -186,7 +186,7 @@ router.get('/restock/history',
 router.post('/branch/restock',
   checkVaultEnabled,
   validateBody(branchRestockSchema),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { branchId, metal, quantity } = req.body;
 
     const response = await DillonGageService.restockBranch(branchId, metal, quantity);
@@ -207,12 +207,12 @@ router.get('/redemptions/pending',
   checkVaultEnabled,
   validateQuery(z.object({
     status: z.enum(['PENDING', 'APPROVED', 'ALLOCATED', 'SHIPPED']).optional(),
-    limit: z.string().transform(val => Math.min(parseInt(val) || 50, 100)).optional(),
-    offset: z.string().transform(val => Math.max(parseInt(val) || 0, 0)).optional(),
+    limit: z.coerce.number().min(1).max(100).default(50),
+    offset: z.coerce.number().min(0).default(0),
   })),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     // Mock implementation - would query redemption_requests table
-    const mockRedemptions = [];
+    const mockRedemptions: any[] = [];
 
     res.json({
       code: 'SUCCESS',
@@ -233,7 +233,7 @@ router.post('/redemptions/:id/approve',
   validateBody(z.object({
     notes: z.string().max(500).optional(),
   })),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const { notes } = req.body;
 
@@ -262,7 +262,7 @@ router.post('/redemptions/:id/ship',
     trackingNumber: z.string().min(1).max(100),
     shippingCarrier: z.string().max(50).default('FEDEX'),
   })),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const { trackingNumber, shippingCarrier } = req.body;
 
@@ -286,12 +286,12 @@ router.post('/redemptions/:id/ship',
  */
 router.get('/stats',
   checkVaultEnabled,
-  asyncHandler(async (req, res) => {
-    const [inventorySummary, restockStats, redemptionStats] = await Promise.all([
+  asyncHandler(async (req: Request, res: Response) => {
+    const [inventorySummary, restockStats] = await Promise.all([
       VaultCustodyService.getInventorySummary(),
       DillonGageService.getServiceStatistics(),
-      // RedemptionService.getRedemptionStats(), // Would implement
     ]);
+    // Would add: const redemptionStats = await RedemptionService.getRedemptionStats();
 
     const stats = {
       inventory: inventorySummary,
