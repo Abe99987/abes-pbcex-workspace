@@ -110,17 +110,49 @@ const BuyAssetModal = ({ isOpen, onClose, asset }: BuyAssetModalProps) => {
     
     setIsConfirming(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setShowToken(true);
-    
-    toast({
-      title: "Purchase Successful!",
-      description: `${conversion.units.toFixed(assetConfig.unit === "barrel" ? 3 : 3)} ${assetConfig.unit}${conversion.units !== 1 ? 's' : ''} of ${asset.name} added to your wallet`,
-    });
-    
-    setIsConfirming(false);
+    try {
+      // Backend API Integration
+      // TODO: Replace with actual Supabase client calls
+      // const { data: tradeData } = await supabase
+      //   .from('trades')
+      //   .insert({
+      //     user_id: user.id,
+      //     asset_symbol: asset.symbol,
+      //     amount: conversion.units,
+      //     price_usd: conversion.usd,
+      //     trade_type: 'buy',
+      //     payment_method: paymentMethod,
+      //     status: 'pending'
+      //   });
+      
+      // TODO: Update user wallet balances
+      // const { data: walletUpdate } = await supabase
+      //   .from('wallet_balances')
+      //   .upsert({
+      //     user_id: user.id,
+      //     asset_symbol: asset.symbol,
+      //     balance: currentBalance + conversion.units
+      //   });
+      
+      // Simulate API call with debounced pricing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      setShowToken(true);
+      
+      toast({
+        title: "Purchase Successful!",
+        description: `${conversion.units.toFixed(assetConfig.unit === "barrel" ? 3 : 3)} ${assetConfig.unit}${conversion.units !== 1 ? 's' : ''} of ${asset.name} added to your wallet`,
+      });
+    } catch (error) {
+      console.error('Purchase failed:', error);
+      toast({
+        title: "Purchase Failed",
+        description: "There was an error processing your purchase. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsConfirming(false);
+    }
   };
 
   const paymentMethods = [

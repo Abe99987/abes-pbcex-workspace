@@ -1,3 +1,33 @@
+/*
+ * BACKEND INTEGRATION REQUIREMENTS:
+ * 
+ * 1. Real-time Price Feeds:
+ *    - Replace mock prices with live data from TradingView/Chainlink
+ *    - API: GET /api/prices/realtime for all commodities
+ *    - Update frequency: 1-5 seconds for precious metals, 30s for others
+ * 
+ * 2. User Authentication:
+ *    - All actions require valid Supabase auth session
+ *    - User balances from: GET /api/wallet/balances/:user_id
+ * 
+ * 3. Modal Action APIs:
+ *    - Buy: POST /api/trades/buy (triggers USDC/bank/card payment flow)
+ *    - Sell: POST /api/trades/sell (triggers payout to user wallet)
+ *    - Order: POST /api/orders (physical delivery + token burning)
+ *    - Deposit: POST /api/wallet/deposit (funding methods integration)
+ *    - Send: POST /api/wallet/transfer (peer-to-peer transfers)
+ * 
+ * 4. Error Handling:
+ *    - Show backend error messages in toast notifications
+ *    - Retry failed API calls with exponential backoff
+ *    - Graceful degradation when price feeds are unavailable
+ * 
+ * 5. Performance:
+ *    - Debounce price calculations by 250ms in modals
+ *    - Cache balance checks for 30 seconds
+ *    - Show skeleton states while loading
+ */
+
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toCommodityPath, toTradingPath } from '@/lib/routes';
@@ -140,34 +170,72 @@ const Shop = () => {
     },
   ];
 
-  const handleBuyClick = (asset: Asset) => {
-    setSelectedAsset(asset);
-    setBuyModalOpen(true);
-    track('shop_action_modal', { symbol: asset.symbol, action: 'buy', source_page: '/shop' });
+  // Backend API Integration handlers
+  const handleBuyClick = async (asset: Asset) => {
+    try {
+      setSelectedAsset(asset);
+      setBuyModalOpen(true);
+      track('shop_action_modal', { symbol: asset.symbol, action: 'buy', source_page: '/shop' });
+      
+      // TODO: API Call - GET /api/prices/:symbol for real-time pricing
+      // TODO: API Call - GET /api/wallet/balances for user wallet balances
+      // TODO: API Call - POST /api/trades/buy (when modal confirms purchase)
+    } catch (error) {
+      console.error('Error opening buy modal:', error);
+    }
   };
 
-  const handleSellClick = (asset: Asset) => {
-    setSelectedAsset(asset);
-    setRealizeModalOpen(true);
-    track('shop_action_modal', { symbol: asset.symbol, action: 'sell', source_page: '/shop' });
+  const handleSellClick = async (asset: Asset) => {
+    try {
+      setSelectedAsset(asset);
+      setRealizeModalOpen(true);
+      track('shop_action_modal', { symbol: asset.symbol, action: 'sell', source_page: '/shop' });
+      
+      // TODO: API Call - GET /api/wallet/balances/:symbol for available balance
+      // TODO: API Call - POST /api/trades/sell (when modal confirms sale)
+    } catch (error) {
+      console.error('Error opening sell modal:', error);
+    }
   };
 
-  const handleOrderClick = (asset: Asset) => {
-    setSelectedAsset(asset);
-    setBuyPhysicalModalOpen(true);
-    track('shop_action_modal', { symbol: asset.symbol, action: 'order', source_page: '/shop' });
+  const handleOrderClick = async (asset: Asset) => {
+    try {
+      setSelectedAsset(asset);
+      setBuyPhysicalModalOpen(true);
+      track('shop_action_modal', { symbol: asset.symbol, action: 'order', source_page: '/shop' });
+      
+      // TODO: API Call - GET /api/wallet/balances for token balances panel
+      // TODO: API Call - POST /api/orders (when modal confirms physical order)
+      // TODO: API Call - POST /api/fulfillment/physical (for shipping logistics)
+    } catch (error) {
+      console.error('Error opening order modal:', error);
+    }
   };
 
-  const handleDepositClick = (asset: Asset) => {
-    setSelectedAsset(asset);
-    setBorrowingModalOpen(true);
-    track('shop_action_modal', { symbol: asset.symbol, action: 'deposit', source_page: '/shop' });
+  const handleDepositClick = async (asset: Asset) => {
+    try {
+      setSelectedAsset(asset);
+      setBorrowingModalOpen(true);
+      track('shop_action_modal', { symbol: asset.symbol, action: 'deposit', source_page: '/shop' });
+      
+      // TODO: API Call - GET /api/wallet/deposit-methods for available methods
+      // TODO: API Call - POST /api/wallet/deposit (when modal confirms deposit)
+    } catch (error) {
+      console.error('Error opening deposit modal:', error);
+    }
   };
 
-  const handleSendClick = (asset: Asset) => {
-    setSelectedAsset(asset);
-    setSendModalOpen(true);
-    track('shop_action_modal', { symbol: asset.symbol, action: 'send', source_page: '/shop' });
+  const handleSendClick = async (asset: Asset) => {
+    try {
+      setSelectedAsset(asset);
+      setSendModalOpen(true);
+      track('shop_action_modal', { symbol: asset.symbol, action: 'send', source_page: '/shop' });
+      
+      // TODO: API Call - GET /api/wallet/balances/:symbol for available balance
+      // TODO: API Call - POST /api/wallet/send (when modal confirms transfer)
+    } catch (error) {
+      console.error('Error opening send modal:', error);
+    }
   };
 
   const handleDetailsClick = (asset: Asset) => {
@@ -226,28 +294,35 @@ const Shop = () => {
                   aria-label={`Open ${asset.name} details`}
                 >
                   {/* Asset Info - Left Side */}
-                  <div className='lg:col-span-3 flex items-center space-x-4'>
-                    <div className='text-3xl group-hover:scale-110 transition-transform'>
+                  <div className='lg:col-span-3 flex items-center space-x-4' data-testid="ticker-click-area">
+                    <div className='text-3xl group-hover:scale-110 transition-transform pointer-events-none'>
                       {asset.icon}
                     </div>
                     <div>
                       <div className='font-semibold text-foreground text-lg group-hover:text-primary transition-colors'>
                         {asset.name}
                         <button
-                          className='ml-2 text-sm font-normal text-muted-foreground hover:text-primary transition-colors z-10 relative'
+                          className='ml-2 text-sm font-normal text-muted-foreground hover:text-primary transition-colors z-10 relative focus:outline-none focus:ring-2 focus:ring-primary/60 rounded px-1'
                           aria-label={`Open ${asset.name} trading`}
                           data-testid="row-ticker-link"
                           onClick={(e) => handleTickerClick(asset, e)}
                           onMouseDown={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleTickerClick(asset, e as any);
+                            }
+                          }}
                         >
                           ({asset.symbol})
                         </button>
                       </div>
-                      <p className='text-sm text-muted-foreground'>
+                      <p className='text-sm text-muted-foreground pointer-events-none'>
                         {asset.description}
                       </p>
                       {asset.minimumOrder && (
-                        <p className='text-xs text-muted-foreground mt-1'>
+                        <p className='text-xs text-muted-foreground mt-1 pointer-events-none'>
                           Minimum Order: {asset.minimumOrder}
                         </p>
                       )}
@@ -292,12 +367,13 @@ const Shop = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-4'
+                              className='h-10 px-2 md:px-4 min-w-[80px]'
                               onClick={() => handleBuyClick(asset)}
                               aria-label={`Buy ${asset.name}`}
+                              data-testid="buy-btn"
                             >
-                              <ShoppingCart className='w-4 h-4 mr-2' />
-                              Buy
+                              <ShoppingCart className='w-4 h-4 mr-1 md:mr-2' />
+                              <span className='text-xs md:text-sm'>Buy</span>
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -314,12 +390,13 @@ const Shop = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-4'
+                              className='h-10 px-2 md:px-4 min-w-[80px]'
                               onClick={() => handleSellClick(asset)}
                               aria-label={`Sell ${asset.name}`}
+                              data-testid="sell-btn"
                             >
-                              <Package className='w-4 h-4 mr-2' />
-                              Sell
+                              <Package className='w-4 h-4 mr-1 md:mr-2' />
+                              <span className='text-xs md:text-sm'>Sell</span>
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -333,12 +410,13 @@ const Shop = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='premium'
-                              className='h-10 px-4 bg-black text-white hover:bg-black/90'
+                              className='h-10 px-2 md:px-4 min-w-[80px] bg-black text-white hover:bg-black/90'
                               onClick={() => handleOrderClick(asset)}
                               aria-label={`Order ${asset.name}`}
+                              data-testid="order-btn"
                             >
-                              <Truck className='w-4 h-4 mr-2' />
-                              Order
+                              <Truck className='w-4 h-4 mr-1 md:mr-2' />
+                              <span className='text-xs md:text-sm'>Order</span>
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -358,12 +436,13 @@ const Shop = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-4'
+                              className='h-10 px-2 md:px-4 min-w-[80px]'
                               onClick={() => handleDepositClick(asset)}
                               aria-label={`Deposit ${asset.name}`}
+                              data-testid="deposit-btn"
                             >
-                              <Upload className='w-4 h-4 mr-2' />
-                              Deposit
+                              <Upload className='w-4 h-4 mr-1 md:mr-2' />
+                              <span className='text-xs md:text-sm'>Deposit</span>
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -377,12 +456,13 @@ const Shop = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-4'
+                              className='h-10 px-2 md:px-4 min-w-[80px]'
                               onClick={() => handleSendClick(asset)}
                               aria-label={`Send ${asset.name}`}
+                              data-testid="send-btn"
                             >
-                              <Send className='w-4 h-4 mr-2' />
-                              Send
+                              <Send className='w-4 h-4 mr-1 md:mr-2' />
+                              <span className='text-xs md:text-sm'>Send</span>
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -396,12 +476,13 @@ const Shop = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-4'
+                              className='h-10 px-2 md:px-4 min-w-[80px]'
                               onClick={() => handleDetailsClick(asset)}
                               aria-label={`View ${asset.name} details`}
+                              data-testid="details-btn"
                             >
-                              <Package className='w-4 h-4 mr-2' />
-                              Details
+                              <Package className='w-4 h-4 mr-1 md:mr-2' />
+                              <span className='text-xs md:text-sm'>Details</span>
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
