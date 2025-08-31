@@ -356,10 +356,10 @@ export function validateBody<T>(schema: z.ZodSchema<T>) {
   };
 }
 
-export function validateQuery<T extends Record<string, unknown>>(schema: z.ZodSchema<T>) {
+export function validateQuery<T>(schema: z.ZodSchema<T>) {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
-      req.query = schema.parse(req.query) as Record<string, unknown>;
+      req.query = schema.parse(req.query) as any;
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
