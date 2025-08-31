@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Store authentication tokens
 let authToken: string | null = null;
-let adminToken: string | null = null;
+const adminToken: string | null = null;
 let supportToken: string | null = null;
 
 // Test user credentials

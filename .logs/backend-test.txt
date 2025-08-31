@@ -1,0 +1,129 @@
+
+> @pbcex/backend@1.0.0 dev
+> ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts
+
+[INFO] 10:57:20 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.2)
+🔧 Integration Status:
+  ✅ Configured: none
+  🔧 Missing integrations: SUPPRESSED (vendor placeholders enabled)
+  📝 Note: Using mock implementations for development
+🚀 Phase-3 Features:
+  📊 Phase: 1
+  ⛓️  Onchain: DISABLED
+  🏛️  Vault Redemption: DISABLED
+  📦 Fulfillment: JM
+  🛠️  Development Mode: Vendor placeholders enabled
+10:57:20 [32minfo[39m: [32mDatabase pool initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mAPI documentation available at /api/docs[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mInitializing PBCEx services...[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mInitializing NotificationService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mLocal SMTP email service initialized (MailDev)[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [33mwarn[39m: [33mTwilio not configured, SMS will be mocked[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [33mwarn[39m: [33mIntercom not configured, support tickets will be mocked[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mNotificationService initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32m✅ NotificationService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mInitializing EmailService with Resend[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [33mwarn[39m: [33mResend not configured, email will be mocked[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mEmailService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32m✅ EmailService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mInitializing VerifyService with Twilio Verify[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [33mwarn[39m: [33mTwilio Verify not fully configured, verification will be mocked[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mVerifyService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32m✅ VerifyService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mInitializing FedexService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [33mwarn[39m: [33mFedEx not fully configured, service will be mocked[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mFedexService initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32m✅ FedexService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mInitializing PricesService with CoinGecko[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mCoinGecko API request[39m {"service":"pbcex-api","version":"1.0.0","url":"/ping","correlationId":"b81if66tg"}
+10:57:21 [32minfo[39m: [32mCoinGecko API response[39m {"service":"pbcex-api","version":"1.0.0","status":200,"correlationId":"b81if66tg","duration":178}
+10:57:21 [32minfo[39m: [32mCoinGecko API connectivity verified[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mPricesService initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32m✅ PricesService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mInitializing CheckoutService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mCheckoutService depends on PricesService for base price data[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mCheckoutService initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32m✅ CheckoutService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mInitializing PriceFeedService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mInitializing mock price data[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mMock prices initialized[39m {"service":"pbcex-api","version":"1.0.0","count":8}
+10:57:21 [33mwarn[39m: [33mTradingView not configured, using mock prices[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mStarting price update loop[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mPriceFeedService initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32m✅ PriceFeedService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32m🎉 All services initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32m🚀 PBCEx API Server started[39m {"service":"pbcex-api","version":"1.0.0","port":4001,"environment":"development","nodeVersion":"v24.6.0","pid":30614,"corsOrigins":["http://localhost:3000","http://localhost:3001","http://localhost:3002","http://localhost:3003","http://localhost:3004","http://localhost:3005","http://127.0.0.1:3000"]}
+10:57:21 [32minfo[39m: [32m📊 Integration Status:[39m {"service":"pbcex-api","version":"1.0.0","database":true,"redis":true,"plaid":false,"stripe":false,"sendgrid":false,"twilio":false,"intercom":false,"tradingView":false,"datadog":false}
+10:57:21 [32minfo[39m: [32m💡 7 integrations need configuration for full functionality[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:21 [32minfo[39m: [32mServer is listening[39m {"service":"pbcex-api","version":"1.0.0","address":{"address":"::","family":"IPv6","port":4001}}
+10:57:33 [32minfo[39m: [32mHTTP 200 GET /oracle/chainlink[39m {"service":"pbcex-api","version":"1.0.0","requestId":"jrg6i3jbg","method":"GET","url":"/oracle/chainlink","statusCode":200,"duration":404,"userAgent":"curl/8.7.1","ip":"::1","contentLength":"115"}
+[INFO] 10:57:45 Restarting: /Users/ebraheimsalem/Documents/GitHub/abes-pbcex-workspace/backend/src/controllers/AdminController.ts has been modified
+10:57:45 [32minfo[39m: [32mReceived SIGTERM. Starting graceful shutdown...[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mHTTP server closed.[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mShutting down PBCEx services...[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mShutting down PriceFeedService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mPriceFeedService shutdown complete[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mShutting down PricesService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mPricesService shut down[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mShutting down CheckoutService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mCheckoutService shut down[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mShutting down EmailService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mEmailService shut down[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mShutting down VerifyService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mVerifyService shut down[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mShutting down FedexService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mFedexService shut down[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32m✅ All services shut down gracefully[39m {"service":"pbcex-api","version":"1.0.0"}
+🔧 Integration Status:
+  ✅ Configured: none
+  🔧 Missing integrations: SUPPRESSED (vendor placeholders enabled)
+  📝 Note: Using mock implementations for development
+🚀 Phase-3 Features:
+  📊 Phase: 1
+  ⛓️  Onchain: DISABLED
+  🏛️  Vault Redemption: DISABLED
+  📦 Fulfillment: JM
+  🛠️  Development Mode: Vendor placeholders enabled
+10:57:45 [32minfo[39m: [32mDatabase pool initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mAPI documentation available at /api/docs[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mInitializing PBCEx services...[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mInitializing NotificationService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mLocal SMTP email service initialized (MailDev)[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [33mwarn[39m: [33mTwilio not configured, SMS will be mocked[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [33mwarn[39m: [33mIntercom not configured, support tickets will be mocked[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mNotificationService initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32m✅ NotificationService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mInitializing EmailService with Resend[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [33mwarn[39m: [33mResend not configured, email will be mocked[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mEmailService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32m✅ EmailService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mInitializing VerifyService with Twilio Verify[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [33mwarn[39m: [33mTwilio Verify not fully configured, verification will be mocked[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mVerifyService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32m✅ VerifyService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mInitializing FedexService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [33mwarn[39m: [33mFedEx not fully configured, service will be mocked[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mFedexService initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32m✅ FedexService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mInitializing PricesService with CoinGecko[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mCoinGecko API request[39m {"service":"pbcex-api","version":"1.0.0","url":"/ping","correlationId":"is2lm8dpb"}
+10:57:45 [32minfo[39m: [32mCoinGecko API response[39m {"service":"pbcex-api","version":"1.0.0","status":200,"correlationId":"is2lm8dpb","duration":123}
+10:57:45 [32minfo[39m: [32mCoinGecko API connectivity verified[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mPricesService initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32m✅ PricesService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mInitializing CheckoutService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mCheckoutService depends on PricesService for base price data[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mCheckoutService initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32m✅ CheckoutService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mInitializing PriceFeedService[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mInitializing mock price data[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mMock prices initialized[39m {"service":"pbcex-api","version":"1.0.0","count":8}
+10:57:45 [33mwarn[39m: [33mTradingView not configured, using mock prices[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mStarting price update loop[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mPriceFeedService initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32m✅ PriceFeedService initialized[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32m🎉 All services initialized successfully[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32m🚀 PBCEx API Server started[39m {"service":"pbcex-api","version":"1.0.0","port":4001,"environment":"development","nodeVersion":"v24.6.0","pid":31524,"corsOrigins":["http://localhost:3000","http://localhost:3001","http://localhost:3002","http://localhost:3003","http://localhost:3004","http://localhost:3005","http://127.0.0.1:3000"]}
+10:57:45 [32minfo[39m: [32m📊 Integration Status:[39m {"service":"pbcex-api","version":"1.0.0","database":true,"redis":true,"plaid":false,"stripe":false,"sendgrid":false,"twilio":false,"intercom":false,"tradingView":false,"datadog":false}
+10:57:45 [32minfo[39m: [32m💡 7 integrations need configuration for full functionality[39m {"service":"pbcex-api","version":"1.0.0"}
+10:57:45 [32minfo[39m: [32mServer is listening[39m {"service":"pbcex-api","version":"1.0.0","address":{"address":"::","family":"IPv6","port":4001}}
