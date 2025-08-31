@@ -666,7 +666,7 @@ export class ShopController {
                         order.shipping.service === 'EXPEDITED' ? 2 : 5;
     
     // Add business days (skip weekends)
-    let delivery = new Date(now);
+    const delivery = new Date(now);
     let daysAdded = 0;
     
     while (daysAdded < businessDays) {
