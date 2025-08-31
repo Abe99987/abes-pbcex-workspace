@@ -50,7 +50,7 @@ const userNoteSchema = z.object({
 const searchQuerySchema = z.object({
   q: z.string().min(3, 'Search query must be at least 3 characters').max(100, 'Search query too long'),
   type: z.enum(['all', 'email', 'name', 'phone', 'order']).default('all'),
-  limit: z.string().transform(val => Math.min(parseInt(val) || 20, 100)).optional(),
+  limit: z.coerce.number().min(1).max(100).default(20).optional(),
 });
 
 /**

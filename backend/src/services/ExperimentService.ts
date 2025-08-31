@@ -154,12 +154,12 @@ export class ExperimentService {
 
     // Check if experiment is enabled
     if (experiment && !experiment.enabled) {
-      return effectiveVariants[0]; // Return control variant if disabled
+      return effectiveVariants[0] || 'control'; // Return control variant if disabled
     }
 
     // Check audience targeting
     if (experiment?.targetAudience && !this.isUserInTargetAudience(userId, experiment.targetAudience)) {
-      return effectiveVariants[0]; // Return control for users not in target audience
+      return effectiveVariants[0] || 'control'; // Return control for users not in target audience
     }
 
     // Generate consistent hash for user + experiment
@@ -171,12 +171,12 @@ export class ExperimentService {
     for (let i = 0; i < effectiveVariants.length; i++) {
       cumulativeTraffic += effectiveTraffic[i] || 0;
       if (bucket < cumulativeTraffic) {
-        return effectiveVariants[i];
+        return effectiveVariants[i] || 'control';
       }
     }
 
     // Fallback to control variant
-    return effectiveVariants[0];
+    return effectiveVariants[0] || 'control';
   }
 
   /**

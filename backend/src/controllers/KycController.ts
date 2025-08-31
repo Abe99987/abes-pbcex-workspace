@@ -172,9 +172,9 @@ export class KycController {
     };
 
     // Store additional business data
-    kybRecord.submissionData.controlPerson = ownership.controlPerson;
-    kybRecord.submissionData.contacts = contacts;
-    kybRecord.submissionData.shippingProfile = shippingProfile;
+    (kybRecord.submissionData as any).controlPerson = ownership.controlPerson;
+    (kybRecord.submissionData as any).contacts = contacts;
+    (kybRecord.submissionData as any).shippingProfile = shippingProfile;
 
     // Simulate enhanced business verification
     const verificationId = await KycController.startBusinessVerification(userId, kybRecord.submissionData);

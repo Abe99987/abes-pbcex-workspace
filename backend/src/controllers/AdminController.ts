@@ -282,7 +282,7 @@ export class AdminController {
     // Sum all synthetic balances across all users
     allBalances.forEach(balance => {
       if (syntheticExposures.hasOwnProperty(balance.asset)) {
-        syntheticExposures[balance.asset] += parseFloat(balance.amount);
+        syntheticExposures[balance.asset] = (syntheticExposures[balance.asset] || 0) + parseFloat(balance.amount);
       }
     });
 

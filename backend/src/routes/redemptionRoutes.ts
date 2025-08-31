@@ -60,14 +60,15 @@ const checkRedemptionEnabled = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   if (!env.ENABLE_VAULT_REDEMPTION) {
-    return res.status(501).json({
+    res.status(501).json({
       code: 'SERVICE_UNAVAILABLE',
       message: 'Vault redemption services are not implemented',
       feature: 'ENABLE_VAULT_REDEMPTION',
       status: 'DISABLED',
     });
+    return;
   }
   next();
 };

@@ -190,9 +190,9 @@ function shouldRetry(
   }
 
   // Retry on network errors or 5xx responses
-  const isNetworkError = !error.response;
-  const isRetryableStatus = error.response?.status >= 500;
-  const isTimeout = error.code === 'ECONNABORTED';
+  const isNetworkError = !(error as any)?.response;
+  const isRetryableStatus = (error as any)?.response?.status >= 500;
+  const isTimeout = (error as any)?.code === 'ECONNABORTED';
 
   return isNetworkError || isRetryableStatus || isTimeout;
 }

@@ -337,7 +337,7 @@ export class AnalyticsController {
     const totalPnL = (Math.random() - 0.3) * 10000;
     const pnlPercentage = (totalPnL / (totalValue - totalPnL)) * 100;
 
-    let breakdown: Array<{ name: string; value: number; pnl: number; percentage: number }> = [];
+    let breakdown: Array<{ category: string; value: number; pnl: number; percentage: number; pnlPercentage: number }> = [];
     if (includeBreakdown) {
       const categories = [
         { name: 'Funding', baseValue: 0.4 },
@@ -354,10 +354,11 @@ export class AnalyticsController {
         const pnlPerc = (pnl / (value - pnl)) * 100;
 
         return {
-          name: cat.name,
+          category: cat.name,
           value: Math.round(value * 100) / 100,
           percentage: Math.round((value / totalValue) * 100 * 100) / 100,
           pnl: Math.round(pnl * 100) / 100,
+          pnlPercentage: Math.round(pnlPerc * 100) / 100,
         };
       });
     }

@@ -351,6 +351,10 @@ export class ShopController {
     const { quoteId } = req.params;
     const userId = req.user!.id;
 
+    if (!quoteId) {
+      throw createError.validation('Quote ID is required');
+    }
+
     const quote = lockedQuotes.get(quoteId);
     if (!quote || quote.userId !== userId) {
       throw createError.notFound('Quote');
@@ -625,7 +629,7 @@ export class ShopController {
   }
 
   private static getEstimatedShipping(provider: string): string {
-    const shippingTimes = {
+    const shippingTimes: Record<string, string> = {
       'JM_BULLION': '3-5 business days',
       'DILLON_GAGE': '2-4 business days',
     };
@@ -639,7 +643,7 @@ export class ShopController {
     if (orderValue >= 1500) return 0;
     
     // Flat rate shipping by metal
-    const shippingRates = {
+    const shippingRates: Record<string, number> = {
       'AU': 25, // Gold - secure shipping
       'AG': 15, // Silver - standard
       'PT': 25, // Platinum - secure

@@ -115,7 +115,7 @@ export class SupportController {
     if (
       !userRole ||
       ![USER_ROLES.SUPPORT, USER_ROLES.TELLER, USER_ROLES.ADMIN].includes(
-        userRole
+        userRole as typeof USER_ROLES.SUPPORT | typeof USER_ROLES.TELLER | typeof USER_ROLES.ADMIN
       )
     ) {
       throw createError.authorization('Support or Teller access required');
@@ -255,7 +255,7 @@ export class SupportController {
         const supportAction: SupportAction = {
           userId: id,
           action: 'PASSWORD_RESET',
-          performedBy: req.user?.id,
+          performedBy: req.user?.id || 'unknown',
           reason,
           metadata: {
             sendEmail,
@@ -355,7 +355,7 @@ export class SupportController {
         const supportAction: SupportAction = {
           userId: 'user-from-order', // Would get from order record
           action: `ORDER_${action}`,
-          performedBy: req.user?.id,
+          performedBy: req.user?.id || 'unknown',
           reason,
           metadata: {
             orderId: id,
@@ -406,13 +406,13 @@ export class SupportController {
             ? limit[0]
             : 20;
 
-      if (!queryQ || queryQ.trim().length < 3) {
-        throw createError.validation(
-          'Search query must be at least 3 characters'
-        );
-      }
+             if (!queryQ || typeof queryQ !== 'string' || queryQ.trim().length < 3) {
+         throw createError.validation(
+           'Search query must be at least 3 characters'
+         );
+       }
 
-      const searchQuery = queryQ.trim();
+       const searchQuery = queryQ.trim();
       const searchLimit = Math.min(parseInt(queryLimit as string) || 20, 100);
 
       logInfo('Support user search', {

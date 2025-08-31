@@ -140,7 +140,7 @@ class DatabaseManager {
 export const db = DatabaseManager.getInstance();
 
 // Helper functions for common operations
-export async function findOne<T>(
+export async function findOne<T extends QueryResultRow>(
   table: string,
   conditions: Record<string, unknown>
 ): Promise<T | null> {
@@ -155,7 +155,7 @@ export async function findOne<T>(
   return result.rows[0] || null;
 }
 
-export async function findMany<T>(
+export async function findMany<T extends QueryResultRow>(
   table: string,
   conditions: Record<string, unknown> = {},
   options: {
@@ -193,7 +193,7 @@ export async function findMany<T>(
   return result.rows;
 }
 
-export async function insertOne<T>(
+export async function insertOne<T extends QueryResultRow>(
   table: string,
   data: Record<string, unknown>
 ): Promise<T> {
@@ -216,7 +216,7 @@ export async function insertOne<T>(
   return result.rows[0];
 }
 
-export async function updateOne<T>(
+export async function updateOne<T extends QueryResultRow>(
   table: string,
   conditions: Record<string, unknown>,
   updates: Record<string, unknown>

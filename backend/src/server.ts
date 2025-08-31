@@ -145,7 +145,8 @@ const generalLimiter = rateLimit({
     return (
       (req.headers['x-forwarded-for'] as string) ||
       req.connection.remoteAddress ||
-      req.ip
+      req.ip ||
+      'unknown'
     );
   },
 });
@@ -220,7 +221,7 @@ app.get('/health', async (req, res) => {
   // Determine overall health
   const serviceStatuses = Object.values(healthData.services);
   const hasUnhealthyService = serviceStatuses.some(
-    (service: { status?: string }) =>
+    (service: any) =>
       service?.status === 'unhealthy' || service?.status === 'error'
   );
 

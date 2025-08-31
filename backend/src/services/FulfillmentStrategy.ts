@@ -358,7 +358,7 @@ export class FulfillmentStrategy {
       // Extract metal from product code (assuming format like "AU-EAGLE-1OZ")
       const metal = request.productCode.split('-')[0];
       
-      if (['AU', 'AG', 'PT', 'PD', 'CU'].includes(metal)) {
+      if (metal && ['AU', 'AG', 'PT', 'PD', 'CU'].includes(metal)) {
         await DillonGageService.restockVault(metal as any, request.quantity);
       }
 

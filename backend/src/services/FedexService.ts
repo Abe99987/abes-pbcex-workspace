@@ -809,7 +809,7 @@ export class FedexService {
       trackingNumber,
       labelUrl: filePath,
       labelBase64: mockPdfContent,
-      serviceType: request.serviceType,
+      serviceType: (request as any)?.serviceType || 'FEDEX_GROUND',
       deliveryDate: FedexService.getTomorrowDate(),
       totalCharge: 15.99,
       currency: 'USD',
