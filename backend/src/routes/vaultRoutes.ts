@@ -16,14 +16,19 @@ router.use(requireAdmin);
 /**
  * Feature flag check middleware
  */
-const checkVaultEnabled = (req: any, res: any, next: any) => {
+const checkVaultEnabled = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   if (!env.ENABLE_VAULT_REDEMPTION) {
-    return res.status(501).json({
+    res.status(501).json({
       code: 'SERVICE_UNAVAILABLE',
       message: 'Vault redemption services are not implemented',
       feature: 'ENABLE_VAULT_REDEMPTION',
       status: 'DISABLED',
     });
+    return;
   }
   next();
 };
@@ -32,7 +37,10 @@ const checkVaultEnabled = (req: any, res: any, next: any) => {
 const restockRequestSchema = z.object({
   sku: z.string().min(1).max(50),
   quantity: z.number().int().min(1).max(1000),
-  unitCost: z.string().regex(/^\d+\.?\d*$/).optional(),
+  unitCost: z
+    .string()
+    .regex(/^\d+\.?\d*$/)
+    .optional(),
 });
 
 const branchRestockSchema = z.object({
@@ -54,7 +62,8 @@ const inventoryQuerySchema = z.object({
  * GET /api/vault/inventory
  * Get vault inventory summary
  */
-router.get('/inventory',
+router.get(
+  '/inventory',
   checkVaultEnabled,
   validateQuery(inventoryQuerySchema),
   asyncHandler(async (req: Request, res: Response) => {
@@ -71,7 +80,8 @@ router.get('/inventory',
  * GET /api/vault/inventory/summary
  * Get inventory summary statistics
  */
-router.get('/inventory/summary',
+router.get(
+  '/inventory/summary',
   checkVaultEnabled,
   asyncHandler(async (req: Request, res: Response) => {
     const summary = await VaultCustodyService.getInventorySummary();
@@ -87,7 +97,8 @@ router.get('/inventory/summary',
  * GET /api/vault/inventory/levels
  * Check inventory levels across all locations
  */
-router.get('/inventory/levels',
+router.get(
+  '/inventory/levels',
   checkVaultEnabled,
   asyncHandler(async (req: Request, res: Response) => {
     const levels = await DillonGageService.checkInventoryLevels();
@@ -103,13 +114,18 @@ router.get('/inventory/levels',
  * GET /api/vault/inventory/low-stock
  * Get items that need restocking
  */
-router.get('/inventory/low-stock',
+router.get(
+  '/inventory/low-stock',
   checkVaultEnabled,
-  validateQuery(z.object({
-    threshold: z.coerce.number().min(1).max(100).default(10),
-  })),
+  validateQuery(
+    z.object({
+      threshold: z.coerce.number().min(1).max(100).default(10),
+    })
+  ),
   asyncHandler(async (req: Request, res: Response) => {
-    const threshold = req.query.threshold as number || 10;
+    // Zod validation ensures threshold is a number, but we need to access it safely
+    const validatedQuery = req.query as { threshold?: number };
+    const threshold = validatedQuery.threshold ?? 10;
     const lowStockItems = await VaultCustodyService.getLowStockItems(threshold);
 
     res.json({
@@ -123,11 +139,16 @@ router.get('/inventory/low-stock',
  * POST /api/vault/inventory/restock
  * Restock vault inventory
  */
-router.post('/inventory/restock',
+router.post(
+  '/inventory/restock',
   checkVaultEnabled,
   validateBody(restockRequestSchema),
   asyncHandler(async (req: Request, res: Response) => {
-    const { sku, quantity, unitCost } = req.body;
+    const { sku, quantity, unitCost } = req.body as {
+      sku: string;
+      quantity: number;
+      unitCost?: string;
+    };
 
     await VaultCustodyService.restockInventory(sku, quantity, unitCost);
 
@@ -143,7 +164,8 @@ router.post('/inventory/restock',
  * POST /api/vault/inventory/auto-restock
  * Trigger automatic restocking based on inventory levels
  */
-router.post('/inventory/auto-restock',
+router.post(
+  '/inventory/auto-restock',
   checkVaultEnabled,
   asyncHandler(async (req: Request, res: Response) => {
     const result = await DillonGageService.triggerAutoRestock();
@@ -160,17 +182,30 @@ router.post('/inventory/auto-restock',
  * GET /api/vault/restock/history
  * Get restock history
  */
-router.get('/restock/history',
+router.get(
+  '/restock/history',
   checkVaultEnabled,
-  validateQuery(z.object({
-    limit: z.coerce.number().min(1).max(100).default(50),
-    location: z.string().optional(),
-    metal: z.enum(['AU', 'AG', 'PT', 'PD', 'CU']).optional(),
-  })),
+  validateQuery(
+    z.object({
+      limit: z.coerce.number().min(1).max(100).default(50),
+      location: z.string().optional(),
+      metal: z.enum(['AU', 'AG', 'PT', 'PD', 'CU']).optional(),
+    })
+  ),
   asyncHandler(async (req: Request, res: Response) => {
-    const { limit, location, metal } = req.query as any;
+    // Zod validation ensures proper types
+    const validatedQuery = req.query as {
+      limit?: number;
+      location?: string;
+      metal?: 'AU' | 'AG' | 'PT' | 'PD' | 'CU';
+    };
+    const { limit, location, metal } = validatedQuery;
 
-    const history = await DillonGageService.getRestockHistory(limit, location, metal);
+    const history = await DillonGageService.getRestockHistory(
+      limit,
+      location,
+      metal
+    );
 
     res.json({
       code: 'SUCCESS',
@@ -183,13 +218,22 @@ router.get('/restock/history',
  * POST /api/vault/branch/restock
  * Restock branch inventory
  */
-router.post('/branch/restock',
+router.post(
+  '/branch/restock',
   checkVaultEnabled,
   validateBody(branchRestockSchema),
   asyncHandler(async (req: Request, res: Response) => {
-    const { branchId, metal, quantity } = req.body;
+    const { branchId, metal, quantity } = req.body as {
+      branchId: string;
+      metal: 'AU' | 'AG' | 'PT' | 'PD' | 'CU';
+      quantity: number;
+    };
 
-    const response = await DillonGageService.restockBranch(branchId, metal, quantity);
+    const response = await DillonGageService.restockBranch(
+      branchId,
+      metal,
+      quantity
+    );
 
     res.json({
       code: 'SUCCESS',
@@ -203,20 +247,31 @@ router.post('/branch/restock',
  * GET /api/vault/redemptions/pending
  * Get pending redemption requests (admin view)
  */
-router.get('/redemptions/pending',
+router.get(
+  '/redemptions/pending',
   checkVaultEnabled,
-  validateQuery(z.object({
-    status: z.enum(['PENDING', 'APPROVED', 'ALLOCATED', 'SHIPPED']).optional(),
-    limit: z.coerce.number().min(1).max(100).default(50),
-    offset: z.coerce.number().min(0).default(0),
-  })),
+  validateQuery(
+    z.object({
+      status: z
+        .enum(['PENDING', 'APPROVED', 'ALLOCATED', 'SHIPPED'])
+        .optional(),
+      limit: z.coerce.number().min(1).max(100).default(50),
+      offset: z.coerce.number().min(0).default(0),
+    })
+  ),
   asyncHandler(async (req: Request, res: Response) => {
     // Mock implementation - would query redemption_requests table
-    const mockRedemptions: any[] = [];
+    const mockRedemptions: Array<{
+      id: string;
+      userId: string;
+      asset: string;
+      status: string;
+      createdAt: Date;
+    }> = [];
 
     res.json({
       code: 'SUCCESS',
-      data: { 
+      data: {
         redemptions: mockRedemptions,
         total: 0,
       },
@@ -228,18 +283,26 @@ router.get('/redemptions/pending',
  * POST /api/vault/redemptions/:id/approve
  * Approve a redemption request
  */
-router.post('/redemptions/:id/approve',
+router.post(
+  '/redemptions/:id/approve',
   checkVaultEnabled,
-  validateBody(z.object({
-    notes: z.string().max(500).optional(),
-  })),
+  validateBody(
+    z.object({
+      notes: z.string().max(500).optional(),
+    })
+  ),
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { notes } = req.body;
 
-    if (!id.match(/^[a-f0-9-]+$/)) {
-      throw createError.validation('Invalid redemption ID format');
+    if (!id || typeof id !== 'string' || !id.match(/^[a-f0-9-]+$/)) {
+      res.status(400).json({
+        code: 'BAD_REQUEST',
+        message: 'Missing or invalid redemption ID format',
+      });
+      return;
     }
+
+    const { notes } = req.body as { notes?: string };
 
     // Mock implementation - would update redemption status
     // TODO: Implement actual redemption approval logic
@@ -256,19 +319,30 @@ router.post('/redemptions/:id/approve',
  * POST /api/vault/redemptions/:id/ship
  * Mark redemption as shipped
  */
-router.post('/redemptions/:id/ship',
+router.post(
+  '/redemptions/:id/ship',
   checkVaultEnabled,
-  validateBody(z.object({
-    trackingNumber: z.string().min(1).max(100),
-    shippingCarrier: z.string().max(50).default('FEDEX'),
-  })),
+  validateBody(
+    z.object({
+      trackingNumber: z.string().min(1).max(100),
+      shippingCarrier: z.string().max(50).default('FEDEX'),
+    })
+  ),
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { trackingNumber, shippingCarrier } = req.body;
 
-    if (!id.match(/^[a-f0-9-]+$/)) {
-      throw createError.validation('Invalid redemption ID format');
+    if (!id || typeof id !== 'string' || !id.match(/^[a-f0-9-]+$/)) {
+      res.status(400).json({
+        code: 'BAD_REQUEST',
+        message: 'Missing or invalid redemption ID format',
+      });
+      return;
     }
+
+    const { trackingNumber, shippingCarrier } = req.body as {
+      trackingNumber: string;
+      shippingCarrier: string;
+    };
 
     await VaultCustodyService.markShipped(id, trackingNumber, shippingCarrier);
 
@@ -284,7 +358,8 @@ router.post('/redemptions/:id/ship',
  * GET /api/vault/stats
  * Get vault and redemption statistics
  */
-router.get('/stats',
+router.get(
+  '/stats',
   checkVaultEnabled,
   asyncHandler(async (req: Request, res: Response) => {
     const [inventorySummary, restockStats] = await Promise.all([
