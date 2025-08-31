@@ -56,19 +56,45 @@ const envSchema = z.object({
   DILLON_GAGE_API_SECRET: z.string().optional(),
   FEDEX_CLIENT_ID: z.string().optional(),
   FEDEX_CLIENT_SECRET: z.string().optional(),
+  FEDEX_ACCOUNT_NUMBER: z.string().optional(),
+  FEDEX_BASE_URL: z
+    .string()
+    .url()
+    .default('https://apis-sandbox.fedex.com'),
 
   // Payments
   STRIPE_SECRET_KEY: z.string().optional(),
 
   // Messaging & Communication
+  EMAIL_FROM: z
+    .string()
+    .email()
+    .default('contact@pbcex.com'),
+  RESEND_API_KEY: z.string().optional(),
   SENDGRID_API_KEY: z.string().optional(),
   TWILIO_ACCOUNT_SID: z.string().optional(),
   TWILIO_AUTH_TOKEN: z.string().optional(),
+  TWILIO_VERIFY_SERVICE_SID: z.string().optional(),
+  TWILIO_MESSAGING_SERVICE_SID: z.string().optional(),
   INTERCOM_ACCESS_TOKEN: z.string().optional(),
 
   // Monitoring & Compliance
   DATADOG_API_KEY: z.string().optional(),
   VANTA_API_KEY: z.string().optional(),
+
+  // API Configuration
+  API_BASE_URL: z
+    .string()
+    .url()
+    .default('http://localhost:3000'),
+  APP_BASE_URL: z
+    .string()
+    .url()
+    .default('http://localhost:8080'),
+  COINGECKO_BASE_URL: z
+    .string()
+    .url()
+    .default('https://api.coingecko.com/api/v3'),
 
   // Phase-3 Feature Flags
   PHASE: z
@@ -106,12 +132,30 @@ const envSchema = z.object({
 export type EnvConfig = z.infer<typeof envSchema>;
 
 /**
+ * Production-specific validation schema
+ * Requires critical integration keys in production
+ */
+const productionSchema = envSchema.extend({
+  // Critical integrations required in production
+  RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required in production'),
+  TWILIO_ACCOUNT_SID: z.string().min(1, 'TWILIO_ACCOUNT_SID is required in production'),
+  TWILIO_AUTH_TOKEN: z.string().min(1, 'TWILIO_AUTH_TOKEN is required in production'),
+  TWILIO_VERIFY_SERVICE_SID: z.string().min(1, 'TWILIO_VERIFY_SERVICE_SID is required in production'),
+  FEDEX_CLIENT_ID: z.string().min(1, 'FEDEX_CLIENT_ID is required in production'),
+  FEDEX_CLIENT_SECRET: z.string().min(1, 'FEDEX_CLIENT_SECRET is required in production'),
+  FEDEX_ACCOUNT_NUMBER: z.string().min(1, 'FEDEX_ACCOUNT_NUMBER is required in production'),
+});
+
+/**
  * Validates and parses environment variables
  * Throws an error if validation fails
  */
 function validateEnv(): EnvConfig {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const schema = isProduction ? productionSchema : envSchema;
+  
   try {
-    return envSchema.parse(process.env);
+    return schema.parse(process.env);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const missingVars = error.errors
@@ -159,9 +203,12 @@ export const integrations = {
   jmBullion: !!(env.JM_BULLION_API_KEY && env.JM_BULLION_API_SECRET),
   dillonGage: !!(env.DILLON_GAGE_API_KEY && env.DILLON_GAGE_API_SECRET),
   fedex: !!(env.FEDEX_CLIENT_ID && env.FEDEX_CLIENT_SECRET),
+  fedexFull: !!(env.FEDEX_CLIENT_ID && env.FEDEX_CLIENT_SECRET && env.FEDEX_ACCOUNT_NUMBER),
   stripe: !!env.STRIPE_SECRET_KEY,
+  resend: !!env.RESEND_API_KEY,
   sendgrid: !!env.SENDGRID_API_KEY,
   twilio: !!(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN),
+  twilioVerify: !!(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && env.TWILIO_VERIFY_SERVICE_SID),
   intercom: !!env.INTERCOM_ACCESS_TOKEN,
   datadog: !!env.DATADOG_API_KEY,
   vanta: !!env.VANTA_API_KEY,

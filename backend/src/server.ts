@@ -19,6 +19,11 @@ import { RATE_LIMITS } from '@/utils/constants';
 // Import services
 import PriceFeedService from '@/services/PriceFeedService';
 import NotificationService from '@/services/NotificationService';
+import EmailService from '@/services/EmailService';
+import VerifyService from '@/services/VerifyService';
+import FedexService from '@/services/FedexService';
+import PricesService from '@/services/PricesService';
+import CheckoutService from '@/services/CheckoutService';
 
 // Import routes
 import authRoutes from '@/routes/authRoutes';
@@ -31,6 +36,10 @@ import redemptionRoutes from '@/routes/redemptionRoutes';
 import vaultRoutes from '@/routes/vaultRoutes';
 import supportRoutes from '@/routes/supportRoutes';
 import analyticsRoutes from '@/routes/analyticsRoutes';
+import emailRoutes from '@/routes/emailRoutes';
+import fedexRoutes from '@/routes/fedexRoutes';
+import pricesRoutes from '@/routes/pricesRoutes';
+import checkoutRoutes from '@/routes/checkoutRoutes';
 
 // Import controllers for direct endpoints
 import { TradeControllerDb } from '@/controllers/TradeControllerDb';
@@ -253,10 +262,14 @@ try {
 }
 
 // Public endpoints (no auth required)
-app.get('/api/prices', TradeControllerDb.getPrices);
+// app.get('/api/prices', TradeControllerDb.getPrices); // Moved to /api/prices routes
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/checkout', checkoutRoutes);
+app.use('/api/email', emailRoutes);
+app.use('/api/fedex', fedexRoutes);
+app.use('/api/prices', pricesRoutes);
 app.use('/api/kyc', kycRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/trade', tradeRoutes);
@@ -290,6 +303,10 @@ app.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: {
       auth: '/api/auth',
+      checkout: '/api/checkout',
+      email: '/api/email',
+      fedex: '/api/fedex',
+      prices: '/api/prices',
       kyc: '/api/kyc',
       wallet: '/api/wallet',
       trade: '/api/trade',
@@ -317,6 +334,26 @@ async function initializeServices(): Promise<void> {
     await NotificationService.initialize();
     logInfo('✅ NotificationService initialized');
 
+    // Initialize email service
+    await EmailService.initialize();
+    logInfo('✅ EmailService initialized');
+
+    // Initialize verify service
+    await VerifyService.initialize();
+    logInfo('✅ VerifyService initialized');
+
+    // Initialize FedEx service
+    await FedexService.initialize();
+    logInfo('✅ FedexService initialized');
+
+    // Initialize Prices service (CoinGecko + Redis)
+    await PricesService.initialize();
+    logInfo('✅ PricesService initialized');
+
+    // Initialize Checkout service (Price-lock stubs)
+    await CheckoutService.initialize();
+    logInfo('✅ CheckoutService initialized');
+
     // Initialize price feed service
     await PriceFeedService.initialize();
     logInfo('✅ PriceFeedService initialized');
@@ -339,6 +376,11 @@ async function shutdownServices(): Promise<void> {
 
   try {
     await PriceFeedService.shutdown();
+    await PricesService.shutdown();
+    await CheckoutService.shutdown();
+    await EmailService.shutdown();
+    await VerifyService.shutdown();
+    await FedexService.shutdown();
     // await DatabaseService.shutdown();
     // await RedisService.shutdown();
 

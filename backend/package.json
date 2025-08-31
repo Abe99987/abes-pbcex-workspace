@@ -27,7 +27,8 @@
     "seed": "ts-node -r tsconfig-paths/register scripts/seed-supabase.ts",
     "seed:memory": "ts-node -r tsconfig-paths/register scripts/seed-dev.ts",
     "reset:db": "npm run migrate && npm run seed",
-    "dev:backend": "npm run dev"
+    "dev:backend": "npm run dev",
+    "dev:fedex-smoke": "ts-node -r tsconfig-paths/register scripts/dev-fedex-smoke.ts"
   },
   "keywords": [
     "pbcex",
@@ -52,6 +53,7 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.4",
     "pg": "^8.16.3",
+    "resend": "^6.0.2",
     "stripe": "^12.18.0",
     "swagger-ui-express": "^5.0.0",
     "twilio": "^4.14.0",
