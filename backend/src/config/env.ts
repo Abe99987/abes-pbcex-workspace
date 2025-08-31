@@ -127,6 +127,13 @@ const envSchema = z.object({
 
   // A/B Testing Configuration
   EXPERIMENTS_JSON: z.string().optional(),
+
+  // API & Application Info
+  API_VERSION: z.string().default('1.0.0'),
+  NEXT_PUBLIC_APP_URL: z
+    .string()
+    .url()
+    .default('http://localhost:8080'),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

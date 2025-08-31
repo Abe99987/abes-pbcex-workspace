@@ -219,7 +219,7 @@ declare module 'axios' {
     metadata?: {
       correlationId: string;
       startTime: number;
-      serviceName: string;
+      serviceName?: string;
     };
     __retryCount?: number;
   }

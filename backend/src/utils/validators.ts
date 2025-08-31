@@ -30,7 +30,7 @@ export const einSchema = z.string()
   .regex(VALIDATION.EIN.PATTERN, 'Invalid EIN format (use XX-XXXXXXX)');
 
 // Asset and account validations
-export const assetSchema = z.enum([...Object.values(ASSETS)]);
+export const assetSchema = z.enum(['PAXG', 'USD', 'USDC', 'XAU-s', 'XAG-s', 'XPT-s', 'XPD-s', 'XCU-s']);
 export const realAssetSchema = z.enum(['PAXG', 'USD', 'USDC']);
 export const syntheticAssetSchema = z.enum(['XAU-s', 'XAG-s', 'XPT-s', 'XPD-s', 'XCU-s']);
 export const accountTypeSchema = z.enum([ACCOUNT_TYPES.FUNDING, ACCOUNT_TYPES.TRADING]);

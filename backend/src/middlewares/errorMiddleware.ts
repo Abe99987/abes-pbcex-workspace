@@ -66,6 +66,15 @@ export const createError = {
 
   internal: (message: string = 'Internal server error', details?: Record<string, any>) =>
     new AppError(message, 500, API_CODES.INTERNAL_ERROR, false, details),
+
+  badRequest: (message: string, details?: Record<string, any>) =>
+    new AppError(message, 400, API_CODES.VALIDATION_ERROR, true, details),
+
+  forbidden: (message: string = 'Access denied') =>
+    new AppError(message, 403, API_CODES.AUTHORIZATION_ERROR, true),
+
+  internalServerError: (message: string = 'Internal server error', details?: Record<string, any>) =>
+    new AppError(message, 500, API_CODES.INTERNAL_ERROR, false, details),
 };
 
 /**

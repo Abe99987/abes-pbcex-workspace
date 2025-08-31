@@ -91,6 +91,15 @@ class RedisManager {
     }
   }
 
+  // Alias for backward compatibility
+  public async setex(
+    key: string,
+    ttlSeconds: number,
+    value: string
+  ): Promise<boolean> {
+    return this.set(key, value, ttlSeconds);
+  }
+
   public async getJson<T = unknown>(key: string): Promise<T | null> {
     const value = await this.get(key);
     if (!value) return null;
