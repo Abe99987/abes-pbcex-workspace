@@ -55,6 +55,7 @@ const Realize = () => {
   const [buyPhysicalModalOpen, setBuyPhysicalModalOpen] = useState(false);
   const [borrowingModalOpen, setBorrowingModalOpen] = useState(false);
   const [sendModalOpen, setSendModalOpen] = useState(false);
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const navigate = useNavigate();
 
@@ -215,28 +216,32 @@ const Realize = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className='lg:col-span-4'>
-                    <div className='grid grid-cols-2 lg:grid-cols-5 gap-3'>
+                  <div 
+                    className='lg:col-span-4'
+                    onClick={e => e.stopPropagation()}
+                    onMouseDown={e => e.stopPropagation()}
+                  >
+                    {/* Row 1: Buy | Sell | Order */}
+                    <div className='grid grid-cols-3 gap-3 mb-3'>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-4'
+                              className='h-10 px-4 min-h-[40px]'
                               onClick={() => {
                                 setSelectedAsset(asset);
                                 setBuyModalOpen(true);
                               }}
+                              aria-label={`Buy ${asset.name}`}
+                              data-testid="buy-btn"
                             >
                               <ShoppingCart className='w-4 h-4 mr-2' />
                               Buy
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>
-                              Purchase using USDC, PAXG, bank wire, or debit
-                              card
-                            </p>
+                            <p>Purchase tokens using USD, USDC, PAXG, bank wire, or debit card</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -246,18 +251,20 @@ const Realize = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-4'
+                              className='h-10 px-4 min-h-[40px]'
                               onClick={() => {
                                 setSelectedAsset(asset);
                                 setRealizeModalOpen(true);
                               }}
+                              aria-label={`Sell ${asset.name}`}
+                              data-testid="sell-btn"
                             >
-                              <Package className='w-4 h-4 mr-2' />
+                              <CreditCard className='w-4 h-4 mr-2' />
                               Sell
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Sell {asset.name}</p>
+                            <p>Realize/withdraw {asset.name} holdings</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -267,35 +274,39 @@ const Realize = () => {
                           <TooltipTrigger asChild>
                             <Button
                               variant='premium'
-                              className='h-10 px-4 bg-black text-white hover:bg-black/90'
+                              className='h-10 px-4 min-h-[40px] bg-black text-white hover:bg-black/90'
                               onClick={() => {
                                 setSelectedAsset(asset);
                                 setBuyPhysicalModalOpen(true);
                               }}
+                              aria-label={`Order ${asset.name}`}
+                              data-testid="order-btn"
                             >
                               <Truck className='w-4 h-4 mr-2' />
                               Order
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>
-                              Ship physical asset to your address. Token will be
-                              burned on fulfillment.
-                            </p>
+                            <p>Physical delivery (bars/coins/Goldbacks) with format selection</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
+                    </div>
 
+                    {/* Row 2: Send | Deposit | Mortgage */}
+                    <div className='grid grid-cols-3 gap-3'>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               variant='outline'
-                              className='h-10 px-4'
+                              className='h-10 px-4 min-h-[40px]'
                               onClick={() => {
                                 setSelectedAsset(asset);
                                 setSendModalOpen(true);
                               }}
+                              aria-label={`Send ${asset.name}`}
+                              data-testid="send-btn"
                             >
                               <Send className='w-4 h-4 mr-2' />
                               Send
@@ -310,13 +321,45 @@ const Realize = () => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant='outline' className='h-10 px-4'>
+                            <Button
+                              variant='outline'
+                              className='h-10 px-4 min-h-[40px]'
+                              onClick={() => {
+                                setSelectedAsset(asset);
+                                setDepositModalOpen(true);
+                              }}
+                              aria-label={`Deposit ${asset.name}`}
+                              data-testid="deposit-btn"
+                            >
                               <Upload className='w-4 h-4 mr-2' />
                               Deposit
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Deposit {asset.name}</p>
+                            <p>Crypto deposit: PAXG, USDC, or related tokens</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant='outline'
+                              className='h-10 px-4 min-h-[40px]'
+                              onClick={() => {
+                                setSelectedAsset(asset);
+                                setBorrowingModalOpen(true);
+                              }}
+                              aria-label={`Mortgage with ${asset.name}`}
+                              data-testid={`mortgage-link-${asset.symbol}`}
+                            >
+                              <ArrowUpDown className='w-4 h-4 mr-2' />
+                              Mortgage
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Asset-backed financing with {asset.name} as collateral</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -371,6 +414,27 @@ const Realize = () => {
             onClose={() => setBorrowingModalOpen(false)}
             asset={selectedAsset}
           />
+
+          {/* Deposit = Development Modal */}
+          <Dialog open={depositModalOpen} onOpenChange={setDepositModalOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Crypto Deposit - {selectedAsset?.name}</DialogTitle>
+                <DialogDescription>
+                  This feature is under development. Please use the main deposit flow for now.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant='outline'
+                  onClick={() => setDepositModalOpen(false)}
+                >
+                  Close
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           <Dialog open={sendModalOpen} onOpenChange={setSendModalOpen}>
             <DialogContent>
               <DialogHeader>
