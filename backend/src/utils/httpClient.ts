@@ -87,7 +87,7 @@ export function createHttpClient(options: HttpClientOptions): AxiosInstance {
       config.metadata = { 
         correlationId, 
         startTime: Date.now(),
-        serviceName 
+        serviceName: serviceName 
       };
 
       logInfo(`${serviceName} HTTP request`, {
@@ -107,7 +107,8 @@ export function createHttpClient(options: HttpClientOptions): AxiosInstance {
   // Response interceptor for logging and retry logic
   client.interceptors.response.use(
     (response) => {
-      const { correlationId, startTime, serviceName: service } = response.config.metadata || {};
+      const metadata = response.config.metadata || {};
+      const { correlationId, startTime, serviceName: service } = metadata;
       const duration = startTime ? Date.now() - startTime : 0;
 
       logInfo(`${service} HTTP response`, {

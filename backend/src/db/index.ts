@@ -51,7 +51,7 @@ class DatabaseManager {
     }
   }
 
-  public async query<T = unknown>(
+  public async query<T extends QueryResultRow = any>(
     text: string,
     params?: unknown[]
   ): Promise<QueryResult<T>> {
@@ -210,6 +210,9 @@ export async function insertOne<T>(
   `;
 
   const result = await db.query<T>(query, values);
+  if (!result.rows[0]) {
+    throw new Error(`Failed to insert into ${table}`);
+  }
   return result.rows[0];
 }
 

@@ -1,15 +1,7 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import { logInfo, logWarn, logError } from '@/utils/logger';
 
-// Extend AxiosRequestConfig to include metadata
-declare module 'axios' {
-  export interface AxiosRequestConfig {
-    metadata?: {
-      correlationId: string;
-      startTime: number;
-    };
-  }
-}
+// Metadata types are declared in utils/httpClient.ts
 import { env, integrations } from '@/config/env';
 import { cache } from '@/cache/redis';
 import fs from 'fs/promises';

@@ -251,7 +251,7 @@ export class EmailService {
    */
   private static maskEmail(email: string): string {
     const [local, domain] = email.split('@');
-    if (!domain) return '***@***';
+    if (!domain || !local) return '***@***';
     
     const maskedLocal = local.length > 2 
       ? local.charAt(0) + '***' + local.slice(-1)

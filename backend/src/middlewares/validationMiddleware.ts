@@ -13,14 +13,14 @@ interface ValidatedRequest<T = unknown> extends Request {
  * Validates request body against a Zod schema
  */
 export function validateRequest<T>(schema: ZodSchema<T>) {
-  return (req: ValidatedRequest<T>, res: Response, next: NextFunction) => {
+  return (req: ValidatedRequest<T>, res: Response, next: NextFunction): void => {
     try {
       const validatedData = schema.parse(req.body);
       req.validatedData = validatedData;
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
+        res.status(400).json({
           error: 'Validation failed',
           details: error.errors.map(err => ({
             path: err.path.join('.'),
@@ -28,6 +28,7 @@ export function validateRequest<T>(schema: ZodSchema<T>) {
             code: err.code,
           })),
         });
+        return;
       }
       next(error);
     }
@@ -38,14 +39,14 @@ export function validateRequest<T>(schema: ZodSchema<T>) {
  * Validates request query parameters against a Zod schema
  */
 export function validateQuery<T>(schema: ZodSchema<T>) {
-  return (req: ValidatedRequest<T>, res: Response, next: NextFunction) => {
+  return (req: ValidatedRequest<T>, res: Response, next: NextFunction): void => {
     try {
       const validatedData = schema.parse(req.query);
       req.validatedData = validatedData;
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
+        res.status(400).json({
           error: 'Query validation failed',
           details: error.errors.map(err => ({
             path: err.path.join('.'),
@@ -53,6 +54,7 @@ export function validateQuery<T>(schema: ZodSchema<T>) {
             code: err.code,
           })),
         });
+        return;
       }
       next(error);
     }
@@ -63,14 +65,14 @@ export function validateQuery<T>(schema: ZodSchema<T>) {
  * Validates request parameters against a Zod schema
  */
 export function validateParams<T>(schema: ZodSchema<T>) {
-  return (req: ValidatedRequest<T>, res: Response, next: NextFunction) => {
+  return (req: ValidatedRequest<T>, res: Response, next: NextFunction): void => {
     try {
       const validatedData = schema.parse(req.params);
       req.validatedData = validatedData;
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
+        res.status(400).json({
           error: 'Parameter validation failed',
           details: error.errors.map(err => ({
             path: err.path.join('.'),
@@ -78,6 +80,7 @@ export function validateParams<T>(schema: ZodSchema<T>) {
             code: err.code,
           })),
         });
+        return;
       }
       next(error);
     }
@@ -96,7 +99,7 @@ export function validateRequestFull<
   query?: ZodSchema<TQuery>;
   params?: ZodSchema<TParams>;
 }) {
-  return (req: ValidatedRequest, res: Response, next: NextFunction) => {
+  return (req: ValidatedRequest, res: Response, next: NextFunction): void => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const validatedData: any = {};
@@ -117,7 +120,7 @@ export function validateRequestFull<
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
+        res.status(400).json({
           error: 'Validation failed',
           details: error.errors.map(err => ({
             path: err.path.join('.'),
@@ -125,6 +128,7 @@ export function validateRequestFull<
             code: err.code,
           })),
         });
+        return;
       }
       next(error);
     }

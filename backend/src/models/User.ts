@@ -5,12 +5,15 @@ import { USER_ROLES, KYC_STATUS } from '@/utils/constants';
  * User model for PBCEx platform
  */
 
+// User role type alias
+export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
+
 // Base user interface
 export interface User {
   id: string;
   email: string;
   passwordHash: string;
-  role: typeof USER_ROLES[keyof typeof USER_ROLES];
+  role: UserRole;
   kycStatus: typeof KYC_STATUS[keyof typeof KYC_STATUS];
   firstName?: string;
   lastName?: string;

@@ -80,7 +80,7 @@ export interface CreateKycRecordInput {
 
 export class KycRecordUtils {
   static needsReview(record: KycRecord): boolean {
-    return [KYC_STATUS.IN_PROGRESS, KYC_STATUS.PENDING_REVIEW].includes(record.status);
+    return [KYC_STATUS.IN_PROGRESS, KYC_STATUS.PENDING_REVIEW].includes(record.status as any);
   }
 
   static isExpired(record: KycRecord): boolean {
@@ -88,7 +88,7 @@ export class KycRecordUtils {
   }
 
   static canResubmit(record: KycRecord): boolean {
-    return [KYC_STATUS.REJECTED, KYC_STATUS.EXPIRED].includes(record.status);
+    return [KYC_STATUS.REJECTED, KYC_STATUS.EXPIRED].includes(record.status as any);
   }
 
   static getRequiredDocuments(type: string): string[] {
