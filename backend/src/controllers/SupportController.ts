@@ -109,7 +109,7 @@ export class SupportController {
 
     const { id } = req.params;
     
-    if (!id.match(/^[a-f0-9-]+$/)) {
+    if (!id || !id.match(/^[a-f0-9-]+$/)) {
       throw createError.validation('Invalid user ID format');
     }
 
@@ -203,7 +203,7 @@ export class SupportController {
     const { id } = req.params;
     const { reason, sendEmail = true } = req.body;
 
-    if (!id.match(/^[a-f0-9-]+$/)) {
+    if (!id || !id.match(/^[a-f0-9-]+$/)) {
       throw createError.validation('Invalid user ID format');
     }
 
@@ -268,7 +268,7 @@ export class SupportController {
     const { id } = req.params;
     const { action, newStatus, refundAmount, reason } = req.body;
 
-    if (!id.match(/^[a-f0-9-]+$/)) {
+    if (!id || !id.match(/^[a-f0-9-]+$/)) {
       throw createError.validation('Invalid order ID format');
     }
 
@@ -481,7 +481,7 @@ export class SupportController {
     const { id } = req.params;
     const { note, category = 'GENERAL', priority = 'MEDIUM' } = req.body;
 
-    if (!id.match(/^[a-f0-9-]+$/)) {
+    if (!id || !id.match(/^[a-f0-9-]+$/)) {
       throw createError.validation('Invalid user ID format');
     }
 
@@ -544,7 +544,7 @@ export class SupportController {
 
     const { userId } = req.params;
     
-    if (!userId.match(/^[a-f0-9-]+$/)) {
+    if (!userId || !userId.match(/^[a-f0-9-]+$/)) {
       throw createError.validation('Invalid user ID format');
     }
 

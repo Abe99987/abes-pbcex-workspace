@@ -84,7 +84,7 @@ export function createHttpClient(options: HttpClientOptions): AxiosInstance {
   client.interceptors.request.use(
     (config) => {
       const correlationId = Math.random().toString(36).substr(2, 9);
-      config.metadata = { 
+      (config as any).metadata = { 
         correlationId, 
         startTime: Date.now(),
         serviceName 
@@ -107,7 +107,7 @@ export function createHttpClient(options: HttpClientOptions): AxiosInstance {
   // Response interceptor for logging and retry logic
   client.interceptors.response.use(
     (response) => {
-      const metadata = response.config.metadata || { correlationId: '', startTime: 0 };
+      const metadata = (response.config as any).metadata || { correlationId: '', startTime: 0 };
       const { correlationId, startTime, serviceName: service } = metadata;
       const duration = startTime ? Date.now() - startTime : 0;
 
@@ -214,17 +214,9 @@ export const httpClients = {
   coingecko: createHttpClient(HTTP_CLIENT_CONFIGS.COINGECKO)
 };
 
-// Extend AxiosRequestConfig to include metadata
-// Remove conflicting module declaration - use specific interface instead
+// HTTP Client metadata interface
 interface HttpRequestMeta {
   correlationId: string;
   startTime: number;
   serviceName?: string;
-}
-
-declare module 'axios' {
-  export interface AxiosRequestConfig {
-    metadata?: HttpRequestMeta;
-    __retryCount?: number;
-  }
 }

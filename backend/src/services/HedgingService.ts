@@ -111,6 +111,9 @@ export class HedgingService {
     currentHedges: HedgePosition[]
   ): Promise<ExposureSummary> {
     const config = HedgingService.exposureThresholds[asset];
+    if (!config) {
+      throw new Error(`No hedging configuration found for asset: ${asset}`);
+    }
     const exposure = parseFloat(totalExposure);
 
     // Calculate current hedge coverage
@@ -172,6 +175,9 @@ export class HedgingService {
     recommendation: string;
   } {
     const config = HedgingService.exposureThresholds[asset];
+    if (!config) {
+      throw new Error(`No hedging configuration found for asset: ${asset}`);
+    }
     const targetHedgedAmount = currentExposure * targetRatio;
     const hedgeDeficit = targetHedgedAmount - currentHedgedAmount;
 
@@ -211,6 +217,9 @@ export class HedgingService {
     marketImpact: string;
   }> {
     const config = HedgingService.exposureThresholds[asset];
+    if (!config) {
+      throw new Error(`No hedging configuration found for asset: ${asset}`);
+    }
     const ratio = targetRatio || config.targetRatio;
 
     // Mock current ETF prices
@@ -225,8 +234,8 @@ export class HedgingService {
       'JJC': 52.30,
     };
 
-    const primaryEtf = config.etfSymbols[0];
-    const etfPrice = mockEtfPrices[primaryEtf] || 100.0;
+    const primaryEtf = config.etfSymbols?.[0];
+    const etfPrice = primaryEtf ? (mockEtfPrices[primaryEtf] || 100.0) : 100.0;
 
     const currentHedgedAmount = currentHedges.reduce((sum, h) => 
       sum + parseFloat(h.quantity), 0
@@ -427,21 +436,25 @@ export class HedgingService {
       // Generate recommendations
       if (evaluation.recommendedAction !== 'MAINTAIN') {
         const config = HedgingService.exposureThresholds[asset];
-        recommendations.push(
-          `${asset}: ${evaluation.recommendedAction.replace('_', ' ')} - ` +
-          `Current ratio: ${evaluation.hedgeRatio}%, Target: ${(config.targetRatio * 100).toFixed(0)}%`
-        );
+        if (config) {
+          recommendations.push(
+            `${asset}: ${evaluation.recommendedAction.replace('_', ' ')} - ` +
+            `Current ratio: ${evaluation.hedgeRatio}%, Target: ${(config.targetRatio * 100).toFixed(0)}%`
+          );
+        }
       }
 
       // Generate alerts
       const hedgeRatio = parseFloat(evaluation.hedgeRatio) / 100;
       const config = HedgingService.exposureThresholds[asset];
       
-      if (hedgeRatio < config.minRatio) {
-        alerts.push(`${asset} hedge ratio (${evaluation.hedgeRatio}%) below minimum threshold`);
-      }
-      if (hedgeRatio > config.maxRatio) {
-        alerts.push(`${asset} hedge ratio (${evaluation.hedgeRatio}%) above maximum threshold`);
+      if (config) {
+        if (hedgeRatio < config.minRatio) {
+          alerts.push(`${asset} hedge ratio (${evaluation.hedgeRatio}%) below minimum threshold`);
+        }
+        if (hedgeRatio > config.maxRatio) {
+          alerts.push(`${asset} hedge ratio (${evaluation.hedgeRatio}%) above maximum threshold`);
+        }
       }
     }
 
@@ -490,7 +503,7 @@ export class HedgingService {
   private static assessMarketConditions(asset: string): string {
     // Simulate market condition assessment
     const conditions = ['NORMAL', 'VOLATILE', 'TRENDING_UP', 'TRENDING_DOWN'];
-    return conditions[Math.floor(Math.random() * conditions.length)];
+    return conditions[Math.floor(Math.random() * conditions.length)] || 'NORMAL';
   }
 
   private static calculateRiskLevel(unhedgedExposure: number): string {

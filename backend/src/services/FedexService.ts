@@ -696,7 +696,7 @@ export class FedexService {
   private static getTomorrowDate(): string {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split('T')[0];
+    return tomorrow.toISOString().split('T')[0] || tomorrow.toISOString().slice(0, 10);
   }
 
   private static generateMockRates(request: any): FedExRateQuote[] {
@@ -794,9 +794,20 @@ export class FedexService {
   }
 
   private static async parseShipmentResponse(response: FedExShipmentResponse, correlationId: string): Promise<FedExLabelResult> {
-    const transaction = response.output.transactionShipments[0];
-    const packageDetail = transaction.completedPackageDetails[0];
-    const document = packageDetail.packageDocuments[0];
+    const transaction = response.output.transactionShipments?.[0];
+    if (!transaction) {
+      throw new Error('No transaction data in FedEx shipment response');
+    }
+    
+    const packageDetail = transaction.completedPackageDetails?.[0];
+    if (!packageDetail) {
+      throw new Error('No package details in FedEx transaction response');
+    }
+    
+    const document = packageDetail.packageDocuments?.[0];
+    if (!document) {
+      throw new Error('No package documents in FedEx package response');
+    }
 
     const filename = `label-${packageDetail.trackingNumber}-${correlationId}.pdf`;
     const filePath = await FedexService.saveLabel(document.encodedLabel, filename);

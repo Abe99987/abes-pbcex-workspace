@@ -6,6 +6,13 @@ import { env } from '@/config/env';
 import RedemptionService from '@/services/RedemptionService';
 import { z } from 'zod';
 
+interface UserPayload {
+  id: string;
+  role: string;
+}
+
+type AuthedRequest<T = any> = Request & { user: UserPayload; body: T };
+
 const router = Router();
 
 // All redemption routes require authentication and approved KYC
@@ -43,7 +50,7 @@ const redemptionRequestSchema = z.object({
 /**
  * Feature flag check middleware
  */
-const checkRedemptionEnabled = (req: any, res: any, next: any) => {
+const checkRedemptionEnabled = (req: Request, res: Response, next: NextFunction) => {
   if (!env.ENABLE_VAULT_REDEMPTION) {
     return res.status(501).json({
       code: 'SERVICE_UNAVAILABLE',
@@ -63,7 +70,7 @@ router.get('/quote',
   checkRedemptionEnabled,
   validateQuery(redemptionQuoteSchema),
   asyncHandler(async (req: Request, res: Response) => {
-    const { asset, amount, format } = req.query as any;
+    const { asset, amount, format } = req.query as z.infer<typeof redemptionQuoteSchema>;
 
     const quote = await RedemptionService.getRedemptionQuote(asset, amount, format);
 
@@ -81,9 +88,9 @@ router.get('/quote',
 router.post('/',
   checkRedemptionEnabled,
   validateBody(redemptionRequestSchema),
-  asyncHandler(async (req: Request, res: Response) => {
+  asyncHandler(async (req: AuthedRequest<z.infer<typeof redemptionRequestSchema>>, res: Response) => {
     const redemptionInput = {
-      userId: req.user!.id,
+      userId: req.user.id,
       ...req.body,
     };
 
@@ -106,11 +113,20 @@ router.post('/',
  */
 router.get('/history',
   checkRedemptionEnabled,
-  asyncHandler(async (req: Request, res: Response) => {
-    const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
-    const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
+  asyncHandler(async (req: AuthedRequest, res: Response) => {
+    const limitParam = req.query.limit;
+    const offsetParam = req.query.offset;
 
-    const result = await RedemptionService.getUserRedemptions(req.user!.id, limit, offset);
+    const limit = Math.min(
+      typeof limitParam === 'string' && /^\d+$/.test(limitParam) ? parseInt(limitParam) : 50,
+      100
+    );
+    const offset = Math.max(
+      typeof offsetParam === 'string' && /^\d+$/.test(offsetParam) ? parseInt(offsetParam) : 0,
+      0
+    );
+
+    const result = await RedemptionService.getUserRedemptions(req.user.id, limit, offset);
 
     res.json({
       code: 'SUCCESS',
@@ -125,17 +141,17 @@ router.get('/history',
  */
 router.get('/status/:id',
   checkRedemptionEnabled,
-  asyncHandler(async (req: Request, res: Response) => {
+  asyncHandler(async (req: AuthedRequest, res: Response) => {
     const { id } = req.params;
 
-    if (!id.match(/^[a-f0-9-]+$/)) {
+    if (!id || !id.match(/^[a-f0-9-]+$/)) {
       throw createError.validation('Invalid redemption ID format');
     }
 
     const redemption = await RedemptionService.getRedemptionStatus(id);
 
     // Check ownership
-    if (redemption.userId !== req.user!.id && req.user!.role !== 'ADMIN') {
+    if (redemption.userId !== req.user.id && req.user.role !== 'ADMIN') {
       throw createError.authorization('Access denied');
     }
 
@@ -155,15 +171,15 @@ router.post('/:id/cancel',
   validateBody(z.object({
     reason: z.string().max(500).optional(),
   })),
-  asyncHandler(async (req: Request, res: Response) => {
+  asyncHandler(async (req: AuthedRequest<{ reason?: string }>, res: Response) => {
     const { id } = req.params;
     const { reason } = req.body;
 
-    if (!id.match(/^[a-f0-9-]+$/)) {
+    if (!id || !id.match(/^[a-f0-9-]+$/)) {
       throw createError.validation('Invalid redemption ID format');
     }
 
-    await RedemptionService.cancelRedemption(id, req.user!.id, reason);
+    await RedemptionService.cancelRedemption(id, req.user.id, reason);
 
     res.json({
       code: 'SUCCESS',
@@ -178,9 +194,9 @@ router.post('/:id/cancel',
  */
 router.get('/stats',
   checkRedemptionEnabled,
-  asyncHandler(async (req: Request, res: Response) => {
+  asyncHandler(async (req: AuthedRequest, res: Response) => {
     // Check admin role
-    if (req.user!.role !== 'ADMIN') {
+    if (req.user.role !== 'ADMIN') {
       throw createError.authorization('Admin access required');
     }
 
