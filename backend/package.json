@@ -28,7 +28,11 @@
     "seed:memory": "ts-node -r tsconfig-paths/register scripts/seed-dev.ts",
     "reset:db": "npm run migrate && npm run seed",
     "dev:backend": "npm run dev",
-    "dev:fedex-smoke": "ts-node -r tsconfig-paths/register scripts/dev-fedex-smoke.ts"
+    "dev:fedex-smoke": "ts-node -r tsconfig-paths/register scripts/dev-fedex-smoke.ts",
+    "lint:check": "eslint \"{src,tests}/**/*.ts\" --max-warnings 0",
+    "type-check": "tsc --noEmit",
+    "test:ci": "jest --ci --coverage --watchAll=false --runInBand",
+    "build:check": "npm run lint:check && npm run type-check && npm run build"
   },
   "keywords": [
     "pbcex",
@@ -41,6 +45,7 @@
   "dependencies": {
     "axios": "^1.5.0",
     "bcrypt": "^5.1.0",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
@@ -66,6 +71,7 @@
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "@types/bcrypt": "^5.0.0",
+    "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.3",
