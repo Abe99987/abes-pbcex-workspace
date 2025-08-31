@@ -4,6 +4,7 @@ import { authenticate, optionalAuthenticate } from '@/middlewares/authMiddleware
 import { validateBody } from '@/utils/validators';
 import { RATE_LIMITS } from '@/utils/constants';
 import { AuthController } from '@/controllers/AuthController';
+import { VerifyController } from '@/controllers/VerifyController';
 import { z } from 'zod';
 
 const router = Router();
@@ -63,6 +64,23 @@ const disable2FASchema = z.object({
 
 const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token required'),
+});
+
+const verifyStartSchema = z.object({
+  phone: z.string()
+    .min(10, 'Phone number too short')
+    .max(20, 'Phone number too long')
+    .regex(/[\d\s\-\+\(\)]+/, 'Invalid phone number format'),
+  channel: z.enum(['sms', 'call']).optional(),
+});
+
+const verifyCheckSchema = z.object({
+  phone: z.string()
+    .min(10, 'Phone number too short')
+    .max(20, 'Phone number too long')
+    .regex(/[\d\s\-\+\(\)]+/, 'Invalid phone number format'),
+  code: z.string()
+    .regex(/^\d{4,8}$/, 'Code must be 4-8 digits'),
 });
 
 // Routes
@@ -152,6 +170,42 @@ router.post('/2fa/disable',
   authenticate,
   validateBody(disable2FASchema),
   AuthController.disable2FA
+);
+
+/**
+ * POST /api/auth/verify/start
+ * Start phone number verification
+ */
+router.post('/verify/start',
+  authLimiter,
+  validateBody(verifyStartSchema),
+  VerifyController.startVerification
+);
+
+/**
+ * POST /api/auth/verify/check
+ * Check verification code
+ */
+router.post('/verify/check',
+  authLimiter,
+  validateBody(verifyCheckSchema),
+  VerifyController.checkVerification
+);
+
+/**
+ * GET /api/auth/verify/status
+ * Get verification service status
+ */
+router.get('/verify/status',
+  VerifyController.getVerificationStatus
+);
+
+/**
+ * POST /api/auth/verify/test
+ * Send test verification (development only)
+ */
+router.post('/verify/test',
+  VerifyController.sendTestVerification
 );
 
 /**

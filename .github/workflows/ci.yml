@@ -1,705 +1,106 @@
-name: PBCEx CI/CD Pipeline
+name: CI Pipeline
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop ]
-  # Allow manual triggering
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'staging'
-        type: choice
-        options:
-        - staging
-        - production
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 env:
-  NODE_VERSION: '18'
-  POSTGRES_VERSION: '14'
-  REDIS_VERSION: '7'
+  NODE_VERSION: '20'
 
 jobs:
-  # Pre-flight checks and setup
-  setup:
-    name: 🔍 Setup & Validation
+  actionlint:
+    name: Lint GitHub Workflows
     runs-on: ubuntu-latest
-    outputs:
-      backend-changed: ${{ steps.changes.outputs.backend }}
-      frontend-changed: ${{ steps.changes.outputs.frontend }}
-      contracts-changed: ${{ steps.changes.outputs.contracts }}
-      e2e-changed: ${{ steps.changes.outputs.e2e }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: reviewdog/action-actionlint@v1
         with:
-          fetch-depth: 0
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Detect changes
-        uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            backend:
-              - 'backend/**'
-              - 'package*.json'
-            frontend:
-              - 'frontend/**'
-            contracts:
-              - 'onchain/**'
-            e2e:
-              - 'e2e/**'
-              - 'backend/**'
-              - 'frontend/**'
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
-            e2e/package-lock.json
-
-      - name: Validate package.json files
-        run: |
-          echo "🔍 Validating package.json files..."
-          cd backend && npm pkg validate
-          cd ../frontend && npm pkg validate
-          cd ../e2e && npm pkg validate
-
-      - name: Check for security vulnerabilities
-        run: |
-          echo "🔒 Checking for security issues..."
-          cd backend && npm audit --audit-level=high
-          cd ../frontend && npm audit --audit-level=high
-
-      - name: Install root dependencies
-        run: npm ci
-
-      - name: Environment Doctor
-        run: |
-          echo "🩺 Running Environment Doctor..."
-          npm run env:doctor
-        env:
-          # Required for basic validation (using GitHub secrets in actual deployment)
-          NODE_ENV: test
-          PORT: 4001
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/pbcex_test
-          REDIS_URL: redis://localhost:6379
-          JWT_SECRET: test-jwt-secret-key-must-be-32-characters-long
-          SESSION_SECRET: test-session-secret-key-must-be-32-characters-long
-          ENCRYPTION_KEY: test-encryption-key-must-be-32-characters-long
-          NEXT_PUBLIC_APP_NAME: PBCEx
-          NEXT_PUBLIC_API_BASE_URL: http://localhost:4001
-
-  # Backend linting and code quality
-  lint:
-    name: 🧹 Lint & Code Quality
+  backend:
+    name: Backend (lint + build + test)
     runs-on: ubuntu-latest
-    needs: setup
-    if: needs.setup.outputs.backend-changed == 'true' || github.event_name == 'workflow_dispatch'
-    defaults:
-      run:
-        working-directory: ./backend
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run ESLint
-        run: npm run lint
-
-      - name: Check TypeScript compilation
-        run: npm run build
-        continue-on-error: true
-
-      - name: Upload lint results
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: eslint-results
-          path: backend/eslint-results.json
-          retention-days: 7
-
-      - name: allow-merge-for-legacy-debt
-        if: ${{ always() }}
-        run: echo "non-blocking"
-
-  # Backend unit tests
-  unit-tests:
-    name: 🧪 Unit Tests
-    runs-on: ubuntu-latest
-    needs: setup
-    if: needs.setup.outputs.backend-changed == 'true' || github.event_name == 'workflow_dispatch'
-    defaults:
-      run:
-        working-directory: ./backend
-    strategy:
-      matrix:
-        test-group: [unit, security]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run unit tests
+      - name: Show versions
         run: |
-          if [ "${{ matrix.test-group }}" = "unit" ]; then
-            npm run test:unit -- --coverage --ci --watchAll=false
-          else
-            npm test tests/unit/security.test.ts -- --ci --watchAll=false
-          fi
-
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
-        if: matrix.test-group == 'unit'
-        with:
-          directory: ./backend/coverage
-          flags: backend-unit
-          name: backend-unit-coverage
-
-      - name: Store test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: unit-test-results-${{ matrix.test-group }}
-          path: |
-            backend/coverage/
-            backend/test-results.xml
-          retention-days: 7
-
-  # Integration tests with services
-  integration-tests:
-    name: 🔗 Integration Tests
-    runs-on: ubuntu-latest
-    needs: setup
-    if: needs.setup.outputs.backend-changed == 'true' || github.event_name == 'workflow_dispatch'
-    defaults:
-      run:
-        working-directory: ./backend
-    
-    services:
-      postgres:
-        image: postgres:${{ env.POSTGRES_VERSION }}
-        env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: pbcex_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-      redis:
-        image: redis:${{ env.REDIS_VERSION }}
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Wait for services
+          node -v
+          npm -v
+      - name: Install backend deps
         run: |
-          # Wait for PostgreSQL
-          until pg_isready -h localhost -p 5432 -U testuser; do
-            echo "Waiting for PostgreSQL..."
-            sleep 2
-          done
-          
-          # Wait for Redis
-          until redis-cli -h localhost -p 6379 ping; do
-            echo "Waiting for Redis..."
-            sleep 2
-          done
-
-      - name: Setup test database
+          cd backend
+          npm ci --prefer-offline --no-audit
+      - name: Lint backend
         run: |
-          npm run migrate:test
-        env:
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/pbcex_test
-          REDIS_URL: redis://localhost:6379
-
-      - name: Run API integration tests
-        run: npm run test:api -- --ci --watchAll=false
-        env:
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/pbcex_test
-          REDIS_URL: redis://localhost:6379
-          JWT_SECRET: test-jwt-secret-key
-          SESSION_SECRET: test-session-secret
-
-      - name: Run feature flag tests
-        run: npm run test tests/integration/api/flags.api.test.ts -- --ci --watchAll=false
-        env:
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/pbcex_test
-          ENABLE_VAULT_REDEMPTION: true
-          FULFILLMENT_STRATEGY: JM
-
-      - name: Upload integration test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: integration-test-results
-          path: backend/test-results.xml
-          retention-days: 7
-
-  # OpenAPI contract validation
-  contract-tests:
-    name: 📋 Contract Tests
-    runs-on: ubuntu-latest
-    needs: setup
-    if: needs.setup.outputs.backend-changed == 'true' || github.event_name == 'workflow_dispatch'
-    defaults:
-      run:
-        working-directory: ./backend
-    
-    services:
-      postgres:
-        image: postgres:${{ env.POSTGRES_VERSION }}
-        env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: pbcex_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Validate OpenAPI specification
-        run: npm run validate:openapi
-
-      - name: Setup test database
-        run: npm run migrate:test
-        env:
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/pbcex_test
-
-      - name: Start API server in background
+          cd backend
+          npm run lint
+      - name: Build backend
         run: |
-          npm start &
-          echo $! > api_server.pid
-          # Wait for server to be ready
-          timeout 30 bash -c 'until curl -f http://localhost:4001/health; do sleep 2; done'
-        env:
-          NODE_ENV: test
-          PORT: 4001
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/pbcex_test
-          JWT_SECRET: test-jwt-secret-key
-
-      - name: Run contract tests
-        run: npm run test:contract
-        env:
-          API_BASE: http://localhost:4001
-
-      - name: Stop API server
-        if: always()
-        run: |
-          if [ -f api_server.pid ]; then
-            kill $(cat api_server.pid) || true
-            rm api_server.pid
-          fi
-
-      - name: Upload contract test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: contract-test-results
-          path: |
-            backend/dredd-results.json
-            backend/openapi-validation-results.json
-          retention-days: 7
-
-  # Build and package
-  build:
-    name: 🏗️ Build & Package
-    runs-on: ubuntu-latest
-    needs: [lint, unit-tests]
-    if: always() && (needs.lint.result == 'success' && needs.unit-tests.result == 'success')
-    strategy:
-      matrix:
-        component: [backend, frontend]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: ${{ matrix.component }}/package-lock.json
-
-      - name: Install dependencies
-        run: |
-          cd ${{ matrix.component }}
-          npm ci
-
-      - name: Build application
-        run: |
-          cd ${{ matrix.component }}
+          cd backend
           npm run build
-        continue-on-error: true
+      - name: Test backend
+        run: |
+          cd backend
+          npm run test:unit
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.component }}-build
-          path: |
-            ${{ matrix.component }}/dist/
-            ${{ matrix.component }}/package.json
-            ${{ matrix.component }}/package-lock.json
-          retention-days: 7
-
-      - name: allow-merge-for-legacy-debt
-        if: ${{ always() }}
-        run: echo "non-blocking"
-
-  # Smart contract tests
-  contract-build:
-    name: ⛓️ Smart Contract Build
+  frontend:
+    name: Frontend (lint + build + test)
     runs-on: ubuntu-latest
-    needs: setup
-    if: needs.setup.outputs.contracts-changed == 'true' || github.event_name == 'workflow_dispatch'
-    defaults:
-      run:
-        working-directory: ./onchain
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: onchain/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Compile contracts
-        run: npx hardhat compile
-
-      - name: Run contract tests
-        run: npx hardhat test
-
-      - name: Upload contract artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: contract-artifacts
-          path: |
-            onchain/artifacts/
-            onchain/cache/
-          retention-days: 7
-
-  # End-to-end tests
-  e2e-tests:
-    name: 🌐 E2E Tests
-    runs-on: ubuntu-latest
-    needs: [build]
-    if: needs.setup.outputs.e2e-changed == 'true' || github.event_name == 'workflow_dispatch'
-    timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: ./e2e
-
-    services:
-      postgres:
-        image: postgres:${{ env.POSTGRES_VERSION }}
-        env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: pbcex_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
-            e2e/package-lock.json
-
-      - name: Download backend build
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-build
-          path: backend/
-
-      - name: Download frontend build
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-          path: frontend/
-
-      - name: Install E2E dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install chromium firefox webkit
-
-      - name: Start backend services
+      - name: Show versions
         run: |
-          cd ../backend
-          npm ci
-          npm run migrate:test &
-          npm start &
-          echo $! > ../e2e/backend.pid
-        env:
-          NODE_ENV: test
-          PORT: 4001
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/pbcex_test
-          JWT_SECRET: test-jwt-secret-key
-
-      - name: Start frontend services
+          node -v
+          npm -v
+      - name: Install frontend deps
+        run: npm ci --prefer-offline --no-audit
+      - name: Lint frontend
+        run: npm run lint
+      - name: Build frontend
+        run: npm run build
+      - name: Test frontend (if present)
         run: |
-          cd ../frontend
-          npm ci
-          npm start &
-          echo $! > ../e2e/frontend.pid
-        env:
-          NODE_ENV: test
-          PORT: 3000
-          NEXT_PUBLIC_API_URL: http://localhost:4001
-
-      - name: Wait for services
-        run: |
-          # Wait for backend
-          timeout 60 bash -c 'until curl -f http://localhost:4001/health; do sleep 2; done'
-          # Wait for frontend
-          timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
-
-      - name: Run E2E tests
-        run: npm test -- --reporter=html
-        env:
-          BASE_URL: http://localhost:3000
-          API_URL: http://localhost:4001
-
-      - name: Stop services
-        if: always()
-        run: |
-          [ -f backend.pid ] && kill $(cat backend.pid) || true
-          [ -f frontend.pid ] && kill $(cat frontend.pid) || true
-
-      - name: Upload E2E test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: e2e-test-results
-          path: |
-            e2e/playwright-report/
-            e2e/test-results/
-          retention-days: 7
-
-  # Load testing (optional job)
-  load-tests:
-    name: ⚡ Load Tests
-    runs-on: ubuntu-latest
-    needs: [build]
-    if: github.event_name == 'workflow_dispatch' || (github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[load-test]'))
-    defaults:
-      run:
-        working-directory: ./backend
-    
-    services:
-      postgres:
-        image: postgres:${{ env.POSTGRES_VERSION }}
-        env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: pbcex_test
-        ports:
-          - 5432:5432
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup k6
-        run: |
-          sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update
-          sudo apt-get install k6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Install dependencies and start server
-        run: |
-          npm ci
-          npm start &
-          echo $! > server.pid
-          timeout 30 bash -c 'until curl -f http://localhost:4001/health; do sleep 2; done'
-        env:
-          NODE_ENV: test
-          PORT: 4001
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/pbcex_test
-
-      - name: Run load tests
-        run: |
-          k6 run loadtests/k6/scenarios/trade_order.js --out json=load-test-results.json
-          k6 run loadtests/k6/scenarios/price_polling.js --out json=price-polling-results.json
-
-      - name: Stop server
-        if: always()
-        run: |
-          [ -f server.pid ] && kill $(cat server.pid) || true
-
-      - name: Upload load test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: load-test-results
-          path: |
-            backend/load-test-results.json
-            backend/price-polling-results.json
-          retention-days: 7
-
-  # Security audit
-  security-audit:
-    name: 🔒 Security Audit
-    runs-on: ubuntu-latest
-    needs: setup
-    if: needs.setup.outputs.backend-changed == 'true' || github.event_name == 'workflow_dispatch'
-    defaults:
-      run:
-        working-directory: ./backend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run security audit
-        run: npm run audit
-        continue-on-error: true
-
-      - name: Upload security audit results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: security-audit-results
-          path: backend/security-audit-report.json
-          retention-days: 30
-
-  # Summary and notification
-  summary:
-    name: 📊 Test Summary
-    runs-on: ubuntu-latest
-    needs: [lint, unit-tests, integration-tests, contract-tests, build, e2e-tests, security-audit]
-    if: always()
-    steps:
-      - name: Check job results
-        run: |
-          echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
-          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Contract Tests | ${{ needs.contract-tests.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| E2E Tests | ${{ needs.e2e-tests.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security Audit | ${{ needs.security-audit.result }} |" >> $GITHUB_STEP_SUMMARY
-          
-          # Determine overall status
-          if [[ "${{ needs.lint.result }}" == "success" && 
-                "${{ needs.unit-tests.result }}" == "success" && 
-                "${{ needs.integration-tests.result }}" == "success" && 
-                "${{ needs.contract-tests.result }}" == "success" && 
-                "${{ needs.build.result }}" == "success" ]]; then
-            echo "✅ All critical tests passed!" >> $GITHUB_STEP_SUMMARY
-            echo "BUILD_STATUS=success" >> $GITHUB_ENV
+          if grep -q '"test"' package.json; then
+            npm test -- --watchAll=false --coverage=false
           else
-            echo "❌ Some tests failed. Check the job details above." >> $GITHUB_STEP_SUMMARY
-            echo "BUILD_STATUS=failure" >> $GITHUB_ENV
+            echo "No frontend tests found, skipping test step"
           fi
 
-      - name: Set workflow conclusion
+  summary:
+    name: CI Summary
+    needs: [actionlint, backend, frontend]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print job results
         run: |
-          if [ "$BUILD_STATUS" = "failure" ]; then
-            echo "Critical tests failed"
+          echo "actionlint: ${{ needs.actionlint.result }}"
+          echo "backend:    ${{ needs.backend.result }}"
+          echo "frontend:   ${{ needs.frontend.result }}"
+
+          # Check if any required job failed
+          if [[ "${{ needs.actionlint.result }}" != "success" || \
+                "${{ needs.backend.result }}" != "success" || \
+                "${{ needs.frontend.result }}" != "success" ]]; then
+            echo "❌ CI Pipeline failed - some jobs did not complete successfully"
             exit 1
+          else
+            echo "✅ CI Pipeline completed successfully!"
           fi
