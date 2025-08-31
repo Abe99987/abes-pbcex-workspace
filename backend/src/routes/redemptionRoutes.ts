@@ -11,7 +11,7 @@ interface UserPayload {
   role: string;
 }
 
-type AuthedRequest<T = any> = Request & { user: UserPayload; body: T };
+type AuthedRequest<T = unknown> = Request & { user: UserPayload; body: T };
 
 const router = Router();
 
@@ -22,13 +22,17 @@ router.use(requireKyc(['APPROVED']));
 // Validation schemas
 const redemptionQuoteSchema = z.object({
   asset: z.string().regex(/^X[A-Z]{2,3}-s$/, 'Invalid synthetic asset format'),
-  amount: z.string().regex(/^\d+\.?\d*$/, 'Amount must be a valid decimal number'),
+  amount: z
+    .string()
+    .regex(/^\d+\.?\d*$/, 'Amount must be a valid decimal number'),
   format: z.enum(['BAR', 'COIN', 'SHEET', 'COIL', 'ROUND']),
 });
 
 const redemptionRequestSchema = z.object({
   asset: z.string().regex(/^X[A-Z]{2,3}-s$/, 'Invalid synthetic asset format'),
-  amount: z.string().regex(/^\d+\.?\d*$/, 'Amount must be a valid decimal number'),
+  amount: z
+    .string()
+    .regex(/^\d+\.?\d*$/, 'Amount must be a valid decimal number'),
   format: z.enum(['BAR', 'COIN', 'SHEET', 'COIL', 'ROUND']),
   shippingAddress: z.object({
     name: z.string().min(1).max(100),
@@ -40,17 +44,23 @@ const redemptionRequestSchema = z.object({
     country: z.string().length(2).default('US'),
     phone: z.string().min(10).max(20),
   }),
-  preferences: z.object({
-    vaultLocation: z.string().optional(),
-    priority: z.boolean().default(false),
-    insuranceRequired: z.boolean().default(true),
-  }).optional(),
+  preferences: z
+    .object({
+      vaultLocation: z.string().optional(),
+      priority: z.boolean().default(false),
+      insuranceRequired: z.boolean().default(true),
+    })
+    .optional(),
 });
 
 /**
  * Feature flag check middleware
  */
-const checkRedemptionEnabled = (req: Request, res: Response, next: NextFunction) => {
+const checkRedemptionEnabled = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!env.ENABLE_VAULT_REDEMPTION) {
     return res.status(501).json({
       code: 'SERVICE_UNAVAILABLE',
@@ -66,13 +76,20 @@ const checkRedemptionEnabled = (req: Request, res: Response, next: NextFunction)
  * GET /api/redeem/quote
  * Get redemption quote for synthetic asset
  */
-router.get('/quote',
+router.get(
+  '/quote',
   checkRedemptionEnabled,
   validateQuery(redemptionQuoteSchema),
   asyncHandler(async (req: Request, res: Response) => {
-    const { asset, amount, format } = req.query as z.infer<typeof redemptionQuoteSchema>;
+    const { asset, amount, format } = req.query as z.infer<
+      typeof redemptionQuoteSchema
+    >;
 
-    const quote = await RedemptionService.getRedemptionQuote(asset, amount, format);
+    const quote = await RedemptionService.getRedemptionQuote(
+      asset,
+      amount,
+      format
+    );
 
     res.json({
       code: 'SUCCESS',
@@ -85,48 +102,64 @@ router.get('/quote',
  * POST /api/redeem
  * Submit redemption request
  */
-router.post('/',
+router.post(
+  '/',
   checkRedemptionEnabled,
   validateBody(redemptionRequestSchema),
-  asyncHandler(async (req: AuthedRequest<z.infer<typeof redemptionRequestSchema>>, res: Response) => {
-    const redemptionInput = {
-      userId: req.user.id,
-      ...req.body,
-    };
+  asyncHandler(
+    async (
+      req: AuthedRequest<z.infer<typeof redemptionRequestSchema>>,
+      res: Response
+    ) => {
+      const redemptionInput = {
+        userId: req.user.id,
+        ...req.body,
+      };
 
-    const redemptionRequest = await RedemptionService.requestRedemption(redemptionInput);
+      const redemptionRequest =
+        await RedemptionService.requestRedemption(redemptionInput);
 
-    res.status(201).json({
-      code: 'SUCCESS',
-      message: 'Redemption request submitted successfully',
-      data: { 
-        redemption: redemptionRequest,
-        referenceNumber: `RED-${redemptionRequest.id.substring(0, 8).toUpperCase()}`,
-      },
-    });
-  })
+      res.status(201).json({
+        code: 'SUCCESS',
+        message: 'Redemption request submitted successfully',
+        data: {
+          redemption: redemptionRequest,
+          referenceNumber: `RED-${redemptionRequest.id.substring(0, 8).toUpperCase()}`,
+        },
+      });
+    }
+  )
 );
 
 /**
  * GET /api/redeem/history
  * Get user's redemption history
  */
-router.get('/history',
+router.get(
+  '/history',
   checkRedemptionEnabled,
   asyncHandler(async (req: AuthedRequest, res: Response) => {
     const limitParam = req.query.limit;
     const offsetParam = req.query.offset;
 
     const limit = Math.min(
-      typeof limitParam === 'string' && /^\d+$/.test(limitParam) ? parseInt(limitParam) : 50,
+      typeof limitParam === 'string' && /^\d+$/.test(limitParam)
+        ? parseInt(limitParam)
+        : 50,
       100
     );
     const offset = Math.max(
-      typeof offsetParam === 'string' && /^\d+$/.test(offsetParam) ? parseInt(offsetParam) : 0,
+      typeof offsetParam === 'string' && /^\d+$/.test(offsetParam)
+        ? parseInt(offsetParam)
+        : 0,
       0
     );
 
-    const result = await RedemptionService.getUserRedemptions(req.user.id, limit, offset);
+    const result = await RedemptionService.getUserRedemptions(
+      req.user.id,
+      limit,
+      offset
+    );
 
     res.json({
       code: 'SUCCESS',
@@ -139,7 +172,8 @@ router.get('/history',
  * GET /api/redeem/status/:id
  * Get redemption status by ID
  */
-router.get('/status/:id',
+router.get(
+  '/status/:id',
   checkRedemptionEnabled,
   asyncHandler(async (req: AuthedRequest, res: Response) => {
     const { id } = req.params;
@@ -166,33 +200,39 @@ router.get('/status/:id',
  * POST /api/redeem/:id/cancel
  * Cancel a redemption request
  */
-router.post('/:id/cancel',
+router.post(
+  '/:id/cancel',
   checkRedemptionEnabled,
-  validateBody(z.object({
-    reason: z.string().max(500).optional(),
-  })),
-  asyncHandler(async (req: AuthedRequest<{ reason?: string }>, res: Response) => {
-    const { id } = req.params;
-    const { reason } = req.body;
+  validateBody(
+    z.object({
+      reason: z.string().max(500).optional(),
+    })
+  ),
+  asyncHandler(
+    async (req: AuthedRequest<{ reason?: string }>, res: Response) => {
+      const { id } = req.params;
+      const { reason } = req.body;
 
-    if (!id || !id.match(/^[a-f0-9-]+$/)) {
-      throw createError.validation('Invalid redemption ID format');
+      if (!id || !id.match(/^[a-f0-9-]+$/)) {
+        throw createError.validation('Invalid redemption ID format');
+      }
+
+      await RedemptionService.cancelRedemption(id, req.user.id, reason);
+
+      res.json({
+        code: 'SUCCESS',
+        message: 'Redemption request cancelled successfully',
+      });
     }
-
-    await RedemptionService.cancelRedemption(id, req.user.id, reason);
-
-    res.json({
-      code: 'SUCCESS',
-      message: 'Redemption request cancelled successfully',
-    });
-  })
+  )
 );
 
 /**
  * GET /api/redeem/stats (Admin only)
  * Get redemption statistics
  */
-router.get('/stats',
+router.get(
+  '/stats',
   checkRedemptionEnabled,
   asyncHandler(async (req: AuthedRequest, res: Response) => {
     // Check admin role

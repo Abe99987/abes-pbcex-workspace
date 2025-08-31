@@ -32,29 +32,29 @@ export const HTTP_CLIENT_CONFIGS = {
     retries: 2,
     retryDelay: 1000,
     circuitBreaker: circuitBreakers.fedex,
-    serviceName: 'FedEx'
+    serviceName: 'FedEx',
   },
   TWILIO: {
     timeout: 3000,
     retries: 2,
     retryDelay: 500,
     circuitBreaker: circuitBreakers.twilio,
-    serviceName: 'Twilio'
+    serviceName: 'Twilio',
   },
   RESEND: {
     timeout: 3000,
     retries: 2,
     retryDelay: 500,
     circuitBreaker: circuitBreakers.resend,
-    serviceName: 'Resend'
+    serviceName: 'Resend',
   },
   COINGECKO: {
     timeout: 3000,
     retries: 3,
     retryDelay: 200,
     circuitBreaker: circuitBreakers.coingecko,
-    serviceName: 'CoinGecko'
-  }
+    serviceName: 'CoinGecko',
+  },
 } as const;
 
 /**
@@ -67,7 +67,7 @@ export function createHttpClient(options: HttpClientOptions): AxiosInstance {
     retries = 2,
     retryDelay = 1000,
     circuitBreaker,
-    serviceName = 'External API'
+    serviceName = 'External API',
   } = options;
 
   const client = axios.create({
@@ -75,30 +75,31 @@ export function createHttpClient(options: HttpClientOptions): AxiosInstance {
     timeout,
     headers: {
       'User-Agent': 'PBCEx/1.0',
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    }
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
   });
 
   // Request interceptor for logging and correlation IDs
   client.interceptors.request.use(
-    (config) => {
+    config => {
       const correlationId = Math.random().toString(36).substr(2, 9);
-      (config as any).metadata = { 
-        correlationId, 
-        startTime: Date.now(),
-        serviceName 
-      };
+      (config as AxiosRequestConfig & { metadata?: HttpRequestMeta }).metadata =
+        {
+          correlationId,
+          startTime: Date.now(),
+          serviceName,
+        };
 
       logInfo(`${serviceName} HTTP request`, {
         method: config.method?.toUpperCase(),
         url: config.url,
-        correlationId
+        correlationId,
       });
 
       return config;
     },
-    (error) => {
+    error => {
       logError(`${serviceName} request setup error`, error);
       return Promise.reject(error);
     }
@@ -106,29 +107,35 @@ export function createHttpClient(options: HttpClientOptions): AxiosInstance {
 
   // Response interceptor for logging and retry logic
   client.interceptors.response.use(
-    (response) => {
-      const metadata = (response.config as any).metadata || { correlationId: '', startTime: 0 };
+    response => {
+      const metadata = (
+        response.config as AxiosRequestConfig & { metadata?: HttpRequestMeta }
+      ).metadata || { correlationId: '', startTime: 0 };
       const { correlationId, startTime, serviceName: service } = metadata;
       const duration = startTime ? Date.now() - startTime : 0;
 
       logInfo(`${service} HTTP response`, {
         status: response.status,
         correlationId,
-        duration
+        duration,
       });
 
       return response;
     },
-    async (error) => {
+    async error => {
       const config = error.config;
-      const { correlationId, startTime, serviceName: service } = config?.metadata || {};
+      const {
+        correlationId,
+        startTime,
+        serviceName: service,
+      } = config?.metadata || {};
       const duration = startTime ? Date.now() - startTime : 0;
 
       logError(`${service} HTTP error`, {
         status: error.response?.status,
         message: error.message,
         correlationId,
-        duration
+        duration,
       });
 
       // Retry logic with exponential backoff
@@ -137,12 +144,12 @@ export function createHttpClient(options: HttpClientOptions): AxiosInstance {
         config.__retryCount = retryCount;
 
         const delay = calculateRetryDelay(retryCount, retryDelay);
-        
+
         logWarn(`${service} retrying request`, {
           attempt: retryCount,
           maxRetries: retries,
           delay,
-          correlationId
+          correlationId,
         });
 
         await sleep(delay);
@@ -173,7 +180,11 @@ export async function executeWithCircuitBreaker<T>(
 /**
  * Determine if request should be retried
  */
-function shouldRetry(error: any, config: any, maxRetries: number): boolean {
+function shouldRetry(
+  error: unknown,
+  config: AxiosRequestConfig & { __retryCount?: number },
+  maxRetries: number
+): boolean {
   if (!config || (config.__retryCount || 0) >= maxRetries) {
     return false;
   }
@@ -193,7 +204,7 @@ function calculateRetryDelay(retryCount: number, baseDelay: number): number {
   const exponentialDelay = baseDelay * Math.pow(2, retryCount - 1);
   const jitter = Math.random() * 0.1 * exponentialDelay; // 10% jitter
   const maxDelay = 10000; // Cap at 10 seconds
-  
+
   return Math.min(exponentialDelay + jitter, maxDelay);
 }
 
@@ -211,7 +222,7 @@ export const httpClients = {
   fedex: createHttpClient(HTTP_CLIENT_CONFIGS.FEDEX),
   twilio: createHttpClient(HTTP_CLIENT_CONFIGS.TWILIO),
   resend: createHttpClient(HTTP_CLIENT_CONFIGS.RESEND),
-  coingecko: createHttpClient(HTTP_CLIENT_CONFIGS.COINGECKO)
+  coingecko: createHttpClient(HTTP_CLIENT_CONFIGS.COINGECKO),
 };
 
 // HTTP Client metadata interface

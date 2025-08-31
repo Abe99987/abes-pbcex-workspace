@@ -1,5 +1,9 @@
 import { logInfo, logWarn, logError } from '@/utils/logger';
-import { HedgePosition, ExposureSummary, HedgePositionUtils } from '@/models/HedgePosition';
+import {
+  HedgePosition,
+  ExposureSummary,
+  HedgePositionUtils,
+} from '@/models/HedgePosition';
 import { HEDGING } from '@/utils/constants';
 import { createError } from '@/middlewares/errorMiddleware';
 
@@ -24,10 +28,10 @@ export class HedgingService {
   private static readonly exposureThresholds: ExposureThresholds = {
     'XAU-s': {
       threshold: HEDGING.GOLD_THRESHOLD, // 100 oz
-      targetRatio: 0.90, // 90% for gold
+      targetRatio: 0.9, // 90% for gold
       maxRatio: 1.0,
-      minRatio: 0.70,
-      bandSize: 0.10, // ±10%
+      minRatio: 0.7,
+      bandSize: 0.1, // ±10%
       etfSymbols: ['GLD', 'IAU'], // Gold ETFs
       conversionFactor: 0.1, // Approximate shares per ounce
     },
@@ -35,17 +39,17 @@ export class HedgingService {
       threshold: HEDGING.SILVER_THRESHOLD, // 5,000 oz
       targetRatio: 0.85, // 85% for silver
       maxRatio: 1.0,
-      minRatio: 0.70,
+      minRatio: 0.7,
       bandSize: 0.15, // ±15%
       etfSymbols: ['SLV', 'SIVR'],
       conversionFactor: 1.0, // Approximately 1 share per ounce
     },
     'XPT-s': {
       threshold: HEDGING.PLATINUM_THRESHOLD, // 50 oz
-      targetRatio: 0.80, // 80% for platinum
+      targetRatio: 0.8, // 80% for platinum
       maxRatio: 1.0,
-      minRatio: 0.60,
-      bandSize: 0.20, // ±20%
+      minRatio: 0.6,
+      bandSize: 0.2, // ±20%
       etfSymbols: ['PPLT'],
       conversionFactor: 0.1, // Approximate shares per ounce
     },
@@ -53,16 +57,16 @@ export class HedgingService {
       threshold: HEDGING.PALLADIUM_THRESHOLD, // 50 oz
       targetRatio: 0.75, // 75% for palladium
       maxRatio: 1.0,
-      minRatio: 0.50,
-      bandSize: 0.20, // ±20%
+      minRatio: 0.5,
+      bandSize: 0.2, // ±20%
       etfSymbols: ['PALL'],
       conversionFactor: 0.1, // Approximate shares per ounce
     },
     'XCU-s': {
       threshold: HEDGING.COPPER_THRESHOLD, // 10,000 lbs
-      targetRatio: 0.70, // 70% for copper (more volatile)
-      maxRatio: 0.90,
-      minRatio: 0.50,
+      targetRatio: 0.7, // 70% for copper (more volatile)
+      maxRatio: 0.9,
+      minRatio: 0.5,
       bandSize: 0.25, // ±25%
       etfSymbols: ['CPER', 'JJC'],
       conversionFactor: 50.0, // Approximate shares per pound
@@ -76,7 +80,7 @@ export class HedgingService {
     exposures: Record<string, string>, // asset -> total synthetic amount
     currentHedgePositions: HedgePosition[]
   ): Promise<Record<string, ExposureSummary>> {
-    logInfo('Evaluating system exposure', { 
+    logInfo('Evaluating system exposure', {
       exposureCount: Object.keys(exposures).length,
       activeHedges: currentHedgePositions.filter(h => h.isActive).length,
     });
@@ -89,7 +93,9 @@ export class HedgingService {
         continue;
       }
 
-      const assetHedges = currentHedgePositions.filter(h => h.asset === asset && h.isActive);
+      const assetHedges = currentHedgePositions.filter(
+        h => h.asset === asset && h.isActive
+      );
       const evaluation = await HedgingService.evaluateAssetExposure(
         asset,
         exposureAmount,
@@ -117,8 +123,9 @@ export class HedgingService {
     const exposure = parseFloat(totalExposure);
 
     // Calculate current hedge coverage
-    const totalHedged = currentHedges.reduce((sum, hedge) => 
-      sum + parseFloat(hedge.quantity), 0
+    const totalHedged = currentHedges.reduce(
+      (sum, hedge) => sum + parseFloat(hedge.quantity),
+      0
     );
 
     const currentHedgeRatio = exposure > 0 ? totalHedged / exposure : 0;
@@ -186,7 +193,8 @@ export class HedgingService {
     const estimatedCost = requiredShares * etfPrice;
 
     let recommendation: string;
-    if (hedgeDeficit > config.threshold * 0.01) { // 1% of threshold
+    if (hedgeDeficit > config.threshold * 0.01) {
+      // 1% of threshold
       recommendation = `BUY ${requiredShares.toFixed(0)} shares of ${config.etfSymbols[0]}`;
     } else if (hedgeDeficit < -config.threshold * 0.01) {
       recommendation = `SELL ${requiredShares.toFixed(0)} shares of ${config.etfSymbols[0]}`;
@@ -212,7 +220,7 @@ export class HedgingService {
     targetRatio?: number
   ): Promise<{
     success: boolean;
-    simulation: any;
+    simulation: Record<string, unknown>;
     estimatedCost: number;
     marketImpact: string;
   }> {
@@ -224,21 +232,22 @@ export class HedgingService {
 
     // Mock current ETF prices
     const mockEtfPrices: Record<string, number> = {
-      'GLD': 185.50,
-      'IAU': 37.25,
-      'SLV': 23.75,
-      'SIVR': 23.80,
-      'PPLT': 97.80,
-      'PALL': 245.60,
-      'CPER': 26.15,
-      'JJC': 52.30,
+      GLD: 185.5,
+      IAU: 37.25,
+      SLV: 23.75,
+      SIVR: 23.8,
+      PPLT: 97.8,
+      PALL: 245.6,
+      CPER: 26.15,
+      JJC: 52.3,
     };
 
     const primaryEtf = config.etfSymbols?.[0];
-    const etfPrice = primaryEtf ? (mockEtfPrices[primaryEtf] || 100.0) : 100.0;
+    const etfPrice = primaryEtf ? mockEtfPrices[primaryEtf] || 100.0 : 100.0;
 
-    const currentHedgedAmount = currentHedges.reduce((sum, h) => 
-      sum + parseFloat(h.quantity), 0
+    const currentHedgedAmount = currentHedges.reduce(
+      (sum, h) => sum + parseFloat(h.quantity),
+      0
     );
 
     const optimalHedge = HedgingService.calculateOptimalHedge(
@@ -262,8 +271,10 @@ export class HedgingService {
       asset,
       action,
       currentExposure: currentExposure.toFixed(8),
-      currentHedgeRatio: currentExposure > 0 ? 
-        ((currentHedgedAmount / currentExposure) * 100).toFixed(2) : '0',
+      currentHedgeRatio:
+        currentExposure > 0
+          ? ((currentHedgedAmount / currentExposure) * 100).toFixed(2)
+          : '0',
       targetRatio: (ratio * 100).toFixed(2),
       etfSymbol: primaryEtf,
       etfPrice,
@@ -319,10 +330,14 @@ export class HedgingService {
     const commission = Math.max(1.0, shares * 0.005); // $0.005 per share, $1 minimum
 
     // Simulate partial fills for large orders
-    const executedShares = shares > 1000 ? 
-      Math.floor(shares * (0.95 + Math.random() * 0.05)) : shares;
+    const executedShares =
+      shares > 1000
+        ? Math.floor(shares * (0.95 + Math.random() * 0.05))
+        : shares;
 
-    const totalCost = executedShares * mockPrice + (action === 'BUY' ? commission : -commission);
+    const totalCost =
+      executedShares * mockPrice +
+      (action === 'BUY' ? commission : -commission);
 
     // In production, this would:
     // 1. Connect to Interactive Brokers, TD Ameritrade, or other broker API
@@ -365,8 +380,10 @@ export class HedgingService {
       }
 
       // Get current market price (mock)
-      const currentPrice = await HedgingService.getCurrentEtfPrice(position.hedgeInstrument);
-      
+      const currentPrice = await HedgingService.getCurrentEtfPrice(
+        position.hedgeInstrument
+      );
+
       // Calculate unrealized P&L
       const entryPrice = parseFloat(position.entryPrice);
       const quantity = parseFloat(position.quantity);
@@ -383,7 +400,8 @@ export class HedgingService {
       updatedPositions.push(updatedPosition);
 
       // Check if position needs attention
-      const pnlPercent = entryPrice > 0 ? (pnl / (entryPrice * quantity)) * 100 : 0;
+      const pnlPercent =
+        entryPrice > 0 ? (pnl / (entryPrice * quantity)) * 100 : 0;
       if (Math.abs(pnlPercent) > 10) {
         logWarn('Hedge position has significant P&L', {
           positionId: position.id,
@@ -404,12 +422,15 @@ export class HedgingService {
     exposures: Record<string, string>,
     hedgePositions: HedgePosition[]
   ): Promise<{
-    summary: any;
+    summary: Record<string, unknown>;
     recommendations: string[];
-    riskMetrics: any;
+    riskMetrics: Record<string, unknown>;
     alerts: string[];
   }> {
-    const summary = await HedgingService.evaluateExposure(exposures, hedgePositions);
+    const summary = await HedgingService.evaluateExposure(
+      exposures,
+      hedgePositions
+    );
     const recommendations: string[] = [];
     const alerts: string[] = [];
 
@@ -439,7 +460,7 @@ export class HedgingService {
         if (config) {
           recommendations.push(
             `${asset}: ${evaluation.recommendedAction.replace('_', ' ')} - ` +
-            `Current ratio: ${evaluation.hedgeRatio}%, Target: ${(config.targetRatio * 100).toFixed(0)}%`
+              `Current ratio: ${evaluation.hedgeRatio}%, Target: ${(config.targetRatio * 100).toFixed(0)}%`
           );
         }
       }
@@ -447,18 +468,23 @@ export class HedgingService {
       // Generate alerts
       const hedgeRatio = parseFloat(evaluation.hedgeRatio) / 100;
       const config = HedgingService.exposureThresholds[asset];
-      
+
       if (config) {
         if (hedgeRatio < config.minRatio) {
-          alerts.push(`${asset} hedge ratio (${evaluation.hedgeRatio}%) below minimum threshold`);
+          alerts.push(
+            `${asset} hedge ratio (${evaluation.hedgeRatio}%) below minimum threshold`
+          );
         }
         if (hedgeRatio > config.maxRatio) {
-          alerts.push(`${asset} hedge ratio (${evaluation.hedgeRatio}%) above maximum threshold`);
+          alerts.push(
+            `${asset} hedge ratio (${evaluation.hedgeRatio}%) above maximum threshold`
+          );
         }
       }
     }
 
-    const overallRatio = totalExposureUsd > 0 ? (totalHedgedUsd / totalExposureUsd) : 0;
+    const overallRatio =
+      totalExposureUsd > 0 ? totalHedgedUsd / totalExposureUsd : 0;
     const riskMetrics = {
       totalExposureUsd: totalExposureUsd.toFixed(2),
       totalHedgedUsd: totalHedgedUsd.toFixed(2),
@@ -487,14 +513,14 @@ export class HedgingService {
   private static async getCurrentEtfPrice(symbol: string): Promise<number> {
     // Mock current prices (in production, fetch from market data API)
     const mockPrices: Record<string, number> = {
-      'GLD': 185.50 + (Math.random() - 0.5) * 2,
-      'IAU': 37.25 + (Math.random() - 0.5) * 0.5,
-      'SLV': 23.75 + (Math.random() - 0.5) * 1,
-      'SIVR': 23.80 + (Math.random() - 0.5) * 1,
-      'PPLT': 97.80 + (Math.random() - 0.5) * 3,
-      'PALL': 245.60 + (Math.random() - 0.5) * 10,
-      'CPER': 26.15 + (Math.random() - 0.5) * 1,
-      'JJC': 52.30 + (Math.random() - 0.5) * 2,
+      GLD: 185.5 + (Math.random() - 0.5) * 2,
+      IAU: 37.25 + (Math.random() - 0.5) * 0.5,
+      SLV: 23.75 + (Math.random() - 0.5) * 1,
+      SIVR: 23.8 + (Math.random() - 0.5) * 1,
+      PPLT: 97.8 + (Math.random() - 0.5) * 3,
+      PALL: 245.6 + (Math.random() - 0.5) * 10,
+      CPER: 26.15 + (Math.random() - 0.5) * 1,
+      JJC: 52.3 + (Math.random() - 0.5) * 2,
     };
 
     return mockPrices[symbol] || 100.0;
@@ -503,7 +529,9 @@ export class HedgingService {
   private static assessMarketConditions(asset: string): string {
     // Simulate market condition assessment
     const conditions = ['NORMAL', 'VOLATILE', 'TRENDING_UP', 'TRENDING_DOWN'];
-    return conditions[Math.floor(Math.random() * conditions.length)] || 'NORMAL';
+    return (
+      conditions[Math.floor(Math.random() * conditions.length)] || 'NORMAL'
+    );
   }
 
   private static calculateRiskLevel(unhedgedExposure: number): string {
@@ -522,24 +550,32 @@ export class HedgingService {
     dryRun: boolean = true
   ): Promise<{
     executed: boolean;
-    actions: any[];
+    actions: Array<Record<string, unknown>>;
     totalCost: number;
   }> {
     logInfo('Starting automated hedge rebalancing', { dryRun });
 
-    const evaluations = await HedgingService.evaluateExposure(exposures, hedgePositions);
-    const actions: any[] = [];
+    const evaluations = await HedgingService.evaluateExposure(
+      exposures,
+      hedgePositions
+    );
+    const actions: Array<Record<string, unknown>> = [];
     let totalCost = 0;
 
     for (const [asset, evaluation] of Object.entries(evaluations)) {
       if (evaluation.recommendedAction === 'MAINTAIN') continue;
 
       const currentExposure = parseFloat(evaluation.totalSyntheticAmount);
-      const currentHedges = hedgePositions.filter(h => h.asset === asset && h.isActive);
+      const currentHedges = hedgePositions.filter(
+        h => h.asset === asset && h.isActive
+      );
 
       const simulation = await HedgingService.simulateHedgeExecution(
         asset,
-        evaluation.recommendedAction as any,
+        evaluation.recommendedAction as
+          | 'INCREASE_HEDGE'
+          | 'DECREASE_HEDGE'
+          | 'CLOSE_HEDGE',
         currentExposure,
         currentHedges
       );
@@ -555,7 +591,11 @@ export class HedgingService {
       totalCost += simulation.estimatedCost;
 
       // Execute if not dry run and cost is reasonable
-      if (!dryRun && simulation.estimatedCost < 50000 && simulation.marketImpact !== 'HIGH') {
+      if (
+        !dryRun &&
+        simulation.estimatedCost < 50000 &&
+        simulation.marketImpact !== 'HIGH'
+      ) {
         // Execute trade logic would go here
         logInfo('Auto-hedge trade would be executed', {
           asset,
