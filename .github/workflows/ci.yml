@@ -46,11 +46,19 @@ jobs:
       - name: Lint backend
         run: |
           cd backend
-          npm run lint
+          npm run lint:check
+      - name: Type-check backend
+        run: |
+          cd backend
+          npm run type-check
       - name: Build backend
         run: |
           cd backend
           npm run build
+      - name: Build validation
+        run: |
+          cd backend
+          npm run build:check
       - name: Test backend
         run: |
           cd backend

@@ -31,7 +31,6 @@ class RedisManager {
 
     try {
       this.redis = new Redis(redisUrl, {
-        retryDelayOnFailover: 100,
         maxRetriesPerRequest: 3,
         connectTimeout: 2000,
         lazyConnect: true,
@@ -89,6 +88,15 @@ class RedisManager {
       logError(`Redis SET failed for key: ${key}`, error as Error);
       return false;
     }
+  }
+
+  // Alias for backward compatibility
+  public async setex(
+    key: string,
+    ttlSeconds: number,
+    value: string
+  ): Promise<boolean> {
+    return this.set(key, value, ttlSeconds);
   }
 
   public async getJson<T = unknown>(key: string): Promise<T | null> {

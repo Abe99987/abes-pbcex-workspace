@@ -442,8 +442,8 @@ export class PriceFeedService {
     return {
       symbol: asset,
       price: avgPrice,
-      change: prices[0].change, // Use first source for change calculation
-      changePercent: prices[0].changePercent,
+      change: prices[0]?.change || 0, // Use first source for change calculation
+      changePercent: prices[0]?.changePercent || 0,
       volume: Math.max(...prices.map(p => p.volume)),
       timestamp: latestTimestamp,
       source: 'TRADINGVIEW', // Primary source

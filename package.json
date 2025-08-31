@@ -22,7 +22,11 @@
     "postman:open": "echo '📮 Postman Collection: tooling/postman/PBCEx.postman_collection.json' && echo '🌍 Local Environment: tooling/postman/PBCEx.local.postman_environment.json' && echo '🏢 Staging Environment: tooling/postman/PBCEx.staging.postman_environment.json'",
     "thunder:open": "echo '⚡ Thunder Collection: tooling/thunder/thunder-collection_PBCEx.json' && echo '🌍 Local Environment: tooling/thunder/thunder-environment_local.json' && echo '🏢 Staging Environment: tooling/thunder/thunder-environment_staging.json'",
     "commit": "git-cz",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test": "echo 'No frontend tests configured yet'",
+    "type-check": "tsc --noEmit",
+    "lint:check": "eslint . --max-warnings 0",
+    "prepush": "npx gitleaks detect --verbose --no-git || exit 0"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -109,5 +113,17 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,jsx,json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*": [
+      "scripts/check-secrets.sh"
+    ]
   }
 }

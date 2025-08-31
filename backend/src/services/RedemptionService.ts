@@ -58,7 +58,7 @@ export class RedemptionService {
    */
   private static checkRedemptionEnabled(): void {
     if (!env.ENABLE_VAULT_REDEMPTION) {
-      throw createError.serviceUnavailable('Redemption', 'Vault redemption services are not implemented', 501);
+      throw createError.serviceUnavailable('Vault redemption services are not implemented');
     }
   }
 
@@ -96,7 +96,7 @@ export class RedemptionService {
       }
 
       // Calculate estimated value and costs
-      const baseValue = requestedAmount * parseFloat(mockSkus[0].unitCost);
+      const baseValue = requestedAmount * parseFloat(mockSkus[0]?.unitCost || '0');
       const redemptionFeeRate = 0.01; // 1% redemption fee
       const redemptionFee = (baseValue * redemptionFeeRate).toFixed(2);
       const shippingCost = RedemptionService.calculateShippingCost(baseValue);

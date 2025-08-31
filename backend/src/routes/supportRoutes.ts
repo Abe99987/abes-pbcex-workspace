@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { asyncHandler, createError } from '@/middlewares/errorMiddleware';
 import { authenticate, authorize } from '@/middlewares/authMiddleware';
 import { validateBody, validateQuery } from '@/utils/validators';
@@ -50,7 +50,7 @@ const userNoteSchema = z.object({
 const searchQuerySchema = z.object({
   q: z.string().min(3, 'Search query must be at least 3 characters').max(100, 'Search query too long'),
   type: z.enum(['all', 'email', 'name', 'phone', 'order']).default('all'),
-  limit: z.string().transform(val => Math.min(parseInt(val) || 20, 100)).optional(),
+  limit: z.coerce.number().min(1).max(100).default(20).optional(),
 });
 
 /**
@@ -117,7 +117,7 @@ router.get('/audit/:userId',
  * Get support tickets assigned to current user
  */
 router.get('/tickets',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     // Stub for future ticket system
     res.json({
       code: 'SUCCESS',
@@ -135,7 +135,7 @@ router.get('/tickets',
  * Create internal support ticket
  */
 router.post('/tickets',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     // Stub for future ticket system
     res.status(501).json({
       code: 'SERVICE_UNAVAILABLE',
@@ -150,7 +150,7 @@ router.post('/tickets',
  */
 router.get('/stats',
   authorize(USER_ROLES.ADMIN),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     // Mock support statistics
     const stats = {
       team: {

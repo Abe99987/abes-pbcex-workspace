@@ -1,15 +1,7 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import { logInfo, logWarn, logError } from '@/utils/logger';
 
-// Extend AxiosRequestConfig to include metadata
-declare module 'axios' {
-  export interface AxiosRequestConfig {
-    metadata?: {
-      correlationId: string;
-      startTime: number;
-    };
-  }
-}
+// Metadata types are declared in utils/httpClient.ts
 import { env, integrations } from '@/config/env';
 import { cache } from '@/cache/redis';
 import fs from 'fs/promises';
@@ -67,44 +59,42 @@ export class FedexService {
           'X-locale': 'en_US',
         },
         // Retry configuration
-        validateStatus: (status) => status < 500, // Don't throw on 4xx errors
+        validateStatus: status => status < 500, // Don't throw on 4xx errors
       });
 
       // Add request interceptor for logging
-      FedexService.httpClient.interceptors.request.use(
-        (config) => {
-          const correlationId = Math.random().toString(36).substr(2, 9);
-          config.metadata = { correlationId, startTime: Date.now() };
-          
-          logInfo('FedEx API request', {
-            method: config.method?.toUpperCase(),
-            url: config.url,
-            correlationId,
-            hasAuth: !!config.headers?.['Authorization'],
-          });
-          
-          return config;
-        }
-      );
+      FedexService.httpClient.interceptors.request.use(config => {
+        const correlationId = Math.random().toString(36).substr(2, 9);
+        config.metadata = { correlationId, startTime: Date.now() };
+
+        logInfo('FedEx API request', {
+          method: config.method?.toUpperCase(),
+          url: config.url,
+          correlationId,
+          hasAuth: !!config.headers?.['Authorization'],
+        });
+
+        return config;
+      });
 
       // Add response interceptor for logging and error handling
       FedexService.httpClient.interceptors.response.use(
-        (response) => {
+        response => {
           const { correlationId, startTime } = response.config.metadata || {};
           const duration = startTime ? Date.now() - startTime : 0;
-          
+
           logInfo('FedEx API response', {
             status: response.status,
             correlationId,
             duration,
           });
-          
+
           return response;
         },
         (error: AxiosError) => {
           const { correlationId, startTime } = error.config?.metadata || {};
           const duration = startTime ? Date.now() - startTime : 0;
-          
+
           logError('FedEx API error', {
             status: error.response?.status,
             correlationId,
@@ -112,7 +102,7 @@ export class FedexService {
             error: error.message,
             data: error.response?.data,
           });
-          
+
           return Promise.reject(error);
         }
       );
@@ -127,7 +117,6 @@ export class FedexService {
 
       FedexService.isInitialized = true;
       logInfo('FedexService initialized successfully');
-
     } catch (error) {
       logError('Failed to initialize FedexService', error as Error);
       // Continue with mock service
@@ -153,7 +142,11 @@ export class FedexService {
       }
 
       // Get new token
-      if (!integrations.fedex || !env.FEDEX_CLIENT_ID || !env.FEDEX_CLIENT_SECRET) {
+      if (
+        !integrations.fedex ||
+        !env.FEDEX_CLIENT_ID ||
+        !env.FEDEX_CLIENT_SECRET
+      ) {
         return {
           success: false,
           error: 'FedEx not configured',
@@ -163,15 +156,19 @@ export class FedexService {
 
       logInfo('Requesting new FedEx OAuth token', { correlationId });
 
-      const response = await FedexService.httpClient.post<FedExOAuthResponse>('/oauth/token', {
-        grant_type: 'client_credentials',
-        client_id: env.FEDEX_CLIENT_ID,
-        client_secret: env.FEDEX_CLIENT_SECRET,
-      }, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+      const response = await FedexService.httpClient.post<FedExOAuthResponse>(
+        '/oauth/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: env.FEDEX_CLIENT_ID,
+          client_secret: env.FEDEX_CLIENT_SECRET,
         },
-      });
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
 
       if (response.status !== 200) {
         return {
@@ -187,7 +184,7 @@ export class FedexService {
       const ttl = expires_in - FedexService.TOKEN_SAFETY_MARGIN_SECONDS;
       await cache.setex(FedexService.TOKEN_CACHE_KEY, ttl, access_token);
 
-      logInfo('FedEx OAuth token obtained and cached', { 
+      logInfo('FedEx OAuth token obtained and cached', {
         correlationId,
         expiresIn: expires_in,
         ttl,
@@ -198,7 +195,6 @@ export class FedexService {
         data: access_token,
         correlationId,
       };
-
     } catch (error) {
       logError('Failed to get FedEx token', {
         error: error as Error,
@@ -233,7 +229,12 @@ export class FedexService {
     };
     packages: Array<{
       weight: { value: number; units: 'LB' | 'KG' };
-      dimensions?: { length: number; width: number; height: number; units: 'IN' | 'CM' };
+      dimensions?: {
+        length: number;
+        width: number;
+        height: number;
+        units: 'IN' | 'CM';
+      };
       declaredValue?: { amount: number; currency: string };
     }>;
     shipDate?: string; // YYYY-MM-DD, defaults to tomorrow
@@ -297,11 +298,15 @@ export class FedexService {
       };
 
       // Make API request
-      const response = await FedexService.httpClient.post<FedExRateResponse>('/rate/v1/rates/quotes', fedexRequest, {
-        headers: {
-          'Authorization': `Bearer ${tokenResult.data}`,
-        },
-      });
+      const response = await FedexService.httpClient.post<FedExRateResponse>(
+        '/rate/v1/rates/quotes',
+        fedexRequest,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenResult.data}`,
+          },
+        }
+      );
 
       if (response.status !== 200) {
         return {
@@ -313,9 +318,9 @@ export class FedexService {
 
       // Process response
       const rates = FedexService.parseRateResponse(response.data);
-      
+
       // Filter by requested service types if specified
-      const filteredRates = request.serviceTypes 
+      const filteredRates = request.serviceTypes
         ? rates.filter(rate => request.serviceTypes!.includes(rate.serviceType))
         : rates;
 
@@ -331,7 +336,6 @@ export class FedexService {
         transactionId: response.data.transactionId,
         correlationId,
       };
-
     } catch (error) {
       logError('Failed to get FedEx rates', {
         error: error as Error,
@@ -366,7 +370,12 @@ export class FedexService {
     };
     packages: Array<{
       weight: { value: number; units: 'LB' | 'KG' };
-      dimensions?: { length: number; width: number; height: number; units: 'IN' | 'CM' };
+      dimensions?: {
+        length: number;
+        width: number;
+        height: number;
+        units: 'IN' | 'CM';
+      };
     }>;
     shipDate?: string;
   }): Promise<FedExServiceResult<FedExServiceOption[]>> {
@@ -414,15 +423,16 @@ export class FedexService {
         },
       };
 
-      const response = await FedexService.httpClient.post<FedExServiceAvailabilityResponse>(
-        '/ship/v1/shipments/availability', 
-        fedexRequest,
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenResult.data}`,
-          },
-        }
-      );
+      const response =
+        await FedexService.httpClient.post<FedExServiceAvailabilityResponse>(
+          '/ship/v1/shipments/availability',
+          fedexRequest,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenResult.data}`,
+            },
+          }
+        );
 
       if (response.status !== 200) {
         return {
@@ -432,7 +442,9 @@ export class FedexService {
         };
       }
 
-      const services = FedexService.parseServiceAvailabilityResponse(response.data);
+      const services = FedexService.parseServiceAvailabilityResponse(
+        response.data
+      );
 
       logInfo('FedEx service availability retrieved', {
         correlationId,
@@ -446,7 +458,6 @@ export class FedexService {
         transactionId: response.data.transactionId,
         correlationId,
       };
-
     } catch (error) {
       logError('Failed to get FedEx service availability', {
         error: error as Error,
@@ -455,7 +466,8 @@ export class FedexService {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown availability error',
+        error:
+          error instanceof Error ? error.message : 'Unknown availability error',
         correlationId,
       };
     }
@@ -497,7 +509,12 @@ export class FedexService {
     };
     packages: Array<{
       weight: { value: number; units: 'LB' | 'KG' };
-      dimensions?: { length: number; width: number; height: number; units: 'IN' | 'CM' };
+      dimensions?: {
+        length: number;
+        width: number;
+        height: number;
+        units: 'IN' | 'CM';
+      };
       declaredValue?: { amount: number; currency: string };
       customerReference?: string;
     }>;
@@ -543,10 +560,12 @@ export class FedexService {
             address: request.shipper.address,
             contact: request.shipper.contact,
           },
-          recipients: [{
-            address: request.recipient.address,
-            contact: request.recipient.contact,
-          }],
+          recipients: [
+            {
+              address: request.recipient.address,
+              contact: request.recipient.contact,
+            },
+          ],
           shipDatestamp: shipDate,
           serviceType: request.serviceType,
           packagingType: request.packagingType || 'YOUR_PACKAGING',
@@ -564,10 +583,14 @@ export class FedexService {
             weight: pkg.weight,
             dimensions: pkg.dimensions,
             declaredValue: pkg.declaredValue,
-            customerReferences: pkg.customerReference ? [{
-              customerReferenceType: 'CUSTOMER_REFERENCE',
-              value: pkg.customerReference,
-            }] : undefined,
+            customerReferences: pkg.customerReference
+              ? [
+                  {
+                    customerReferenceType: 'CUSTOMER_REFERENCE',
+                    value: pkg.customerReference,
+                  },
+                ]
+              : undefined,
           })),
         },
         accountNumber: {
@@ -575,15 +598,16 @@ export class FedexService {
         },
       };
 
-      const response = await FedexService.httpClient.post<FedExShipmentResponse>(
-        '/ship/v1/shipments',
-        fedexRequest,
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenResult.data}`,
-          },
-        }
-      );
+      const response =
+        await FedexService.httpClient.post<FedExShipmentResponse>(
+          '/ship/v1/shipments',
+          fedexRequest,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenResult.data}`,
+            },
+          }
+        );
 
       if (response.status !== 200) {
         return {
@@ -594,7 +618,10 @@ export class FedexService {
       }
 
       // Parse response and save label
-      const labelResult = await FedexService.parseShipmentResponse(response.data, correlationId);
+      const labelResult = await FedexService.parseShipmentResponse(
+        response.data,
+        correlationId
+      );
 
       logInfo('FedEx shipment created successfully', {
         correlationId,
@@ -609,7 +636,6 @@ export class FedexService {
         transactionId: response.data.transactionId,
         correlationId,
       };
-
     } catch (error) {
       logError('Failed to create FedEx shipment', {
         error: error as Error,
@@ -618,7 +644,8 @@ export class FedexService {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown shipment error',
+        error:
+          error instanceof Error ? error.message : 'Unknown shipment error',
         correlationId,
       };
     }
@@ -627,7 +654,10 @@ export class FedexService {
   /**
    * Save label to local file system
    */
-  static async saveLabel(base64Content: string, filename?: string): Promise<string> {
+  static async saveLabel(
+    base64Content: string,
+    filename?: string
+  ): Promise<string> {
     const labelsDir = path.join(process.cwd(), 'tmp', 'labels');
     await fs.mkdir(labelsDir, { recursive: true });
 
@@ -685,16 +715,20 @@ export class FedexService {
     }
 
     // Test OAuth endpoint
-    const response = await FedexService.httpClient.post('/oauth/token', {
-      grant_type: 'client_credentials',
-      client_id: 'test',
-      client_secret: 'test',
-    }, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+    const response = await FedexService.httpClient.post(
+      '/oauth/token',
+      {
+        grant_type: 'client_credentials',
+        client_id: 'test',
+        client_secret: 'test',
       },
-      validateStatus: () => true, // Accept any status for test
-    });
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        validateStatus: () => true, // Accept any status for test
+      }
+    );
 
     if (response.status === 404) {
       throw new Error('FedEx API endpoint not found - check base URL');
@@ -704,10 +738,13 @@ export class FedexService {
   private static getTomorrowDate(): string {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split('T')[0];
+    return (
+      tomorrow.toISOString().split('T')[0] ||
+      tomorrow.toISOString().slice(0, 10)
+    );
   }
 
-  private static generateMockRates(request: any): FedExRateQuote[] {
+  private static generateMockRates(request: unknown): FedExRateQuote[] {
     const baseRate = 15.99;
     return [
       {
@@ -715,12 +752,12 @@ export class FedexService {
         serviceName: 'FedEx Ground',
         packagingType: 'YOUR_PACKAGING',
         totalCharge: baseRate,
-        baseCharge: baseRate - 2.50,
+        baseCharge: baseRate - 2.5,
         currency: 'USD',
         transitDays: 3,
         deliveryDay: 'MON',
         surcharges: [
-          { type: 'FUEL', description: 'Fuel Surcharge', amount: 2.50 },
+          { type: 'FUEL', description: 'Fuel Surcharge', amount: 2.5 },
         ],
       },
       {
@@ -728,12 +765,12 @@ export class FedexService {
         serviceName: 'FedEx Express Saver',
         packagingType: 'YOUR_PACKAGING',
         totalCharge: baseRate + 8,
-        baseCharge: baseRate + 5.50,
+        baseCharge: baseRate + 5.5,
         currency: 'USD',
         transitDays: 2,
         deliveryDay: 'FRI',
         surcharges: [
-          { type: 'FUEL', description: 'Fuel Surcharge', amount: 2.50 },
+          { type: 'FUEL', description: 'Fuel Surcharge', amount: 2.5 },
         ],
       },
     ];
@@ -758,40 +795,51 @@ export class FedexService {
     ];
   }
 
-  private static async generateMockLabel(request: any): Promise<FedExLabelResult> {
+  private static async generateMockLabel(
+    request: unknown
+  ): Promise<FedExLabelResult> {
     const trackingNumber = `1234567890${Date.now().toString().slice(-2)}`;
-    const mockPdfContent = 'JVBERi0xLjQKJdPr6eEKMSAwIG9iago8PAovVGl0bGUgKEZlZEV4IE1vY2sgTGFiZWwpCi9Qcm9kdWNlciAoUEJDRXggTW9jayBHZW5lcmF0b3IpCi9DcmVhdGlvbkRhdGUgKEQ6MjAyNDA0MDEwMDAwMDBaKQo+PgplbmRvYmoKJSVFT0Y=';
-    
+    const mockPdfContent =
+      'JVBERi0xLjQKJdPr6eEKMSAwIG9iago8PAovVGl0bGUgKEZlZEV4IE1vY2sgTGFiZWwpCi9Qcm9kdWNlciAoUEJDRXggTW9jayBHZW5lcmF0b3IpCi9DcmVhdGlvbkRhdGUgKEQ6MjAyNDA0MDEwMDAwMDBaKQo+PgplbmRvYmoKJSVFT0Y=';
+
     const filename = `mock-label-${trackingNumber}.pdf`;
     const filePath = await FedexService.saveLabel(mockPdfContent, filename);
-    
+
     return {
       trackingNumber,
       labelUrl: filePath,
       labelBase64: mockPdfContent,
-      serviceType: request.serviceType,
+      serviceType: (request as any)?.serviceType || 'FEDEX_GROUND',
       deliveryDate: FedexService.getTomorrowDate(),
       totalCharge: 15.99,
       currency: 'USD',
     };
   }
 
-  private static parseRateResponse(response: FedExRateResponse): FedExRateQuote[] {
+  private static parseRateResponse(
+    response: FedExRateResponse
+  ): FedExRateQuote[] {
     return response.output.rateReplyDetails.map(detail => ({
       serviceType: detail.serviceType as FedExServiceType,
       serviceName: detail.serviceName,
       packagingType: detail.packagingType as FedExPackagingType,
       totalCharge: detail.ratedShipmentDetails[0]?.totalNetCharge || 0,
       baseCharge: detail.ratedShipmentDetails[0]?.totalBaseCharge || 0,
-      currency: detail.ratedShipmentDetails[0]?.shipmentRateDetail.currency || 'USD',
-      transitDays: detail.operationalDetail ? parseInt(detail.operationalDetail.transitTime) : undefined,
+      currency:
+        detail.ratedShipmentDetails[0]?.shipmentRateDetail.currency || 'USD',
+      transitDays: detail.operationalDetail
+        ? parseInt(detail.operationalDetail.transitTime)
+        : undefined,
       deliveryDate: detail.operationalDetail?.deliveryDate,
       deliveryDay: detail.operationalDetail?.deliveryDay,
-      surcharges: detail.ratedShipmentDetails[0]?.shipmentRateDetail.surcharges || [],
+      surcharges:
+        detail.ratedShipmentDetails[0]?.shipmentRateDetail.surcharges || [],
     }));
   }
 
-  private static parseServiceAvailabilityResponse(response: FedExServiceAvailabilityResponse): FedExServiceOption[] {
+  private static parseServiceAvailabilityResponse(
+    response: FedExServiceAvailabilityResponse
+  ): FedExServiceOption[] {
     return response.output.options.map(option => ({
       serviceType: option.serviceType as FedExServiceType,
       serviceName: option.serviceName,
@@ -801,13 +849,30 @@ export class FedexService {
     }));
   }
 
-  private static async parseShipmentResponse(response: FedExShipmentResponse, correlationId: string): Promise<FedExLabelResult> {
-    const transaction = response.output.transactionShipments[0];
-    const packageDetail = transaction.completedPackageDetails[0];
-    const document = packageDetail.packageDocuments[0];
+  private static async parseShipmentResponse(
+    response: FedExShipmentResponse,
+    correlationId: string
+  ): Promise<FedExLabelResult> {
+    const transaction = response.output.transactionShipments?.[0];
+    if (!transaction) {
+      throw new Error('No transaction data in FedEx shipment response');
+    }
+
+    const packageDetail = transaction.completedPackageDetails?.[0];
+    if (!packageDetail) {
+      throw new Error('No package details in FedEx transaction response');
+    }
+
+    const document = packageDetail.packageDocuments?.[0];
+    if (!document) {
+      throw new Error('No package documents in FedEx package response');
+    }
 
     const filename = `label-${packageDetail.trackingNumber}-${correlationId}.pdf`;
-    const filePath = await FedexService.saveLabel(document.encodedLabel, filename);
+    const filePath = await FedexService.saveLabel(
+      document.encodedLabel,
+      filename
+    );
 
     return {
       trackingNumber: packageDetail.trackingNumber,

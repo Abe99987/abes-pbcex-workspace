@@ -54,7 +54,7 @@ export class WalletControllerDb {
 
     if (!db.isConnected()) {
       logWarn('Database not available, falling back to in-memory');
-      return WalletController.getBalances(req, res);
+      return WalletController.getBalances(req, res, () => {});
     }
 
     try {
@@ -67,7 +67,7 @@ export class WalletControllerDb {
 
       if (!fundingAccount || !tradingAccount) {
         logWarn('User accounts not found in DB, falling back to in-memory');
-        return WalletController.getBalances(req, res);
+        return WalletController.getBalances(req, res, () => {});
       }
 
       // Get balances for each account
@@ -125,7 +125,7 @@ export class WalletControllerDb {
       });
     } catch (error) {
       logError('Database balances query failed, falling back', error as Error);
-      return WalletController.getBalances(req, res);
+      return WalletController.getBalances(req, res, () => {});
     }
   });
 
@@ -147,7 +147,7 @@ export class WalletControllerDb {
 
     if (!db.isConnected()) {
       logWarn('Database not available, falling back to in-memory');
-      return WalletController.getTransactions(req, res);
+      return WalletController.getTransactions(req, res, () => {});
     }
 
     try {
@@ -236,7 +236,7 @@ export class WalletControllerDb {
         'Database transactions query failed, falling back',
         error as Error
       );
-      return WalletController.getTransactions(req, res);
+      return WalletController.getTransactions(req, res, () => {});
     }
   });
 
@@ -338,7 +338,7 @@ export class WalletControllerDb {
     async (req: Request, res: Response) => {
       // For now, redirect to CSV
       req.url = req.url.replace('.xlsx', '.csv');
-      return WalletControllerDb.exportTransactionsCsv(req, res);
+      return WalletControllerDb.exportTransactionsCsv(req, res, () => {});
     }
   );
 }

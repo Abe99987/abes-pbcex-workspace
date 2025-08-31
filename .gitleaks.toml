@@ -1,0 +1,57 @@
+# GitLeaks Configuration for PBCEx
+# Basic secret detection rules with safe defaults
+
+title = "PBCEx Secret Detection"
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+regex = '''AKIA[0-9A-Z]{16}'''
+tags = ["aws", "credentials"]
+
+[[rules]]
+id = "stripe-api-key"
+description = "Stripe API Key"
+regex = '''sk_(live|test)_[a-zA-Z0-9]+'''
+tags = ["stripe", "payment"]
+
+[[rules]]
+id = "twilio-auth-token"
+description = "Twilio Auth Token"
+regex = '''(?i)twilio.*auth.*token'''
+tags = ["twilio", "sms"]
+
+[[rules]]
+id = "resend-api-key"
+description = "Resend API Key"
+regex = '''(?i)resend.*api.*key'''
+tags = ["resend", "email"]
+
+[[rules]]
+id = "fedex-credentials"
+description = "FedEx API Credentials"
+regex = '''(?i)fedex.*(secret|password|key)'''
+tags = ["fedex", "shipping"]
+
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN.*PRIVATE.*KEY-----'''
+tags = ["crypto", "private-key"]
+
+[[rules]]
+id = "generic-api-tokens"
+description = "Generic API Tokens"
+regex = '''(?i)(access[_-]?token|refresh[_-]?token|api[_-]?key|bearer\s+[a-zA-Z0-9]+)'''
+tags = ["api", "token"]
+
+# Allowlist for template files and documentation
+[allowlist]
+paths = [
+  "env-template",
+  "**/env-template",
+  "**/README*.md",
+  "docs/**/*.md"
+]
+
+description = "Allowlisted files (templates and docs)"

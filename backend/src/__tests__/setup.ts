@@ -1,53 +1,94 @@
-/**
+/****
  * Test Setup for PBCEx Backend
- * Configures Jest test environment and mocks for Phase-3 features
+ * - Strongly-typed Jest/Express mocks
+ * - Safe global helpers typing
+ * - No real external calls
  */
 
-import { jest } from '@jest/globals';
+import { jest, expect } from '@jest/globals';
+import type { Request, Response, NextFunction } from 'express';
 
-// Mock environment variables for testing
+// -----------------------------
+// Environment & Feature Flags
+// -----------------------------
 process.env.NODE_ENV = 'test';
-process.env.PORT = '4001'; // Different port for testing
+process.env.PORT = '4001';
 process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing-only';
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/pbcex_test';
 
-// Phase-3 Feature flags for testing
 process.env.PHASE = '3';
 process.env.ENABLE_VAULT_REDEMPTION = 'true';
 process.env.ENABLE_ONCHAIN = 'false';
 process.env.FULFILLMENT_STRATEGY = 'JM';
 
-// Mock integration services (prevent real API calls during tests)
+// Vendor/API placeholders (prevent real calls)
 process.env.PLAID_CLIENT_ID = 'test_plaid_client_id';
 process.env.PLAID_SECRET = 'test_plaid_secret';
 process.env.PAXOS_API_KEY = 'test_paxos_key';
 process.env.PRIMETRUST_API_KEY = 'test_primetrust_key';
-
-// Mock notification services
 process.env.SENDGRID_API_KEY = 'test_sendgrid_key';
 process.env.TWILIO_ACCOUNT_SID = 'test_twilio_sid';
 process.env.TWILIO_AUTH_TOKEN = 'test_twilio_token';
 
-// Database connection timeout for tests
 process.env.DB_CONNECT_TIMEOUT = '5000';
 process.env.DB_POOL_SIZE = '5';
 
-// Disable logging in tests unless explicitly enabled
 if (!process.env.ENABLE_TEST_LOGS) {
   process.env.LOG_LEVEL = 'silent';
 }
 
-// Mock JWT authentication for testing
+// -----------------------------
+// Local Types for Test Mocks
+// -----------------------------
+type Role = 'ADMIN' | 'SUPPORT' | 'TELLER' | 'USER';
+type KycStatus = 'APPROVED' | 'PENDING' | 'REJECTED';
+
+interface MockUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: Role;
+  kycStatus: KycStatus;
+  emailVerified?: boolean;
+  phoneVerified?: boolean;
+  twoFactorEnabled?: boolean;
+  createdAt?: Date;
+}
+
+interface MockPriceQuote {
+  price: string;
+  timestamp: Date;
+  source: string;
+}
+
+interface MockPriceMap {
+  [symbol: string]: {
+    price: string;
+    change24h: string;
+  };
+}
+
+interface MockSendResult {
+  success: boolean;
+  messageId: string;
+}
+
+interface MockQueryResult {
+  rows: unknown[];
+  rowCount: number;
+}
+
+// -----------------------------
+// Auth Middleware Mock
+// -----------------------------
 jest.mock('../middlewares/authMiddleware', () => {
-  const originalModule = jest.requireActual('../middlewares/authMiddleware');
-  
-  return {
-    ...originalModule,
-    authenticate: jest.fn((req: any, res: any, next: any) => {
-      // Mock user based on Authorization header
+  // Use explicit express types for req/res/next
+  const authenticate = jest.fn(
+    (req: Request, res: Response, next: NextFunction) => {
       const token = req.headers.authorization?.replace('Bearer ', '');
-      
-      const mockUsers: Record<string, any> = {
+
+      const mockUsers: Record<string, MockUser> = {
         'mock-admin-jwt-token': {
           id: 'admin-user-id',
           email: 'admin@pbcex.com',
@@ -57,7 +98,7 @@ jest.mock('../middlewares/authMiddleware', () => {
           kycStatus: 'APPROVED',
         },
         'mock-support-jwt-token': {
-          id: 'support-user-id', 
+          id: 'support-user-id',
           email: 'support@pbcex.com',
           firstName: 'Support',
           lastName: 'Agent',
@@ -66,7 +107,7 @@ jest.mock('../middlewares/authMiddleware', () => {
         },
         'mock-teller-jwt-token': {
           id: 'teller-user-id',
-          email: 'teller@pbcex.com', 
+          email: 'teller@pbcex.com',
           firstName: 'Bank',
           lastName: 'Teller',
           role: 'TELLER',
@@ -76,7 +117,7 @@ jest.mock('../middlewares/authMiddleware', () => {
           id: 'regular-user-id',
           email: 'user@example.com',
           firstName: 'Regular',
-          lastName: 'User', 
+          lastName: 'User',
           role: 'USER',
           kycStatus: 'APPROVED',
         },
@@ -89,9 +130,11 @@ jest.mock('../middlewares/authMiddleware', () => {
           kycStatus: 'APPROVED',
         },
       };
-      
-      if (token && mockUsers[token]) {
-        req.user = mockUsers[token];
+
+      const found = token ? mockUsers[token] : undefined;
+      if (found) {
+        // attach typed user onto req
+        (req as unknown as { user: MockUser }).user = found;
         next();
       } else {
         res.status(401).json({
@@ -99,108 +142,115 @@ jest.mock('../middlewares/authMiddleware', () => {
           message: 'Authentication required',
         });
       }
-    }),
-    
-    requireKyc: jest.fn((allowedStatuses = ['APPROVED']) => {
-      return (req: any, res: any, next: any) => {
-        if (req.user && allowedStatuses.includes(req.user.kycStatus)) {
-          next();
-        } else {
-          res.status(403).json({
-            code: 'KYC_REQUIRED',
-            message: 'KYC approval required',
-            requiredStatuses: allowedStatuses,
-            userStatus: req.user?.kycStatus,
-          });
-        }
-      };
-    }),
+    }
+  );
 
-    requireAdmin: jest.fn((req: any, res: any, next: any) => {
-      if (req.user?.role === 'ADMIN') {
+  const requireKyc = jest.fn((allowedStatuses: KycStatus[] = ['APPROVED']) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+      const user = (req as unknown as { user?: MockUser }).user;
+      if (user && allowedStatuses.includes(user.kycStatus)) {
+        next();
+      } else {
+        res.status(403).json({
+          code: 'KYC_REQUIRED',
+          message: 'KYC approval required',
+          requiredStatuses: allowedStatuses,
+          userStatus: user?.kycStatus,
+        });
+      }
+    };
+  });
+
+  const requireAdmin = jest.fn(
+    (req: Request, res: Response, next: NextFunction) => {
+      const user = (req as unknown as { user?: MockUser }).user;
+      if (user?.role === 'ADMIN') {
         next();
       } else {
         res.status(403).json({
           code: 'AUTHORIZATION_ERROR',
           message: 'Admin access required',
-          userRole: req.user?.role,
+          userRole: user?.role,
         });
       }
-    }),
+    }
+  );
 
-    authorize: jest.fn((requiredRole: string | string[]) => {
-      return (req: any, res: any, next: any) => {
-        const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-        
-        if (req.user?.role === 'ADMIN' || roles.includes(req.user?.role)) {
-          next();
-        } else {
-          res.status(403).json({
-            code: 'AUTHORIZATION_ERROR', 
-            message: 'Insufficient permissions',
-            requiredRoles: roles,
-            userRole: req.user?.role,
-          });
-        }
-      };
-    }),
+  const authorize = jest.fn((requiredRole: Role | Role[]) => {
+    const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    return (req: Request, res: Response, next: NextFunction) => {
+      const user = (req as unknown as { user?: MockUser }).user;
+      if (user?.role === 'ADMIN' || (user && roles.includes(user.role))) {
+        next();
+      } else {
+        res.status(403).json({
+          code: 'AUTHORIZATION_ERROR',
+          message: 'Insufficient permissions',
+          requiredRoles: roles,
+          userRole: user?.role,
+        });
+      }
+    };
+  });
+
+  return {
+    __esModule: true,
+    authenticate,
+    requireKyc,
+    requireAdmin,
+    authorize,
   };
 });
 
-// Mock external services to prevent real API calls
+// -----------------------------
+// External Services Mocks
+// -----------------------------
 jest.mock('../services/PriceFeedService', () => ({
   __esModule: true,
   default: {
-    getPrice: jest.fn().mockResolvedValue({
-      price: '2150.00',
-      timestamp: new Date(),
-      source: 'mock',
-    }),
-    getPrices: jest.fn().mockResolvedValue({
-      'PAXG': { price: '2150.00', change24h: '1.2%' },
-      'XAU-s': { price: '2150.00', change24h: '1.2%' },
-      'XAG-s': { price: '32.50', change24h: '0.8%' },
-    }),
+    getPrice: jest.fn(),
+    getPrices: jest.fn(),
   },
 }));
 
 jest.mock('../services/NotificationService', () => ({
   __esModule: true,
   default: {
-    sendEmail: jest.fn().mockResolvedValue({ success: true, messageId: 'mock-email-id' }),
-    sendSMS: jest.fn().mockResolvedValue({ success: true, messageId: 'mock-sms-id' }),
-    sendPush: jest.fn().mockResolvedValue({ success: true, messageId: 'mock-push-id' }),
+    sendEmail: jest.fn(),
+    sendSMS: jest.fn(),
+    sendPush: jest.fn(),
   },
 }));
 
-// Mock database connections (if using a real DB, consider using test database)
-jest.mock('../config/database', () => ({
+// -----------------------------
+// DB/Redis/File mocks
+// -----------------------------
+jest.mock('../db/index', () => ({
   __esModule: true,
   default: {
     query: jest.fn(),
-    transaction: jest.fn((callback) => callback({
-      query: jest.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
-      rollback: jest.fn(),
-      commit: jest.fn(),
-    })),
+    transaction: jest.fn(),
     end: jest.fn(),
   },
 }));
 
-// Mock Redis for caching (if used)
-jest.mock('redis', () => ({
-  createClient: jest.fn(() => ({
-    connect: jest.fn().mockResolvedValue(true),
-    disconnect: jest.fn().mockResolvedValue(true),
-    get: jest.fn().mockResolvedValue(null),
-    set: jest.fn().mockResolvedValue(true),
-    del: jest.fn().mockResolvedValue(1),
-    exists: jest.fn().mockResolvedValue(0),
-    expire: jest.fn().mockResolvedValue(1),
-  })),
-}));
+jest.mock('ioredis', () => {
+  const mockRedis = jest.fn(() => ({
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+    get: jest.fn(),
+    set: jest.fn(),
+    setex: jest.fn(),
+    del: jest.fn(),
+    exists: jest.fn(),
+    expire: jest.fn(),
+    flushall: jest.fn(),
+    quit: jest.fn(),
+  }));
+  
+  return mockRedis;
+});
 
-// Mock file system operations
 jest.mock('fs/promises', () => ({
   readFile: jest.fn(),
   writeFile: jest.fn(),
@@ -208,29 +258,35 @@ jest.mock('fs/promises', () => ({
   mkdir: jest.fn(),
 }));
 
-// Global test utilities
+// -----------------------------
+// Global helpers (typed)
+// -----------------------------
 declare global {
-  namespace NodeJS {
-    interface Global {
-      testHelpers: {
-        createMockUser: (role?: string) => any;
-        createAuthHeaders: (role?: string) => Record<string, string>;
-        expectApiError: (response: any, code: string) => void;
-        expectApiSuccess: (response: any) => void;
-        withFeatureFlag: (flag: string, value: string, testFn: () => Promise<void>) => Promise<void>;
-      };
-    }
-  }
+  // augment the NodeJS globalThis with a typed helper (Jest runtime)
+   
+  var testHelpers: {
+    createMockUser: (role?: Role) => MockUser;
+    createAuthHeaders: (role?: Role) => Record<string, string>;
+    expectApiError: (
+      response: { body: unknown; status: number },
+      code: string
+    ) => void;
+    expectApiSuccess: (response: { body: unknown; status: number }) => void;
+    withFeatureFlag: (
+      flag: string,
+      value: string,
+      testFn: () => Promise<void>
+    ) => Promise<void>;
+  };
 }
 
-// Global test helper functions
 global.testHelpers = {
-  createMockUser: (role: string = 'USER') => ({
+  createMockUser: (role: Role = 'USER'): MockUser => ({
     id: `${role.toLowerCase()}-user-id`,
     email: `${role.toLowerCase()}@pbcex.com`,
     firstName: 'Test',
     lastName: 'User',
-    role: role,
+    role,
     kycStatus: 'APPROVED',
     emailVerified: true,
     phoneVerified: false,
@@ -238,12 +294,15 @@ global.testHelpers = {
     createdAt: new Date(),
   }),
 
-  createAuthHeaders: (role: string = 'USER') => ({
-    'Authorization': `Bearer mock-${role.toLowerCase()}-jwt-token`,
+  createAuthHeaders: (role: Role = 'USER') => ({
+    Authorization: `Bearer mock-${role.toLowerCase()}-jwt-token`,
     'Content-Type': 'application/json',
   }),
 
-  expectApiError: (response: any, code: string) => {
+  expectApiError: (
+    response: { body: unknown; status: number },
+    code: string
+  ) => {
     expect(response.body).toMatchObject({
       code,
       message: expect.any(String),
@@ -251,22 +310,25 @@ global.testHelpers = {
     expect(response.status).toBeGreaterThanOrEqual(400);
   },
 
-  expectApiSuccess: (response: any) => {
+  expectApiSuccess: (response: { body: unknown; status: number }) => {
     expect(response.body).toMatchObject({
       code: 'SUCCESS',
     });
     expect(response.status).toBeLessThan(400);
   },
 
-  withFeatureFlag: async (flag: string, value: string, testFn: () => Promise<void>) => {
+  withFeatureFlag: async (
+    flag: string,
+    value: string,
+    testFn: () => Promise<void>
+  ) => {
     const original = process.env[flag];
     process.env[flag] = value;
-    
     try {
       await testFn();
     } finally {
-      if (original) {
-        process.env[flag] = original;
+      if (typeof original !== 'undefined') {
+        process.env[flag] = original!;
       } else {
         delete process.env[flag];
       }
@@ -274,125 +336,26 @@ global.testHelpers = {
   },
 };
 
-// Test data factories
-export const TestDataFactory = {
-  user: (overrides = {}) => ({
-    id: 'test-user-id',
-    email: 'test@example.com',
-    firstName: 'Test',
-    lastName: 'User',
-    role: 'USER',
-    kycStatus: 'APPROVED',
-    emailVerified: true,
-    createdAt: new Date(),
-    ...overrides,
-  }),
-
-  account: (overrides = {}) => ({
-    id: 'test-account-id',
-    userId: 'test-user-id',
-    type: 'FUNDING',
-    isActive: true,
-    createdAt: new Date(),
-    ...overrides,
-  }),
-
-  balance: (overrides = {}) => ({
-    accountId: 'test-account-id',
-    asset: 'USD',
-    amount: '1000.00',
-    lockedAmount: '0.00',
-    lastUpdated: new Date(),
-    ...overrides,
-  }),
-
-  trade: (overrides = {}) => ({
-    id: 'test-trade-id',
-    userId: 'test-user-id',
-    fromAsset: 'USD',
-    toAsset: 'PAXG',
-    fromAmount: '2150.00',
-    toAmount: '1.00000000',
-    status: 'COMPLETED',
-    executedAt: new Date(),
-    createdAt: new Date(),
-    ...overrides,
-  }),
-
-  order: (overrides = {}) => ({
-    id: 'test-order-id',
-    userId: 'test-user-id',
-    productId: 'AU-EAGLE-1OZ',
-    quantity: 1,
-    unitPrice: '2150.00',
-    totalPrice: '2150.00',
-    status: 'PROCESSING',
-    createdAt: new Date(),
-    ...overrides,
-  }),
-
-  redemptionRequest: (overrides = {}) => ({
-    id: 'test-redemption-id',
-    userId: 'test-user-id',
-    asset: 'XAU-s',
-    assetAmount: '1.00000000',
-    vaultSku: 'AU-EAGLE-1OZ',
-    requestedQty: 1,
-    status: 'PENDING',
-    estimatedValue: '2150.00',
-    shippingAddress: {
-      name: 'Test User',
-      line1: '123 Test St',
-      city: 'Test City',
-      state: 'CA',
-      postalCode: '90210',
-      country: 'US',
-      phone: '555-0123',
-    },
-    createdAt: new Date(),
-    ...overrides,
-  }),
-
-  vaultInventory: (overrides = {}) => ({
-    id: 'test-inventory-id',
-    metal: 'AU',
-    sku: 'AU-EAGLE-1OZ',
-    format: 'COIN',
-    weight: '1.0000',
-    purity: '0.9167',
-    vaultLocation: 'VAULT-MAIN',
-    qtyAvailable: 100,
-    qtyReserved: 5,
-    unitCost: '2150.00',
-    isActive: true,
-    createdAt: new Date(),
-    ...overrides,
-  }),
-
-  supportNote: (overrides = {}) => ({
-    id: 'test-note-id',
-    userId: 'test-user-id',
-    note: 'Test support note content',
-    category: 'GENERAL',
-    priority: 'MEDIUM',
-    addedBy: 'support-user-id',
-    createdAt: new Date(),
-    ...overrides,
-  }),
-};
-
-// Setup and teardown
+// -----------------------------
+// Jest lifecycle
+// -----------------------------
 beforeAll(async () => {
   // Global test setup
-  console.log('🧪 Starting PBCEx test suite...');
+  // Intentionally quiet unless ENABLE_TEST_LOGS is set
 });
 
 afterAll(async () => {
   // Global test cleanup
-  console.log('✅ PBCEx test suite completed');
 });
 
-// Increase timeout for integration tests
-jest.setTimeout(30000);
+jest.setTimeout(30_000);
+
+// Simple test to make Jest happy (setup.ts needs a test)
+describe('Test Setup', () => {
+  it('should initialize test helpers correctly', () => {
+    expect(globalThis.testHelpers).toBeDefined();
+    expect(typeof globalThis.testHelpers.createMockUser).toBe('function');
+  });
+});
 
 export { jest };

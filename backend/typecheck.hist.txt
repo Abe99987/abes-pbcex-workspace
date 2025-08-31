@@ -1,0 +1,146 @@
+   1 src/utils/httpClient.ts(90,9): error TS2353: Object literal may only specify known properties, and 'serviceName' does not exist in type '{ correlationId: string; startTime: number; }'.
+   1 src/utils/httpClient.ts(227,5): error TS2717: Subsequent property declarations must have the same type.  Property 'metadata' must be of type '{ correlationId: string; startTime: number; } | undefined', but here has type 'HttpRequestMeta | undefined'.
+   1 src/utils/httpClient.ts(111,41): error TS2339: Property 'serviceName' does not exist on type '{ correlationId: string; startTime: number; }'.
+   1 src/services/RedemptionService.ts(99,54): error TS2532: Object is possibly 'undefined'.
+   1 src/services/RedemptionService.ts(61,107): error TS2554: Expected 1-2 arguments, but got 3.
+   1 src/services/PriceFeedService.ts(446,22): error TS2532: Object is possibly 'undefined'.
+   1 src/services/PriceFeedService.ts(445,15): error TS2532: Object is possibly 'undefined'.
+   1 src/services/HedgingService.ts(493,5): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+   1 src/services/HedgingService.ts(443,24): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(440,24): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(432,65): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(229,36): error TS2538: Type 'undefined' cannot be used as an index type.
+   1 src/services/HedgingService.ts(228,24): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(214,34): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(186,71): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(185,32): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(184,70): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(183,24): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(179,52): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(149,21): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(135,47): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(135,26): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(134,47): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(134,26): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/HedgingService.ts(127,20): error TS18048: 'config' is possibly 'undefined'.
+   1 src/services/FulfillmentStrategy.ts(361,51): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+   1 src/services/FedexService.ts(809,21): error TS18048: 'packageDetail' is possibly 'undefined'.
+   1 src/services/FedexService.ts(808,20): error TS18048: 'transaction' is possibly 'undefined'.
+   1 src/services/FedexService.ts(807,20): error TS18048: 'document' is possibly 'undefined'.
+   1 src/services/FedexService.ts(805,23): error TS18048: 'packageDetail' is possibly 'undefined'.
+   1 src/services/FedexService.ts(802,51): error TS18048: 'document' is possibly 'undefined'.
+   1 src/services/FedexService.ts(801,31): error TS18048: 'packageDetail' is possibly 'undefined'.
+   1 src/services/FedexService.ts(799,22): error TS18048: 'packageDetail' is possibly 'undefined'.
+   1 src/services/FedexService.ts(798,27): error TS18048: 'transaction' is possibly 'undefined'.
+   1 src/services/FedexService.ts(699,5): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+   1 src/services/ExperimentService.ts(179,5): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+   1 src/services/ExperimentService.ts(174,9): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+   1 src/services/ExperimentService.ts(162,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+   1 src/services/ExperimentService.ts(157,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+   1 src/server.ts(223,5): error TS2345: Argument of type '(service: { status?: string; }) => boolean' is not assignable to parameter of type '(value: { status: "healthy" | "degraded" | "unhealthy"; cachedPrices: number; subscribers: number; lastUpdate: Date | null; uptime: number; } | { email: { status: string; provider: string; }; sms: { ...; }; support: { ...; }; } | { ...; } | { ...; }, index: number, array: ({ ...; } | ... 2 more ... | { ...; })[]) =>...'.
+   1 src/server.ts(144,3): error TS2322: Type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>) => string | undefined' is not assignable to type 'ValueDeterminingMiddleware<string>'.
+   1 src/routes/vaultRoutes.ts(92,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(92,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(76,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(76,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(60,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(60,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(59,17): error TS2345: Argument of type 'ZodObject<{ metal: ZodOptional<ZodEnum<["AU", "AG", "PT", "PD", "CU"]>>; format: ZodOptional<ZodEnum<["BAR", "COIN", "SHEET", "COIL", "ROUND"]>>; vaultLocation: ZodOptional<...>; lowStock: ZodOptional<...>; limit: ZodOptional<...>; offset: ZodOptional<...>; }, "strip", ZodTypeAny, { ...; }, { ...; }>' is not assignable to parameter of type 'ZodType<{ format?: "BAR" | "COIN" | "SHEET" | "COIL" | "ROUND" | undefined; metal?: "AU" | "AG" | "PT" | "PD" | "CU" | undefined; limit?: number | undefined; offset?: number | undefined; vaultLocation?: string | undefined; lowStock?: boolean | undefined; }, ZodTypeDef, { ...; }>'.
+   1 src/routes/vaultRoutes.ts(290,44): error TS2493: Tuple type '[{ totalItems: number; totalValue: string; lowStockItems: number; recentRestocks: number; }, { totalRestocks: number; totalValue: string; averageDeliveryTime: number; successRate: string; }]' of length '2' has no element at index '2'.
+   1 src/routes/vaultRoutes.ts(289,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(289,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(265,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(265,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(236,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(236,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(220,22): error TS7005: Variable 'mockRedemptions' implicitly has an 'any[]' type.
+   1 src/routes/vaultRoutes.ts(215,11): error TS7034: Variable 'mockRedemptions' implicitly has type 'any[]' in some locations where its type cannot be determined.
+   1 src/routes/vaultRoutes.ts(213,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(213,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(208,17): error TS2345: Argument of type 'ZodObject<{ status: ZodOptional<ZodEnum<["PENDING", "APPROVED", "ALLOCATED", "SHIPPED"]>>; limit: ZodOptional<ZodEffects<ZodString, number, string>>; offset: ZodOptional<...>; }, "strip", ZodTypeAny, { ...; }, { ...; }>' is not assignable to parameter of type 'ZodType<{ status?: "APPROVED" | "PENDING" | "SHIPPED" | "ALLOCATED" | undefined; limit?: number | undefined; offset?: number | undefined; }, ZodTypeDef, { status?: "APPROVED" | "PENDING" | "SHIPPED" | "ALLOCATED" | undefined; limit?: number | undefined; offset?: number | undefined; }>'.
+   1 src/routes/vaultRoutes.ts(189,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(189,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(170,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(170,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(165,17): error TS2345: Argument of type 'ZodObject<{ limit: ZodOptional<ZodEffects<ZodString, number, string>>; location: ZodOptional<ZodString>; metal: ZodOptional<ZodEnum<["AU", "AG", "PT", "PD", "CU"]>>; }, "strip", ZodTypeAny, { ...; }, { ...; }>' is not assignable to parameter of type 'ZodType<{ metal?: "AU" | "AG" | "PT" | "PD" | "CU" | undefined; limit?: number | undefined; location?: string | undefined; }, ZodTypeDef, { metal?: "AU" | "AG" | "PT" | "PD" | "CU" | undefined; limit?: number | undefined; location?: string | undefined; }>'.
+   1 src/routes/vaultRoutes.ts(148,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(148,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(129,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(129,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(111,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(111,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/vaultRoutes.ts(108,17): error TS2345: Argument of type 'ZodObject<{ threshold: ZodOptional<ZodPipeline<ZodEffects<ZodString, number, string>, ZodNumber>>; }, "strip", ZodTypeAny, { ...; }, { ...; }>' is not assignable to parameter of type 'ZodType<{ threshold?: number | undefined; }, ZodTypeDef, { threshold?: number | undefined; }>'.
+   1 src/routes/supportRoutes.ts(67,17): error TS2345: Argument of type 'ZodObject<{ q: ZodString; type: ZodDefault<ZodEnum<["all", "email", "name", "phone", "order"]>>; limit: ZodOptional<ZodEffects<ZodString, number, string>>; }, "strip", ZodTypeAny, { ...; }, { ...; }>' is not assignable to parameter of type 'ZodType<{ type: "name" | "all" | "email" | "phone" | "order"; q: string; limit?: number | undefined; }, ZodTypeDef, { type: "name" | "all" | "email" | "phone" | "order"; q: string; limit?: number | undefined; }>'.
+   1 src/routes/supportRoutes.ts(153,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/supportRoutes.ts(153,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/supportRoutes.ts(138,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/supportRoutes.ts(138,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/supportRoutes.ts(120,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/supportRoutes.ts(120,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/shopRoutes.ts(64,17): error TS2345: Argument of type 'ZodObject<{ status: ZodOptional<ZodEnum<["DRAFT", "QUOTE_LOCKED", "PAYMENT_PENDING", "PAYMENT_CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"]>>; limit: ZodEffects<...>; offset: ZodEffects<...>; }, "strip", ZodTypeAny, { ...; }, { ...; }>' is not assignable to parameter of type 'ZodType<{ limit: number; offset: number; status?: "CANCELLED" | "DRAFT" | "QUOTE_LOCKED" | "PAYMENT_PENDING" | "PAYMENT_CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "REFUNDED" | undefined; }, ZodTypeDef, { ...; }>'.
+   1 src/routes/redemptionRoutes.ts(84,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/redemptionRoutes.ts(84,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/redemptionRoutes.ts(65,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/redemptionRoutes.ts(65,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/redemptionRoutes.ts(181,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/redemptionRoutes.ts(181,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/redemptionRoutes.ts(158,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/redemptionRoutes.ts(158,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/redemptionRoutes.ts(128,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/redemptionRoutes.ts(128,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/redemptionRoutes.ts(109,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+   1 src/routes/redemptionRoutes.ts(109,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+   1 src/routes/analyticsRoutes.ts(40,17): error TS2345: Argument of type 'ZodObject<{ period: ZodDefault<ZodEnum<["day", "week", "month", "quarter", "year"]>>; includeBreakdown: ZodDefault<ZodEffects<ZodString, boolean, string>>; }, "strip", ZodTypeAny, { ...; }, { ...; }>' is not assignable to parameter of type 'ZodType<{ period: "year" | "week" | "day" | "quarter" | "month"; includeBreakdown: boolean; }, ZodTypeDef, { period: "year" | "week" | "day" | "quarter" | "month"; includeBreakdown: boolean; }>'.
+   1 src/models/User.ts(192,16): error TS2345: Argument of type '"NOT_STARTED" | "IN_PROGRESS" | "PENDING_REVIEW" | "APPROVED" | "REJECTED" | "EXPIRED"' is not assignable to parameter of type '"NOT_STARTED" | "REJECTED" | "EXPIRED"'.
+   1 src/models/RedemptionRequest.ts(296,74): error TS2345: Argument of type '"APPROVED" | "PENDING" | "CANCELLED" | "FAILED" | "SHIPPED" | "DELIVERED" | "ALLOCATED"' is not assignable to parameter of type '"APPROVED" | "ALLOCATED"'.
+   1 src/models/RedemptionRequest.ts(181,77): error TS2345: Argument of type '"APPROVED" | "PENDING" | "CANCELLED" | "FAILED" | "SHIPPED" | "DELIVERED" | "ALLOCATED"' is not assignable to parameter of type '"APPROVED" | "PENDING"'.
+   1 src/models/RedemptionRequest.ts(173,79): error TS2345: Argument of type '"APPROVED" | "PENDING" | "CANCELLED" | "FAILED" | "SHIPPED" | "DELIVERED" | "ALLOCATED"' is not assignable to parameter of type '"APPROVED" | "ALLOCATED"'.
+   1 src/models/RedemptionRequest.ts(159,77): error TS2345: Argument of type '"APPROVED" | "PENDING" | "CANCELLED" | "FAILED" | "SHIPPED" | "DELIVERED" | "ALLOCATED"' is not assignable to parameter of type '"APPROVED" | "PENDING"'.
+   1 src/db/index.ts(241,33): error TS2344: Type 'T' does not satisfy the constraint 'QueryResultRow'.
+   1 src/db/index.ts(212,33): error TS2344: Type 'T' does not satisfy the constraint 'QueryResultRow'.
+   1 src/db/index.ts(192,33): error TS2344: Type 'T' does not satisfy the constraint 'QueryResultRow'.
+   1 src/db/index.ts(154,33): error TS2344: Type 'T' does not satisfy the constraint 'QueryResultRow'.
+   1 src/controllers/SupportController.ts(98,90): error TS2345: Argument of type 'string' is not assignable to parameter of type '"ADMIN" | "SUPPORT" | "TELLER"'.
+   1 src/controllers/SupportController.ts(547,10): error TS18048: 'userId' is possibly 'undefined'.
+   1 src/controllers/SupportController.ts(514,64): error TS2339: Property 'lastName' does not exist on type '{ id: string; email: string; role: string; kycStatus: string; }'.
+   1 src/controllers/SupportController.ts(514,35): error TS2339: Property 'firstName' does not exist on type '{ id: string; email: string; role: string; kycStatus: string; }'.
+   1 src/controllers/SupportController.ts(484,10): error TS18048: 'id' is possibly 'undefined'.
+   1 src/controllers/SupportController.ts(271,10): error TS18048: 'id' is possibly 'undefined'.
+   1 src/controllers/SupportController.ts(227,9): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+   1 src/controllers/SupportController.ts(206,10): error TS18048: 'id' is possibly 'undefined'.
+   1 src/controllers/SupportController.ts(126,11): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+   1 src/controllers/SupportController.ts(112,10): error TS18048: 'id' is possibly 'undefined'.
+   1 src/controllers/ShopController.ts(650,12): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ AU: number; AG: number; PT: number; PD: number; CU: number; }'.
+   1 src/controllers/ShopController.ts(632,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ JM_BULLION: string; DILLON_GAGE: string; }'.
+   1 src/controllers/ShopController.ts(363,27): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+   1 src/controllers/ShopController.ts(354,36): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+   1 src/controllers/KycController.ts(296,61): error TS2345: Argument of type '"NOT_STARTED" | "IN_PROGRESS" | "PENDING_REVIEW" | "APPROVED" | "REJECTED" | "EXPIRED"' is not assignable to parameter of type '"REJECTED" | "EXPIRED"'.
+   1 src/controllers/KycController.ts(177,30): error TS2339: Property 'shippingProfile' does not exist on type '{ personal?: { firstName: string; lastName: string; dateOfBirth: string; ssn: string; nationality: string; phone: string; email: string; address: { line1: string; line2?: string | undefined; city: string; state: string; postalCode: string; country: string; }; } | undefined; business?: { ...; } | undefined; documents...'.
+   1 src/controllers/KycController.ts(176,30): error TS2339: Property 'contacts' does not exist on type '{ personal?: { firstName: string; lastName: string; dateOfBirth: string; ssn: string; nationality: string; phone: string; email: string; address: { line1: string; line2?: string | undefined; city: string; state: string; postalCode: string; country: string; }; } | undefined; business?: { ...; } | undefined; documents...'.
+   1 src/controllers/KycController.ts(175,30): error TS2339: Property 'controlPerson' does not exist on type '{ personal?: { firstName: string; lastName: string; dateOfBirth: string; ssn: string; nationality: string; phone: string; email: string; address: { line1: string; line2?: string | undefined; city: string; state: string; postalCode: string; country: string; }; } | undefined; business?: { ...; } | undefined; documents...'.
+   1 src/controllers/EmailController.ts(67,36): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+   1 src/controllers/AnalyticsController.ts(402,7): error TS2322: Type '{ date: string | undefined; value: number; pnl: number; }[]' is not assignable to type '{ date: string; value: number; pnl: number; }[]'.
+   1 src/controllers/AnalyticsController.ts(401,7): error TS7005: Variable 'breakdown' implicitly has an 'any[]' type.
+   1 src/controllers/AnalyticsController.ts(389,16): error TS2532: Object is possibly 'undefined'.
+   1 src/controllers/AnalyticsController.ts(378,42): error TS7005: Variable 'performance' implicitly has an 'any[]' type.
+   1 src/controllers/AnalyticsController.ts(378,18): error TS7005: Variable 'performance' implicitly has an 'any[]' type.
+   1 src/controllers/AnalyticsController.ts(358,11): error TS7034: Variable 'performance' implicitly has type 'any[]' in some locations where its type cannot be determined.
+   1 src/controllers/AnalyticsController.ts(330,9): error TS7034: Variable 'breakdown' implicitly has type 'any[]' in some locations where its type cannot be determined.
+   1 src/controllers/AnalyticsController.ts(317,7): error TS2322: Type '{ date: string | undefined; pnl: number; cumulativePnL: number; trades: number; }[]' is not assignable to type '{ date: string; pnl: number; cumulativePnL: number; trades: number; }[]'.
+   1 src/controllers/AnalyticsController.ts(249,22): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+   1 src/controllers/AnalyticsController.ts(246,21): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+   1 src/controllers/AnalyticsController.ts(218,7): error TS2322: Type '{ date: string | undefined; amount: number; }[]' is not assignable to type '{ date: string; amount: number; }[]'.
+   1 src/controllers/AdminController.ts(285,9): error TS2532: Object is possibly 'undefined'.
+   1 src/__tests__/setup.ts(199,41): error TS2345: Argument of type '1' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(198,41): error TS2345: Argument of type '0' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(197,38): error TS2345: Argument of type '1' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(196,38): error TS2345: Argument of type 'true' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(195,38): error TS2345: Argument of type 'null' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(194,45): error TS2345: Argument of type 'true' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(193,42): error TS2345: Argument of type 'true' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(182,42): error TS2345: Argument of type '{ rows: never[]; rowCount: number; }' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(172,43): error TS2345: Argument of type '{ success: boolean; messageId: string; }' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(171,42): error TS2345: Argument of type '{ success: boolean; messageId: string; }' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(170,44): error TS2345: Argument of type '{ success: boolean; messageId: string; }' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(159,44): error TS2345: Argument of type '{ PAXG: { price: string; change24h: string; }; 'XAU-s': { price: string; change24h: string; }; 'XAG-s': { price: string; change24h: string; }; }' is not assignable to parameter of type 'never'.
+   1 src/__tests__/setup.ts(154,43): error TS2345: Argument of type '{ price: string; timestamp: Date; source: string; }' is not assignable to parameter of type 'never'.

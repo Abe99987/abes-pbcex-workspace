@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Run GitLeaks scan if config exists
+if [ -f ".gitleaks.toml" ]; then
+  echo "🔍 Running GitLeaks pre-push scan..."
+  npm run prepush
+else
+  echo "⚠️  No .gitleaks.toml found, skipping GitLeaks scan"
+fi

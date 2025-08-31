@@ -81,11 +81,11 @@ export class OrderUtils {
   }
 
   static canCancel(order: Order): boolean {
-    return [ORDER_STATUS.QUOTE_LOCKED, ORDER_STATUS.PAYMENT_PENDING].includes(order.status);
+    return [ORDER_STATUS.QUOTE_LOCKED, ORDER_STATUS.PAYMENT_PENDING].includes(order.status as any);
   }
 
   static requiresPayment(order: Order): boolean {
-    return [ORDER_STATUS.QUOTE_LOCKED, ORDER_STATUS.PAYMENT_PENDING].includes(order.status);
+    return [ORDER_STATUS.QUOTE_LOCKED, ORDER_STATUS.PAYMENT_PENDING].includes(order.status as any);
   }
 
   static isShippable(order: Order): boolean {

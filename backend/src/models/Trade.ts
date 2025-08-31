@@ -205,7 +205,7 @@ export class TradeUtils {
    * Check if trade is final (completed or failed)
    */
   static isFinal(trade: Trade): boolean {
-    return [TRADE_STATUS.FILLED, TRADE_STATUS.CANCELLED, TRADE_STATUS.FAILED].includes(trade.status);
+    return [TRADE_STATUS.FILLED, TRADE_STATUS.CANCELLED, TRADE_STATUS.FAILED].includes(trade.status as any);
   }
 
   /**

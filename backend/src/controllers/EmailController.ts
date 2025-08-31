@@ -64,7 +64,7 @@ export class EmailController {
       ];
       
       const domain = to.split('@')[1];
-      if (!allowedDomains.includes(domain)) {
+      if (domain && !allowedDomains.includes(domain)) {
         logWarn('Test email to non-standard domain', { 
           domain,
           to: EmailService['maskEmail']?.(to) || to,

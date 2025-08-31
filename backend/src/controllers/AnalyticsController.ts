@@ -4,6 +4,13 @@ import { logInfo, logError } from '@/utils/logger';
 import { TradeController } from './TradeController';
 import { WalletController } from './WalletController';
 
+interface UserPayload {
+  id: string;
+  role: string;
+}
+
+type AuthedRequest = Request & { user: UserPayload };
+
 /**
  * Analytics Controller for PBCEx
  * Handles spending analytics, PnL calculations, and portfolio performance
@@ -105,14 +112,15 @@ export class AnalyticsController {
    * GET /api/analytics/spending
    * Get spending analytics and categorization
    */
-  static getSpendingAnalytics = asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user!.id;
-    const { period = 'month', currency = 'USD' } = req.query;
+  static getSpendingAnalytics = asyncHandler(async (req: AuthedRequest, res: Response) => {
+    const userId = req.user.id;
+    const period = req.query.period as string || 'month';
+    const currency = req.query.currency as string || 'USD';
 
     logInfo('Fetching spending analytics', { userId, period, currency });
 
     // Generate mock spending data (replace with real data later)
-    const spendingData = AnalyticsController.generateMockSpendingData(period as string);
+    const spendingData = AnalyticsController.generateMockSpendingData(period);
 
     res.json({
       code: 'SUCCESS',
@@ -125,14 +133,15 @@ export class AnalyticsController {
    * GET /api/analytics/pnl
    * Get profit and loss analytics
    */
-  static getPnLAnalytics = asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user!.id;
-    const { period = 'month', currency = 'USD' } = req.query;
+  static getPnLAnalytics = asyncHandler(async (req: AuthedRequest, res: Response) => {
+    const userId = req.user.id;
+    const period = req.query.period as string || 'month';
+    const currency = req.query.currency as string || 'USD';
 
     logInfo('Fetching PnL analytics', { userId, period, currency });
 
     // Generate mock PnL data (replace with real calculations later)
-    const pnlData = AnalyticsController.generateMockPnLData(period as string);
+    const pnlData = AnalyticsController.generateMockPnLData(period);
 
     res.json({
       code: 'SUCCESS',
@@ -145,15 +154,16 @@ export class AnalyticsController {
    * GET /api/analytics/portfolio
    * Get portfolio performance analytics
    */
-  static getPortfolioAnalytics = asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user!.id;
-    const { period = 'month', includeBreakdown = 'true' } = req.query;
+  static getPortfolioAnalytics = asyncHandler(async (req: AuthedRequest, res: Response) => {
+    const userId = req.user.id;
+    const period = req.query.period as string || 'month';
+    const includeBreakdown = (req.query.includeBreakdown as string) || 'true';
 
     logInfo('Fetching portfolio analytics', { userId, period, includeBreakdown });
 
     // Generate mock portfolio data (replace with real calculations later)
     const portfolioData = AnalyticsController.generateMockPortfolioData(
-      period as string,
+      period,
       includeBreakdown === 'true'
     );
 
@@ -194,7 +204,7 @@ export class AnalyticsController {
       const date = new Date();
       date.setDate(date.getDate() - i);
       trends.push({
-        date: date.toISOString().split('T')[0],
+        date: date.toISOString().split('T')[0] || date.toISOString().slice(0, 10),
         amount: Math.round((totalSpent / daysInPeriod) * (0.5 + Math.random()) * 100) / 100,
       });
     }
@@ -234,7 +244,7 @@ export class AnalyticsController {
     for (let i = daysInPeriod - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = date.toISOString().split('T')[0] || date.toISOString().slice(0, 10);
       
       // Random PnL with slight positive bias
       const pnl = (Math.random() - 0.4) * 1000;
@@ -327,7 +337,7 @@ export class AnalyticsController {
     const totalPnL = (Math.random() - 0.3) * 10000;
     const pnlPercentage = (totalPnL / (totalValue - totalPnL)) * 100;
 
-    let breakdown = [];
+    let breakdown: Array<{ category: string; value: number; pnl: number; percentage: number; pnlPercentage: number }> = [];
     if (includeBreakdown) {
       const categories = [
         { name: 'Funding', baseValue: 0.4 },
@@ -355,7 +365,7 @@ export class AnalyticsController {
 
     // Generate performance data
     const daysInPeriod = period === 'year' ? 365 : period === 'quarter' ? 90 : 30;
-    const performance = [];
+    const performance: Array<{ date: string; value: number; pnl: number }> = [];
     let currentValue = totalValue - totalPnL;
     
     for (let i = daysInPeriod - 1; i >= 0; i--) {
@@ -366,17 +376,19 @@ export class AnalyticsController {
       currentValue += dailyChange;
       const currentPnL = currentValue - (totalValue - totalPnL);
       
+      const dateStr = date.toISOString().split('T')[0] || date.toISOString().slice(0, 10);
       performance.push({
-        date: date.toISOString().split('T')[0],
+        date: dateStr,
         value: Math.round(currentValue * 100) / 100,
         pnl: Math.round(currentPnL * 100) / 100,
       });
     }
 
     // Calculate risk metrics (simplified mock calculations)
-    const dailyReturns = performance.slice(1).map((p, i) => 
-      (p.value - performance[i].value) / performance[i].value
-    );
+    const dailyReturns = performance.slice(1).map((p, i) => {
+      const previousPerformance = performance[i];
+      return previousPerformance ? (p.value - previousPerformance.value) / previousPerformance.value : 0;
+    });
     
     const avgReturn = dailyReturns.reduce((sum, r) => sum + r, 0) / dailyReturns.length;
     const variance = dailyReturns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / dailyReturns.length;
@@ -386,7 +398,7 @@ export class AnalyticsController {
     const sharpeRatio = volatility > 0 ? (avgReturn * 252 - riskFreeRate) / volatility : 0;
     
     // Max drawdown calculation
-    let peak = performance[0].value;
+    let peak = performance[0]?.value || 0;
     let maxDrawdown = 0;
     for (const p of performance) {
       if (p.value > peak) peak = p.value;

@@ -47,7 +47,7 @@ export class TradeControllerDb {
 
     if (!db.isConnected()) {
       logWarn('Database not available, falling back to in-memory');
-      return TradeController.getTradeHistory(req, res);
+      return TradeController.getTradeHistory(req, res, () => {});
     }
 
     try {
@@ -160,7 +160,7 @@ export class TradeControllerDb {
       });
     } catch (error) {
       logError('Database trades query failed, falling back', error as Error);
-      return TradeController.getTradeHistory(req, res);
+      return TradeController.getTradeHistory(req, res, () => {});
     }
   });
 
@@ -271,7 +271,7 @@ export class TradeControllerDb {
     async (req: Request, res: Response) => {
       // For now, redirect to CSV
       req.url = req.url.replace('.xlsx', '.csv');
-      return TradeControllerDb.exportTradeHistoryCsv(req, res);
+      return TradeControllerDb.exportTradeHistoryCsv(req, res, () => {});
     }
   );
 
@@ -304,10 +304,10 @@ export class TradeControllerDb {
       }
 
       // Fall back to existing price logic
-      return TradeController.getPrices(req, res);
+      return TradeController.getPrices(req, res, () => {});
     } catch (error) {
       logError('Enhanced price lookup failed, falling back', error as Error);
-      return TradeController.getPrices(req, res);
+      return TradeController.getPrices(req, res, () => {});
     }
   });
 

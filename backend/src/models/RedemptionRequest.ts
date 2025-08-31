@@ -16,6 +16,12 @@ export const REDEMPTION_STATUS = {
   FAILED: 'FAILED',
 } as const;
 
+// Type guards for Redemption Status
+export type RedemptionStatus = typeof REDEMPTION_STATUS[keyof typeof REDEMPTION_STATUS];
+export function isRedemptionStatus(value: unknown): value is RedemptionStatus {
+  return typeof value === 'string' && Object.values(REDEMPTION_STATUS).includes(value as RedemptionStatus);
+}
+
 // Redemption request interface
 export interface RedemptionRequest {
   id: string;
@@ -156,7 +162,8 @@ export class RedemptionRequestUtils {
    * Check if redemption request can be cancelled
    */
   static canCancel(request: RedemptionRequest): boolean {
-    return [REDEMPTION_STATUS.PENDING, REDEMPTION_STATUS.APPROVED].includes(request.status);
+    const cancelableStatuses = [REDEMPTION_STATUS.PENDING, REDEMPTION_STATUS.APPROVED] as const;
+    return cancelableStatuses.includes(request.status as typeof cancelableStatuses[number]);
   }
 
   /**
@@ -170,15 +177,17 @@ export class RedemptionRequestUtils {
    * Check if redemption request can be shipped
    */
   static canShip(request: RedemptionRequest): boolean {
-    return [REDEMPTION_STATUS.APPROVED, REDEMPTION_STATUS.ALLOCATED].includes(request.status);
+    const shippableStatuses = [REDEMPTION_STATUS.APPROVED, REDEMPTION_STATUS.ALLOCATED] as const;
+    return shippableStatuses.includes(request.status as typeof shippableStatuses[number]);
   }
 
   /**
    * Check if lock is still valid
    */
   static isLockValid(request: RedemptionRequest): boolean {
+    const lockValidStatuses = [REDEMPTION_STATUS.PENDING, REDEMPTION_STATUS.APPROVED] as const;
     return new Date() < request.lockExpiresAt && 
-           [REDEMPTION_STATUS.PENDING, REDEMPTION_STATUS.APPROVED].includes(request.status);
+           lockValidStatuses.includes(request.status as typeof lockValidStatuses[number]);
   }
 
   /**
@@ -292,8 +301,9 @@ export class RedemptionRequestUtils {
   static calculateSummary(requests: RedemptionRequest[]): RedemptionSummary {
     const totalRequests = requests.length;
     const pendingApproval = requests.filter(r => r.status === REDEMPTION_STATUS.PENDING).length;
+    const shipmentStatuses = [REDEMPTION_STATUS.APPROVED, REDEMPTION_STATUS.ALLOCATED] as const;
     const awaitingShipment = requests.filter(r => 
-      [REDEMPTION_STATUS.APPROVED, REDEMPTION_STATUS.ALLOCATED].includes(r.status)
+      shipmentStatuses.includes(r.status as typeof shipmentStatuses[number])
     ).length;
     const inTransit = requests.filter(r => r.status === REDEMPTION_STATUS.SHIPPED).length;
     const completed = requests.filter(r => r.status === REDEMPTION_STATUS.DELIVERED).length;

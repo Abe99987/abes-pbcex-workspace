@@ -3,6 +3,7 @@ import { ZodError } from 'zod';
 import { env } from '@/config/env';
 import { API_CODES } from '@/utils/constants';
 import { logError } from '@/utils/logger';
+import { redactingLogger, redactRequestResponse } from '@/utils/redactingLogger';
 
 /**
  * Custom error class for application-specific errors
@@ -64,6 +65,15 @@ export const createError = {
     ),
 
   internal: (message: string = 'Internal server error', details?: Record<string, any>) =>
+    new AppError(message, 500, API_CODES.INTERNAL_ERROR, false, details),
+
+  badRequest: (message: string, details?: Record<string, any>) =>
+    new AppError(message, 400, API_CODES.VALIDATION_ERROR, true, details),
+
+  forbidden: (message: string = 'Access denied') =>
+    new AppError(message, 403, API_CODES.AUTHORIZATION_ERROR, true),
+
+  internalServerError: (message: string = 'Internal server error', details?: Record<string, any>) =>
     new AppError(message, 500, API_CODES.INTERNAL_ERROR, false, details),
 };
 
@@ -208,35 +218,36 @@ export const errorHandler: ErrorRequestHandler = (
     appError = createError.internal('An unexpected error occurred');
   }
 
+  // Generate correlation ID for tracking
+  const correlationId = (req as any).requestId || Math.random().toString(36).substr(2, 9);
+  
+  // Use redacting logger to prevent secret exposure
+  const { req: redactedReq, res: redactedRes } = redactRequestResponse(req, res);
+
   // Log operational errors as warnings, programming errors as errors
   if (appError.isOperational) {
-    logError(`Operational error: ${appError.message}`, {
+    redactingLogger.error(`Operational error: ${appError.message}`, {
+      correlationId,
       statusCode: appError.statusCode,
       code: appError.code,
       url: req.url,
       method: req.method,
       userAgent: req.get('User-Agent'),
       ip: req.ip,
-      userId: req.user?.id,
+      userId: (req as any).user?.id,
       details: appError.details,
     });
   } else {
-    logError(`Programming error: ${appError.message}`, {
+    redactingLogger.error(`Programming error: ${appError.message}`, {
+      correlationId,
       error: {
         message: appError.message,
-        stack: appError.stack,
+        stack: env.NODE_ENV === 'development' ? appError.stack : '[REDACTED]',
         statusCode: appError.statusCode,
         code: appError.code,
       },
-      request: {
-        url: req.url,
-        method: req.method,
-        headers: req.headers,
-        body: req.body,
-        params: req.params,
-        query: req.query,
-      },
-      user: req.user,
+      request: redactedReq,
+      user: (req as any).user?.id ? { id: (req as any).user.id } : undefined,
     });
   }
 
@@ -244,6 +255,7 @@ export const errorHandler: ErrorRequestHandler = (
   const response: any = {
     code: appError.code,
     message: appError.message,
+    correlationId,
     timestamp: new Date().toISOString(),
     path: req.path,
   };

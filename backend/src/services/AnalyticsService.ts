@@ -155,7 +155,10 @@ export class AnalyticsService {
       }
 
     } catch (error) {
-      this.logError('Failed to log analytics event', { event, error: error.message });
+      this.logError('Failed to log analytics event', { 
+        event, 
+        error: error instanceof Error ? error.message : String(error) 
+      });
     }
   }
 
@@ -265,7 +268,7 @@ export class AnalyticsService {
   /**
    * Log error event
    */
-  static async logError(
+  static async logErrorEvent(
     errorType: string,
     errorData: Record<string, any>,
     userId?: string
@@ -337,7 +340,7 @@ export class AnalyticsService {
     } catch (error) {
       this.logError('Failed to process analytics batch', { 
         batchSize: batch.length, 
-        error: error.message 
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   }
