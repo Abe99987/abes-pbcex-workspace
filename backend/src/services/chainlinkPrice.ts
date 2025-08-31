@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { getRedisClient } from '../lib/redis';
+import { cache } from '../cache/redis';
 import assert from 'assert';
 
 type FeedResult = {
@@ -28,11 +28,8 @@ export async function readChainlinkPrice(
   assert(rpcUrl, 'RPC URL not set');
   const cacheKey = `chainlink:${feedAddr}`;
 
-  const redis = await getRedisClient().catch(() => null);
-  if (redis) {
-    const cached = await redis.get(cacheKey);
-    if (cached) return JSON.parse(cached);
-  }
+  const cached = await cache.get(cacheKey);
+  if (cached) return JSON.parse(cached);
 
   const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
   const feed = new ethers.Contract(feedAddr, AGGREGATOR_ABI, provider);
@@ -53,7 +50,6 @@ export async function readChainlinkPrice(
     source: 'chainlink',
   };
 
-  if (redis)
-    await redis.set(cacheKey, JSON.stringify(result), 'EX', cacheTtlSec);
+  await cache.set(cacheKey, JSON.stringify(result), cacheTtlSec);
   return result;
 }
