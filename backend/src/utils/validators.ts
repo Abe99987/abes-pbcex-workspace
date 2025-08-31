@@ -335,13 +335,13 @@ export const withdrawalSchema = z.object({
  * Request validation middleware helper
  */
 export function validateBody<T>(schema: z.ZodSchema<T>) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     try {
       req.body = schema.parse(req.body);
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
+        res.status(400).json({
           code: 'VALIDATION_ERROR',
           message: 'Request validation failed',
           errors: error.errors.map(err => ({
@@ -349,20 +349,21 @@ export function validateBody<T>(schema: z.ZodSchema<T>) {
             message: err.message,
           })),
         });
+        return;
       }
       next(error);
     }
   };
 }
 
-export function validateQuery<T>(schema: z.ZodSchema<T>) {
-  return (req: Request, res: Response, next: NextFunction) => {
+export function validateQuery<T extends Record<string, unknown>>(schema: z.ZodSchema<T>) {
+  return (req: Request, res: Response, next: NextFunction): void => {
     try {
-      req.query = schema.parse(req.query);
+      req.query = schema.parse(req.query) as Record<string, unknown>;
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
+        res.status(400).json({
           code: 'VALIDATION_ERROR',
           message: 'Query validation failed',
           errors: error.errors.map(err => ({
@@ -370,6 +371,7 @@ export function validateQuery<T>(schema: z.ZodSchema<T>) {
             message: err.message,
           })),
         });
+        return;
       }
       next(error);
     }
