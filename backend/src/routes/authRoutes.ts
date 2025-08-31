@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import { authenticate, optionalAuthenticate } from '@/middlewares/authMiddleware';
+import {
+  authenticate,
+  optionalAuthenticate,
+} from '@/middlewares/authMiddleware';
 import { validateBody } from '@/utils/validators';
 import { RATE_LIMITS } from '@/utils/constants';
 import { AuthController } from '@/controllers/AuthController';
@@ -24,10 +27,11 @@ const authLimiter = rateLimit({
 // Validation schemas
 const registerSchema = z.object({
   email: z.string().email('Invalid email format'),
-  password: z.string()
+  password: z
+    .string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain uppercase letter')
-    .regex(/[a-z]/, 'Password must contain lowercase letter')  
+    .regex(/[a-z]/, 'Password must contain lowercase letter')
     .regex(/\d/, 'Password must contain a number')
     .regex(/[^A-Za-z0-9]/, 'Password must contain special character'),
   firstName: z.string().min(1).max(50).optional(),
@@ -42,7 +46,8 @@ const loginSchema = z.object({
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Current password required'),
-  newPassword: z.string()
+  newPassword: z
+    .string()
     .min(8, 'New password must be at least 8 characters')
     .regex(/[A-Z]/, 'New password must contain uppercase letter')
     .regex(/[a-z]/, 'New password must contain lowercase letter')
@@ -67,20 +72,21 @@ const refreshTokenSchema = z.object({
 });
 
 const verifyStartSchema = z.object({
-  phone: z.string()
+  phone: z
+    .string()
     .min(10, 'Phone number too short')
     .max(20, 'Phone number too long')
-    .regex(/[\d\s\-\+\(\)]+/, 'Invalid phone number format'),
+    .regex(/[\d\s\-+()]+/, 'Invalid phone number format'),
   channel: z.enum(['sms', 'call']).optional(),
 });
 
 const verifyCheckSchema = z.object({
-  phone: z.string()
+  phone: z
+    .string()
     .min(10, 'Phone number too short')
     .max(20, 'Phone number too long')
-    .regex(/[\d\s\-\+\(\)]+/, 'Invalid phone number format'),
-  code: z.string()
-    .regex(/^\d{4,8}$/, 'Code must be 4-8 digits'),
+    .regex(/[\d\s\-+()]+/, 'Invalid phone number format'),
+  code: z.string().regex(/^\d{4,8}$/, 'Code must be 4-8 digits'),
 });
 
 // Routes
@@ -89,7 +95,8 @@ const verifyCheckSchema = z.object({
  * POST /api/auth/register
  * Register a new user account
  */
-router.post('/register', 
+router.post(
+  '/register',
   authLimiter,
   validateBody(registerSchema),
   AuthController.register
@@ -99,7 +106,8 @@ router.post('/register',
  * POST /api/auth/login
  * Authenticate user login
  */
-router.post('/login',
+router.post(
+  '/login',
   authLimiter,
   validateBody(loginSchema),
   AuthController.login
@@ -109,25 +117,20 @@ router.post('/login',
  * POST /api/auth/logout
  * Logout user and blacklist token
  */
-router.post('/logout',
-  authenticate,
-  AuthController.logout
-);
+router.post('/logout', authenticate, AuthController.logout);
 
 /**
  * GET /api/auth/me
  * Get current user profile
  */
-router.get('/me',
-  authenticate,
-  AuthController.getProfile
-);
+router.get('/me', authenticate, AuthController.getProfile);
 
 /**
  * POST /api/auth/change-password
  * Change user password
  */
-router.post('/change-password',
+router.post(
+  '/change-password',
   authenticate,
   validateBody(changePasswordSchema),
   AuthController.changePassword
@@ -137,7 +140,8 @@ router.post('/change-password',
  * POST /api/auth/forgot-password
  * Request password reset
  */
-router.post('/forgot-password',
+router.post(
+  '/forgot-password',
   authLimiter,
   validateBody(forgotPasswordSchema),
   AuthController.forgotPassword
@@ -147,16 +151,14 @@ router.post('/forgot-password',
  * POST /api/auth/2fa/setup
  * Setup two-factor authentication
  */
-router.post('/2fa/setup',
-  authenticate,
-  AuthController.setup2FA
-);
+router.post('/2fa/setup', authenticate, AuthController.setup2FA);
 
 /**
  * POST /api/auth/2fa/enable
  * Enable two-factor authentication
  */
-router.post('/2fa/enable',
+router.post(
+  '/2fa/enable',
   authenticate,
   validateBody(enable2FASchema),
   AuthController.enable2FA
@@ -166,7 +168,8 @@ router.post('/2fa/enable',
  * POST /api/auth/2fa/disable
  * Disable two-factor authentication
  */
-router.post('/2fa/disable',
+router.post(
+  '/2fa/disable',
   authenticate,
   validateBody(disable2FASchema),
   AuthController.disable2FA
@@ -176,7 +179,8 @@ router.post('/2fa/disable',
  * POST /api/auth/verify/start
  * Start phone number verification
  */
-router.post('/verify/start',
+router.post(
+  '/verify/start',
   authLimiter,
   validateBody(verifyStartSchema),
   VerifyController.startVerification
@@ -186,7 +190,8 @@ router.post('/verify/start',
  * POST /api/auth/verify/check
  * Check verification code
  */
-router.post('/verify/check',
+router.post(
+  '/verify/check',
   authLimiter,
   validateBody(verifyCheckSchema),
   VerifyController.checkVerification
@@ -196,23 +201,20 @@ router.post('/verify/check',
  * GET /api/auth/verify/status
  * Get verification service status
  */
-router.get('/verify/status',
-  VerifyController.getVerificationStatus
-);
+router.get('/verify/status', VerifyController.getVerificationStatus);
 
 /**
  * POST /api/auth/verify/test
  * Send test verification (development only)
  */
-router.post('/verify/test',
-  VerifyController.sendTestVerification
-);
+router.post('/verify/test', VerifyController.sendTestVerification);
 
 /**
  * POST /api/auth/refresh
  * Refresh access token using refresh token
  */
-router.post('/refresh',
+router.post(
+  '/refresh',
   validateBody(refreshTokenSchema),
   AuthController.refreshToken
 );

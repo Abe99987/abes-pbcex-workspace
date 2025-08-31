@@ -18,7 +18,10 @@ import {
   Search,
 } from 'lucide-react';
 import { MiniChart, Screener, AdvancedChart } from '@/components/tradingview';
-import { MY_ASSETS_SYMBOLS, getSymbolDisplayName } from '@/utils/tradingview';
+import {
+  MY_ASSETS_SYMBOLS,
+  getSymbolDisplayName,
+} from '@/src/utils/tradingview';
 
 interface PnLData {
   totalPnL: number;
@@ -99,24 +102,30 @@ const generateMockPnLData = (): PnLData => {
 
   const profitFactor = averageLoss > 0 ? averageWin / averageLoss : 0;
 
-  const bestDay = dailyPnL.reduce((best, current) =>
-    current.pnl > best.pnl ? current : best
-  );
+  const bestDay =
+    dailyPnL.length > 0
+      ? dailyPnL.reduce((best, current) =>
+          current.pnl > best.pnl ? current : best
+        )
+      : { date: '', pnl: 0, cumulativePnL: 0, trades: 0 };
 
-  const worstDay = dailyPnL.reduce((worst, current) =>
-    current.pnl < worst.pnl ? current : worst
-  );
+  const worstDay =
+    dailyPnL.length > 0
+      ? dailyPnL.reduce((worst, current) =>
+          current.pnl < worst.pnl ? current : worst
+        )
+      : { date: '', pnl: 0, cumulativePnL: 0, trades: 0 };
 
   return {
     totalPnL,
     winRate,
     profitFactor,
     bestDay: {
-      date: bestDay.date,
+      date: bestDay.date || '',
       pnl: bestDay.pnl,
     },
     worstDay: {
-      date: worstDay.date,
+      date: worstDay.date || '',
       pnl: worstDay.pnl,
     },
     averageWin,
@@ -124,7 +133,16 @@ const generateMockPnLData = (): PnLData => {
     totalTrades,
     winningTrades,
     losingTrades,
-    dailyPnL,
+    dailyPnL: dailyPnL.filter(
+      (
+        day
+      ): day is {
+        date: string;
+        pnl: number;
+        cumulativePnL: number;
+        trades: number;
+      } => day.date != null
+    ),
   };
 };
 

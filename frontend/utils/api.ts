@@ -206,6 +206,18 @@ export interface Balance {
   usdValue: string;
 }
 
+// Backend transaction response structure
+export interface BackendTransaction {
+  id: string;
+  type: string;
+  asset: string;
+  amount: string;
+  accountType: string;
+  description: string;
+  reference?: string;
+  createdAt: string;
+}
+
 export interface BalancesResponse {
   funding: {
     id: string;
