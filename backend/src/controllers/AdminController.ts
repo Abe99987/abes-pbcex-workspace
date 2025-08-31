@@ -397,8 +397,8 @@ export class AdminController {
       recommendedETFs: HedgePositionUtils.getRecommendedETF(asset),
     };
 
-    let newPositions: any[] = [];
-    let closedPositions: any[] = [];
+    const newPositions: any[] = [];
+    const closedPositions: any[] = [];
 
     if (forceExecution && Math.abs(hedgeAdjustment) > 0.001) {
       if (hedgeAdjustment > 0) {
