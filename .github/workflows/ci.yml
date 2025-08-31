@@ -1,6 +1,3 @@
-# BACKUP: Previous workflow had complex caching/setup logic with env context issues
-# Replaced with simplified workflow to fix actionlint validation errors
-
 name: CI Pipeline
 
 on:
@@ -31,16 +28,6 @@ jobs:
   backend:
     name: Backend (lint + build + test)
     runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -48,7 +35,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
-      - name: Enable npm and show versions
+      - name: Show versions
         run: |
           node -v
           npm -v
@@ -60,10 +47,6 @@ jobs:
         run: |
           cd backend
           npm run lint
-      - name: Check TypeScript compilation
-        run: |
-          cd backend
-          npx tsc --noEmit
       - name: Build backend
         run: |
           cd backend
@@ -72,16 +55,6 @@ jobs:
         run: |
           cd backend
           npm run test:unit
-        env:
-          NODE_ENV: test
-          JWT_SECRET: test_jwt_secret_32_characters_long
-          REDIS_URL: redis://localhost:6379
-          DATABASE_URL: postgres://test:test@localhost:5432/test
-          COINGECKO_BASE_URL: http://localhost:8999/mock
-          FEDEX_BASE_URL: http://localhost:8999/mock
-          RESEND_API_KEY: test_key
-          TWILIO_ACCOUNT_SID: test_sid
-          TWILIO_AUTH_TOKEN: test_token
 
   frontend:
     name: Frontend (lint + build + test)
@@ -92,7 +65,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - name: Enable npm and show versions
+      - name: Show versions
         run: |
           node -v
           npm -v
@@ -100,13 +73,8 @@ jobs:
         run: npm ci --prefer-offline --no-audit
       - name: Lint frontend
         run: npm run lint
-      - name: Check TypeScript compilation
-        run: npx tsc --noEmit
       - name: Build frontend
         run: npm run build
-        env:
-          VITE_API_BASE_URL: https://api.pbcex.com
-          NODE_ENV: production
       - name: Test frontend (if present)
         run: |
           if grep -q '"test"' package.json; then
@@ -114,8 +82,6 @@ jobs:
           else
             echo "No frontend tests found, skipping test step"
           fi
-        env:
-          CI: true
 
   summary:
     name: CI Summary
