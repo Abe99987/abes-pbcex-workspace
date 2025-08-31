@@ -41,6 +41,7 @@ import emailRoutes from '@/routes/emailRoutes';
 import fedexRoutes from '@/routes/fedexRoutes';
 import pricesRoutes from '@/routes/pricesRoutes';
 import checkoutRoutes from '@/routes/checkoutRoutes';
+import priceOracleRoutes from '@/routes/priceOracleRoutes';
 
 // Import controllers for direct endpoints
 import { TradeControllerDb } from '@/controllers/TradeControllerDb';
@@ -60,18 +61,20 @@ const app = express();
 app.set('trust proxy', 1);
 
 // Response compression middleware (before other middleware)
-app.use(compression({
-  filter: (req, res) => {
-    // Don't compress responses with this request header
-    if (req.headers['x-no-compression']) {
-      return false;
-    }
-    // Fallback to standard filter function
-    return compression.filter(req, res);
-  },
-  level: 6, // Balance between compression ratio and speed
-  threshold: 1024, // Only compress responses larger than 1KB
-}));
+app.use(
+  compression({
+    filter: (req, res) => {
+      // Don't compress responses with this request header
+      if (req.headers['x-no-compression']) {
+        return false;
+      }
+      // Fallback to standard filter function
+      return compression.filter(req, res);
+    },
+    level: 6, // Balance between compression ratio and speed
+    threshold: 1024, // Only compress responses larger than 1KB
+  })
+);
 
 // Security middleware
 app.use(
@@ -221,8 +224,9 @@ app.get('/health', async (req, res) => {
   // Determine overall health
   const serviceStatuses = Object.values(healthData.services);
   const hasUnhealthyService = serviceStatuses.some(
-    (service: any) =>
-      service?.status === 'unhealthy' || service?.status === 'error'
+    (service: unknown) =>
+      (service as { status?: string })?.status === 'unhealthy' ||
+      (service as { status?: string })?.status === 'error'
   );
 
   if (hasUnhealthyService) {
@@ -286,6 +290,7 @@ app.use('/api/checkout', checkoutRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/fedex', fedexRoutes);
 app.use('/api/prices', pricesRoutes);
+app.use('/api', priceOracleRoutes);
 app.use('/api/kyc', kycRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/trade', tradeRoutes);

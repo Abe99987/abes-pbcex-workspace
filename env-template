@@ -13,6 +13,11 @@ ENCRYPTION_KEY=replace_me_with_32_byte_key
 # Market Data
 TRADINGVIEW_API_KEY=
 
+# Chainlink Oracle Configuration
+RPC_URL_MAINNET=
+RPC_URL_SEPOLIA=
+CHAINLINK_FEED_ADDRESS=0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
+
 # KYC & Identity Verification
 PLAID_CLIENT_ID=
 PLAID_SECRET=
