@@ -185,11 +185,12 @@ export class UserUtils {
    * Check if user needs to complete KYC
    */
   static needsKyc(user: User): boolean {
-    return [
+    const needsKycStatuses = [
       KYC_STATUS.NOT_STARTED,
       KYC_STATUS.REJECTED,
       KYC_STATUS.EXPIRED,
-    ].includes(user.kycStatus);
+    ] as const;
+    return needsKycStatuses.includes(user.kycStatus as typeof needsKycStatuses[number]);
   }
 
   /**

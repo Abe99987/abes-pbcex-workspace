@@ -56,6 +56,12 @@ export const KYC_STATUS = {
   EXPIRED: 'EXPIRED',
 } as const;
 
+// Type guards for KYC Status
+export type KycStatus = typeof KYC_STATUS[keyof typeof KYC_STATUS];
+export function isKycStatus(value: unknown): value is KycStatus {
+  return typeof value === 'string' && Object.values(KYC_STATUS).includes(value as KycStatus);
+}
+
 export const KYC_TYPES = {
   PERSONAL: 'PERSONAL',
   BUSINESS: 'BUSINESS',
@@ -69,6 +75,12 @@ export const TRADE_STATUS = {
   FAILED: 'FAILED',
 } as const;
 
+// Type guards for Trade Status
+export type TradeStatus = typeof TRADE_STATUS[keyof typeof TRADE_STATUS];
+export function isTradeStatus(value: unknown): value is TradeStatus {
+  return typeof value === 'string' && Object.values(TRADE_STATUS).includes(value as TradeStatus);
+}
+
 export const ORDER_STATUS = {
   DRAFT: 'DRAFT',
   QUOTE_LOCKED: 'QUOTE_LOCKED',
@@ -80,6 +92,12 @@ export const ORDER_STATUS = {
   CANCELLED: 'CANCELLED',
   REFUNDED: 'REFUNDED',
 } as const;
+
+// Type guards for Order Status
+export type OrderStatus = typeof ORDER_STATUS[keyof typeof ORDER_STATUS];
+export function isOrderStatus(value: unknown): value is OrderStatus {
+  return typeof value === 'string' && Object.values(ORDER_STATUS).includes(value as OrderStatus);
+}
 
 // Trading constants
 export const TRADING = {

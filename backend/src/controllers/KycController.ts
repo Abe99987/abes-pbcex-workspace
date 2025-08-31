@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createError, asyncHandler } from '@/middlewares/errorMiddleware';
 import { logInfo, logError } from '@/utils/logger';
 import { KycRecord } from '@/models/KycRecord';
-import { KYC_STATUS, KYC_TYPES } from '@/utils/constants';
+import { KYC_STATUS, KYC_TYPES, isKycStatus } from '@/utils/constants';
 import { AuthController } from './AuthController';
 
 /**
@@ -293,7 +293,8 @@ export class KycController {
       throw createError.notFound('KYC record');
     }
 
-    if (![KYC_STATUS.REJECTED, KYC_STATUS.EXPIRED].includes(kycRecord.status)) {
+    const allowedStatuses = [KYC_STATUS.REJECTED, KYC_STATUS.EXPIRED] as const;
+    if (!allowedStatuses.includes(kycRecord.status as typeof allowedStatuses[number])) {
       throw createError.validation('KYC record cannot be resubmitted in current status');
     }
 
