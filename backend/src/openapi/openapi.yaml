@@ -25,8 +25,8 @@ info:
     name: Proprietary
   x-build-info:
     branch: feature/money-movement-backend
-    shortHash: ff3d03a
-    generatedAt: '2025-08-31T20:00:00Z'
+    shortHash: 7b670b4
+    generatedAt: '2025-08-31T18:00:00Z'
 
 servers:
   - url: http://localhost:4000
@@ -75,50 +75,327 @@ components:
         details:
           type: object
 
-    # Money Movement Schemas
-    InternalTransfer:
+    User:
       type: object
       properties:
         id:
           type: string
           format: uuid
-        fromAccount:
+        email:
           type: string
-        toAccount:
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          type: string
+          enum: [USER, ADMIN, SUPPORT, TELLER]
+        kycStatus:
+          type: string
+          enum:
+            [
+              NOT_STARTED,
+              IN_PROGRESS,
+              PENDING_REVIEW,
+              APPROVED,
+              REJECTED,
+              EXPIRED,
+            ]
+        emailVerified:
+          type: boolean
+        twoFactorEnabled:
+          type: boolean
+
+    Balance:
+      type: object
+      properties:
+        asset:
+          type: string
+        amount:
+          type: string
+          pattern: '^\d+\.?\d*$'
+        usdValue:
+          type: string
+          pattern: '^\d+\.?\d*$'
+
+    Trade:
+      type: object
+      properties:
+        id:
+          type: string
+        fromAsset:
+          type: string
+        toAsset:
+          type: string
+        amount:
+          type: string
+        price:
+          type: string
+        fee:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, FILLED, CANCELLED, FAILED]
+        executedAt:
+          type: string
+          format: date-time
+
+    VaultInventory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        metal:
+          type: string
+          enum: [AU, AG, PT, PD, CU]
+        sku:
+          type: string
+        format:
+          type: string
+          enum: [bar, coin, sheet, coil]
+        weight:
+          type: string
+          pattern: '^\d+\.?\d*$'
+        vaultLocation:
+          type: string
+        qtyAvailable:
+          type: integer
+          minimum: 0
+        qtyReserved:
+          type: integer
+          minimum: 0
+        unitCost:
+          type: string
+          pattern: '^\d+\.?\d*$'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RedemptionRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        asset:
+          type: string
+          enum: [AU, AG, PT, PD, CU]
+        qty:
+          type: string
+          pattern: '^\d+\.?\d*$'
+        format:
+          type: string
+          enum: [bar, coin, sheet, coil]
+        sku:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, shipped, delivered, cancelled]
+        shippingAddress:
+          type: object
+          properties:
+            street:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            zipCode:
+              type: string
+            country:
+              type: string
+        trackingNumber:
+          type: string
+        fees:
+          type: string
+          pattern: '^\d+\.?\d*$'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RedemptionQuote:
+      type: object
+      properties:
+        asset:
+          type: string
+          enum: [AU, AG, PT, PD, CU]
+        qty:
+          type: string
+          pattern: '^\d+\.?\d*$'
+        format:
+          type: string
+          enum: [bar, coin, sheet, coil]
+        spotPrice:
+          type: string
+          pattern: '^\d+\.?\d*$'
+        fees:
+          type: string
+          pattern: '^\d+\.?\d*$'
+        totalCost:
+          type: string
+          pattern: '^\d+\.?\d*$'
+        expiresAt:
+          type: string
+          format: date-time
+        availableSkus:
+          type: array
+          items:
+            type: object
+            properties:
+              sku:
+                type: string
+              description:
+                type: string
+              weight:
+                type: string
+                pattern: '^\d+\.?\d*$'
+              premium:
+                type: string
+                pattern: '^\d+\.?\d*$'
+
+    UserProfile:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        balances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Balance'
+        kycStatus:
+          type: string
+          enum:
+            [
+              NOT_STARTED,
+              IN_PROGRESS,
+              PENDING_REVIEW,
+              APPROVED,
+              REJECTED,
+              EXPIRED,
+            ]
+        orders:
+          type: array
+          items:
+            type: object
+        redemptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/RedemptionRequest'
+
+    # Money Movement Schemas (x-inferred: true)
+    Beneficiary:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [internal_user, bank_swift, email_link]
+        displayName:
+          type: string
+        details:
+          type: object
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaymentRequest:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        mode:
+          type: string
+          enum: [internal_user, external_link]
+        target:
+          type: object
+        asset:
+          type: string
+        amount:
+          type: string
+        memoOptional:
+          type: boolean
+        allowPartial:
+          type: boolean
+        expiresAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [draft, active, expired, paid, cancelled]
+        linkToken:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    InternalTransfer:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        fromUserId:
+          type: string
+          format: uuid
+        toInternalAccountNumber:
           type: string
         asset:
           type: string
         amount:
           type: string
+        memo:
+          type: string
         status:
           type: string
+          enum: [pending, completed, rejected]
+        audit:
+          type: object
         createdAt:
           type: string
           format: date-time
-
-    BankTransfer:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        beneficiaryId:
-          type: string
-          format: uuid
-        amount:
-          type: string
-        currency:
-          type: string
-        status:
-          type: string
-        createdAt:
+        updatedAt:
           type: string
           format: date-time
 
     CryptoWithdrawal:
       type: object
+      x-inferred: true
       properties:
         id:
+          type: string
+          format: uuid
+        userId:
           type: string
           format: uuid
         asset:
@@ -129,211 +406,152 @@ components:
           type: string
         amount:
           type: string
+        feeEstimate:
+          type: string
         status:
           type: string
+          enum: [pending, queued, broadcast, failed, cancelled]
+        audit:
+          type: object
         createdAt:
           type: string
           format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
-    Beneficiary:
+    BankTransfer:
       type: object
+      x-inferred: true
       properties:
         id:
           type: string
           format: uuid
-        type:
+        userId:
           type: string
-        displayName:
-          type: string
-        details:
-          type: object
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-
-    PaymentRequest:
-      type: object
-      properties:
-        id:
+          format: uuid
+        beneficiaryId:
           type: string
           format: uuid
         amount:
           type: string
         currency:
           type: string
-        description:
+        purposeCode:
           type: string
         status:
           type: string
-        token:
+          enum: [draft, pending, submitted, failed, cancelled]
+        rails:
           type: string
-        expiresAt:
+          enum: [swift, wise]
+        audit:
+          type: object
+        createdAt:
           type: string
           format: date-time
-        createdAt:
+        updatedAt:
           type: string
           format: date-time
 
     RecurringRule:
       type: object
+      x-inferred: true
       properties:
         id:
           type: string
           format: uuid
-        amount:
-          type: string
-        currency:
-          type: string
-        frequency:
-          type: string
-        targetAccount:
-          type: string
-        enabled:
-          type: boolean
-        nextRunAt:
-          type: string
-          format: date-time
-        createdAt:
-          type: string
-          format: date-time
-
-    CardFundingPreference:
-      type: object
-      properties:
-        cardRef:
-          type: string
-        eligibleAssets:
-          type: array
-          items:
-            type: string
-        selectedAsset:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-
-    DCAPlan:
-      type: object
-      properties:
-        id:
+        userId:
           type: string
           format: uuid
+        name:
+          type: string
         asset:
           type: string
         amount:
           type: string
         frequency:
           type: string
-        startDate:
-          type: string
-          format: date
-        endDate:
-          type: string
-          format: date
-        enabled:
-          type: boolean
-        nextRunAt:
+          enum: [daily, weekly, monthly, quarterly, yearly]
+        nextRun:
           type: string
           format: date-time
+        isActive:
+          type: boolean
         createdAt:
           type: string
           format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
-    PriceQuote:
+    DCAPlan:
       type: object
+      x-inferred: true
       properties:
         id:
           type: string
           format: uuid
-        symbol:
+        userId:
           type: string
-        side:
+          format: uuid
+        name:
+          type: string
+        asset:
           type: string
         amount:
           type: string
-        price:
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly, quarterly, yearly]
+        nextRun:
+          type: string
+          format: date-time
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    QRToken:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+        type:
+          type: string
+          enum: [pay, receive]
+        asset:
+          type: string
+        amount:
           type: string
         expiresAt:
           type: string
           format: date-time
-        createdAt:
-          type: string
-          format: date-time
-
-    Order:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        symbol:
-          type: string
-        amount:
-          type: number
         status:
           type: string
+          enum: [active, used, expired, cancelled]
         createdAt:
           type: string
           format: date-time
-
-  responses:
-    ValidationError:
-      description: Validation error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-tags:
-  - name: Transfers
-    description: Internal and external money transfers
-  - name: Crypto
-    description: Cryptocurrency operations and withdrawals
-  - name: Beneficiaries
-    description: Transfer beneficiary management
-  - name: QR
-    description: QR code payment tokens
-  - name: Payment Requests
-    description: Payment request creation and management
-  - name: Recurring
-    description: Recurring transfer rules
-  - name: Card Funding
-    description: Card funding preferences and settings
-  - name: DCA
-    description: Dollar Cost Averaging plans
-  - name: Quotes
-    description: Price quotes and estimates
-  - name: Orders
-    description: Trading orders and execution
-  - name: Health
-    description: Service health endpoints
-  - name: Authentication
-    description: User authentication and authorization
+        updatedAt:
+          type: string
+          format: date-time
 
 paths:
   # Money Movement Endpoints
-
-  # Transfers
   /api/transfers/internal:
     post:
       tags: [Transfers]
-      operationId: createInternalTransfer
-      summary: Create internal transfer between accounts
-      description: Transfer funds between internal accounts (requires authentication)
+      summary: Create internal transfer
+      description: Transfer assets between internal accounts
       security:
         - bearerAuth: []
       requestBody:
@@ -346,7 +564,7 @@ paths:
               properties:
                 toInternalAccountNumber:
                   type: string
-                  description: Destination internal account number
+                  description: Internal account number to transfer to
                 asset:
                   type: string
                   enum: [AU, AG, PT, PD, CU, USD, USDC]
@@ -357,7 +575,7 @@ paths:
                   description: Amount to transfer
                 memo:
                   type: string
-                  description: Optional transfer memo
+                  description: Optional memo for the transfer
       responses:
         '201':
           description: Internal transfer created successfully
@@ -368,36 +586,19 @@ paths:
                 properties:
                   code:
                     type: string
-                    example: 'SUCCESS'
+                    example: SUCCESS
                   data:
-                    type: object
-                    properties:
-                      transfer:
-                        $ref: '#/components/schemas/InternalTransfer'
+                    $ref: '#/components/schemas/InternalTransfer'
         '400':
-          description: Invalid request parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ValidationError'
         '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Feature disabled or insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
+          description: Insufficient balance or transfer not allowed
 
   /api/transfers/internal/{id}:
     get:
       tags: [Transfers]
-      operationId: getInternalTransferStatus
       summary: Get internal transfer status
       description: Retrieve the status of an internal transfer
       security:
@@ -420,27 +621,17 @@ paths:
                 properties:
                   code:
                     type: string
-                    example: 'SUCCESS'
+                    example: SUCCESS
                   data:
                     $ref: '#/components/schemas/InternalTransfer'
         '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Transfer not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
+          $ref: '#/components/responses/NotFound'
 
   /api/transfers/bank:
     post:
       tags: [Transfers]
-      operationId: createBankTransfer
       summary: Create bank transfer
       description: Initiate a bank transfer to external beneficiary
       security:
@@ -460,11 +651,14 @@ paths:
                 amount:
                   type: string
                   pattern: '^\d+\.?\d*$'
-                  description: Transfer amount
+                  description: Amount to transfer
                 currency:
                   type: string
                   enum: [USD, EUR, GBP, CAD, AUD]
-                  description: Transfer currency
+                  description: Currency for the transfer
+                purposeCode:
+                  type: string
+                  description: Optional purpose code for the transfer
       responses:
         '201':
           description: Bank transfer created successfully
@@ -475,27 +669,19 @@ paths:
                 properties:
                   code:
                     type: string
-                    example: 'SUCCESS'
+                    example: SUCCESS
                   data:
                     $ref: '#/components/schemas/BankTransfer'
         '400':
-          description: Invalid request parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ValidationError'
         '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Insufficient balance or transfer not allowed
 
   /api/transfers/bank/{id}:
     get:
       tags: [Transfers]
-      operationId: getBankTransferStatus
       summary: Get bank transfer status
       description: Retrieve the status of a bank transfer
       security:
@@ -518,29 +704,19 @@ paths:
                 properties:
                   code:
                     type: string
-                    example: 'SUCCESS'
+                    example: SUCCESS
                   data:
                     $ref: '#/components/schemas/BankTransfer'
         '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Transfer not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
+          $ref: '#/components/responses/NotFound'
 
   /api/transfers/bank/estimate-fees:
     post:
       tags: [Transfers]
-      operationId: estimateBankFees
       summary: Estimate bank transfer fees
-      description: Get fee estimate for bank transfer
+      description: Get estimated fees for a bank transfer
       security:
         - bearerAuth: []
       requestBody:
@@ -549,7 +725,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [amount, currency]
+              required: [amount, currency, rails]
               properties:
                 amount:
                   type: string
@@ -559,6 +735,10 @@ paths:
                   type: string
                   enum: [USD, EUR, GBP, CAD, AUD]
                   description: Transfer currency
+                rails:
+                  type: string
+                  enum: [swift, wise]
+                  description: Transfer rails to use
       responses:
         '200':
           description: Fee estimate retrieved successfully
@@ -569,49 +749,51 @@ paths:
                 properties:
                   code:
                     type: string
-                    example: 'SUCCESS'
+                    example: SUCCESS
                   data:
                     type: object
                     properties:
-                      estimate:
-                        type: object
-                        properties:
-                          fee:
-                            type: string
-                            description: Estimated fee amount
-                          currency:
-                            type: string
-                            description: Fee currency
+                      estimatedFee:
+                        type: string
+                        description: Estimated fee amount
+                      currency:
+                        type: string
+                        description: Fee currency
+                      estimatedDelivery:
+                        type: string
+                        description: Estimated delivery time
         '400':
-          description: Invalid request parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ValidationError'
         '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
+          $ref: '#/components/responses/Unauthorized'
 
   /api/transfers/history:
     get:
       tags: [Transfers]
-      operationId: getTransferHistory
       summary: Get transfer history
-      description: Retrieve transfer history with pagination and filters
+      description: Retrieve transfer history for the authenticated user
       security:
         - bearerAuth: []
       parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [internal, bank, crypto]
+          description: Filter by transfer type
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, completed, rejected, failed, cancelled]
+          description: Filter by transfer status
         - name: limit
           in: query
           schema:
             type: integer
             minimum: 1
             maximum: 100
-            default: 50
+            default: 20
           description: Number of records to return
         - name: offset
           in: query
@@ -620,13 +802,6 @@ paths:
             minimum: 0
             default: 0
           description: Number of records to skip
-        - name: type
-          in: query
-          schema:
-            type: string
-            enum: [internal, bank, all]
-            default: all
-          description: Transfer type filter
       responses:
         '200':
           description: Transfer history retrieved successfully
@@ -637,7 +812,7 @@ paths:
                 properties:
                   code:
                     type: string
-                    example: 'SUCCESS'
+                    example: SUCCESS
                   data:
                     type: object
                     properties:
@@ -647,2412 +822,15 @@ paths:
                           oneOf:
                             - $ref: '#/components/schemas/InternalTransfer'
                             - $ref: '#/components/schemas/BankTransfer'
+                            - $ref: '#/components/schemas/CryptoWithdrawal'
                       total:
                         type: integer
                         description: Total number of transfers
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  # Crypto
-  /api/crypto/networks:
-    get:
-      tags: [Crypto]
-      operationId: getSupportedNetworks
-      summary: Get supported cryptocurrency networks
-      description: Retrieve list of supported blockchain networks
-      security: []
-      responses:
-        '200':
-          description: Networks retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        symbol:
-                          type: string
-                        isActive:
-                          type: boolean
-        '501':
-          description: Feature disabled
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: CRYPTO_ENABLED
-
-  /api/crypto/assets:
-    get:
-      tags: [Crypto]
-      operationId: getSupportedAssets
-      summary: Get supported cryptocurrency assets
-      description: Retrieve list of supported cryptocurrency assets
-      security: []
-      responses:
-        '200':
-          description: Assets retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        symbol:
-                          type: string
-                        name:
-                          type: string
-                        networks:
-                          type: array
-                          items:
-                            type: string
-                        isActive:
-                          type: boolean
-        '501':
-          description: Feature disabled
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: CRYPTO_ENABLED
-
-  /api/crypto/withdrawals:
-    post:
-      tags: [Crypto]
-      operationId: createCryptoWithdrawal
-      summary: Create cryptocurrency withdrawal
-      description: Initiate a cryptocurrency withdrawal
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [asset, network, address, amount]
-              properties:
-                asset:
-                  type: string
-                  enum: [BTC, ETH, USDC, USDT]
-                  description: Cryptocurrency to withdraw
-                network:
-                  type: string
-                  description: Network to use for withdrawal
-                address:
-                  type: string
-                  description: Destination address
-                amount:
-                  type: string
-                  pattern: '^\d+\.?\d*$'
-                  description: Amount to withdraw
-      responses:
-        '201':
-          description: Crypto withdrawal created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      withdrawal:
-                        $ref: '#/components/schemas/CryptoWithdrawal'
-        '400':
-          description: Invalid request parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: CRYPTO_ENABLED
-
-  /api/crypto/withdrawals/{id}:
-    get:
-      tags: [Crypto]
-      operationId: getCryptoWithdrawalStatus
-      summary: Get cryptocurrency withdrawal status
-      description: Retrieve the status and details of a cryptocurrency withdrawal
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Withdrawal ID
-      responses:
-        '200':
-          description: Withdrawal details retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      withdrawal:
-                        $ref: '#/components/schemas/CryptoWithdrawal'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Withdrawal not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: CRYPTO_ENABLED
-
-  /api/crypto/withdrawals/{id}/cancel:
-    post:
-      tags: [Crypto]
-      operationId: cancelCryptoWithdrawal
-      summary: Cancel cryptocurrency withdrawal
-      description: Cancel a pending cryptocurrency withdrawal
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Withdrawal ID
-      responses:
-        '200':
-          description: Withdrawal cancelled successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      withdrawal:
-                        $ref: '#/components/schemas/CryptoWithdrawal'
-        '400':
-          description: Withdrawal cannot be cancelled
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Withdrawal not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: CRYPTO_ENABLED
-
-  /api/crypto/withdrawals/estimate-fee:
-    post:
-      tags: [Crypto]
-      operationId: estimateCryptoFee
-      summary: Estimate cryptocurrency withdrawal fee
-      description: Get fee estimate for cryptocurrency withdrawal
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [asset, network, amount]
-              properties:
-                asset:
-                  type: string
-                  enum: [BTC, ETH, USDC, USDT]
-                  description: Cryptocurrency asset
-                network:
-                  type: string
-                  enum: [bitcoin, ethereum, polygon, arbitrum]
-                  description: Blockchain network
-                amount:
-                  type: string
-                  pattern: '^\d+\.?\d*$'
-                  description: Withdrawal amount
-      responses:
-        '200':
-          description: Fee estimate retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      estimate:
-                        type: object
-                        properties:
-                          fee:
-                            type: string
-                            description: Estimated fee amount
-                          asset:
-                            type: string
-                            description: Fee asset
-                          network:
-                            type: string
-                            description: Network used for estimate
-        '400':
-          description: Invalid request parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: CRYPTO_ENABLED
-
-  # Beneficiaries
-  /api/beneficiaries:
-    post:
-      tags: [Beneficiaries]
-      operationId: createBeneficiary
-      summary: Create beneficiary
-      description: Create a new beneficiary for transfers
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [type, displayName, details]
-              properties:
-                type:
-                  type: string
-                  enum: [internal_user, bank_swift, email_link]
-                  description: Type of beneficiary
-                displayName:
-                  type: string
-                  description: Display name for the beneficiary
-                details:
-                  type: object
-                  description: Beneficiary-specific details
-      responses:
-        '201':
-          description: Beneficiary created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/Beneficiary'
-        '400':
-          description: Invalid request parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    get:
-      tags: [Beneficiaries]
-      operationId: getBeneficiaries
-      summary: Get beneficiaries
-      description: Retrieve list of user's beneficiaries
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Beneficiaries retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Beneficiary'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/beneficiaries/{id}:
-    get:
-      tags: [Beneficiaries]
-      operationId: getBeneficiary
-      summary: Get beneficiary
-      description: Retrieve a specific beneficiary
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Beneficiary ID
-      responses:
-        '200':
-          description: Beneficiary retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/Beneficiary'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Beneficiary not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    put:
-      tags: [Beneficiaries]
-      operationId: updateBeneficiary
-      summary: Update beneficiary
-      description: Update an existing beneficiary
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Beneficiary ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                displayName:
-                  type: string
-                  description: New display name
-                details:
-                  type: object
-                  description: Updated beneficiary details
-                isActive:
-                  type: boolean
-                  description: Whether beneficiary is active
-      responses:
-        '200':
-          description: Beneficiary updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/Beneficiary'
-        '400':
-          description: Invalid request parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Beneficiary not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    delete:
-      tags: [Beneficiaries]
-      operationId: deleteBeneficiary
-      summary: Delete beneficiary
-      description: Remove a beneficiary
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Beneficiary ID
-      responses:
-        '200':
-          description: Beneficiary deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: 'Beneficiary deleted successfully'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Beneficiary not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  # QR Endpoints
-  /api/qr/pay:
-    post:
-      tags: [QR]
-      operationId: createPayToken
-      summary: Create QR payment token
-      description: Generate a QR token for receiving payments
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [asset, amount, expiresIn]
-              properties:
-                asset:
-                  type: string
-                  enum: [AU, AG, PT, PD, CU, USD, USDC]
-                  description: Asset to receive
-                amount:
-                  type: string
-                  pattern: '^\d+\.?\d*$'
-                  description: Amount to receive
-                expiresIn:
-                  type: integer
-                  minimum: 300
-                  maximum: 86400
-                  description: Token expiration in seconds (5 min to 24 hours)
-                memo:
-                  type: string
-                  description: Optional payment memo
-      responses:
-        '201':
-          description: QR payment token created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      token:
-                        type: string
-                        description: QR token identifier
-                      qrCode:
-                        type: string
-                        description: Base64 encoded QR code image
-                      expiresAt:
-                        type: string
-                        format: date-time
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/qr/receive:
-    post:
-      tags: [QR]
-      operationId: createReceiveToken
-      summary: Create QR receive token
-      description: Generate a QR token for sending payments
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [asset, amount, expiresIn]
-              properties:
-                asset:
-                  type: string
-                  enum: [AU, AG, PT, PD, CU, USD, USDC]
-                  description: Asset to send
-                amount:
-                  type: string
-                  pattern: '^\d+\.?\d*$'
-                  description: Amount to send
-                expiresIn:
-                  type: integer
-                  minimum: 300
-                  maximum: 86400
-                  description: Token expiration in seconds
-                memo:
-                  type: string
-                  description: Optional payment memo
-      responses:
-        '201':
-          description: QR receive token created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      token:
-                        type: string
-                        description: QR token identifier
-                      qrCode:
-                        type: string
-                        description: Base64 encoded QR code image
-                      expiresAt:
-                        type: string
-                        format: date-time
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/qr/{token}:
-    get:
-      tags: [QR]
-      operationId: getQRToken
-      summary: Get QR token details
-      description: Retrieve QR token information (public access)
-      security: []
-      parameters:
-        - name: token
-          in: path
-          required: true
-          schema:
-            type: string
-          description: QR token identifier
-      responses:
-        '200':
-          description: QR token details retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/QRToken'
-        '404':
-          description: QR token not found or expired
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /api/qr/{token}/use:
-    post:
-      tags: [QR]
-      operationId: useQRToken
-      summary: Use QR token
-      description: Consume a QR token to complete payment
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: token
-          in: path
-          required: true
-          schema:
-            type: string
-          description: QR token identifier
-      responses:
-        '200':
-          description: QR token used successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: 'Payment completed successfully'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/qr/{token}/cancel:
-    post:
-      tags: [QR]
-      operationId: cancelQRToken
-      summary: Cancel QR token
-      description: Cancel an active QR token
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: token
-          in: path
-          required: true
-          schema:
-            type: string
-          description: QR token identifier
-      responses:
-        '200':
-          description: QR token cancelled successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: 'QR token cancelled successfully'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/qr/history:
-    get:
-      tags: [QR]
-      operationId: getQRHistory
-      summary: Get QR token history
-      description: Retrieve user's QR token usage history
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: QR history retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/QRToken'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/qr/stats:
-    get:
-      tags: [QR]
-      operationId: getQRStats
-      summary: Get QR usage statistics
-      description: Retrieve QR token usage statistics
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: QR stats retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      totalTokens:
-                        type: integer
-                      activeTokens:
-                        type: integer
-                      completedPayments:
-                        type: integer
-                      totalVolume:
-                        type: string
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  # Payment Requests Endpoints
-  /api/payment-requests:
-    post:
-      tags: [Payment Requests]
-      operationId: createPaymentRequest
-      summary: Create payment request
-      description: Create a new payment request
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [asset, amount, expiresIn]
-              properties:
-                asset:
-                  type: string
-                  enum: [AU, AG, PT, PD, CU, USD, USDC]
-                  description: Asset to request
-                amount:
-                  type: string
-                  pattern: '^\d+\.?\d*$'
-                  description: Amount to request
-                expiresIn:
-                  type: integer
-                  minimum: 3600
-                  maximum: 604800
-                  description: Request expiration in seconds (1 hour to 1 week)
-                memo:
-                  type: string
-                  description: Optional payment memo
-                recipientEmail:
-                  type: string
-                  format: email
-                  description: Recipient email address
-      responses:
-        '201':
-          description: Payment request created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/PaymentRequest'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    get:
-      tags: [Payment Requests]
-      operationId: getPaymentRequests
-      summary: Get payment requests
-      description: Retrieve user's payment requests
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Payment requests retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/PaymentRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/payment-requests/{id}:
-    get:
-      tags: [Payment Requests]
-      operationId: getPaymentRequest
-      summary: Get payment request details
-      description: Retrieve specific payment request details
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Payment request ID
-      responses:
-        '200':
-          description: Payment request details retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/PaymentRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    post:
-      tags: [Payment Requests]
-      operationId: cancelPaymentRequest
-      summary: Cancel payment request
-      description: Cancel an active payment request
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Payment request ID
-      responses:
-        '200':
-          description: Payment request cancelled successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: 'Payment request cancelled successfully'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/payment-requests/link/{token}:
-    get:
-      tags: [Payment Requests]
-      operationId: getPaymentRequestByToken
-      summary: Get payment request by token
-      description: Retrieve payment request details using public token
-      security: []
-      parameters:
-        - name: token
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Payment request token
-      responses:
-        '200':
-          description: Payment request details retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/PaymentRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-  /api/payment-requests/stats:
-    get:
-      tags: [Payment Requests]
-      operationId: getPaymentRequestStats
-      summary: Get payment request statistics
-      description: Retrieve payment request statistics
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Payment request stats retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      totalRequests:
-                        type: integer
-                      activeRequests:
-                        type: integer
-                      completedPayments:
-                        type: integer
-                      totalVolume:
-                        type: string
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  # Recurring Endpoints
-  /api/recurring/rules:
-    post:
-      tags: [Recurring]
-      operationId: createRecurringRule
-      summary: Create recurring transfer rule
-      description: Create a new recurring transfer rule
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [asset, amount, frequency, nextRunAt]
-              properties:
-                asset:
-                  type: string
-                  enum: [AU, AG, PT, PD, CU, USD, USDC]
-                  description: Asset to transfer
-                amount:
-                  type: string
-                  pattern: '^\d+\.?\d*$'
-                  description: Amount to transfer
-                frequency:
-                  type: string
-                  enum: [daily, weekly, monthly, quarterly]
-                  description: Transfer frequency
-                nextRunAt:
-                  type: string
-                  format: date-time
-                  description: Next scheduled run time
-                enabled:
-                  type: boolean
-                  default: true
-                  description: Whether the rule is active
-      responses:
-        '201':
-          description: Recurring rule created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/RecurringRule'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    get:
-      tags: [Recurring]
-      operationId: getRecurringRules
-      summary: Get recurring rules
-      description: Retrieve user's recurring transfer rules
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Recurring rules retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/RecurringRule'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/recurring/rules/{id}:
-    get:
-      tags: [Recurring]
-      operationId: getRecurringRule
-      summary: Get recurring rule details
-      description: Retrieve specific recurring rule details
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Recurring rule ID
-      responses:
-        '200':
-          description: Recurring rule details retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/RecurringRule'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    put:
-      tags: [Recurring]
-      operationId: updateRecurringRule
-      summary: Update recurring rule
-      description: Update an existing recurring transfer rule
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Recurring rule ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                asset:
-                  type: string
-                  enum: [AU, AG, PT, PD, CU, USD, USDC]
-                amount:
-                  type: string
-                  pattern: '^\d+\.?\d*$'
-                frequency:
-                  type: string
-                  enum: [daily, weekly, monthly, quarterly]
-                nextRunAt:
-                  type: string
-                  format: date-time
-                enabled:
-                  type: boolean
-      responses:
-        '200':
-          description: Recurring rule updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/RecurringRule'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    post:
-      tags: [Recurring]
-      operationId: duplicateRecurringRule
-      summary: Duplicate recurring rule
-      description: Create a copy of an existing recurring rule
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Recurring rule ID to duplicate
-      responses:
-        '201':
-          description: Recurring rule duplicated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/RecurringRule'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    delete:
-      tags: [Recurring]
-      operationId: deleteRecurringRule
-      summary: Delete recurring rule
-      description: Remove a recurring transfer rule
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Recurring rule ID
-      responses:
-        '200':
-          description: Recurring rule deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: 'Recurring rule deleted successfully'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/recurring/rules/{id}/toggle:
-    post:
-      tags: [Recurring]
-      operationId: toggleRecurringRule
-      summary: Toggle recurring rule
-      description: Enable or disable a recurring transfer rule
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Recurring rule ID
-      responses:
-        '200':
-          description: Recurring rule toggled successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      enabled:
+                      hasMore:
                         type: boolean
-                        description: New enabled state
+                        description: Whether there are more records
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/recurring/rules/{id}/history:
-    get:
-      tags: [Recurring]
-      operationId: getRecurringRuleHistory
-      summary: Get recurring rule history
-      description: Retrieve execution history for a recurring rule
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Recurring rule ID
-      responses:
-        '200':
-          description: Recurring rule history retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Transfer'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/recurring/rules/stats:
-    get:
-      tags: [Recurring]
-      operationId: getRecurringRulesStats
-      summary: Get recurring rules statistics
-      description: Retrieve recurring rules statistics
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Recurring rules stats retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      totalRules:
-                        type: integer
-                      activeRules:
-                        type: integer
-                      totalExecutions:
-                        type: integer
-                      totalVolume:
-                        type: string
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  # Card Funding Endpoints
-  /api/cards/funding:
-    get:
-      tags: [Card Funding]
-      operationId: getAllCardFundingPreferences
-      summary: Get all card funding preferences
-      description: Retrieve all card funding preferences for the user
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Card funding preferences retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CardFundingPreference'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/cards/funding/assets:
-    get:
-      tags: [Card Funding]
-      operationId: getAvailableAssets
-      summary: Get available funding assets
-      description: Retrieve available assets for card funding
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Available assets retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      type: string
-                      enum: [AU, AG, PT, PD, CU, USD, USDC]
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/cards/{cardRef}/funding:
-    get:
-      tags: [Card Funding]
-      operationId: getCardFundingPreferences
-      summary: Get card funding preferences
-      description: Retrieve funding preferences for a specific card
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: cardRef
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Card reference identifier
-      responses:
-        '200':
-          description: Card funding preferences retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/CardFundingPreference'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/cards/{cardRef}/funding/eligibility:
-    put:
-      tags: [Card Funding]
-      operationId: setEligibleAssets
-      summary: Set eligible funding assets
-      description: Configure which assets are eligible for funding a card
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: cardRef
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Card reference identifier
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [eligibleAssets]
-              properties:
-                eligibleAssets:
-                  type: array
-                  items:
-                    type: string
-                    enum: [AU, AG, PT, PD, CU, USD, USDC]
-                  description: List of eligible assets
-      responses:
-        '200':
-          description: Eligible assets updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: 'Eligible assets updated successfully'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/cards/{cardRef}/funding/selected:
-    put:
-      tags: [Card Funding]
-      operationId: setSelectedAsset
-      summary: Set selected funding asset
-      description: Set the preferred asset for funding a card
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: cardRef
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Card reference identifier
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [asset]
-              properties:
-                asset:
-                  type: string
-                  enum: [AU, AG, PT, PD, CU, USD, USDC]
-                  description: Selected funding asset
-      responses:
-        '200':
-          description: Selected asset updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: 'Selected asset updated successfully'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    delete:
-      tags: [Card Funding]
-      operationId: clearSelectedAsset
-      summary: Clear selected funding asset
-      description: Remove the selected funding asset preference
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: cardRef
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Card reference identifier
-      responses:
-        '200':
-          description: Selected asset cleared successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: 'Selected asset cleared successfully'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/cards/{cardRef}/funding/stats:
-    get:
-      tags: [Card Funding]
-      operationId: getCardFundingStats
-      summary: Get card funding statistics
-      description: Retrieve funding statistics for a specific card
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: cardRef
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Card reference identifier
-      responses:
-        '200':
-          description: Card funding stats retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      totalFunding:
-                        type: string
-                      lastFunding:
-                        type: string
-                        format: date-time
-                      fundingCount:
-                        type: integer
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  # DCA Endpoints
-  /api/dca/plans:
-    post:
-      tags: [DCA]
-      operationId: createDCAPlan
-      summary: Create DCA plan
-      description: Create a new Dollar Cost Averaging plan
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [asset, amount, frequency, startDate]
-              properties:
-                asset:
-                  type: string
-                  enum: [AU, AG, PT, PD, CU, USD, USDC]
-                  description: Asset to purchase
-                amount:
-                  type: string
-                  pattern: '^\d+\.?\d*$'
-                  description: Amount to invest per period
-                frequency:
-                  type: string
-                  enum: [daily, weekly, monthly, quarterly]
-                  description: Investment frequency
-                startDate:
-                  type: string
-                  format: date-time
-                  description: Plan start date
-                enabled:
-                  type: boolean
-                  default: true
-                  description: Whether the plan is active
-      responses:
-        '201':
-          description: DCA plan created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/DCAPlan'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    get:
-      tags: [DCA]
-      operationId: getDCAPlans
-      summary: Get DCA plans
-      description: Retrieve user's DCA plans
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: DCA plans retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/DCAPlan'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/dca/plans/{id}:
-    get:
-      tags: [DCA]
-      operationId: getDCAPlan
-      summary: Get DCA plan details
-      description: Retrieve specific DCA plan details
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: DCA plan ID
-      responses:
-        '200':
-          description: DCA plan details retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/DCAPlan'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    put:
-      tags: [DCA]
-      operationId: updateDCAPlan
-      summary: Update DCA plan
-      description: Update an existing DCA plan
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: DCA plan ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                asset:
-                  type: string
-                  enum: [AU, AG, PT, PD, CU, USD, USDC]
-                amount:
-                  type: string
-                  pattern: '^\d+\.?\d*$'
-                frequency:
-                  type: string
-                  enum: [daily, weekly, monthly, quarterly]
-                startDate:
-                  type: string
-                  format: date-time
-                enabled:
-                  type: boolean
-      responses:
-        '200':
-          description: DCA plan updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/DCAPlan'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    post:
-      tags: [DCA]
-      operationId: pauseDCAPlan
-      summary: Pause DCA plan
-      description: Pause an active DCA plan
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: DCA plan ID
-      responses:
-        '200':
-          description: DCA plan paused successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: 'DCA plan paused successfully'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/dca/plans/{id}/resume:
-    post:
-      tags: [DCA]
-      operationId: resumeDCAPlan
-      summary: Resume DCA plan
-      description: Resume a paused DCA plan
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: DCA plan ID
-      responses:
-        '200':
-          description: DCA plan resumed successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: 'DCA plan resumed successfully'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-    delete:
-      tags: [DCA]
-      operationId: deleteDCAPlan
-      summary: Delete DCA plan
-      description: Remove a DCA plan
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: DCA plan ID
-      responses:
-        '200':
-          description: DCA plan deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: 'DCA plan deleted successfully'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/dca/plans/{id}/history:
-    get:
-      tags: [DCA]
-      operationId: getDCAPlanHistory
-      summary: Get DCA plan history
-      description: Retrieve execution history for a DCA plan
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: DCA plan ID
-      responses:
-        '200':
-          description: DCA plan history retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Order'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/dca/backtest:
-    post:
-      tags: [DCA]
-      operationId: runDCABacktest
-      summary: Run DCA backtest
-      description: Run a backtest simulation for a DCA strategy
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [asset, amount, frequency, startDate, endDate]
-              properties:
-                asset:
-                  type: string
-                  enum: [AU, AG, PT, PD, CU, USD, USDC]
-                  description: Asset to simulate
-                amount:
-                  type: string
-                  pattern: '^\d+\.?\d*$'
-                  description: Investment amount per period
-                frequency:
-                  type: string
-                  enum: [daily, weekly, monthly, quarterly]
-                  description: Investment frequency
-                startDate:
-                  type: string
-                  format: date
-                  description: Simulation start date
-                endDate:
-                  type: string
-                  format: date
-                  description: Simulation end date
-      responses:
-        '200':
-          description: DCA backtest completed successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      totalInvested:
-                        type: string
-                      finalValue:
-                        type: string
-                      totalReturn:
-                        type: string
-                      returnPercentage:
-                        type: string
-                      tradeCount:
-                        type: integer
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/dca/assets:
-    get:
-      tags: [DCA]
-      operationId: getDCAAssets
-      summary: Get DCA available assets
-      description: Retrieve available assets for DCA plans
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: DCA assets retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: array
-                    items:
-                      type: string
-                      enum: [AU, AG, PT, PD, CU, USD, USDC]
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/dca/stats:
-    get:
-      tags: [DCA]
-      operationId: getDCAStats
-      summary: Get DCA statistics
-      description: Retrieve DCA plan statistics
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: DCA stats retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    type: object
-                    properties:
-                      totalPlans:
-                        type: integer
-                      activePlans:
-                        type: integer
-                      totalInvested:
-                        type: string
-                      totalReturn:
-                        type: string
-                      averageReturn:
-                        type: string
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  # Quotes Endpoints
-  /api/quotes/estimate:
-    get:
-      tags: [Quotes]
-      operationId: getPriceEstimate
-      summary: Get price estimate
-      description: Get price estimate for buy/sell operation
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: symbol
-          in: query
-          required: true
-          schema:
-            type: string
-            enum: [AU, AG, PT, PD, CU, USD, USDC]
-          description: Asset symbol
-        - name: side
-          in: query
-          required: true
-          schema:
-            type: string
-            enum: [buy, sell]
-          description: Trade side
-        - name: amount
-          in: query
-          required: true
-          schema:
-            type: string
-            pattern: '^\d+\.?\d*$'
-          description: Trade amount
-        - name: format
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [physical, digital]
-          description: Asset format
-        - name: payout
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [USD, USDC, USDT, TOKEN]
-          description: Payout method
-      responses:
-        '200':
-          description: Price estimate retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/PriceQuote'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/quotes/{quoteId}:
-    get:
-      tags: [Quotes]
-      operationId: getQuote
-      summary: Get cached quote
-      description: Get cached quote details by ID
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: quoteId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Quote ID
-      responses:
-        '200':
-          description: Quote details retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/PriceQuote'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  # Orders Endpoints
-  /api/orders/physical:
-    post:
-      tags: [Orders]
-      operationId: createPhysicalOrder
-      summary: Create physical commodity order
-      description: Place physical commodity order
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                [
-                  symbol,
-                  amount,
-                  format,
-                  paymentMethod,
-                  clientId,
-                  idempotencyKey,
-                ]
-              properties:
-                symbol:
-                  type: string
-                  minLength: 1
-                  maxLength: 10
-                  description: Asset symbol
-                amount:
-                  type: number
-                  minimum: 0
-                  description: Order amount
-                format:
-                  type: string
-                  minLength: 1
-                  description: Asset format
-                paymentMethod:
-                  type: string
-                  enum: [BALANCE, STRIPE_CARD]
-                  description: Payment method
-                clientId:
-                  type: string
-                  minLength: 8
-                  description: Client identifier
-                idempotencyKey:
-                  type: string
-                  minLength: 16
-                  description: Idempotency key
-                shippingAddress:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      minLength: 1
-                    line1:
-                      type: string
-                      minLength: 1
-                    line2:
-                      type: string
-                    city:
-                      type: string
-                      minLength: 1
-                    state:
-                      type: string
-                      minLength: 1
-                    postalCode:
-                      type: string
-                      minLength: 1
-                    country:
-                      type: string
-                      minLength: 1
-                    phone:
-                      type: string
-                      minLength: 1
-      responses:
-        '201':
-          description: Physical order created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/Order'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
-
-  /api/orders/sell-convert:
-    post:
-      tags: [Orders]
-      operationId: createSellConvertOrder
-      summary: Create sell/convert order
-      description: Process sell/convert operation
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [symbol, amount, payout, clientId, idempotencyKey]
-              properties:
-                symbol:
-                  type: string
-                  minLength: 1
-                  maxLength: 10
-                  description: Asset symbol
-                amount:
-                  type: number
-                  minimum: 0
-                  description: Order amount
-                payout:
-                  type: string
-                  enum: [USD, USDC, USDT, TOKEN]
-                  description: Payout method
-                clientId:
-                  type: string
-                  minLength: 8
-                  description: Client identifier
-                idempotencyKey:
-                  type: string
-                  minLength: 16
-                  description: Idempotency key
-      responses:
-        '201':
-          description: Sell/convert order created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: 'SUCCESS'
-                  data:
-                    $ref: '#/components/schemas/Order'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      x-feature-flag: MONEY_MOVEMENT_ENABLED
 
   # Health endpoint
   /health:
@@ -3074,3 +852,647 @@ paths:
                     type: string
                   version:
                     type: string
+
+  /api/auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register new user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+      responses:
+        '201':
+          description: User registered successfully
+        '400':
+          description: Validation error
+        '409':
+          description: User already exists
+
+  /api/auth/login:
+    post:
+      tags: [Authentication]
+      summary: User login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+        '401':
+          description: Invalid credentials
+
+  /api/auth/me:
+    get:
+      tags: [Authentication]
+      summary: Get current user profile
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+
+  /api/wallet/balances:
+    get:
+      tags: [Wallet]
+      summary: Get account balances
+      responses:
+        '200':
+          description: Account balances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      funding:
+                        type: object
+                        properties:
+                          balances:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Balance'
+                      trading:
+                        type: object
+                        properties:
+                          balances:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Balance'
+
+  /api/trade/prices:
+    get:
+      tags: [Trading]
+      summary: Get current asset prices
+      parameters:
+        - name: asset
+          in: query
+          schema:
+            type: string
+            enum: [AU, AG, PT, PD, CU]
+      responses:
+        '200':
+          description: Current prices
+
+  /api/trade/order:
+    post:
+      tags: [Trading]
+      summary: Place market conversion order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fromAsset, toAsset, amount]
+              properties:
+                fromAsset:
+                  type: string
+                toAsset:
+                  type: string
+                amount:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+      responses:
+        '201':
+          description: Trade executed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      trade:
+                        $ref: '#/components/schemas/Trade'
+
+  /api/shop/products:
+    get:
+      tags: [Shop]
+      summary: List available products
+      security: []
+      parameters:
+        - name: metal
+          in: query
+          schema:
+            type: string
+            enum: [AU, AG, PT, PD, CU]
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [COINS, BARS, ROUNDS, JEWELRY]
+      responses:
+        '200':
+          description: Product list
+
+  /api/admin/exposure:
+    get:
+      tags: [Admin]
+      summary: View system exposure
+      responses:
+        '200':
+          description: Exposure data
+        '403':
+          description: Admin access required
+
+  # Phase-3 Redemption Endpoints
+  /api/redeem:
+    post:
+      tags: [Redemption]
+      summary: Request physical asset redemption
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [asset, qty, format, shippingAddress]
+              properties:
+                asset:
+                  type: string
+                  enum: [AU, AG, PT, PD, CU]
+                qty:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+                format:
+                  type: string
+                  enum: [bar, coin, sheet, coil]
+                preferredSku:
+                  type: string
+                shippingAddress:
+                  type: object
+                  required: [street, city, state, zipCode, country]
+                  properties:
+                    street:
+                      type: string
+                    city:
+                      type: string
+                    state:
+                      type: string
+                    zipCode:
+                      type: string
+                    country:
+                      type: string
+      responses:
+        '201':
+          description: Redemption request created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      redemption:
+                        $ref: '#/components/schemas/RedemptionRequest'
+        '400':
+          description: Invalid request
+        '501':
+          description: Feature disabled
+
+  /api/redeem/status/{id}:
+    get:
+      tags: [Redemption]
+      summary: Get redemption request status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Redemption request status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      redemption:
+                        $ref: '#/components/schemas/RedemptionRequest'
+        '404':
+          description: Redemption request not found
+        '501':
+          description: Feature disabled
+
+  /api/redeem/quote:
+    get:
+      tags: [Redemption]
+      summary: Get redemption quote
+      parameters:
+        - name: asset
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [AU, AG, PT, PD, CU]
+        - name: qty
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\d+\.?\d*$'
+        - name: format
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [bar, coin, sheet, coil]
+      responses:
+        '200':
+          description: Redemption quote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      quote:
+                        $ref: '#/components/schemas/RedemptionQuote'
+        '400':
+          description: Invalid parameters
+        '501':
+          description: Feature disabled
+
+  # Phase-3 Vault Management Endpoints (Admin Only)
+  /api/vault/inventory:
+    get:
+      tags: [Vault]
+      summary: View vault inventory (Admin only)
+      parameters:
+        - name: metal
+          in: query
+          schema:
+            type: string
+            enum: [AU, AG, PT, PD, CU]
+        - name: location
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vault inventory
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      inventory:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/VaultInventory'
+        '403':
+          description: Admin access required
+        '501':
+          description: Feature disabled
+
+  /api/vault/inventory/restock:
+    post:
+      tags: [Vault]
+      summary: Restock vault inventory (Admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [metal, sku, qty, unitCost]
+              properties:
+                metal:
+                  type: string
+                  enum: [AU, AG, PT, PD, CU]
+                sku:
+                  type: string
+                qty:
+                  type: integer
+                  minimum: 1
+                unitCost:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+                vaultLocation:
+                  type: string
+      responses:
+        '200':
+          description: Inventory restocked
+        '403':
+          description: Admin access required
+        '501':
+          description: Feature disabled
+
+  /api/vault/redemptions/{id}/approve:
+    post:
+      tags: [Vault]
+      summary: Approve redemption request (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Redemption approved
+        '403':
+          description: Admin access required
+        '404':
+          description: Redemption not found
+        '501':
+          description: Feature disabled
+
+  /api/vault/redemptions/{id}/ship:
+    post:
+      tags: [Vault]
+      summary: Mark redemption as shipped (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [trackingNumber]
+              properties:
+                trackingNumber:
+                  type: string
+                carrier:
+                  type: string
+                expectedDelivery:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Redemption marked as shipped
+        '403':
+          description: Admin access required
+        '404':
+          description: Redemption not found
+        '501':
+          description: Feature disabled
+
+  # Phase-3 Support/Customer Service Endpoints
+  /api/support/user/{id}:
+    get:
+      tags: [Support]
+      summary: Get user profile for support (Support/Teller only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User profile with support details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      profile:
+                        $ref: '#/components/schemas/UserProfile'
+        '403':
+          description: Support or Teller access required
+        '404':
+          description: User not found
+
+  /api/support/user/{id}/reset-password:
+    post:
+      tags: [Support]
+      summary: Reset user password (Support/Teller only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                notifyUser:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          description: Password reset successfully
+        '403':
+          description: Support or Teller access required
+        '404':
+          description: User not found
+
+  /api/support/order/{id}/adjust:
+    post:
+      tags: [Support]
+      summary: Adjust order (Support/Teller only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, reason]
+              properties:
+                action:
+                  type: string
+                  enum: [cancel, refund, modify_status]
+                reason:
+                  type: string
+                newStatus:
+                  type: string
+                refundAmount:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+      responses:
+        '200':
+          description: Order adjusted successfully
+        '403':
+          description: Support or Teller access required
+        '404':
+          description: Order not found
+
+  /api/support/search:
+    get:
+      tags: [Support]
+      summary: Search users (Support/Teller only)
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 3
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [email, name, phone, userId]
+            default: email
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            email:
+                              type: string
+                            firstName:
+                              type: string
+                            lastName:
+                              type: string
+                            kycStatus:
+                              type: string
+                            lastActivity:
+                              type: string
+                              format: date-time
+        '400':
+          description: Invalid search query
+        '403':
+          description: Support or Teller access required
+
+tags:
+  - name: Health
+    description: Service health endpoints
+  - name: Authentication
+    description: User authentication and authorization
+  - name: KYC
+    description: Know Your Customer verification
+  - name: Wallet
+    description: Account and balance management
+  - name: Trading
+    description: Asset trading operations
+  - name: Shop
+    description: Physical precious metals marketplace
+  - name: Admin
+    description: Administrative operations
+  - name: Redemption
+    description: Physical asset redemption and delivery (Phase-3)
+  - name: Vault
+    description: Vault inventory and redemption management (Phase-3)
+  - name: Support
+    description: Customer service and support operations (Phase-3)
+  - name: Transfers
+    description: Internal and external money transfers
+  - name: Crypto
+    description: Cryptocurrency operations and withdrawals
+  - name: Beneficiaries
+    description: Transfer beneficiary management
+  - name: QR
+    description: QR code payment tokens
+  - name: Payment Requests
+    description: Payment request creation and management
+  - name: Recurring
+    description: Recurring transfer rules
+  - name: Card Funding
+    description: Card funding preferences and settings
+  - name: DCA
+    description: Dollar Cost Averaging plans
