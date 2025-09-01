@@ -113,7 +113,7 @@ const Navigation = () => {
         },
         { label: 'FX Trading', description: 'USD, EUR, GBP, AED, LYD, JPY' },
         { label: 'Margin Trading', description: 'Coming Soon' },
-        { label: 'DCA', description: 'Dollar Cost Average Strategies' },
+        { label: 'Dollar-Cost Average Strategies', href: '/trade/dca', description: 'Automate asset purchases' },
         { label: 'Trade Analytics' },
         { label: 'Market Reports' },
         { label: 'News' },

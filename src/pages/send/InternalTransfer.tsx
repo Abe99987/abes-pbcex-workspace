@@ -11,7 +11,8 @@ import { Users, ArrowRight, CheckCircle } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 
 const InternalTransfer = () => {
-  const [recipient, setRecipient] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [recipientId, setRecipientId] = useState('');
   const [asset, setAsset] = useState('');
   const [amount, setAmount] = useState('');
   const [memo, setMemo] = useState('');
@@ -25,7 +26,7 @@ const InternalTransfer = () => {
     { symbol: 'PAXG', name: 'Pax Gold', balance: '1.25' },
   ];
 
-  const isFormValid = recipient.trim() && asset && amount && parseFloat(amount) > 0;
+  const isFormValid = accountNumber.trim() && asset && amount && parseFloat(amount) > 0;
 
   const handleSendNow = () => {
     if (!isFormValid) return;
@@ -34,10 +35,11 @@ const InternalTransfer = () => {
 
   const handleConfirm = () => {
     // Stub: would make API call here
-    console.log('Internal transfer:', { recipient, asset, amount, memo });
+    console.log('Internal transfer:', { accountNumber, recipientId, asset, amount, memo });
     setConfirmationOpen(false);
     // Reset form
-    setRecipient('');
+    setAccountNumber('');
+    setRecipientId('');
     setAsset('');
     setAmount('');
     setMemo('');
@@ -64,19 +66,33 @@ const InternalTransfer = () => {
                     <span>Transfer Details</span>
                   </CardTitle>
                   <CardDescription>
-                    Send instantly to any PBCEx user using their email, phone, or username.
+                    Send instantly to any PBCEx user using their account number.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="recipient">Recipient *</Label>
+                    <Label htmlFor="account-number">Recipient Account Number *</Label>
                     <Input
-                      id="recipient"
-                      placeholder="Email, phone number, or username"
-                      value={recipient}
-                      onChange={(e) => setRecipient(e.target.value)}
-                      aria-label="Recipient email, phone or username"
+                      id="account-number"
+                      placeholder="Enter PBCEx account number"
+                      value={accountNumber}
+                      onChange={(e) => setAccountNumber(e.target.value)}
+                      aria-label="Recipient account number"
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="recipient-id">Recipient Identifier (Optional)</Label>
+                    <Input
+                      id="recipient-id"
+                      placeholder="Email, phone number, or username"
+                      value={recipientId}
+                      onChange={(e) => setRecipientId(e.target.value)}
+                      aria-label="Optional recipient identifier"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Optional secondary identifier to help us look up the account.
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -159,8 +175,12 @@ const InternalTransfer = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center py-2 border-b border-border">
-                    <span className="text-muted-foreground">Recipient</span>
-                    <span className="font-medium">{recipient || 'Not set'}</span>
+                    <span className="text-muted-foreground">Account</span>
+                    <span className="font-medium">{accountNumber || 'Not set'}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-border">
+                    <span className="text-muted-foreground">Identifier</span>
+                    <span className="font-medium">{recipientId || 'Not set'}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-border">
                     <span className="text-muted-foreground">Asset</span>
@@ -206,9 +226,15 @@ const InternalTransfer = () => {
           <div className="space-y-4">
             <div className="p-4 bg-muted rounded-lg space-y-2">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">To:</span>
-                <span className="font-medium">{recipient}</span>
+                <span className="text-muted-foreground">To Account:</span>
+                <span className="font-medium">{accountNumber}</span>
               </div>
+              {recipientId && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Identifier:</span>
+                  <span className="font-medium">{recipientId}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Amount:</span>
                 <span className="font-medium">{amount} {asset}</span>

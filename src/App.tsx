@@ -42,6 +42,7 @@ import CardSpend from "./pages/card/Spend";
 import BillPay from "./pages/pay/BillPay";
 import RequestPayment from "./pages/pay/RequestPayment";
 import RecurringTransfers from "./pages/send/Recurring";
+import DCA from "./pages/trade/DCA";
 import HelpCenter from "./pages/support/HelpCenter";
 import Security from "./pages/support/Security";
 import Compliance from "./pages/support/Compliance";

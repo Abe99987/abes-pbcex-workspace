@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Repeat, Plus, Edit, Trash2, Calendar, Clock, CheckCircle2, Pause } from 'lucide-react';
+import { Repeat, Plus, Edit, Trash2, Calendar, Clock, CheckCircle2, Pause, Users, Mail, Building2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Navigation from '@/components/Navigation';
 
 const RecurringTransfers = () => {
@@ -126,18 +127,72 @@ const RecurringTransfers = () => {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">Recurring Transfers</h1>
             <p className="text-muted-foreground">Automate transfers on a schedule</p>
+            
+            {/* DCA Banner */}
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-blue-900">Looking to auto-buy assets?</h3>
+                  <p className="text-sm text-blue-700">Try Dollar-Cost Averaging for automated asset purchases</p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.location.href = '/trade/dca'}
+                  className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                >
+                  Try DCA
+                </Button>
+              </div>
+            </div>
           </div>
 
-          {/* Create New Rule Button */}
-          <div className="mb-6">
-            <Button onClick={() => setCreateRuleOpen(true)} size="lg">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Recurring Rule
-            </Button>
-          </div>
+          <Tabs defaultValue="outgoing" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="outgoing">Outgoing Transfers</TabsTrigger>
+              <TabsTrigger value="rules">My Rules</TabsTrigger>
+            </TabsList>
 
-          {/* Existing Rules */}
-          <div className="space-y-6">
+            <TabsContent value="outgoing" className="space-y-6 mt-6">
+              {/* Create New Rule Button */}
+              <div className="mb-6">
+                <Button onClick={() => setCreateRuleOpen(true)} size="lg">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Recurring Rule
+                </Button>
+              </div>
+
+              {/* Transfer Types */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setCreateRuleOpen(true)}>
+                  <CardContent className="p-6 text-center">
+                    <Users className="w-8 h-8 mx-auto mb-3 text-primary" />
+                    <h3 className="font-semibold mb-2">To PBCEx User</h3>
+                    <p className="text-sm text-muted-foreground">Account Number + Name + Asset + Amount + Schedule</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="cursor-pointer hover:shadow-md transition-shadow opacity-50">
+                  <CardContent className="p-6 text-center">
+                    <Mail className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
+                    <h3 className="font-semibold mb-2">Payment Link</h3>
+                    <p className="text-sm text-muted-foreground">Generate + schedule sending link emails (Coming Soon)</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="cursor-pointer hover:shadow-md transition-shadow opacity-50">
+                  <CardContent className="p-6 text-center">
+                    <Building2 className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
+                    <h3 className="font-semibold mb-2">Bank/SWIFT</h3>
+                    <p className="text-sm text-muted-foreground">Beneficiary + SWIFT + IBAN + Schedule (Coming Soon)</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="rules" className="space-y-6 mt-6">
+              {/* Existing Rules */}
+              <div className="space-y-6">
             {mockRules.length > 0 ? (
               mockRules.map((rule) => (
                 <Card key={rule.id}>

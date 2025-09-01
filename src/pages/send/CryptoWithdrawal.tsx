@@ -7,12 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Coins, QrCode, Copy, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 
 const CryptoWithdrawal = () => {
-  const [step, setStep] = useState(1);
   const [selectedAsset, setSelectedAsset] = useState('');
   const [selectedNetwork, setSelectedNetwork] = useState('');
   const [address, setAddress] = useState('');
@@ -38,14 +36,7 @@ const CryptoWithdrawal = () => {
   const availableNetworks = selectedAssetData ? networks.filter(n => selectedAssetData.networks.includes(n.id)) : [];
   const selectedNetworkData = networks.find(n => n.id === selectedNetwork);
 
-  const isStep1Valid = selectedAsset;
-  const isStep2Valid = selectedNetwork;
-  const isStep3Valid = address.length > 10; // Basic validation
-  const isStep4Valid = amount && parseFloat(amount) > 0;
-
-  const handleNext = () => {
-    if (step < 4) setStep(step + 1);
-  };
+  const isFormValid = selectedAsset && selectedNetwork && address.length > 10 && amount && parseFloat(amount) > 0;
 
   const handlePaste = async () => {
     try {
@@ -82,51 +73,46 @@ const CryptoWithdrawal = () => {
                     <span>Withdrawal Details</span>
                   </CardTitle>
                   <CardDescription>
-                    Step {step} of 4 - Complete your crypto withdrawal
+                    Complete all fields to withdraw your crypto
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Tabs value={step.toString()} className="w-full">
-                    <TabsList className="grid w-full grid-cols-4">
-                      <TabsTrigger value="1" disabled={step < 1}>Asset</TabsTrigger>
-                      <TabsTrigger value="2" disabled={step < 2}>Network</TabsTrigger>
-                      <TabsTrigger value="3" disabled={step < 3}>Address</TabsTrigger>
-                      <TabsTrigger value="4" disabled={step < 4}>Amount</TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="1" className="space-y-4 mt-6">
-                      <Label>Select Asset</Label>
-                      <div className="space-y-3">
-                        {assets.map((asset) => (
-                          <div
-                            key={asset.symbol}
-                            className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                              selectedAsset === asset.symbol
-                                ? 'border-primary bg-primary/5'
-                                : 'border-border hover:border-primary/50'
-                            }`}
-                            onClick={() => setSelectedAsset(asset.symbol)}
-                          >
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <div className="font-medium">{asset.symbol}</div>
-                                <div className="text-sm text-muted-foreground">{asset.name}</div>
-                              </div>
-                              <div className="text-right">
-                                <div className="font-medium">{asset.balance}</div>
-                                <div className="text-sm text-muted-foreground">Available</div>
-                              </div>
+                <CardContent className="space-y-6">
+                  {/* Asset Selection */}
+                  <div className="space-y-3">
+                    <Label>Select Asset *</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {assets.map((asset) => (
+                        <div
+                          key={asset.symbol}
+                          className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                            selectedAsset === asset.symbol
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border hover:border-primary/50'
+                          }`}
+                          onClick={() => {
+                            setSelectedAsset(asset.symbol);
+                            setSelectedNetwork(''); // Reset network when asset changes
+                          }}
+                        >
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <div className="font-medium">{asset.symbol}</div>
+                              <div className="text-sm text-muted-foreground">{asset.name}</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-medium">{asset.balance}</div>
+                              <div className="text-sm text-muted-foreground">Available</div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                      <Button onClick={handleNext} disabled={!isStep1Valid} className="w-full">
-                        Continue
-                      </Button>
-                    </TabsContent>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-                    <TabsContent value="2" className="space-y-4 mt-6">
-                      <Label>Select Network</Label>
+                  {/* Network Selection */}
+                  {selectedAsset && (
+                    <div className="space-y-3">
+                      <Label>Select Network *</Label>
                       <div className="space-y-3">
                         {availableNetworks.map((network) => (
                           <div
@@ -152,13 +138,13 @@ const CryptoWithdrawal = () => {
                           </div>
                         ))}
                       </div>
-                      <Button onClick={handleNext} disabled={!isStep2Valid} className="w-full">
-                        Continue
-                      </Button>
-                    </TabsContent>
+                    </div>
+                  )}
 
-                    <TabsContent value="3" className="space-y-4 mt-6">
-                      <Label htmlFor="address">Destination Address</Label>
+                  {/* Address Input */}
+                  {selectedNetwork && (
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Destination Address *</Label>
                       <div className="flex space-x-2">
                         <Input
                           id="address"
@@ -175,32 +161,18 @@ const CryptoWithdrawal = () => {
                           <QrCode className="w-4 h-4" />
                         </Button>
                       </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          id="whitelist"
-                          checked={whitelistOnly}
-                          onCheckedChange={setWhitelistOnly}
-                        />
-                        <Label htmlFor="whitelist" className="text-sm">
-                          Only allow whitelisted addresses (Optional)
-                        </Label>
-                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Make sure this is a valid {selectedNetworkData?.name} address. 
+                        {selectedNetwork === 'BTC' && ' Bitcoin addresses start with 1, 3, or bc1.'}
+                        {selectedNetwork === 'ETH' && ' Ethereum addresses start with 0x.'}
+                      </p>
+                    </div>
+                  )}
 
-                      <Alert>
-                        <AlertTriangle className="w-4 h-4" />
-                        <AlertDescription>
-                          Double-check the address. Crypto transactions are irreversible.
-                        </AlertDescription>
-                      </Alert>
-
-                      <Button onClick={handleNext} disabled={!isStep3Valid} className="w-full">
-                        Continue
-                      </Button>
-                    </TabsContent>
-
-                    <TabsContent value="4" className="space-y-4 mt-6">
-                      <Label htmlFor="amount">Amount</Label>
+                  {/* Amount Input */}
+                  {selectedAsset && selectedNetwork && (
+                    <div className="space-y-2">
+                      <Label htmlFor="amount">Amount *</Label>
                       <div className="relative">
                         <Input
                           id="amount"
@@ -225,20 +197,38 @@ const CryptoWithdrawal = () => {
                           MAX
                         </Button>
                       </div>
+                      <p className="text-xs text-muted-foreground">
+                        Network fee will be deducted: {selectedNetworkData?.fee || 'N/A'}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Additional Options */}
+                  {selectedAsset && selectedNetwork && (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="whitelist"
+                          checked={whitelistOnly}
+                          onCheckedChange={setWhitelistOnly}
+                        />
+                        <Label htmlFor="whitelist" className="text-sm">
+                          Only allow whitelisted addresses (Optional)
+                        </Label>
+                      </div>
 
                       <Alert>
                         <AlertTriangle className="w-4 h-4" />
                         <AlertDescription>
-                          Network fee will be deducted from the withdrawal amount. 
-                          Estimated fee: {selectedNetworkData?.fee || 'N/A'}
+                          Double-check the address. Crypto transactions are irreversible.
                         </AlertDescription>
                       </Alert>
+                    </div>
+                  )}
 
-                      <Button onClick={handleWithdraw} disabled={!isStep4Valid} className="w-full" size="lg">
-                        Withdraw {selectedAsset}
-                      </Button>
-                    </TabsContent>
-                  </Tabs>
+                  <Button onClick={handleWithdraw} disabled={!isFormValid} className="w-full" size="lg">
+                    Withdraw {selectedAsset || 'Assets'}
+                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -281,6 +271,12 @@ const CryptoWithdrawal = () => {
                         ETA: {selectedNetworkData?.time || 'Variable'} after confirmation
                       </p>
                     </div>
+                    <Alert>
+                      <AlertTriangle className="w-4 h-4" />
+                      <AlertDescription className="text-xs">
+                        Withdrawals are irreversible. Verify all details before proceeding.
+                      </AlertDescription>
+                    </Alert>
                   </div>
                 </CardContent>
               </Card>
