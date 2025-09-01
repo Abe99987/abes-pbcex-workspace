@@ -1,17 +1,28 @@
 import { Router } from 'express';
 import { authenticate, requireKyc } from '@/middlewares/authMiddleware';
 import { validateBody, validateQuery } from '@/utils/validators';
-import { productQuerySchema, lockQuoteSchema, checkoutSchema } from '@/utils/validators';
+import {
+  productQuerySchema,
+  lockQuoteSchema,
+  checkoutSchema,
+} from '@/utils/validators';
 import { ShopController } from '@/controllers/ShopController';
 import { z } from 'zod';
 
 const router = Router();
 
 /**
+ * GET /api/shop/config
+ * Get commodity configuration with formats, minimums, units, and notices
+ */
+router.get('/config', ShopController.getConfig);
+
+/**
  * GET /api/shop/products
  * List available precious metals products
  */
-router.get('/products',
+router.get(
+  '/products',
   validateQuery(productQuerySchema),
   ShopController.getProducts
 );
@@ -20,15 +31,14 @@ router.get('/products',
  * GET /api/shop/products/:productId
  * Get detailed product information
  */
-router.get('/products/:productId',
-  ShopController.getProduct
-);
+router.get('/products/:productId', ShopController.getProduct);
 
 /**
  * POST /api/shop/lock-quote
  * Lock price quote for 10 minutes
  */
-router.post('/lock-quote',
+router.post(
+  '/lock-quote',
   authenticate,
   requireKyc(['APPROVED']),
   validateBody(lockQuoteSchema),
@@ -39,16 +49,14 @@ router.post('/lock-quote',
  * GET /api/shop/quote/:quoteId
  * Get locked quote details
  */
-router.get('/quote/:quoteId',
-  authenticate,
-  ShopController.getQuote
-);
+router.get('/quote/:quoteId', authenticate, ShopController.getQuote);
 
 /**
  * POST /api/shop/checkout
  * Complete purchase with locked quote
  */
-router.post('/checkout',
+router.post(
+  '/checkout',
   authenticate,
   requireKyc(['APPROVED']),
   validateBody(checkoutSchema),
@@ -59,16 +67,28 @@ router.post('/checkout',
  * GET /api/shop/orders
  * Get user's orders
  */
-router.get('/orders',
+router.get(
+  '/orders',
   authenticate,
-  validateQuery(z.object({
-    status: z.enum([
-      'DRAFT', 'QUOTE_LOCKED', 'PAYMENT_PENDING', 'PAYMENT_CONFIRMED', 
-      'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'
-    ]).optional(),
-    limit: z.coerce.number().min(1).max(100).default(50),
-    offset: z.coerce.number().min(0).default(0),
-  })),
+  validateQuery(
+    z.object({
+      status: z
+        .enum([
+          'DRAFT',
+          'QUOTE_LOCKED',
+          'PAYMENT_PENDING',
+          'PAYMENT_CONFIRMED',
+          'PROCESSING',
+          'SHIPPED',
+          'DELIVERED',
+          'CANCELLED',
+          'REFUNDED',
+        ])
+        .optional(),
+      limit: z.coerce.number().min(1).max(100).default(50),
+      offset: z.coerce.number().min(0).default(0),
+    })
+  ),
   ShopController.getOrders
 );
 
@@ -76,16 +96,14 @@ router.get('/orders',
  * GET /api/shop/orders/:orderId
  * Get detailed order information
  */
-router.get('/orders/:orderId',
-  authenticate,
-  ShopController.getOrder
-);
+router.get('/orders/:orderId', authenticate, ShopController.getOrder);
 
 /**
  * POST /api/shop/orders/:orderId/cancel
  * Cancel an order
  */
-router.post('/orders/:orderId/cancel',
+router.post(
+  '/orders/:orderId/cancel',
   authenticate,
   ShopController.cancelOrder
 );

@@ -115,6 +115,44 @@ components:
           type: string
           format: date-time
 
+    CryptoWithdrawal:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        asset:
+          type: string
+        network:
+          type: string
+        address:
+          type: string
+        amount:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    Beneficiary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+        displayName:
+          type: string
+        details:
+          type: object
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
     PaymentRequest:
       type: object
       properties:
@@ -240,42 +278,6 @@ components:
           type: string
           format: date-time
 
-    Beneficiary:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        type:
-          type: string
-        displayName:
-          type: string
-        details:
-          type: object
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-
-    Transfer:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        type:
-          type: string
-        amount:
-          type: string
-        asset:
-          type: string
-        status:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-
   responses:
     ValidationError:
       description: Validation error
@@ -323,6 +325,883 @@ tags:
     description: User authentication and authorization
 
 paths:
+  # Money Movement Endpoints
+
+  # Transfers
+  /api/transfers/internal:
+    post:
+      tags: [Transfers]
+      operationId: createInternalTransfer
+      summary: Create internal transfer between accounts
+      description: Transfer funds between internal accounts (requires authentication)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [toInternalAccountNumber, asset, amount]
+              properties:
+                toInternalAccountNumber:
+                  type: string
+                  description: Destination internal account number
+                asset:
+                  type: string
+                  enum: [AU, AG, PT, PD, CU, USD, USDC]
+                  description: Asset to transfer
+                amount:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+                  description: Amount to transfer
+                memo:
+                  type: string
+                  description: Optional transfer memo
+      responses:
+        '201':
+          description: Internal transfer created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    type: object
+                    properties:
+                      transfer:
+                        $ref: '#/components/schemas/InternalTransfer'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Feature disabled or insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: MONEY_MOVEMENT_ENABLED
+
+  /api/transfers/internal/{id}:
+    get:
+      tags: [Transfers]
+      operationId: getInternalTransferStatus
+      summary: Get internal transfer status
+      description: Retrieve the status of an internal transfer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Transfer ID
+      responses:
+        '200':
+          description: Transfer status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    $ref: '#/components/schemas/InternalTransfer'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Transfer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: MONEY_MOVEMENT_ENABLED
+
+  /api/transfers/bank:
+    post:
+      tags: [Transfers]
+      operationId: createBankTransfer
+      summary: Create bank transfer
+      description: Initiate a bank transfer to external beneficiary
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [beneficiaryId, amount, currency]
+              properties:
+                beneficiaryId:
+                  type: string
+                  format: uuid
+                  description: ID of the bank beneficiary
+                amount:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+                  description: Transfer amount
+                currency:
+                  type: string
+                  enum: [USD, EUR, GBP, CAD, AUD]
+                  description: Transfer currency
+      responses:
+        '201':
+          description: Bank transfer created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    $ref: '#/components/schemas/BankTransfer'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: MONEY_MOVEMENT_ENABLED
+
+  /api/transfers/bank/{id}:
+    get:
+      tags: [Transfers]
+      operationId: getBankTransferStatus
+      summary: Get bank transfer status
+      description: Retrieve the status of a bank transfer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Transfer ID
+      responses:
+        '200':
+          description: Transfer status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    $ref: '#/components/schemas/BankTransfer'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Transfer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: MONEY_MOVEMENT_ENABLED
+
+  /api/transfers/bank/estimate-fees:
+    post:
+      tags: [Transfers]
+      operationId: estimateBankFees
+      summary: Estimate bank transfer fees
+      description: Get fee estimate for bank transfer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, currency]
+              properties:
+                amount:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+                  description: Transfer amount
+                currency:
+                  type: string
+                  enum: [USD, EUR, GBP, CAD, AUD]
+                  description: Transfer currency
+      responses:
+        '200':
+          description: Fee estimate retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    type: object
+                    properties:
+                      estimate:
+                        type: object
+                        properties:
+                          fee:
+                            type: string
+                            description: Estimated fee amount
+                          currency:
+                            type: string
+                            description: Fee currency
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: MONEY_MOVEMENT_ENABLED
+
+  /api/transfers/history:
+    get:
+      tags: [Transfers]
+      operationId: getTransferHistory
+      summary: Get transfer history
+      description: Retrieve transfer history with pagination and filters
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          description: Number of records to return
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of records to skip
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [internal, bank, all]
+            default: all
+          description: Transfer type filter
+      responses:
+        '200':
+          description: Transfer history retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    type: object
+                    properties:
+                      transfers:
+                        type: array
+                        items:
+                          oneOf:
+                            - $ref: '#/components/schemas/InternalTransfer'
+                            - $ref: '#/components/schemas/BankTransfer'
+                      total:
+                        type: integer
+                        description: Total number of transfers
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: MONEY_MOVEMENT_ENABLED
+
+  # Crypto
+  /api/crypto/networks:
+    get:
+      tags: [Crypto]
+      operationId: getSupportedNetworks
+      summary: Get supported cryptocurrency networks
+      description: Retrieve list of supported blockchain networks
+      security: []
+      responses:
+        '200':
+          description: Networks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        symbol:
+                          type: string
+                        isActive:
+                          type: boolean
+        '501':
+          description: Feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: CRYPTO_ENABLED
+
+  /api/crypto/assets:
+    get:
+      tags: [Crypto]
+      operationId: getSupportedAssets
+      summary: Get supported cryptocurrency assets
+      description: Retrieve list of supported cryptocurrency assets
+      security: []
+      responses:
+        '200':
+          description: Assets retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        symbol:
+                          type: string
+                        name:
+                          type: string
+                        networks:
+                          type: array
+                          items:
+                            type: string
+                        isActive:
+                          type: boolean
+        '501':
+          description: Feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: CRYPTO_ENABLED
+
+  /api/crypto/withdrawals:
+    post:
+      tags: [Crypto]
+      operationId: createCryptoWithdrawal
+      summary: Create cryptocurrency withdrawal
+      description: Initiate a cryptocurrency withdrawal
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [asset, network, address, amount]
+              properties:
+                asset:
+                  type: string
+                  enum: [BTC, ETH, USDC, USDT]
+                  description: Cryptocurrency to withdraw
+                network:
+                  type: string
+                  description: Network to use for withdrawal
+                address:
+                  type: string
+                  description: Destination address
+                amount:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+                  description: Amount to withdraw
+      responses:
+        '201':
+          description: Crypto withdrawal created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    type: object
+                    properties:
+                      withdrawal:
+                        $ref: '#/components/schemas/CryptoWithdrawal'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: CRYPTO_ENABLED
+
+  /api/crypto/withdrawals/{id}:
+    get:
+      tags: [Crypto]
+      operationId: getCryptoWithdrawalStatus
+      summary: Get cryptocurrency withdrawal status
+      description: Retrieve the status and details of a cryptocurrency withdrawal
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Withdrawal ID
+      responses:
+        '200':
+          description: Withdrawal details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    type: object
+                    properties:
+                      withdrawal:
+                        $ref: '#/components/schemas/CryptoWithdrawal'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Withdrawal not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: CRYPTO_ENABLED
+
+  /api/crypto/withdrawals/{id}/cancel:
+    post:
+      tags: [Crypto]
+      operationId: cancelCryptoWithdrawal
+      summary: Cancel cryptocurrency withdrawal
+      description: Cancel a pending cryptocurrency withdrawal
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Withdrawal ID
+      responses:
+        '200':
+          description: Withdrawal cancelled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    type: object
+                    properties:
+                      withdrawal:
+                        $ref: '#/components/schemas/CryptoWithdrawal'
+        '400':
+          description: Withdrawal cannot be cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Withdrawal not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: CRYPTO_ENABLED
+
+  /api/crypto/withdrawals/estimate-fee:
+    post:
+      tags: [Crypto]
+      operationId: estimateCryptoFee
+      summary: Estimate cryptocurrency withdrawal fee
+      description: Get fee estimate for cryptocurrency withdrawal
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [asset, network, amount]
+              properties:
+                asset:
+                  type: string
+                  enum: [BTC, ETH, USDC, USDT]
+                  description: Cryptocurrency asset
+                network:
+                  type: string
+                  enum: [bitcoin, ethereum, polygon, arbitrum]
+                  description: Blockchain network
+                amount:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+                  description: Withdrawal amount
+      responses:
+        '200':
+          description: Fee estimate retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    type: object
+                    properties:
+                      estimate:
+                        type: object
+                        properties:
+                          fee:
+                            type: string
+                            description: Estimated fee amount
+                          asset:
+                            type: string
+                            description: Fee asset
+                          network:
+                            type: string
+                            description: Network used for estimate
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: CRYPTO_ENABLED
+
+  # Beneficiaries
+  /api/beneficiaries:
+    post:
+      tags: [Beneficiaries]
+      operationId: createBeneficiary
+      summary: Create beneficiary
+      description: Create a new beneficiary for transfers
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, displayName, details]
+              properties:
+                type:
+                  type: string
+                  enum: [internal_user, bank_swift, email_link]
+                  description: Type of beneficiary
+                displayName:
+                  type: string
+                  description: Display name for the beneficiary
+                details:
+                  type: object
+                  description: Beneficiary-specific details
+      responses:
+        '201':
+          description: Beneficiary created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    $ref: '#/components/schemas/Beneficiary'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: MONEY_MOVEMENT_ENABLED
+
+    get:
+      tags: [Beneficiaries]
+      operationId: getBeneficiaries
+      summary: Get beneficiaries
+      description: Retrieve list of user's beneficiaries
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Beneficiaries retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Beneficiary'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: MONEY_MOVEMENT_ENABLED
+
+  /api/beneficiaries/{id}:
+    get:
+      tags: [Beneficiaries]
+      operationId: getBeneficiary
+      summary: Get beneficiary
+      description: Retrieve a specific beneficiary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Beneficiary ID
+      responses:
+        '200':
+          description: Beneficiary retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    $ref: '#/components/schemas/Beneficiary'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Beneficiary not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: MONEY_MOVEMENT_ENABLED
+
+    put:
+      tags: [Beneficiaries]
+      operationId: updateBeneficiary
+      summary: Update beneficiary
+      description: Update an existing beneficiary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Beneficiary ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                  description: New display name
+                details:
+                  type: object
+                  description: Updated beneficiary details
+                isActive:
+                  type: boolean
+                  description: Whether beneficiary is active
+      responses:
+        '200':
+          description: Beneficiary updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    $ref: '#/components/schemas/Beneficiary'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Beneficiary not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: MONEY_MOVEMENT_ENABLED
+
+    delete:
+      tags: [Beneficiaries]
+      operationId: deleteBeneficiary
+      summary: Delete beneficiary
+      description: Remove a beneficiary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Beneficiary ID
+      responses:
+        '200':
+          description: Beneficiary deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: 'SUCCESS'
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: 'Beneficiary deleted successfully'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Beneficiary not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-feature-flag: MONEY_MOVEMENT_ENABLED
+
   # Health endpoint
   /health:
     get:

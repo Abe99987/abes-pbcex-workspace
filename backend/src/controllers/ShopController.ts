@@ -7,6 +7,9 @@ import { BalanceUtils } from '@/models/Balance';
 import { ORDER_STATUS, PRODUCT_CATEGORIES } from '@/utils/constants';
 import { AuthController } from './AuthController';
 import { WalletController } from './WalletController';
+import { CommodityConfigService } from '@/services/CommodityConfigService';
+import { QuotesService } from '@/services/QuotesService';
+import { cache } from '@/cache/redis';
 
 /**
  * Shop Controller for PBCEx
@@ -23,12 +26,13 @@ const products = [
     metal: 'AU',
     weight: '1.0000',
     purity: '0.9167',
-    basePrice: 2100.00,
-    premium: 75.00,
+    basePrice: 2100.0,
+    premium: 75.0,
     inStock: true,
     stockQuantity: 150,
     image: '/images/products/gold-eagle-1oz.jpg',
-    description: '1 oz American Gold Eagle coin. Legal tender backed by the U.S. government.',
+    description:
+      '1 oz American Gold Eagle coin. Legal tender backed by the U.S. government.',
     specifications: {
       diameter: '32.7mm',
       thickness: '2.87mm',
@@ -44,8 +48,8 @@ const products = [
     metal: 'AU',
     weight: '1.0000',
     purity: '0.9999',
-    basePrice: 2100.00,
-    premium: 65.00,
+    basePrice: 2100.0,
+    premium: 65.0,
     inStock: true,
     stockQuantity: 200,
     image: '/images/products/gold-maple-1oz.jpg',
@@ -59,12 +63,13 @@ const products = [
     metal: 'AU',
     weight: '1.0000',
     purity: '0.9999',
-    basePrice: 2100.00,
-    premium: 35.00,
+    basePrice: 2100.0,
+    premium: 35.0,
     inStock: true,
     stockQuantity: 300,
     image: '/images/products/gold-bar-1oz.jpg',
-    description: '1 oz Gold Bar. Various refiners including PAMP Suisse, Valcambi.',
+    description:
+      '1 oz Gold Bar. Various refiners including PAMP Suisse, Valcambi.',
     provider: 'DILLON_GAGE',
   },
 
@@ -76,12 +81,13 @@ const products = [
     metal: 'AG',
     weight: '1.0000',
     purity: '0.999',
-    basePrice: 25.50,
-    premium: 6.00,
+    basePrice: 25.5,
+    premium: 6.0,
     inStock: true,
     stockQuantity: 1000,
     image: '/images/products/silver-eagle-1oz.jpg',
-    description: '1 oz American Silver Eagle coin. Official silver bullion coin of the United States.',
+    description:
+      '1 oz American Silver Eagle coin. Official silver bullion coin of the United States.',
     provider: 'JM_BULLION',
   },
   {
@@ -91,8 +97,8 @@ const products = [
     metal: 'AG',
     weight: '10.0000',
     purity: '0.999',
-    basePrice: 25.50,
-    premium: 1.50,
+    basePrice: 25.5,
+    premium: 1.5,
     inStock: true,
     stockQuantity: 500,
     image: '/images/products/silver-bar-10oz.jpg',
@@ -108,12 +114,13 @@ const products = [
     metal: 'PT',
     weight: '1.0000',
     purity: '0.9995',
-    basePrice: 980.00,
-    premium: 120.00,
+    basePrice: 980.0,
+    premium: 120.0,
     inStock: true,
     stockQuantity: 50,
     image: '/images/products/platinum-eagle-1oz.jpg',
-    description: '1 oz American Platinum Eagle coin. Official platinum bullion coin.',
+    description:
+      '1 oz American Platinum Eagle coin. Official platinum bullion coin.',
     provider: 'JM_BULLION',
   },
 
@@ -125,8 +132,8 @@ const products = [
     metal: 'PD',
     weight: '1.0000',
     purity: '0.9995',
-    basePrice: 1150.00,
-    premium: 80.00,
+    basePrice: 1150.0,
+    premium: 80.0,
     inStock: true,
     stockQuantity: 25,
     image: '/images/products/palladium-bar-1oz.jpg',
@@ -142,8 +149,8 @@ const products = [
     metal: 'CU',
     weight: '1.0000',
     purity: '0.999',
-    basePrice: 4.50,
-    premium: 1.50,
+    basePrice: 4.5,
+    premium: 1.5,
     inStock: true,
     stockQuantity: 2000,
     image: '/images/products/copper-bar-1lb.jpg',
@@ -157,18 +164,87 @@ const orders: Order[] = [];
 
 export class ShopController {
   /**
+   * GET /api/shop/config
+   * Get commodity configuration with formats, minimums, units, and notices
+   */
+  static getConfig = asyncHandler(async (req: Request, res: Response) => {
+    logInfo('Shop config requested');
+
+    const cacheKey = 'shop_config_response';
+    const cacheTTL = 120; // 2 minutes
+
+    try {
+      // Try to get cached response first
+      const cachedResponse = await cache.getJson(cacheKey);
+      if (cachedResponse) {
+        logInfo('Returning cached shop config');
+        // Set cache headers for client-side caching
+        res.set('Cache-Control', 'public, max-age=60'); // 1 minute client cache
+        res.json(cachedResponse);
+        return;
+      }
+
+      const configs = await CommodityConfigService.getEnabledConfigs();
+
+      const configData = await Promise.all(
+        configs.map(async config => {
+          const availableFormats =
+            await CommodityConfigService.getAvailableFormats(config.symbol);
+
+          return {
+            symbol: config.symbol,
+            displayName: config.displayName,
+            unitLabel: config.unitLabel,
+            step: config.step,
+            minOrder: config.minOrder,
+            formats: availableFormats.map(format => ({
+              key: format.key,
+              label: format.label,
+              description: format.description,
+              minOrder: format.minOverride || config.minOrder,
+              step: format.step || config.step,
+              requiresLicense: format.requiresLicense || false,
+            })),
+            logisticsNotices: config.logisticsNotices || [],
+            requiresLicense: config.requiresLicense,
+            enabled: config.enabled,
+          };
+        })
+      );
+
+      const responseData = {
+        code: 'SUCCESS',
+        data: {
+          assets: configData,
+          lastUpdated: new Date().toISOString(),
+        },
+      };
+
+      // Cache the response
+      await cache.setJson(cacheKey, responseData, cacheTTL);
+
+      // Set cache headers for client-side caching
+      res.set('Cache-Control', 'public, max-age=60'); // 1 minute client cache
+      res.json(responseData);
+    } catch (error) {
+      logError('Failed to get shop config', error as Error);
+      throw createError.internal('Configuration temporarily unavailable');
+    }
+  });
+
+  /**
    * GET /api/shop/products
    * List available precious metals products
    */
   static getProducts = asyncHandler(async (req: Request, res: Response) => {
-    const { 
-      metal, 
-      category, 
-      minPrice, 
-      maxPrice, 
-      limit = 20, 
+    const {
+      metal,
+      category,
+      minPrice,
+      maxPrice,
+      limit = 20,
       offset = 0,
-      inStockOnly = true 
+      inStockOnly = true,
     } = req.query;
 
     let filteredProducts = [...products];
@@ -184,16 +260,22 @@ export class ShopController {
 
     if (minPrice) {
       const min = parseFloat(minPrice as string);
-      filteredProducts = filteredProducts.filter(p => (p.basePrice + p.premium) >= min);
+      filteredProducts = filteredProducts.filter(
+        p => p.basePrice + p.premium >= min
+      );
     }
 
     if (maxPrice) {
       const max = parseFloat(maxPrice as string);
-      filteredProducts = filteredProducts.filter(p => (p.basePrice + p.premium) <= max);
+      filteredProducts = filteredProducts.filter(
+        p => p.basePrice + p.premium <= max
+      );
     }
 
     if (inStockOnly === true || inStockOnly === 'true') {
-      filteredProducts = filteredProducts.filter(p => p.inStock && p.stockQuantity > 0);
+      filteredProducts = filteredProducts.filter(
+        p => p.inStock && p.stockQuantity > 0
+      );
     }
 
     // Paginate
@@ -203,9 +285,10 @@ export class ShopController {
 
     // Format response with current pricing
     const productsWithPricing = await Promise.all(
-      paginatedProducts.map(async (product) => {
-        const currentPrice = await ShopController.getCurrentProductPrice(product);
-        
+      paginatedProducts.map(async product => {
+        const currentPrice =
+          await ShopController.getCurrentProductPrice(product);
+
         return {
           id: product.id,
           name: product.name,
@@ -222,7 +305,9 @@ export class ShopController {
           description: product.description,
           specifications: product.specifications || {},
           provider: product.provider,
-          estimatedShipping: ShopController.getEstimatedShipping(product.provider),
+          estimatedShipping: ShopController.getEstimatedShipping(
+            product.provider
+          ),
         };
       })
     );
@@ -262,7 +347,9 @@ export class ShopController {
         product: {
           ...product,
           unitPrice: currentPrice.toFixed(2),
-          estimatedShipping: ShopController.getEstimatedShipping(product.provider),
+          estimatedShipping: ShopController.getEstimatedShipping(
+            product.provider
+          ),
           shippingCost: ShopController.calculateShippingCost(product, 1),
         },
       },
@@ -295,7 +382,10 @@ export class ShopController {
     // Get current price and calculate total
     const currentPrice = await ShopController.getCurrentProductPrice(product);
     const subtotal = currentPrice * quantity;
-    const shippingCost = ShopController.calculateShippingCost(product, quantity);
+    const shippingCost = ShopController.calculateShippingCost(
+      product,
+      quantity
+    );
     const totalPrice = subtotal + shippingCost;
 
     // Create locked quote
@@ -321,16 +411,19 @@ export class ShopController {
     lockedQuotes.set(quoteId, quote);
 
     // Auto-expire quote after 10 minutes
-    setTimeout(() => {
-      lockedQuotes.delete(quoteId);
-      logInfo('Quote expired', { quoteId, userId });
-    }, 10 * 60 * 1000);
+    setTimeout(
+      () => {
+        lockedQuotes.delete(quoteId);
+        logInfo('Quote expired', { quoteId, userId });
+      },
+      10 * 60 * 1000
+    );
 
-    logInfo('Quote locked successfully', { 
-      quoteId, 
-      userId, 
-      productId, 
-      totalPrice: quote.totalPrice 
+    logInfo('Quote locked successfully', {
+      quoteId,
+      userId,
+      productId,
+      totalPrice: quote.totalPrice,
     });
 
     res.status(201).json({
@@ -361,7 +454,10 @@ export class ShopController {
     }
 
     const now = new Date();
-    const timeRemaining = Math.max(0, Math.floor((quote.expiresAt.getTime() - now.getTime()) / 1000));
+    const timeRemaining = Math.max(
+      0,
+      Math.floor((quote.expiresAt.getTime() - now.getTime()) / 1000)
+    );
 
     if (timeRemaining === 0) {
       lockedQuotes.delete(quoteId);
@@ -383,12 +479,12 @@ export class ShopController {
    * Complete purchase with locked quote
    */
   static checkout = asyncHandler(async (req: Request, res: Response) => {
-    const { 
-      quoteId, 
-      paymentMethod, 
-      shippingAddress, 
+    const {
+      quoteId,
+      paymentMethod,
+      shippingAddress,
       billingAddress,
-      specialInstructions 
+      specialInstructions,
     } = req.body;
     const userId = req.user!.id;
 
@@ -436,7 +532,9 @@ export class ShopController {
       billingAddress,
       shipping: {
         carrier: 'FEDEX',
-        service: ShopController.getShippingService(parseFloat(quote.totalPrice)),
+        service: ShopController.getShippingService(
+          parseFloat(quote.totalPrice)
+        ),
         cost: quote.shippingCost,
       },
       specialInstructions,
@@ -469,9 +567,9 @@ export class ShopController {
       // Initiate fulfillment process
       await ShopController.initiateFulfillment(order);
 
-      logInfo('Order created successfully', { 
-        orderId, 
-        userId, 
+      logInfo('Order created successfully', {
+        orderId,
+        userId,
         productId: quote.productId,
         totalPrice: quote.totalPrice,
         paymentMethod,
@@ -492,7 +590,6 @@ export class ShopController {
           },
         },
       });
-
     } catch (error) {
       // Restore inventory on failure
       product.stockQuantity += quote.quantity;
@@ -586,7 +683,9 @@ export class ShopController {
     }
 
     if (!OrderUtils.canCancel(order)) {
-      throw createError.validation('Order cannot be cancelled in current status');
+      throw createError.validation(
+        'Order cannot be cancelled in current status'
+      );
     }
 
     // Process refund if payment was made
@@ -630,31 +729,33 @@ export class ShopController {
 
   private static getEstimatedShipping(provider: string): string {
     const shippingTimes: Record<string, string> = {
-      'JM_BULLION': '3-5 business days',
-      'DILLON_GAGE': '2-4 business days',
+      JM_BULLION: '3-5 business days',
+      DILLON_GAGE: '2-4 business days',
     };
     return shippingTimes[provider] || '3-5 business days';
   }
 
   private static calculateShippingCost(product: any, quantity: number): number {
     const orderValue = (product.basePrice + product.premium) * quantity;
-    
+
     // Free shipping over $1500
     if (orderValue >= 1500) return 0;
-    
+
     // Flat rate shipping by metal
     const shippingRates: Record<string, number> = {
-      'AU': 25, // Gold - secure shipping
-      'AG': 15, // Silver - standard
-      'PT': 25, // Platinum - secure
-      'PD': 25, // Palladium - secure  
-      'CU': 10, // Copper - standard
+      AU: 25, // Gold - secure shipping
+      AG: 15, // Silver - standard
+      PT: 25, // Platinum - secure
+      PD: 25, // Palladium - secure
+      CU: 10, // Copper - standard
     };
 
     return shippingRates[product.metal] || 15;
   }
 
-  private static getShippingService(orderValue: number): 'STANDARD' | 'EXPEDITED' | 'OVERNIGHT' {
+  private static getShippingService(
+    orderValue: number
+  ): 'STANDARD' | 'EXPEDITED' | 'OVERNIGHT' {
     if (orderValue >= 5000) return 'OVERNIGHT';
     if (orderValue >= 1500) return 'EXPEDITED';
     return 'STANDARD';
@@ -662,24 +763,32 @@ export class ShopController {
 
   private static calculateEstimatedDelivery(order: Order): Date {
     const now = new Date();
-    const businessDays = order.shipping.service === 'OVERNIGHT' ? 1 : 
-                        order.shipping.service === 'EXPEDITED' ? 2 : 5;
-    
+    const businessDays =
+      order.shipping.service === 'OVERNIGHT'
+        ? 1
+        : order.shipping.service === 'EXPEDITED'
+          ? 2
+          : 5;
+
     // Add business days (skip weekends)
     const delivery = new Date(now);
     let daysAdded = 0;
-    
+
     while (daysAdded < businessDays) {
       delivery.setDate(delivery.getDate() + 1);
-      if (delivery.getDay() !== 0 && delivery.getDay() !== 6) { // Not Sunday (0) or Saturday (6)
+      if (delivery.getDay() !== 0 && delivery.getDay() !== 6) {
+        // Not Sunday (0) or Saturday (6)
         daysAdded++;
       }
     }
-    
+
     return delivery;
   }
 
-  private static async validateSufficientBalance(userId: string, totalPrice: string): Promise<void> {
+  private static async validateSufficientBalance(
+    userId: string,
+    totalPrice: string
+  ): Promise<void> {
     const userBalances = WalletController.getUserBalances(userId);
     const fundingBalances = userBalances.filter(b => {
       const userAccounts = AuthController.getUserAccounts(userId);
@@ -691,51 +800,64 @@ export class ShopController {
     const usdBalance = fundingBalances.find(b => b.asset === 'USD');
     const usdcBalance = fundingBalances.find(b => b.asset === 'USDC');
 
-    const totalFiatBalance = parseFloat(usdBalance?.amount || '0') + 
-                           parseFloat(usdcBalance?.amount || '0');
+    const totalFiatBalance =
+      parseFloat(usdBalance?.amount || '0') +
+      parseFloat(usdcBalance?.amount || '0');
 
     if (totalFiatBalance < parseFloat(totalPrice)) {
-      throw createError.validation('Insufficient USD/USDC balance for purchase');
+      throw createError.validation(
+        'Insufficient USD/USDC balance for purchase'
+      );
     }
   }
 
-  private static async processBalancePayment(userId: string, quote: any, order: Order): Promise<void> {
+  private static async processBalancePayment(
+    userId: string,
+    quote: any,
+    order: Order
+  ): Promise<void> {
     // Debit user's USD balance
     const userAccounts = AuthController.getUserAccounts(userId);
     const fundingAccount = userAccounts.find(a => a.type === 'FUNDING');
-    
+
     if (!fundingAccount) {
       throw createError.internal('Funding account not found');
     }
 
     const userBalances = WalletController.getUserBalances(userId);
-    const usdBalance = userBalances.find(b => 
-      b.accountId === fundingAccount.id && b.asset === 'USD'
+    const usdBalance = userBalances.find(
+      b => b.accountId === fundingAccount.id && b.asset === 'USD'
     );
 
     if (usdBalance) {
-      const newBalance = BalanceUtils.subtract(usdBalance.amount, quote.totalPrice);
+      const newBalance = BalanceUtils.subtract(
+        usdBalance.amount,
+        quote.totalPrice
+      );
       usdBalance.amount = newBalance;
       usdBalance.lastUpdated = new Date();
     }
 
-    logInfo('Balance payment processed', { 
-      userId, 
-      orderId: order.id, 
-      amount: quote.totalPrice 
+    logInfo('Balance payment processed', {
+      userId,
+      orderId: order.id,
+      amount: quote.totalPrice,
     });
   }
 
-  private static async processRefund(userId: string, order: Order): Promise<void> {
+  private static async processRefund(
+    userId: string,
+    order: Order
+  ): Promise<void> {
     // Credit user's USD balance
     const userAccounts = AuthController.getUserAccounts(userId);
     const fundingAccount = userAccounts.find(a => a.type === 'FUNDING');
-    
+
     if (!fundingAccount) return;
 
     const userBalances = WalletController.getUserBalances(userId);
-    const usdBalance = userBalances.find(b => 
-      b.accountId === fundingAccount.id && b.asset === 'USD'
+    const usdBalance = userBalances.find(
+      b => b.accountId === fundingAccount.id && b.asset === 'USD'
     );
 
     if (usdBalance) {
@@ -744,40 +866,41 @@ export class ShopController {
       usdBalance.lastUpdated = new Date();
     }
 
-    logInfo('Refund processed', { 
-      userId, 
-      orderId: order.id, 
-      amount: order.totalPrice 
+    logInfo('Refund processed', {
+      userId,
+      orderId: order.id,
+      amount: order.totalPrice,
     });
   }
 
   private static async initiateFulfillment(order: Order): Promise<void> {
     // Simulate fulfillment provider API call
     const providerId = `${order.fulfillmentProvider}_${order.id.slice(-8)}`;
-    
+
     // Create shipping label
     const trackingNumber = await ShopController.createShippingLabel(order);
     order.shipping.trackingNumber = trackingNumber;
-    order.shipping.estimatedDelivery = ShopController.calculateEstimatedDelivery(order);
+    order.shipping.estimatedDelivery =
+      ShopController.calculateEstimatedDelivery(order);
 
     // Update order status
     order.status = ORDER_STATUS.PROCESSING;
     order.providerOrderId = providerId;
     order.updatedAt = new Date();
 
-    logInfo('Fulfillment initiated', { 
-      orderId: order.id, 
-      providerId, 
-      trackingNumber 
+    logInfo('Fulfillment initiated', {
+      orderId: order.id,
+      providerId,
+      trackingNumber,
     });
   }
 
   private static async createShippingLabel(order: Order): Promise<string> {
     // Simulate FedEx API call
     const trackingNumber = `1Z${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-    
-    logInfo('Shipping label created', { 
-      orderId: order.id, 
+
+    logInfo('Shipping label created', {
+      orderId: order.id,
       trackingNumber,
       service: order.shipping.service,
     });
@@ -788,31 +911,36 @@ export class ShopController {
   // Utility methods for testing and admin
   static getAllProducts = () => products;
   static getAllOrders = (): Order[] => orders;
-  static getUserOrders = (userId: string): Order[] => 
+  static getUserOrders = (userId: string): Order[] =>
     orders.filter(o => o.userId === userId);
-  static getOrderById = (id: string): Order | undefined => 
+  static getOrderById = (id: string): Order | undefined =>
     orders.find(o => o.id === id);
   static getLockedQuotes = (): Map<string, any> => lockedQuotes;
-  
+
   // Shop statistics
   static getShopStatistics = () => {
     const totalOrders = orders.length;
     const totalRevenue = orders
       .filter(o => o.status !== ORDER_STATUS.CANCELLED)
       .reduce((sum, o) => sum + parseFloat(o.totalPrice), 0);
-    
-    const ordersByMetal = orders.reduce((acc, order) => {
-      acc[order.metal] = (acc[order.metal] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+
+    const ordersByMetal = orders.reduce(
+      (acc, order) => {
+        acc[order.metal] = (acc[order.metal] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     return {
       totalProducts: products.length,
       totalOrders,
       totalRevenue: totalRevenue.toFixed(2),
-      averageOrderValue: totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : '0',
+      averageOrderValue:
+        totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : '0',
       ordersByMetal,
-      inStockProducts: products.filter(p => p.inStock && p.stockQuantity > 0).length,
+      inStockProducts: products.filter(p => p.inStock && p.stockQuantity > 0)
+        .length,
     };
   };
 }
