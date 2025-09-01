@@ -1,6 +1,7 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { createError, asyncHandler } from '@/middlewares/errorMiddleware';
+import { AuthenticatedRequest } from '@/middlewares/auth';
 import { logInfo, logError } from '@/utils/logger';
 import { ValidationService } from '@/services/ValidationService';
 import { CommodityConfigService } from '@/services/CommodityConfigService';
@@ -45,7 +46,7 @@ export class OrdersController {
    * Place physical commodity order
    */
   static createPhysicalOrder = asyncHandler(
-    async (req: Request, res: Response) => {
+    async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.user?.id;
       if (!userId) {
         throw createError.authentication('User authentication required');
@@ -221,7 +222,7 @@ export class OrdersController {
    * Process sell/convert operation
    */
   static createSellConvertOrder = asyncHandler(
-    async (req: Request, res: Response) => {
+    async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.user?.id;
       if (!userId) {
         throw createError.authentication('User authentication required');

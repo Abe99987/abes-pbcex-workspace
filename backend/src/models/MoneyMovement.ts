@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import crypto from 'crypto';
 
 /**
  * Money Movement Data Models
@@ -313,8 +314,11 @@ export class MoneyMovementUtils {
   }
 
   static hashForCorrelation(data: string): string {
-    // Simple hash for correlation - in production, use proper crypto hash
-    return Buffer.from(data).toString('base64').slice(0, 16);
+    // Use HMAC-SHA256 for secure correlation hashing
+    const secret =
+      process.env.CORRELATION_SECRET || 'default-secret-change-in-production';
+    const hash = crypto.createHmac('sha256', secret).update(data).digest('hex');
+    return hash.slice(0, 16); // Return first 16 chars for correlation ID
   }
 
   static validateAmount(amount: string, asset: string): boolean {

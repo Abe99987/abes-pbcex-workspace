@@ -115,10 +115,12 @@ async function incrementRequestCount(
   windowMs: number
 ): Promise<void> {
   try {
-    // Note: cache doesn't support multi operations, so we'll use a simpler approach
-    const currentCount = await cache.get(key);
-    const newCount = (currentCount ? parseInt(currentCount) : 0) + 1;
-    await cache.set(key, newCount.toString(), Math.ceil(windowMs / 1000));
+    // Use atomic increment for thread-safe counting
+    const newCount = await cache.increment(key);
+    if (newCount === 1) {
+      // First request, set TTL
+      await cache.expire(key, Math.ceil(windowMs / 1000));
+    }
   } catch (error) {
     logError('Error incrementing rate limit count', error as Error);
   }

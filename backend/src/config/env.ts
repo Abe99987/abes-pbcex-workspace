@@ -303,7 +303,10 @@ function validateEnv(): EnvConfig {
 }
 
 // Export validated configuration
-export const env = validateEnv();
+export const env =
+  process.env.SKIP_ENV_VALIDATION === 'true'
+    ? (process.env as any as EnvConfig)
+    : validateEnv();
 
 /**
  * Check if required integrations are configured
@@ -333,7 +336,7 @@ export const integrations = {
   intercom: !!env.INTERCOM_ACCESS_TOKEN,
   datadog: !!env.DATADOG_API_KEY,
   vanta: !!env.VANTA_API_KEY,
-  tradingView: !!env.TRADINGVIEW_API_KEY,
+  tradingView: env.INTEGRATION_TRADINGVIEW && !!env.TRADINGVIEW_API_KEY,
 } as const;
 
 // Log integration status in development
