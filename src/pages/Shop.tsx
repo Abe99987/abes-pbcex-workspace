@@ -31,7 +31,7 @@ import {
   Home,
 } from 'lucide-react';
 import BuyAssetModal from '@/components/BuyAssetModal';
-import RealizeAssetModal from '@/components/RealizeAssetModal';
+import SellAssetModal from '@/components/SellAssetModal';
 import BuyPhysicalModal from '@/components/BuyPhysicalModal';
 import BorrowingModal from '@/components/BorrowingModal';
 import CryptoDepositModal from '@/components/modals/CryptoDepositModal';
@@ -52,7 +52,7 @@ interface Asset {
 
 const Shop = () => {
   const [buyModalOpen, setBuyModalOpen] = useState(false);
-  const [realizeModalOpen, setRealizeModalOpen] = useState(false);
+  const [sellModalOpen, setSellModalOpen] = useState(false);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [mortgageModalOpen, setMortgageModalOpen] = useState(false);
@@ -150,7 +150,7 @@ const Shop = () => {
   const handleSellClick = (asset: Asset) => {
     track('shop_action_sell', { symbol: asset.symbol, source_page: '/shop' });
     setSelectedAsset(asset);
-    setRealizeModalOpen(true);
+    setSellModalOpen(true);
   };
 
   const handleOrderClick = (asset: Asset) => {
@@ -463,12 +463,12 @@ const Shop = () => {
             asset={selectedAsset}
           />
           
-          {/* Sell = Realize/Withdraw */}
-          <RealizeAssetModal
-            isOpen={realizeModalOpen}
-            onClose={() => setRealizeModalOpen(false)}
-            asset={selectedAsset}
-          />
+           {/* Sell = Convert/Withdraw */}
+           <SellAssetModal
+             isOpen={sellModalOpen}
+             onClose={() => setSellModalOpen(false)}
+             asset={selectedAsset}
+           />
           
           {/* Order = Physical Delivery with Format Selection */}
           <BuyPhysicalModal

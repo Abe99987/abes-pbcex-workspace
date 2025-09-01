@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Branch } from "@/types/branch";
+import { ASSET_FORMATS } from '@/constants/assetFormats';
 import BranchLocator from './BranchLocator';
 
 interface BuyPhysicalModalProps {
@@ -105,154 +106,16 @@ const BuyPhysicalModal = ({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Asset-specific configurations for buying
+  // Asset-specific configurations using centralized config
   const getAssetConfig = () => {
-    switch (asset.symbol) {
-      case 'AU':
-        return {
-          unit: 'grams',
-          formats: [
-            {
-              id: 'bar',
-              name: 'Gold Bar',
-              description:
-                'Pure 24k gold bars in standard weights. Lower premium (closer to spot).',
-              minAmount: 1.0,
-              icon: '🥇',
-            },
-            {
-              id: 'coins',
-              name: 'Gold Coins',
-              description:
-                'American Eagle or Maple Leaf coins. Higher premium (collectability & mint costs).',
-              minAmount: 0.1,
-              icon: '🪙',
-            },
-            {
-              id: 'goldback',
-              name: 'Goldback Notes',
-              description: 'Gold-layered currency notes',
-              minAmount: 0.05,
-              icon: '💵',
-            },
-          ],
-        };
-      case 'AG':
-        return {
-          unit: 'grams',
-          formats: [
-            {
-              id: 'bar',
-              name: 'Silver Bar',
-              description:
-                'Pure .999 silver bars. Lower premium (closer to spot).',
-              minAmount: 10.0,
-              icon: '🥈',
-            },
-            {
-              id: 'coins',
-              name: 'Silver Coins',
-              description:
-                'American Eagle or Maple Leaf coins. Higher premium (collectability & mint costs).',
-              minAmount: 1.0,
-              icon: '🪙',
-            },
-            {
-              id: 'rounds',
-              name: 'Silver Rounds',
-              description: 'Generic silver rounds',
-              minAmount: 1.0,
-              icon: '⚪',
-            },
-          ],
-        };
-      case 'XPT':
-        return {
-          unit: 'grams',
-          formats: [
-            {
-              id: 'bar',
-              name: 'Platinum Bar',
-              description:
-                'Pure .9995 platinum bars. Lower premium (closer to spot).',
-              minAmount: 1.0,
-              icon: '⚪',
-            },
-            {
-              id: 'coins',
-              name: 'Platinum Coins',
-              description:
-                'American Eagle platinum coins. Higher premium (collectability & mint costs).',
-              minAmount: 0.1,
-              icon: '🪙',
-            },
-          ],
-        };
-      case 'XPD':
-        return {
-          unit: 'grams',
-          formats: [
-            {
-              id: 'bar',
-              name: 'Palladium Bar',
-              description:
-                'Pure .9995 palladium bars. Lower premium (closer to spot).',
-              minAmount: 1.0,
-              icon: '⚫',
-            },
-            {
-              id: 'coins',
-              name: 'Palladium Coins',
-              description:
-                'Canadian Maple Leaf palladium coins. Higher premium (collectability & mint costs).',
-              minAmount: 0.1,
-              icon: '🪙',
-            },
-          ],
-        };
-      case 'XCU':
-        return {
-          unit: 'tons',
-          formats: [
-            {
-              id: 'ingots',
-              name: 'Ingots',
-              description: 'High-grade copper ingots',
-              minAmount: 1.0,
-              icon: '🟤',
-            },
-            {
-              id: 'coils',
-              name: 'Coils',
-              description: 'Copper wire coils for industrial use',
-              minAmount: 1.0,
-              icon: '🔄',
-            },
-            {
-              id: 'sheets',
-              name: 'Sheets',
-              description: 'Flat copper sheets',
-              minAmount: 1.0,
-              icon: '📄',
-            },
-          ],
-        };
-      case 'OIL':
-        return {
-          unit: 'barrels',
-          formats: [
-            {
-              id: 'delivery',
-              name: 'Physical Delivery',
-              description: 'Bulk industrial delivery (licensing required)',
-              minAmount: 500000,
-              icon: '🚛',
-            },
-          ],
-        };
-      default:
-        return { unit: 'units', formats: [] };
-    }
+    // Map shop symbols to format symbols
+    const symbolMap: Record<string, string> = {
+      'AU': 'XAU',
+      'AG': 'XAG'
+    };
+    
+    const configSymbol = symbolMap[asset.symbol] || asset.symbol;
+    return ASSET_FORMATS[configSymbol] || { unit: 'units', formats: [] };
   };
 
   const assetConfig = getAssetConfig();
@@ -408,19 +271,17 @@ const BuyPhysicalModal = ({
 
               {/* Format Selection */}
               <div className='space-y-3'>
-                <Label>
-                  {asset.symbol === 'XCU' ? 'Choose Format' : 'Select Format'}
-                </Label>
+                <Label>Select Format</Label>
                 <RadioGroup value={format} onValueChange={setFormat}>
                   {assetConfig.formats.map(fmt => (
                     <div
                       key={fmt.id}
-                      className='flex items-center space-x-3 p-4 border rounded-lg'
+                      className='flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/30 transition-colors'
                     >
                       <RadioGroupItem value={fmt.id} id={fmt.id} />
                       <div className='text-2xl'>{fmt.icon}</div>
                       <div className='flex-1'>
-                        <Label htmlFor={fmt.id} className='font-medium'>
+                        <Label htmlFor={fmt.id} className='font-medium cursor-pointer'>
                           {fmt.name}
                         </Label>
                         <div className='text-sm text-muted-foreground'>
@@ -438,6 +299,12 @@ const BuyPhysicalModal = ({
                     </div>
                   ))}
                 </RadioGroup>
+                
+                {/* Premium information */}
+                <div className='text-xs text-muted-foreground p-3 bg-muted/20 rounded-lg'>
+                  <strong>Premium Note:</strong> Bars typically have lower premiums (closer to spot price); 
+                  coins and collectible products generally carry higher premiums due to minting costs and collectability.
+                </div>
               </div>
 
               {/* Special warnings for oil delivery */}
@@ -475,8 +342,7 @@ const BuyPhysicalModal = ({
                         </strong>
                         <br />
                         <span className='text-orange-700'>
-                          Delivery ETA: 3–5 weeks via MRST Shipping. Minimum
-                          order quantity: 1 ton per format.
+                          ETA 3–5 weeks via MRST Shipping. Minimum order: 1 ton per format.
                         </span>
                       </div>
                     </div>
