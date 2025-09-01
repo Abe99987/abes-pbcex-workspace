@@ -7,6 +7,7 @@ const Footer = () => {
     { label: "Careers", href: "/careers" },
     { label: "Press", href: "/press" },
     { label: "Investors", href: "/investors" },
+    { label: "Franchise", href: "/franchise" },
   ];
 
   const productLinks = [

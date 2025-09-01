@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import Index from "./pages/Index";
 import Trading from "./pages/Trading";
 import CoinTrading from "./pages/CoinTrading";
@@ -31,6 +32,7 @@ import Contact from "./pages/Contact";
 import ThankYou from "./pages/ThankYou";
 import Shop from "./pages/Shop";
 import CommodityDetail from "./pages/CommodityDetail";
+import Account from "./pages/Account";
 import HelpCenter from "./pages/support/HelpCenter";
 import Security from "./pages/support/Security";
 import Compliance from "./pages/support/Compliance";
@@ -49,64 +51,85 @@ const DevIntegrations = import.meta.env.DEV
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/trading" element={<Trading />} />
-          <Route path="/coin-trading" element={<CoinTrading />} />
-          <Route path="/fx-trading" element={<FxTrading />} />
-          <Route path="/franchise" element={<Franchise />} />
-          <Route path="/education" element={<Education />} />
-          <Route path="/my-assets" element={<MyAssets />} />
-          <Route path="/my-spending" element={<MySpending />} />
-          <Route path="/transaction-history" element={<TransactionHistory />} />
-          <Route path="/order-history" element={<OrderHistory />} />
-          <Route path="/titled-asset/:address" element={<TitledAsset />} />
-          <Route path="/realize" element={<Realize />} />
-          <Route path="/pnl" element={<PnL />} />
-          <Route path="/provider-settings" element={<ProviderSettings />} />
-          <Route path="/large-limit" element={<LargeLimit />} />
-          <Route path="/careers" element={<Careers />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/press" element={<Press />} />
-          <Route path="/investors" element={<Investors />} />
-          <Route path="/wallet" element={<DigitalWallet />} />
-          <Route path="/asset-trading" element={<AssetTrading />} />
-          <Route path="/payments" element={<GlobalPayments />} />
-          <Route path="/app" element={<MobileApp />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/thank-you" element={<ThankYou />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/shop/:symbol" element={<CommodityDetail />} />
-          <Route path="/support/help-center" element={<HelpCenter />} />
-          <Route path="/support/security" element={<Security />} />
-          <Route path="/support/compliance" element={<Compliance />} />
-          <Route path="/legal/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/legal/terms-of-service" element={<TermsOfService />} />
-          <Route path="/legal/regulatory" element={<Regulatory />} />
-          <Route path="/legal/licenses" element={<Licenses />} />
-          <Route path="/health" element={<Health />} />
-          {/* Development-only routes */}
-          {import.meta.env.DEV && DevIntegrations && (
-            <Route 
-              path="/dev/integrations" 
-              element={
-                <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
-                  <DevIntegrations />
-                </Suspense>
-              } 
-            />
-          )}
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Helmet>
+          <title>PBCex - Asset-Backed Digital Banking | Trade Gold, Silver & Commodities</title>
+          <meta name="description" content="A Bank for the People — Backed by Real Assets, Connected to the World. Trade gold, silver, commodities with full regulatory compliance and bank-grade security." />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <meta property="og:title" content="PBCex - Asset-Backed Digital Banking" />
+          <meta property="og:description" content="Trade precious metals and commodities with full regulatory compliance. Secure, transparent, and innovative digital banking backed by real assets." />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://pbcex.com" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <link rel="canonical" href="https://pbcex.com" />
+        </Helmet>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/trading" element={<Trading />} />
+            <Route path="/coin-trading" element={<CoinTrading />} />
+            <Route path="/fx-trading" element={<FxTrading />} />
+            <Route path="/franchise" element={<Franchise />} />
+            <Route path="/education" element={<Education />} />
+            <Route path="/my-assets" element={<MyAssets />} />
+            <Route path="/my-spending" element={<MySpending />} />
+            <Route path="/transaction-history" element={<TransactionHistory />} />
+            <Route path="/order-history" element={<OrderHistory />} />
+            <Route path="/titled-asset/:address" element={<TitledAsset />} />
+            <Route path="/realize" element={<Realize />} />
+            <Route path="/pnl" element={<PnL />} />
+            <Route path="/provider-settings" element={<ProviderSettings />} />
+            <Route path="/large-limit" element={<LargeLimit />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/press" element={<Press />} />
+            <Route path="/investors" element={<Investors />} />
+            <Route path="/wallet" element={<DigitalWallet />} />
+            <Route path="/asset-trading" element={<AssetTrading />} />
+            <Route path="/payments" element={<GlobalPayments />} />
+            <Route path="/app" element={<MobileApp />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/thank-you" element={<ThankYou />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/shop/:symbol" element={<CommodityDetail />} />
+            {/* Account Routes */}
+            <Route path="/account" element={<Account />} />
+            <Route path="/account/identity" element={<Account />} />
+            <Route path="/account/security" element={<Account />} />
+            <Route path="/account/payments" element={<Account />} />
+            <Route path="/account/notifications" element={<Account />} />
+            <Route path="/account/api-keys" element={<Account />} />
+            <Route path="/account/tax" element={<Account />} />
+            <Route path="/support/help-center" element={<HelpCenter />} />
+            <Route path="/support/security" element={<Security />} />
+            <Route path="/support/compliance" element={<Compliance />} />
+            <Route path="/legal/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/legal/terms-of-service" element={<TermsOfService />} />
+            <Route path="/legal/regulatory" element={<Regulatory />} />
+            <Route path="/legal/licenses" element={<Licenses />} />
+            <Route path="/health" element={<Health />} />
+            {/* Development-only routes */}
+            {import.meta.env.DEV && DevIntegrations && (
+              <Route 
+                path="/dev/integrations" 
+                element={
+                  <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+                    <DevIntegrations />
+                  </Suspense>
+                } 
+              />
+            )}
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;

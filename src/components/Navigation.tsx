@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
@@ -46,8 +46,13 @@ import {
   Code,
   Badge as BadgeIcon,
   Crown,
+  Key,
+  FileText,
+  Bell,
+  UserCheck,
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MenuItem {
   label: string;
@@ -65,6 +70,27 @@ const Navigation = () => {
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [walletConnectModalOpen, setWalletConnectModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+
+  // Check auth state
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Check if we're on trading page for theme adaptation
   const isTrading =
@@ -420,18 +446,104 @@ const Navigation = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button
-            variant='ghost'
-            size='sm'
-            className={`p-2 ${
-              isTrading
-                ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-            }`}
-            onClick={() => setAuthModalOpen(true)}
-          >
-            <User className='w-4 h-4' />
-          </Button>
+          {/* Account/Auth Button */}
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className={`p-2 ${
+                    isTrading
+                      ? 'text-gray-300 hover:text-white hover:bg-gray-800'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`}
+                  aria-label="Account menu"
+                >
+                  <User className='w-4 h-4' />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="end" 
+                className="w-56 bg-popover border shadow-md"
+              >
+                <DropdownMenuItem
+                  onClick={() => navigate('/account')}
+                  className="cursor-pointer hover:bg-accent"
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Account
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/account/identity')}
+                  className="cursor-pointer hover:bg-accent"
+                >
+                  <UserCheck className="mr-2 h-4 w-4" />
+                  Identity / KYC
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/account/security')}
+                  className="cursor-pointer hover:bg-accent"
+                >
+                  <Shield className="mr-2 h-4 w-4" />
+                  Security
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/account/payments')}
+                  className="cursor-pointer hover:bg-accent"
+                >
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Payment Methods
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/account/notifications')}
+                  className="cursor-pointer hover:bg-accent"
+                >
+                  <Bell className="mr-2 h-4 w-4" />
+                  Notifications
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/account/api-keys')}
+                  className="cursor-pointer hover:bg-accent"
+                >
+                  <Key className="mr-2 h-4 w-4" />
+                  API Keys
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/account/tax')}
+                  className="cursor-pointer hover:bg-accent"
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Tax Documents
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    navigate('/');
+                  }}
+                  className="cursor-pointer hover:bg-accent text-red-600"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              variant='ghost'
+              size='sm'
+              className={`p-2 ${
+                isTrading
+                  ? 'text-gray-300 hover:text-white hover:bg-gray-800'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+              }`}
+              onClick={() => setAuthModalOpen(true)}
+              aria-label="Account access"
+            >
+              <User className='w-4 h-4' />
+            </Button>
+          )}
         </div>
 
         {/* Mobile Navigation */}
