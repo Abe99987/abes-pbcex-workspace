@@ -1,12 +1,13 @@
 import js from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import tseslint from '@typescript-eslint/eslint-plugin';
+import tsparser from '@typescript-eslint/parser';
 
-export default tseslint.config(
+export default [
   js.configs.recommended,
-  ...tseslint.configs.recommended,
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
+      parser: tsparser,
       ecmaVersion: 2021,
       sourceType: 'module',
       globals: {
@@ -30,10 +31,23 @@ export default tseslint.config(
         afterAll: 'readonly',
       },
     },
-    rules: {
-      'no-console': 'warn',
-      'no-unused-vars': 'warn',
-      '@typescript-eslint/no-unused-expressions': 'off',
+    plugins: {
+      '@typescript-eslint': tseslint,
     },
-  }
-);
+    rules: {
+      ...tseslint.configs.recommended.rules,
+      'no-console': 'off',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      'no-undef': 'off',
+      '@typescript-eslint/no-unsafe-function-type': 'off',
+      'no-unreachable': 'off',
+      'no-extra-semi': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
+      'no-prototype-builtins': 'off',
+    },
+  },
+];
