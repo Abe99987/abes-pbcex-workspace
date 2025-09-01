@@ -386,12 +386,36 @@ const Navigation = () => {
                 العربية
               </DropdownMenuItem>
               <DropdownMenuItem
+                onClick={() => setSelectedLanguage('ZH')}
+                className={`cursor-pointer ${
+                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+                }`}
+              >
+                中文
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setSelectedLanguage('ES')}
+                className={`cursor-pointer ${
+                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+                }`}
+              >
+                Español
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={() => setSelectedLanguage('FR')}
                 className={`cursor-pointer ${
                   isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
                 }`}
               >
                 Français
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setSelectedLanguage('HI')}
+                className={`cursor-pointer ${
+                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
+                }`}
+              >
+                हिन्दी
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
