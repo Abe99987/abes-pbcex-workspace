@@ -5,13 +5,13 @@ info:
   description: |
     People's Bank & Commodities Exchange (PBCEx) API for precious metals trading, 
     custody, and fulfillment operations.
-    
+
     ## Authentication
     All protected endpoints require a Bearer token in the Authorization header:
     ```
     Authorization: Bearer <your-access-token>
     ```
-    
+
     ## Rate Limits
     - General API: 1000 requests per 15 minutes
     - Authentication: 5 attempts per 15 minutes  
@@ -23,7 +23,11 @@ info:
     email: api-support@pbcex.com
   license:
     name: Proprietary
-    
+  x-build-info:
+    branch: feature/money-movement-backend
+    shortHash: 7b670b4
+    generatedAt: '2025-08-31T18:00:00Z'
+
 servers:
   - url: http://localhost:4000
     description: Development server
@@ -39,7 +43,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      
+
   schemas:
     Error:
       type: object
@@ -50,7 +54,17 @@ components:
       properties:
         code:
           type: string
-          enum: [VALIDATION_ERROR, AUTHENTICATION_ERROR, AUTHORIZATION_ERROR, NOT_FOUND, CONFLICT, RATE_LIMITED, INTERNAL_ERROR, SERVICE_UNAVAILABLE]
+          enum:
+            [
+              VALIDATION_ERROR,
+              AUTHENTICATION_ERROR,
+              AUTHORIZATION_ERROR,
+              NOT_FOUND,
+              CONFLICT,
+              RATE_LIMITED,
+              INTERNAL_ERROR,
+              SERVICE_UNAVAILABLE,
+            ]
         message:
           type: string
         timestamp:
@@ -60,7 +74,7 @@ components:
           type: string
         details:
           type: object
-          
+
     User:
       type: object
       properties:
@@ -79,12 +93,20 @@ components:
           enum: [USER, ADMIN, SUPPORT, TELLER]
         kycStatus:
           type: string
-          enum: [NOT_STARTED, IN_PROGRESS, PENDING_REVIEW, APPROVED, REJECTED, EXPIRED]
+          enum:
+            [
+              NOT_STARTED,
+              IN_PROGRESS,
+              PENDING_REVIEW,
+              APPROVED,
+              REJECTED,
+              EXPIRED,
+            ]
         emailVerified:
           type: boolean
         twoFactorEnabled:
           type: boolean
-          
+
     Balance:
       type: object
       properties:
@@ -96,7 +118,7 @@ components:
         usdValue:
           type: string
           pattern: '^\d+\.?\d*$'
-          
+
     Trade:
       type: object
       properties:
@@ -253,7 +275,15 @@ components:
             $ref: '#/components/schemas/Balance'
         kycStatus:
           type: string
-          enum: [NOT_STARTED, IN_PROGRESS, PENDING_REVIEW, APPROVED, REJECTED, EXPIRED]
+          enum:
+            [
+              NOT_STARTED,
+              IN_PROGRESS,
+              PENDING_REVIEW,
+              APPROVED,
+              REJECTED,
+              EXPIRED,
+            ]
         orders:
           type: array
           items:
@@ -263,7 +293,546 @@ components:
           items:
             $ref: '#/components/schemas/RedemptionRequest'
 
+    # Money Movement Schemas (x-inferred: true)
+    Beneficiary:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [internal_user, bank_swift, email_link]
+        displayName:
+          type: string
+        details:
+          type: object
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaymentRequest:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        mode:
+          type: string
+          enum: [internal_user, external_link]
+        target:
+          type: object
+        asset:
+          type: string
+        amount:
+          type: string
+        memoOptional:
+          type: boolean
+        allowPartial:
+          type: boolean
+        expiresAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [draft, active, expired, paid, cancelled]
+        linkToken:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    InternalTransfer:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        fromUserId:
+          type: string
+          format: uuid
+        toInternalAccountNumber:
+          type: string
+        asset:
+          type: string
+        amount:
+          type: string
+        memo:
+          type: string
+        status:
+          type: string
+          enum: [pending, completed, rejected]
+        audit:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CryptoWithdrawal:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        asset:
+          type: string
+        network:
+          type: string
+        address:
+          type: string
+        amount:
+          type: string
+        feeEstimate:
+          type: string
+        status:
+          type: string
+          enum: [pending, queued, broadcast, failed, cancelled]
+        audit:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    BankTransfer:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        beneficiaryId:
+          type: string
+          format: uuid
+        amount:
+          type: string
+        currency:
+          type: string
+        purposeCode:
+          type: string
+        status:
+          type: string
+          enum: [draft, pending, submitted, failed, cancelled]
+        rails:
+          type: string
+          enum: [swift, wise]
+        audit:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RecurringRule:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        asset:
+          type: string
+        amount:
+          type: string
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly, quarterly, yearly]
+        nextRun:
+          type: string
+          format: date-time
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DCAPlan:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        asset:
+          type: string
+        amount:
+          type: string
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly, quarterly, yearly]
+        nextRun:
+          type: string
+          format: date-time
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    QRToken:
+      type: object
+      x-inferred: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+        type:
+          type: string
+          enum: [pay, receive]
+        asset:
+          type: string
+        amount:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [active, used, expired, cancelled]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
 paths:
+  # Money Movement Endpoints
+  /api/transfers/internal:
+    post:
+      tags: [Transfers]
+      summary: Create internal transfer
+      description: Transfer assets between internal accounts
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [toInternalAccountNumber, asset, amount]
+              properties:
+                toInternalAccountNumber:
+                  type: string
+                  description: Internal account number to transfer to
+                asset:
+                  type: string
+                  enum: [AU, AG, PT, PD, CU, USD, USDC]
+                  description: Asset to transfer
+                amount:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+                  description: Amount to transfer
+                memo:
+                  type: string
+                  description: Optional memo for the transfer
+      responses:
+        '201':
+          description: Internal transfer created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: SUCCESS
+                  data:
+                    $ref: '#/components/schemas/InternalTransfer'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Insufficient balance or transfer not allowed
+
+  /api/transfers/internal/{id}:
+    get:
+      tags: [Transfers]
+      summary: Get internal transfer status
+      description: Retrieve the status of an internal transfer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Transfer ID
+      responses:
+        '200':
+          description: Transfer status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: SUCCESS
+                  data:
+                    $ref: '#/components/schemas/InternalTransfer'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/transfers/bank:
+    post:
+      tags: [Transfers]
+      summary: Create bank transfer
+      description: Initiate a bank transfer to external beneficiary
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [beneficiaryId, amount, currency]
+              properties:
+                beneficiaryId:
+                  type: string
+                  format: uuid
+                  description: ID of the bank beneficiary
+                amount:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+                  description: Amount to transfer
+                currency:
+                  type: string
+                  enum: [USD, EUR, GBP, CAD, AUD]
+                  description: Currency for the transfer
+                purposeCode:
+                  type: string
+                  description: Optional purpose code for the transfer
+      responses:
+        '201':
+          description: Bank transfer created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: SUCCESS
+                  data:
+                    $ref: '#/components/schemas/BankTransfer'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Insufficient balance or transfer not allowed
+
+  /api/transfers/bank/{id}:
+    get:
+      tags: [Transfers]
+      summary: Get bank transfer status
+      description: Retrieve the status of a bank transfer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Transfer ID
+      responses:
+        '200':
+          description: Transfer status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: SUCCESS
+                  data:
+                    $ref: '#/components/schemas/BankTransfer'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/transfers/bank/estimate-fees:
+    post:
+      tags: [Transfers]
+      summary: Estimate bank transfer fees
+      description: Get estimated fees for a bank transfer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, currency, rails]
+              properties:
+                amount:
+                  type: string
+                  pattern: '^\d+\.?\d*$'
+                  description: Transfer amount
+                currency:
+                  type: string
+                  enum: [USD, EUR, GBP, CAD, AUD]
+                  description: Transfer currency
+                rails:
+                  type: string
+                  enum: [swift, wise]
+                  description: Transfer rails to use
+      responses:
+        '200':
+          description: Fee estimate retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: SUCCESS
+                  data:
+                    type: object
+                    properties:
+                      estimatedFee:
+                        type: string
+                        description: Estimated fee amount
+                      currency:
+                        type: string
+                        description: Fee currency
+                      estimatedDelivery:
+                        type: string
+                        description: Estimated delivery time
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/transfers/history:
+    get:
+      tags: [Transfers]
+      summary: Get transfer history
+      description: Retrieve transfer history for the authenticated user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [internal, bank, crypto]
+          description: Filter by transfer type
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, completed, rejected, failed, cancelled]
+          description: Filter by transfer status
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Number of records to return
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of records to skip
+      responses:
+        '200':
+          description: Transfer history retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: SUCCESS
+                  data:
+                    type: object
+                    properties:
+                      transfers:
+                        type: array
+                        items:
+                          oneOf:
+                            - $ref: '#/components/schemas/InternalTransfer'
+                            - $ref: '#/components/schemas/BankTransfer'
+                            - $ref: '#/components/schemas/CryptoWithdrawal'
+                      total:
+                        type: integer
+                        description: Total number of transfers
+                      hasMore:
+                        type: boolean
+                        description: Whether there are more records
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # Health endpoint
   /health:
     get:
       tags: [Health]
@@ -283,7 +852,7 @@ paths:
                     type: string
                   version:
                     type: string
-                    
+
   /api/auth/register:
     post:
       tags: [Authentication]
@@ -314,7 +883,7 @@ paths:
           description: Validation error
         '409':
           description: User already exists
-          
+
   /api/auth/login:
     post:
       tags: [Authentication]
@@ -338,7 +907,7 @@ paths:
           description: Login successful
         '401':
           description: Invalid credentials
-          
+
   /api/auth/me:
     get:
       tags: [Authentication]
@@ -358,7 +927,7 @@ paths:
                     properties:
                       user:
                         $ref: '#/components/schemas/User'
-                        
+
   /api/wallet/balances:
     get:
       tags: [Wallet]
@@ -390,7 +959,7 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/Balance'
-                              
+
   /api/trade/prices:
     get:
       tags: [Trading]
@@ -404,7 +973,7 @@ paths:
       responses:
         '200':
           description: Current prices
-          
+
   /api/trade/order:
     post:
       tags: [Trading]
@@ -439,7 +1008,7 @@ paths:
                     properties:
                       trade:
                         $ref: '#/components/schemas/Trade'
-                        
+
   /api/shop/products:
     get:
       tags: [Shop]
@@ -459,7 +1028,7 @@ paths:
       responses:
         '200':
           description: Product list
-          
+
   /api/admin/exposure:
     get:
       tags: [Admin]
@@ -527,7 +1096,7 @@ paths:
           description: Invalid request
         '501':
           description: Feature disabled
-          
+
   /api/redeem/status/{id}:
     get:
       tags: [Redemption]
@@ -558,7 +1127,7 @@ paths:
           description: Redemption request not found
         '501':
           description: Feature disabled
-          
+
   /api/redeem/quote:
     get:
       tags: [Redemption]
@@ -911,3 +1480,19 @@ tags:
     description: Vault inventory and redemption management (Phase-3)
   - name: Support
     description: Customer service and support operations (Phase-3)
+  - name: Transfers
+    description: Internal and external money transfers
+  - name: Crypto
+    description: Cryptocurrency operations and withdrawals
+  - name: Beneficiaries
+    description: Transfer beneficiary management
+  - name: QR
+    description: QR code payment tokens
+  - name: Payment Requests
+    description: Payment request creation and management
+  - name: Recurring
+    description: Recurring transfer rules
+  - name: Card Funding
+    description: Card funding preferences and settings
+  - name: DCA
+    description: Dollar Cost Averaging plans
