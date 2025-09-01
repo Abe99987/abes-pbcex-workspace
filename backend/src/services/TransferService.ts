@@ -1,14 +1,16 @@
-import { db } from '@/db';
+import { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+import { createError, asyncHandler } from '@/middlewares/errorMiddleware';
 import { logInfo, logError } from '@/utils/logger';
-import { createError } from '@/middlewares/errorMiddleware';
-import { ValidationService } from './ValidationService';
-import { RecipientLookupService } from './RecipientLookupService';
-import { BalanceService } from './BalanceService';
+import { ValidationService } from '@/services/ValidationService';
+import { RecipientLookupService } from '@/services/RecipientLookupService';
+import { BalanceService } from '@/services/BalanceService';
+import { db } from '@/db';
+import { MoneyMovementUtils } from '@/models/MoneyMovement';
+import { formatTimestamp } from '@/utils/dateUtils';
 import { OutboxService } from './OutboxService';
 import { AuditService } from './AuditService';
 import { getBankRailsConfig } from '@/config/money-movement';
-import { MoneyMovementUtils } from '@/models/MoneyMovement';
-import { v4 as uuidv4 } from 'uuid';
 
 export interface InternalTransferRequest {
   toAccountNumber: string;
@@ -21,7 +23,7 @@ export interface InternalTransferRequest {
 export interface InternalTransferResponse {
   transferId: string;
   status: 'pending' | 'completed' | 'rejected';
-  createdAt: string;
+  createdAt: string | null;
   recipientName: string;
   maskedAccountNumber: string;
 }
@@ -40,7 +42,7 @@ export interface BankTransferResponse {
   rails: 'swift' | 'wise';
   estimatedFee: string;
   processingTime: string;
-  createdAt: string;
+  createdAt: string | null;
 }
 
 export interface BankFeeEstimate {
@@ -189,7 +191,7 @@ export class TransferService {
       return {
         transferId: transfer.id,
         status: transfer.status,
-        createdAt: transfer.created_at.toISOString(),
+        createdAt: formatTimestamp(transfer.created_at),
         recipientName: recipient.displayName,
         maskedAccountNumber: MoneyMovementUtils.maskAccountNumber(
           request.toAccountNumber
@@ -337,7 +339,7 @@ export class TransferService {
         rails: request.rails,
         estimatedFee: feeEstimate,
         processingTime: railsConfig.processingTime,
-        createdAt: transfer.created_at.toISOString(),
+        createdAt: formatTimestamp(transfer.created_at),
       };
     } catch (error) {
       logError('Error creating bank transfer', {
@@ -447,8 +449,8 @@ export class TransferService {
           type: 'internal',
           id: transfer.id,
           status: transfer.status,
-          createdAt: transfer.created_at.toISOString(),
-          updatedAt: transfer.updated_at.toISOString(),
+          createdAt: formatTimestamp(transfer.created_at),
+          updatedAt: formatTimestamp(transfer.updated_at),
           asset: transfer.asset,
           amount: transfer.amount,
           memo: transfer.memo,
@@ -469,8 +471,8 @@ export class TransferService {
           type: 'bank',
           id: transfer.id,
           status: transfer.status,
-          createdAt: transfer.created_at.toISOString(),
-          updatedAt: transfer.updated_at.toISOString(),
+          createdAt: formatTimestamp(transfer.created_at),
+          updatedAt: formatTimestamp(transfer.updated_at),
           amount: transfer.amount,
           currency: transfer.currency,
           rails: transfer.rails,
