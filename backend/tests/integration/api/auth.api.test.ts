@@ -83,10 +83,16 @@ describe('Authentication API', () => {
         message: 'Invalid input data',
         errors: [
           { field: 'email', message: 'Invalid email format' },
-          { field: 'password', message: 'Password must be at least 8 characters' },
+          {
+            field: 'password',
+            message: 'Password must be at least 8 characters',
+          },
           { field: 'firstName', message: 'First name is required' },
           { field: 'lastName', message: 'Last name is required' },
-          { field: 'acceptTerms', message: 'You must accept the terms and conditions' },
+          {
+            field: 'acceptTerms',
+            message: 'You must accept the terms and conditions',
+          },
         ],
       });
 
@@ -114,10 +120,10 @@ describe('Authentication API', () => {
 
     it('should enforce password strength requirements', async () => {
       const weakPasswords = [
-        '12345678',        // Only numbers
-        'password',        // Only lowercase
-        'PASSWORD',        // Only uppercase
-        'Pass123',         // Too short
+        '12345678', // Only numbers
+        'password', // Only lowercase
+        'PASSWORD', // Only uppercase
+        'Pass123', // Too short
         'passwordwithoutcaps123', // No uppercase or symbols
       ];
 
@@ -126,10 +132,11 @@ describe('Authentication API', () => {
           code: 'VALIDATION_ERROR',
           message: 'Password does not meet strength requirements',
           errors: [
-            { 
-              field: 'password', 
-              message: 'Password must contain uppercase, lowercase, numbers, and special characters' 
-            }
+            {
+              field: 'password',
+              message:
+                'Password must contain uppercase, lowercase, numbers, and special characters',
+            },
           ],
         });
 
@@ -256,7 +263,7 @@ describe('Authentication API', () => {
 
     it('should update last login timestamp', async () => {
       const beforeLogin = Date.now();
-      
+
       const mockResponse = createMockResponse(200, {
         code: 'SUCCESS',
         data: {
@@ -266,11 +273,13 @@ describe('Authentication API', () => {
       });
 
       const response = mockResponse;
-      
+
       expect(response.status).toBe(200);
       TestUtils.expectValidTimestamp(response.body.data.user.lastLoginAt);
-      
-      const lastLoginTime = new Date(response.body.data.user.lastLoginAt).getTime();
+
+      const lastLoginTime = new Date(
+        response.body.data.user.lastLoginAt
+      ).getTime();
       expect(lastLoginTime).toBeGreaterThanOrEqual(beforeLogin);
     });
   });
@@ -352,7 +361,7 @@ describe('Authentication API', () => {
         code: 'VALIDATION_ERROR',
         message: 'Invalid email format',
         errors: [
-          { field: 'email', message: 'Please provide a valid email address' }
+          { field: 'email', message: 'Please provide a valid email address' },
         ],
       });
 
@@ -397,10 +406,11 @@ describe('Authentication API', () => {
         code: 'VALIDATION_ERROR',
         message: 'Password does not meet strength requirements',
         errors: [
-          { 
-            field: 'password', 
-            message: 'Password must be at least 8 characters and contain uppercase, lowercase, numbers, and special characters' 
-          }
+          {
+            field: 'password',
+            message:
+              'Password must be at least 8 characters and contain uppercase, lowercase, numbers, and special characters',
+          },
         ],
       });
 
@@ -472,7 +482,7 @@ describe('Authentication API', () => {
   describe('GET /api/auth/me', () => {
     it('should return current user info with valid token', async () => {
       const testUser = await Factory.createUser({ emailVerified: true });
-      
+
       const mockResponse = createMockResponse(200, {
         code: 'SUCCESS',
         data: {
@@ -537,9 +547,7 @@ describe('Authentication API', () => {
       const mockResponse = createMockResponse(400, {
         code: 'VALIDATION_ERROR',
         message: 'Invalid input data',
-        errors: [
-          { field: 'email', message: 'Invalid email format' }
-        ],
+        errors: [{ field: 'email', message: 'Invalid email format' }],
       });
 
       const response = mockResponse;
@@ -573,7 +581,7 @@ describe('Authentication API', () => {
       };
 
       const response = mockResponse;
-      
+
       expect(response.header['x-content-type-options']).toBe('nosniff');
       expect(response.header['x-frame-options']).toBe('DENY');
       expect(response.header['x-xss-protection']).toBe('1; mode=block');
@@ -595,12 +603,12 @@ describe('Authentication API', () => {
 
     it('should handle extremely long input values', async () => {
       const longString = 'a'.repeat(10000);
-      
+
       const mockResponse = createMockResponse(400, {
         code: 'VALIDATION_ERROR',
         message: 'Input too long',
         errors: [
-          { field: 'email', message: 'Email must be less than 255 characters' }
+          { field: 'email', message: 'Email must be less than 255 characters' },
         ],
       });
 

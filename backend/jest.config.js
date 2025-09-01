@@ -1,8 +1,15 @@
-module.exports = {
+export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
+  roots: ['<rootDir>/src', '<rootDir>/tests'],
   testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '.*\\.skip$',
+    '.*\\.skip\\.ts$',
+    '.*skip.*',
+  ],
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
@@ -16,9 +23,11 @@ module.exports = {
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
-  setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
+  // Remove setupFilesAfterEnv to avoid problematic imports
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   testTimeout: 10000,
+  verbose: true,
+  detectOpenHandles: true,
 };

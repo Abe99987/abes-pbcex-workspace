@@ -25,6 +25,8 @@ import VerifyService from '@/services/VerifyService';
 import FedexService from '@/services/FedexService';
 import PricesService from '@/services/PricesService';
 import CheckoutService from '@/services/CheckoutService';
+import { CommodityConfigService } from '@/services/CommodityConfigService';
+import { QuotesService } from '@/services/QuotesService';
 
 // Import routes
 import authRoutes from '@/routes/authRoutes';
@@ -42,6 +44,9 @@ import fedexRoutes from '@/routes/fedexRoutes';
 import pricesRoutes from '@/routes/pricesRoutes';
 import checkoutRoutes from '@/routes/checkoutRoutes';
 import priceOracleRoutes from '@/routes/priceOracleRoutes';
+import quotesRoutes from '@/routes/quotesRoutes';
+import ordersRoutes from '@/routes/ordersRoutes';
+import moneyMovementRoutes from '@/routes/moneyMovement';
 
 // Import controllers for direct endpoints
 import { TradeControllerDb } from '@/controllers/TradeControllerDb';
@@ -290,8 +295,13 @@ app.use('/api/checkout', checkoutRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/fedex', fedexRoutes);
 app.use('/api/prices', pricesRoutes);
+app.use('/api/quotes', quotesRoutes);
+app.use('/api/orders', ordersRoutes);
 app.use('/api', priceOracleRoutes);
 app.use('/api/kyc', kycRoutes);
+
+// Money Movement Routes (feature flagged)
+app.use('/api', moneyMovementRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/trade', tradeRoutes);
 app.use('/api/shop', shopRoutes);
@@ -328,11 +338,15 @@ app.get('/', (req, res) => {
       email: '/api/email',
       fedex: '/api/fedex',
       prices: '/api/prices',
+      quotes: '/api/quotes',
+      orders: '/api/orders',
       kyc: '/api/kyc',
       wallet: '/api/wallet',
       trade: '/api/trade',
       shop: '/api/shop',
       admin: '/api/admin',
+      moneyMovement:
+        '/api/transfers, /api/crypto, /api/beneficiaries, /api/qr, /api/payment-requests, /api/recurring, /api/cards, /api/dca',
     },
   });
 });
@@ -375,6 +389,14 @@ async function initializeServices(): Promise<void> {
     await CheckoutService.initialize();
     logInfo('✅ CheckoutService initialized');
 
+    // Initialize commodity config service
+    await CommodityConfigService.initialize();
+    logInfo('✅ CommodityConfigService initialized');
+
+    // Initialize quotes service
+    await QuotesService.initialize();
+    logInfo('✅ QuotesService initialized');
+
     // Initialize price feed service
     await PriceFeedService.initialize();
     logInfo('✅ PriceFeedService initialized');
@@ -399,6 +421,8 @@ async function shutdownServices(): Promise<void> {
     await PriceFeedService.shutdown();
     await PricesService.shutdown();
     await CheckoutService.shutdown();
+    await CommodityConfigService.shutdown();
+    await QuotesService.shutdown();
     await EmailService.shutdown();
     await VerifyService.shutdown();
     await FedexService.shutdown();

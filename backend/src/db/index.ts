@@ -21,6 +21,30 @@ class DatabaseManager {
     return DatabaseManager.instance;
   }
 
+  private getSSLConfig() {
+    const databaseSSL = process.env.DATABASE_SSL === 'true';
+    const databaseSSLRejectUnauthorized =
+      process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'true';
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    // Default behavior: SSL disabled in dev/test unless explicitly enabled
+    if (!databaseSSL) {
+      return false;
+    }
+
+    // Production: default to secure SSL unless explicitly disabled
+    if (isProduction) {
+      return {
+        rejectUnauthorized: databaseSSLRejectUnauthorized !== false,
+      };
+    }
+
+    // Development: allow insecure SSL for local development
+    return {
+      rejectUnauthorized: databaseSSLRejectUnauthorized || false,
+    };
+  }
+
   private initialize() {
     const databaseUrl = process.env.DATABASE_URL || process.env.DIRECT_URL;
 
@@ -30,11 +54,12 @@ class DatabaseManager {
     }
 
     try {
+      // Configure SSL based on environment
+      const sslConfig = this.getSSLConfig();
+
       this.pool = new Pool({
         connectionString: databaseUrl,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl: sslConfig,
         max: 20, // Maximum number of clients in the pool
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
@@ -139,17 +164,35 @@ class DatabaseManager {
 // Export singleton instance
 export const db = DatabaseManager.getInstance();
 
+// Identifier sanitization to prevent SQL injection
+const safe = (id: string): string => {
+  if (!/^[a-z_][a-z0-9_]*$/i.test(id)) {
+    throw new Error(`Invalid identifier: ${id}`);
+  }
+  return id;
+};
+
+const safeOrderBy = (orderBy: string): string => {
+  const [col, dir] = String(orderBy).split(/\s+/);
+  const safeCol = safe(col || 'id'); // Default to 'id' if no column specified
+  const safeDir = /^(ASC|DESC)$/i.test(dir || '')
+    ? (dir || 'ASC').toUpperCase()
+    : 'ASC';
+  return `${safeCol} ${safeDir}`;
+};
+
 // Helper functions for common operations
 export async function findOne<T extends QueryResultRow>(
   table: string,
   conditions: Record<string, unknown>
 ): Promise<T | null> {
+  const safeTable = safe(table);
   const whereClause = Object.keys(conditions)
-    .map((key, index) => `${key} = $${index + 1}`)
+    .map((key, index) => `${safe(key)} = $${index + 1}`)
     .join(' AND ');
 
   const values = Object.values(conditions);
-  const query = `SELECT * FROM ${table} WHERE ${whereClause} LIMIT 1`;
+  const query = `SELECT * FROM ${safeTable} WHERE ${whereClause} LIMIT 1`;
 
   const result = await db.query<T>(query, values);
   return result.rows[0] || null;
@@ -164,19 +207,20 @@ export async function findMany<T extends QueryResultRow>(
     offset?: number;
   } = {}
 ): Promise<T[]> {
-  let query = `SELECT * FROM ${table}`;
+  const safeTable = safe(table);
+  let query = `SELECT * FROM ${safeTable}`;
   const values: unknown[] = [];
 
   if (Object.keys(conditions).length > 0) {
     const whereClause = Object.keys(conditions)
-      .map((key, index) => `${key} = $${index + 1}`)
+      .map((key, index) => `${safe(key)} = $${index + 1}`)
       .join(' AND ');
     query += ` WHERE ${whereClause}`;
     values.push(...Object.values(conditions));
   }
 
   if (options.orderBy) {
-    query += ` ORDER BY ${options.orderBy}`;
+    query += ` ORDER BY ${safeOrderBy(options.orderBy)}`;
   }
 
   if (options.limit) {
@@ -197,21 +241,22 @@ export async function insertOne<T extends QueryResultRow>(
   table: string,
   data: Record<string, unknown>
 ): Promise<T> {
-  const columns = Object.keys(data).join(', ');
+  const safeTable = safe(table);
+  const columns = Object.keys(data).map(safe).join(', ');
   const placeholders = Object.keys(data)
     .map((_, index) => `$${index + 1}`)
     .join(', ');
   const values = Object.values(data);
 
   const query = `
-    INSERT INTO ${table} (${columns}) 
+    INSERT INTO ${safeTable} (${columns}) 
     VALUES (${placeholders}) 
     RETURNING *
   `;
 
   const result = await db.query<T>(query, values);
   if (!result.rows[0]) {
-    throw new Error(`Failed to insert into ${table}`);
+    throw new Error(`Failed to insert into ${safeTable}`);
   }
   return result.rows[0];
 }
@@ -221,18 +266,22 @@ export async function updateOne<T extends QueryResultRow>(
   conditions: Record<string, unknown>,
   updates: Record<string, unknown>
 ): Promise<T | null> {
+  const safeTable = safe(table);
   const setClause = Object.keys(updates)
-    .map((key, index) => `${key} = $${index + 1}`)
+    .map((key, index) => `${safe(key)} = $${index + 1}`)
     .join(', ');
 
   const whereClause = Object.keys(conditions)
-    .map((key, index) => `${key} = $${Object.keys(updates).length + index + 1}`)
+    .map(
+      (key, index) =>
+        `${safe(key)} = $${Object.keys(updates).length + index + 1}`
+    )
     .join(' AND ');
 
   const values = [...Object.values(updates), ...Object.values(conditions)];
 
   const query = `
-    UPDATE ${table} 
+    UPDATE ${safeTable} 
     SET ${setClause}, updated_at = NOW()
     WHERE ${whereClause}
     RETURNING *

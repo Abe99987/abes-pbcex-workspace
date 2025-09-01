@@ -1,6 +1,6 @@
 module.exports = {
-  // Format and lint TypeScript/JavaScript files
-  '*.{ts,tsx,js,jsx}': [
+  // Format and lint frontend TypeScript/JavaScript files only
+  'src/**/*.{ts,tsx,js,jsx}': [
     'prettier --write',
     'eslint --fix'
   ],
