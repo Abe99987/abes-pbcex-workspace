@@ -7,12 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Repeat, Plus, Edit, Trash2, Calendar, Clock, CheckCircle2, Pause, Users, Mail, Building2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Repeat, Plus, Edit, Trash2, Calendar, Clock, CheckCircle2, Pause, Users, Mail, Building2, Search, Copy, GripVertical } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Navigation from '@/components/Navigation';
 
 const RecurringTransfers = () => {
   const [createRuleOpen, setCreateRuleOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [fromAccount, setFromAccount] = useState('');
   const [toAccount, setToAccount] = useState('');
   const [asset, setAsset] = useState('');
@@ -21,6 +23,16 @@ const RecurringTransfers = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [failoverRule, setFailoverRule] = useState('skip');
+
+  // Mock funding sources with priority order and enabled state
+  const [fundingSources, setFundingSources] = useState([
+    { id: 'usd', name: 'USD', type: 'fiat', balance: '$12,345.67', enabled: true, priority: 1 },
+    { id: 'usdc', name: 'USDC', type: 'crypto', balance: '8,750.00 USDC', enabled: true, priority: 2 },
+    { id: 'xau', name: 'Gold (XAU)', type: 'precious-metal', balance: '5.25 oz', enabled: false, priority: 3 },
+    { id: 'xag', name: 'Silver (XAG)', type: 'precious-metal', balance: '150.00 oz', enabled: true, priority: 4 },
+    { id: 'funding', name: 'Funding Account', type: 'account', balance: '$25,000.00', enabled: true, priority: 5 },
+    { id: 'trading', name: 'Trading Account', type: 'account', balance: '$15,500.00', enabled: false, priority: 6 },
+  ]);
 
   const accounts = [
     { id: 'funding', name: 'Funding Account', type: 'internal' },
@@ -56,6 +68,7 @@ const RecurringTransfers = () => {
       name: 'Weekly Savings',
       fromAccount: 'Funding Account',
       toAccount: 'Savings Account',
+      destinationType: 'pbcex-user',
       asset: 'USD',
       amount: '500.00',
       frequency: 'Weekly',
@@ -68,6 +81,7 @@ const RecurringTransfers = () => {
       name: 'Monthly Gold Purchase',
       fromAccount: 'Funding Account',
       toAccount: 'Trading Account',
+      destinationType: 'pbcex-user',
       asset: 'XAU',
       amount: '0.25',
       frequency: 'Monthly',
@@ -80,14 +94,84 @@ const RecurringTransfers = () => {
       name: 'Alice Payment',
       fromAccount: 'Funding Account',
       toAccount: 'Alice Johnson',
+      destinationType: 'pbcex-user',
       asset: 'USDC',
       amount: '1000.00',
       frequency: 'Monthly',
       nextRun: '2024-02-15',
       enabled: false,
       failoverRule: 'skip'
+    },
+    {
+      id: '4',
+      name: 'Contractor Payment Links',
+      fromAccount: 'Funding Account',
+      toAccount: 'contractor@example.com',
+      destinationType: 'payment-link',
+      asset: 'USD',
+      amount: '2500.00',
+      frequency: 'Biweekly',
+      nextRun: '2024-02-10',
+      enabled: true,
+      failoverRule: 'pause'
+    },
+    {
+      id: '5',
+      name: 'Rent Payment',
+      fromAccount: 'Funding Account',
+      toAccount: 'Bank of America',
+      destinationType: 'bank-swift',
+      asset: 'USD',
+      amount: '3200.00',
+      frequency: 'Monthly',
+      nextRun: '2024-02-01',
+      enabled: true,
+      failoverRule: 'retry'
     }
   ];
+
+  // Example outgoing transfers for the first tab
+  const exampleTransfers = [
+    {
+      id: 'ex1',
+      name: 'Daily DCA Bitcoin',
+      description: 'Auto-purchase $25 BTC daily',
+      status: 'Active',
+      nextRun: '2024-02-02 09:00'
+    },
+    {
+      id: 'ex2', 
+      name: 'Weekly Team Payments',
+      description: 'Send payment links to 5 contractors',
+      status: 'Active',
+      nextRun: '2024-02-05 10:00'
+    }
+  ];
+
+  // Helper functions
+  const toggleFundingSource = (sourceId: string) => {
+    setFundingSources(prev => prev.map(source => 
+      source.id === sourceId ? { ...source, enabled: !source.enabled } : source
+    ));
+  };
+
+  const filterRulesBySearch = (rules: any[]) => {
+    if (!searchQuery) return rules;
+    return rules.filter(rule => 
+      rule.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rule.toAccount.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rule.asset.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (rule.enabled ? 'active' : 'paused').includes(searchQuery.toLowerCase())
+    );
+  };
+
+  const groupRulesByDestination = (rules: any[]) => {
+    return {
+      'pbcex-user': rules.filter(rule => rule.destinationType === 'pbcex-user'),
+      'payment-link': rules.filter(rule => rule.destinationType === 'payment-link'),
+      'bank-swift': rules.filter(rule => rule.destinationType === 'bank-swift')
+    };
+  };
 
   const isFormValid = fromAccount && toAccount && asset && amount &&
                      parseFloat(amount) > 0 && frequency && startDate;
@@ -158,125 +242,405 @@ const RecurringTransfers = () => {
               <div className="mb-6">
                 <Button onClick={() => setCreateRuleOpen(true)} size="lg">
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Recurring Rule
+                  Add Outgoing Transfer
                 </Button>
               </div>
 
+              {/* Example Outgoing Transfers */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Active Outgoing Transfers</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {exampleTransfers.map((transfer) => (
+                    <Card key={transfer.id} className="border-l-4 border-l-green-500">
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-base mb-1">{transfer.name}</h4>
+                            <p className="text-sm text-muted-foreground mb-2">{transfer.description}</p>
+                            <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                              <div className="flex items-center">
+                                <Clock className="w-3 h-3 mr-1" />
+                                Next: {transfer.nextRun}
+                              </div>
+                            </div>
+                          </div>
+                          <Badge className="bg-green-100 text-green-800 text-xs">
+                            {transfer.status}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
               {/* Transfer Types */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setCreateRuleOpen(true)}>
-                  <CardContent className="p-6 text-center">
-                    <Users className="w-8 h-8 mx-auto mb-3 text-primary" />
-                    <h3 className="font-semibold mb-2">To PBCEx User</h3>
-                    <p className="text-sm text-muted-foreground">Account Number + Name + Asset + Amount + Schedule</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="cursor-pointer hover:shadow-md transition-shadow opacity-50">
-                  <CardContent className="p-6 text-center">
-                    <Mail className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
-                    <h3 className="font-semibold mb-2">Payment Link</h3>
-                    <p className="text-sm text-muted-foreground">Generate + schedule sending link emails (Coming Soon)</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="cursor-pointer hover:shadow-md transition-shadow opacity-50">
-                  <CardContent className="p-6 text-center">
-                    <Building2 className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
-                    <h3 className="font-semibold mb-2">Bank/SWIFT</h3>
-                    <p className="text-sm text-muted-foreground">Beneficiary + SWIFT + IBAN + Schedule (Coming Soon)</p>
-                  </CardContent>
-                </Card>
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Create New Transfer</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setCreateRuleOpen(true)}>
+                    <CardContent className="p-6 text-center">
+                      <Users className="w-8 h-8 mx-auto mb-3 text-primary" />
+                      <h3 className="font-semibold mb-2">To PBCEx User</h3>
+                      <p className="text-sm text-muted-foreground">Account Number + Name + Asset + Amount + Schedule</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="cursor-pointer hover:shadow-md transition-shadow opacity-50">
+                    <CardContent className="p-6 text-center">
+                      <Mail className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
+                      <h3 className="font-semibold mb-2">Payment Link</h3>
+                      <p className="text-sm text-muted-foreground">Generate + schedule sending link emails (Coming Soon)</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="cursor-pointer hover:shadow-md transition-shadow opacity-50">
+                    <CardContent className="p-6 text-center">
+                      <Building2 className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
+                      <h3 className="font-semibold mb-2">Bank/SWIFT</h3>
+                      <p className="text-sm text-muted-foreground">Beneficiary + SWIFT + IBAN + Schedule (Coming Soon)</p>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </TabsContent>
 
             <TabsContent value="rules" className="space-y-6 mt-6">
-              {/* Existing Rules */}
-              <div className="space-y-6">
-            {mockRules.length > 0 ? (
-              mockRules.map((rule) => (
-                <Card key={rule.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <h3 className="font-semibold text-lg">{rule.name}</h3>
-                              <Badge
-                                variant={rule.enabled ? 'default' : 'secondary'}
-                                className={rule.enabled ? 'text-green-600' : ''}
-                              >
-                                {rule.enabled ? (
-                                  <>
-                                    <CheckCircle2 className="w-3 h-3 mr-1" />
-                                    Active
-                                  </>
-                                ) : (
-                                  <>
-                                    <Pause className="w-3 h-3 mr-1" />
-                                    Paused
-                                  </>
-                                )}
-                              </Badge>
+              <TooltipProvider>
+                {/* Action Button */}
+                <div className="flex justify-between items-center">
+                  <Button onClick={() => setCreateRuleOpen(true)} size="lg">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Recurring Rule
+                  </Button>
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Search by destination name, asset, or status..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                    aria-label="Search recurring rules"
+                  />
+                </div>
+
+                {/* Funding Sources & Pull Priorities */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Funding Sources & Pull Priorities</h3>
+                    <p className="text-sm text-muted-foreground">Drag to reorder priority</p>
+                  </div>
+                  
+                  {fundingSources.length > 0 ? (
+                    <div className="space-y-2">
+                      {fundingSources
+                        .sort((a, b) => a.priority - b.priority)
+                        .map((source, index) => (
+                        <Card key={source.id} className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab hover:cursor-grabbing" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Drag to set priority</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              
+                              <div className="flex items-center space-x-2">
+                                <Badge variant="outline" className="text-xs">
+                                  #{index + 1}
+                                </Badge>
+                                <span className="font-medium">{source.name}</span>
+                              </div>
+                              
+                              <span className="text-sm text-muted-foreground">{source.balance}</span>
                             </div>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <span className="text-muted-foreground">From:</span> {rule.fromAccount}
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground">To:</span> {rule.toAccount}
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground">Amount:</span> {rule.amount} {rule.asset}
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground">Frequency:</span> {rule.frequency}
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground">Next Run:</span> {rule.nextRun}
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground">On Failure:</span> {rule.failoverRule}
-                              </div>
-                            </div>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Switch
+                                  checked={source.enabled}
+                                  onCheckedChange={() => toggleFundingSource(source.id)}
+                                  aria-label={`${source.enabled ? 'Disable' : 'Enable'} ${source.name} as funding source`}
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Toggle to allow this source for pulls</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <Card>
+                      <CardContent className="text-center py-8">
+                        <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                        <p className="text-muted-foreground">No funding sources configured</p>
+                        <Button variant="ghost" size="sm" className="mt-2">
+                          Add First Source
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+
+                {/* My Recurring Rules */}
+                <div className="space-y-6">
+                  <h3 className="text-lg font-semibold">My Recurring Rules</h3>
+                  
+                  {(() => {
+                    const filteredRules = filterRulesBySearch(mockRules);
+                    const groupedRules = groupRulesByDestination(filteredRules);
+                    
+                    return (
+                      <div className="space-y-6">
+                        {/* To PBCEx Users */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-base flex items-center">
+                            <Users className="w-4 h-4 mr-2 text-primary" />
+                            To PBCEx Users
+                          </h4>
+                          {groupedRules['pbcex-user'].length > 0 ? (
+                            <div className="space-y-3">
+                              {groupedRules['pbcex-user'].map((rule) => (
+                                <Card key={rule.id}>
+                                  <CardContent className="p-4">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex-1">
+                                        <div className="flex items-center space-x-2 mb-2">
+                                          <h5 className="font-semibold">{rule.name}</h5>
+                                          <Badge
+                                            variant={rule.enabled ? 'default' : 'secondary'}
+                                            className={rule.enabled ? 'bg-green-100 text-green-800' : ''}
+                                          >
+                                            {rule.enabled ? (
+                                              <>
+                                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                                Active
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Pause className="w-3 h-3 mr-1" />
+                                                Paused
+                                              </>
+                                            )}
+                                          </Badge>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-muted-foreground">
+                                          <div>To: {rule.toAccount}</div>
+                                          <div>Amount: {rule.amount} {rule.asset}</div>
+                                          <div>Next: {rule.nextRun}</div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex items-center space-x-2 ml-4">
+                                        <Tooltip>
+                                          <TooltipTrigger>
+                                            <Switch
+                                               checked={rule.enabled}
+                                               onCheckedChange={() => toggleRule(rule.id)}
+                                             />
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <p>Enable/disable rule</p>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                        
+                                        <Button variant="ghost" size="sm" aria-label="Edit rule">
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        
+                                        <Button variant="ghost" size="sm" aria-label="Duplicate rule">
+                                          <Copy className="w-3 h-3" />
+                                        </Button>
+                                        
+                                        <Button variant="ghost" size="sm" aria-label="Delete rule">
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          ) : (
+                            <Card>
+                              <CardContent className="text-center py-8">
+                                <Users className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                                <p className="text-muted-foreground">No rules for PBCEx users</p>
+                                <Button variant="ghost" size="sm" className="mt-2" onClick={() => setCreateRuleOpen(true)}>
+                                  Add First Rule
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          )}
+                        </div>
+
+                        {/* Payment Links / Email */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-base flex items-center">
+                            <Mail className="w-4 h-4 mr-2 text-primary" />
+                            Payment Links / Email
+                          </h4>
+                          {groupedRules['payment-link'].length > 0 ? (
+                            <div className="space-y-3">
+                              {groupedRules['payment-link'].map((rule) => (
+                                <Card key={rule.id}>
+                                  <CardContent className="p-4">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex-1">
+                                        <div className="flex items-center space-x-2 mb-2">
+                                          <h5 className="font-semibold">{rule.name}</h5>
+                                          <Badge
+                                            variant={rule.enabled ? 'default' : 'secondary'}
+                                            className={rule.enabled ? 'bg-green-100 text-green-800' : ''}
+                                          >
+                                            {rule.enabled ? (
+                                              <>
+                                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                                Active
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Pause className="w-3 h-3 mr-1" />
+                                                Paused
+                                              </>
+                                            )}
+                                          </Badge>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-muted-foreground">
+                                          <div>To: {rule.toAccount}</div>
+                                          <div>Amount: {rule.amount} {rule.asset}</div>
+                                          <div>Next: {rule.nextRun}</div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex items-center space-x-2 ml-4">
+                                         <Switch
+                                           checked={rule.enabled}
+                                           onCheckedChange={() => toggleRule(rule.id)}
+                                           aria-label="Enable/disable rule"
+                                         />
+                                        
+                                        <Button variant="ghost" size="sm" aria-label="Edit rule">
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        
+                                        <Button variant="ghost" size="sm" aria-label="Duplicate rule">
+                                          <Copy className="w-3 h-3" />
+                                        </Button>
+                                        
+                                        <Button variant="ghost" size="sm" aria-label="Delete rule">
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          ) : (
+                            <Card>
+                              <CardContent className="text-center py-8">
+                                <Mail className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                                <p className="text-muted-foreground">No payment link rules configured</p>
+                                <Button variant="ghost" size="sm" className="mt-2" onClick={() => setCreateRuleOpen(true)}>
+                                  Add First Rule
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          )}
+                        </div>
+
+                        {/* Bank / SWIFT */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-base flex items-center">
+                            <Building2 className="w-4 h-4 mr-2 text-primary" />
+                            Bank / SWIFT
+                          </h4>
+                          {groupedRules['bank-swift'].length > 0 ? (
+                            <div className="space-y-3">
+                              {groupedRules['bank-swift'].map((rule) => (
+                                <Card key={rule.id}>
+                                  <CardContent className="p-4">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex-1">
+                                        <div className="flex items-center space-x-2 mb-2">
+                                          <h5 className="font-semibold">{rule.name}</h5>
+                                          <Badge
+                                            variant={rule.enabled ? 'default' : 'secondary'}
+                                            className={rule.enabled ? 'bg-green-100 text-green-800' : ''}
+                                          >
+                                            {rule.enabled ? (
+                                              <>
+                                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                                Active
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Pause className="w-3 h-3 mr-1" />
+                                                Paused
+                                              </>
+                                            )}
+                                          </Badge>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-muted-foreground">
+                                          <div>To: {rule.toAccount}</div>
+                                          <div>Amount: {rule.amount} {rule.asset}</div>
+                                          <div>Next: {rule.nextRun}</div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex items-center space-x-2 ml-4">
+                                         <Switch
+                                           checked={rule.enabled}
+                                           onCheckedChange={() => toggleRule(rule.id)}
+                                           aria-label="Enable/disable rule"
+                                         />
+                                        
+                                        <Button variant="ghost" size="sm" aria-label="Edit rule">
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        
+                                        <Button variant="ghost" size="sm" aria-label="Duplicate rule">
+                                          <Copy className="w-3 h-3" />
+                                        </Button>
+                                        
+                                        <Button variant="ghost" size="sm" aria-label="Delete rule">
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          ) : (
+                            <Card>
+                              <CardContent className="text-center py-8">
+                                <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                                <p className="text-muted-foreground">No bank/SWIFT rules configured</p>
+                                <Button variant="ghost" size="sm" className="mt-2" onClick={() => setCreateRuleOpen(true)}>
+                                  Add First Rule
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          )}
                         </div>
                       </div>
-                      
-                      <div className="flex items-center space-x-3 ml-6">
-                        <Switch
-                          checked={rule.enabled}
-                          onCheckedChange={() => toggleRule(rule.id)}
-                        />
-                        <Button variant="ghost" size="sm" aria-label="Edit rule">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" aria-label="Delete rule">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <Repeat className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No Recurring Rules</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Create your first recurring transfer rule to automate regular payments
-                  </p>
-                  <Button onClick={() => setCreateRuleOpen(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create First Rule
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-              </div>
+                    );
+                  })()}
+                </div>
+              </TooltipProvider>
             </TabsContent>
           </Tabs>
         </div>
