@@ -65,8 +65,8 @@ describe('CommodityConfigService', () => {
       const result = await CommodityConfigService.getAllConfigs();
 
       expect(result).toHaveLength(6); // AU, AG, PT, PD, CU, CL
-      expect(result[0].symbol).toBe('AU');
-      expect(result[1].symbol).toBe('AG');
+      expect(result[0]?.symbol).toBe('AU');
+      expect(result[1]?.symbol).toBe('AG');
     });
 
     it('should handle cache errors gracefully', async () => {

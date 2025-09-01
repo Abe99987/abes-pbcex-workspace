@@ -13,7 +13,7 @@ describe('Environment Schema Validation', () => {
     DATABASE_URL: 'postgresql://test:test@localhost:5432/pbcex_test',
     JWT_SECRET: 'test-secret-key',
     JWT_EXPIRES_IN: '24h',
-    
+
     // Phase-3 feature flags
     PHASE: '1',
     ENABLE_VAULT_REDEMPTION: 'false',
@@ -39,7 +39,10 @@ describe('Environment Schema Validation', () => {
         DATABASE_URL: z.string().url(),
         JWT_SECRET: z.string().min(10),
         JWT_EXPIRES_IN: z.string().default('24h'),
-        PHASE: z.string().regex(/^[1-3]$/).default('1'),
+        PHASE: z
+          .string()
+          .regex(/^[1-3]$/)
+          .default('1'),
         ENABLE_VAULT_REDEMPTION: z.string().transform(val => val === 'true'),
         ENABLE_ONCHAIN: z.string().transform(val => val === 'true'),
         FULFILLMENT_STRATEGY: z.enum(['JM', 'BRINKS']),
@@ -57,7 +60,7 @@ describe('Environment Schema Validation', () => {
 
     it('should fail validation for missing required fields', () => {
       const invalidEnv = { ...validEnv };
-      delete invalidEnv.DATABASE_URL;
+      const { DATABASE_URL, ...invalidEnvWithoutDB } = invalidEnv;
 
       const envSchema = z.object({
         NODE_ENV: z.enum(['development', 'production', 'test']),
@@ -65,7 +68,7 @@ describe('Environment Schema Validation', () => {
         JWT_SECRET: z.string().min(10),
       });
 
-      const result = envSchema.safeParse(invalidEnv);
+      const result = envSchema.safeParse(invalidEnvWithoutDB);
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -74,7 +77,7 @@ describe('Environment Schema Validation', () => {
             expect.objectContaining({
               code: 'invalid_type',
               path: ['DATABASE_URL'],
-            })
+            }),
           ])
         );
       }
@@ -84,7 +87,10 @@ describe('Environment Schema Validation', () => {
   describe('Data Type Validation', () => {
     it('should validate PORT as number', () => {
       const envSchema = z.object({
-        PORT: z.string().transform(val => parseInt(val, 10)).pipe(z.number()),
+        PORT: z
+          .string()
+          .transform(val => parseInt(val, 10))
+          .pipe(z.number()),
       });
 
       const validPort = envSchema.safeParse({ PORT: '4001' });
@@ -140,7 +146,11 @@ describe('Environment Schema Validation', () => {
       const envSchema = z.object({
         PHASE: z.string().default('1'),
         JWT_EXPIRES_IN: z.string().default('24h'),
-        ENABLE_ONCHAIN: z.string().transform(val => val === 'true').pipe(z.boolean()).default(false),
+        ENABLE_ONCHAIN: z
+          .string()
+          .transform(val => val === 'true')
+          .pipe(z.boolean())
+          .default('false'),
       });
 
       const result = envSchema.safeParse({});
@@ -246,9 +256,16 @@ describe('Environment Schema Validation', () => {
         REDIS_URL: z.string().url().optional(),
       });
 
-      expect(envSchema.safeParse({ REDIS_URL: 'redis://localhost:6379' }).success).toBe(true);
-      expect(envSchema.safeParse({ REDIS_URL: 'redis://user:pass@host:6379/0' }).success).toBe(true);
-      expect(envSchema.safeParse({ REDIS_URL: 'invalid-redis-url' }).success).toBe(false);
+      expect(
+        envSchema.safeParse({ REDIS_URL: 'redis://localhost:6379' }).success
+      ).toBe(true);
+      expect(
+        envSchema.safeParse({ REDIS_URL: 'redis://user:pass@host:6379/0' })
+          .success
+      ).toBe(true);
+      expect(
+        envSchema.safeParse({ REDIS_URL: 'invalid-redis-url' }).success
+      ).toBe(false);
       expect(envSchema.safeParse({}).success).toBe(true); // Optional field
     });
   });
@@ -256,16 +273,23 @@ describe('Environment Schema Validation', () => {
   describe('Security Validation', () => {
     it('should require minimum JWT secret length', () => {
       const envSchema = z.object({
-        JWT_SECRET: z.string().min(32, 'JWT secret must be at least 32 characters'),
+        JWT_SECRET: z
+          .string()
+          .min(32, 'JWT secret must be at least 32 characters'),
       });
 
-      expect(envSchema.safeParse({ 
-        JWT_SECRET: 'this-is-a-very-long-and-secure-jwt-secret-key-for-production' 
-      }).success).toBe(true);
+      expect(
+        envSchema.safeParse({
+          JWT_SECRET:
+            'this-is-a-very-long-and-secure-jwt-secret-key-for-production',
+        }).success
+      ).toBe(true);
 
-      expect(envSchema.safeParse({ 
-        JWT_SECRET: 'short' 
-      }).success).toBe(false);
+      expect(
+        envSchema.safeParse({
+          JWT_SECRET: 'short',
+        }).success
+      ).toBe(false);
     });
 
     it('should validate environment types', () => {
@@ -296,10 +320,12 @@ describe('Environment Schema Validation', () => {
       expect(envSchema.safeParse({}).success).toBe(true);
 
       // Should succeed with some optional fields
-      expect(envSchema.safeParse({
-        PLAID_CLIENT_ID: 'test_client_id',
-        STRIPE_SECRET_KEY: 'sk_test_key',
-      }).success).toBe(true);
+      expect(
+        envSchema.safeParse({
+          PLAID_CLIENT_ID: 'test_client_id',
+          STRIPE_SECRET_KEY: 'sk_test_key',
+        }).success
+      ).toBe(true);
     });
 
     it('should require core database and auth fields', () => {
@@ -311,14 +337,18 @@ describe('Environment Schema Validation', () => {
 
       // Should fail without required fields
       expect(envSchema.safeParse({}).success).toBe(false);
-      expect(envSchema.safeParse({ DATABASE_URL: 'postgres://localhost' }).success).toBe(false);
-      
+      expect(
+        envSchema.safeParse({ DATABASE_URL: 'postgres://localhost' }).success
+      ).toBe(false);
+
       // Should succeed with all required fields
-      expect(envSchema.safeParse({
-        DATABASE_URL: 'postgresql://localhost/test',
-        JWT_SECRET: 'long-enough-secret',
-        NODE_ENV: 'test',
-      }).success).toBe(true);
+      expect(
+        envSchema.safeParse({
+          DATABASE_URL: 'postgresql://localhost/test',
+          JWT_SECRET: 'long-enough-secret',
+          NODE_ENV: 'test',
+        }).success
+      ).toBe(true);
     });
   });
 });

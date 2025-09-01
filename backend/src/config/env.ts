@@ -18,6 +18,13 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url(),
 
+  // Database Configuration
+  DB_CONNECT_TIMEOUT: z
+    .string()
+    .transform(val => parseInt(val, 10))
+    .pipe(z.number().min(1000).max(30000))
+    .default('5000'),
+
   // Authentication & Security
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   SESSION_SECRET: z

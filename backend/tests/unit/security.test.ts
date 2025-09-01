@@ -1,10 +1,17 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
+import {
+  describe,
+  test,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from '@jest/globals';
 
 /**
  * Security-focused Unit Tests
- * 
+ *
  * Tests critical security components including:
  * - Password hashing and validation
  * - JWT token security
@@ -27,39 +34,43 @@ describe('Security Tests', () => {
     test('should hash passwords with sufficient complexity', async () => {
       const plainPassword = 'TestPassword123!';
       const saltRounds = 12;
-      
+
       // Hash password
       const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
-      
+
       // Verify hash properties
       expect(hashedPassword).toBeDefined();
       expect(hashedPassword).not.toBe(plainPassword);
       expect(hashedPassword.length).toBeGreaterThan(50);
       expect(hashedPassword).toMatch(/^\$2[ab]\$12\$/); // bcrypt format with cost 12
-      
+
       // Verify password can be verified
       const isValid = await bcrypt.compare(plainPassword, hashedPassword);
       expect(isValid).toBe(true);
-      
+
       // Verify wrong password fails
-      const isWrongValid = await bcrypt.compare('WrongPassword123!', hashedPassword);
+      const isWrongValid = await bcrypt.compare(
+        'WrongPassword123!',
+        hashedPassword
+      );
       expect(isWrongValid).toBe(false);
     });
 
     test('should reject weak passwords', () => {
       const weakPasswords = [
-        '12345678',        // Only numbers
-        'password',        // Only lowercase
-        'PASSWORD',        // Only uppercase
-        'Pass123',         // Too short
+        '12345678', // Only numbers
+        'password', // Only lowercase
+        'PASSWORD', // Only uppercase
+        'Pass123', // Too short
         'passwordwithoutcaps123', // No uppercase or special chars
-        'PASSWORD123',     // No lowercase
-        'Password',        // No numbers or special chars
-        '',                // Empty
-        'abc',             // Too short
+        'PASSWORD123', // No lowercase
+        'Password', // No numbers or special chars
+        '', // Empty
+        'abc', // Too short
       ];
 
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
       weakPasswords.forEach(password => {
         expect(passwordRegex.test(password)).toBe(false);
@@ -75,7 +86,8 @@ describe('Security Tests', () => {
         'P@ssw0rd!Strong',
       ];
 
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
       strongPasswords.forEach(password => {
         expect(passwordRegex.test(password)).toBe(true);
@@ -85,19 +97,20 @@ describe('Security Tests', () => {
     test('should use timing-safe password comparison', async () => {
       const password = 'TestPassword123!';
       const hash = await bcrypt.hash(password, 12);
-      
+
       // Measure timing for correct password
       const startCorrect = process.hrtime.bigint();
       await bcrypt.compare(password, hash);
       const timeCorrect = process.hrtime.bigint() - startCorrect;
-      
+
       // Measure timing for incorrect password
       const startIncorrect = process.hrtime.bigint();
       await bcrypt.compare('WrongPassword123!', hash);
       const timeIncorrect = process.hrtime.bigint() - startIncorrect;
-      
+
       // bcrypt should have similar timing for both cases (within reasonable bounds)
-      const timeDifference = Math.abs(Number(timeCorrect - timeIncorrect)) / 1000000; // Convert to ms
+      const timeDifference =
+        Math.abs(Number(timeCorrect - timeIncorrect)) / 1000000; // Convert to ms
       expect(timeDifference).toBeLessThan(100); // Less than 100ms difference
     });
   });
@@ -122,7 +135,7 @@ describe('Security Tests', () => {
       expect(token).toBeDefined();
       expect(typeof token).toBe('string');
       expect(token.split('.')).toHaveLength(3); // header.payload.signature
-      
+
       // Verify token can be decoded
       const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
       expect(decoded.userId).toBe(testUserId);
@@ -134,10 +147,10 @@ describe('Security Tests', () => {
     test('should reject tampered tokens', () => {
       const payload = { userId: testUserId };
       const token = jwt.sign(payload, JWT_SECRET);
-      
+
       // Tamper with the token
       const tamperedToken = token.slice(0, -10) + 'tampered123';
-      
+
       expect(() => {
         jwt.verify(tamperedToken, JWT_SECRET);
       }).toThrow('invalid signature');
@@ -146,7 +159,7 @@ describe('Security Tests', () => {
     test('should reject expired tokens', () => {
       const payload = { userId: testUserId };
       const expiredToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '0s' });
-      
+
       expect(() => {
         jwt.verify(expiredToken, JWT_SECRET);
       }).toThrow('jwt expired');
@@ -155,7 +168,7 @@ describe('Security Tests', () => {
     test('should reject tokens with wrong secret', () => {
       const payload = { userId: testUserId };
       const token = jwt.sign(payload, JWT_SECRET);
-      
+
       expect(() => {
         jwt.verify(token, 'wrong-secret');
       }).toThrow('invalid signature');
@@ -177,7 +190,7 @@ describe('Security Tests', () => {
       });
 
       const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
-      
+
       expect(decoded.sub).toBe(testUserId);
       expect(decoded.iss).toBe('pbcex-api');
       expect(decoded.aud).toBe('pbcex-client');
@@ -205,7 +218,7 @@ describe('Security Tests', () => {
       function sanitizeInput(input: string): string {
         return input
           .replace(/['"]/g, '') // Remove quotes
-          .replace(/[;--]/g, '') // Remove SQL comment markers
+          .replace(/[;-]/g, '') // Remove SQL comment markers
           .replace(/\bUNION\b/gi, '') // Remove UNION keyword
           .replace(/\bSELECT\b/gi, '') // Remove SELECT keyword
           .replace(/\bDROP\b/gi, '') // Remove DROP keyword
@@ -309,11 +322,21 @@ describe('Security Tests', () => {
       };
 
       // Mock log redaction function
-      function redactSensitiveData(data: Record<string, any>): Record<string, any> {
+      function redactSensitiveData(
+        data: Record<string, any>
+      ): Record<string, any> {
         const redacted = { ...data };
         const sensitiveFields = [
-          'password', 'token', 'authorization', 'api_key', 'secret_key',
-          'ssn', 'creditCard', 'credit_card', 'cvv', 'pin'
+          'password',
+          'token',
+          'authorization',
+          'api_key',
+          'secret_key',
+          'ssn',
+          'creditCard',
+          'credit_card',
+          'cvv',
+          'pin',
         ];
 
         const sensitivePatterns = [
@@ -344,7 +367,7 @@ describe('Security Tests', () => {
       expect(redactedData.secret_key).toBe('[REDACTED]');
       expect(redactedData.ssn).toBe('[REDACTED]');
       expect(redactedData.creditCard).toBe('[REDACTED]');
-      
+
       // Should preserve non-sensitive data
       expect(redactedData.email).toBe('user@example.com');
       expect(redactedData.phone).toBe('+1-555-0123');
@@ -356,7 +379,7 @@ describe('Security Tests', () => {
         url: '/api/auth/login',
         headers: {
           'content-type': 'application/json',
-          'authorization': 'Bearer jwt-token-12345',
+          authorization: 'Bearer jwt-token-12345',
           'x-api-key': 'api-key-secret-value',
           'user-agent': 'PBCEx-Client/1.0',
         },
@@ -369,12 +392,16 @@ describe('Security Tests', () => {
       // Mock HTTP log redaction
       function redactHttpLog(request: any): any {
         const redacted = JSON.parse(JSON.stringify(request));
-        
+
         // Redact authorization headers
         if (redacted.headers) {
           Object.keys(redacted.headers).forEach(header => {
             const lowerHeader = header.toLowerCase();
-            if (lowerHeader.includes('auth') || lowerHeader.includes('key') || lowerHeader.includes('token')) {
+            if (
+              lowerHeader.includes('auth') ||
+              lowerHeader.includes('key') ||
+              lowerHeader.includes('token')
+            ) {
               redacted.headers[header] = '[REDACTED]';
             }
           });
@@ -384,7 +411,11 @@ describe('Security Tests', () => {
         if (redacted.body && typeof redacted.body === 'object') {
           const sensitiveBodyFields = ['password', 'token', 'secret', 'key'];
           Object.keys(redacted.body).forEach(field => {
-            if (sensitiveBodyFields.some(sensitive => field.toLowerCase().includes(sensitive))) {
+            if (
+              sensitiveBodyFields.some(sensitive =>
+                field.toLowerCase().includes(sensitive)
+              )
+            ) {
               redacted.body[field] = '[REDACTED]';
             }
           });
@@ -407,7 +438,7 @@ describe('Security Tests', () => {
     test('should implement rate limiting logic', () => {
       class RateLimiter {
         private requests: Map<string, number[]> = new Map();
-        
+
         constructor(
           private maxRequests: number,
           private windowMs: number
@@ -416,38 +447,38 @@ describe('Security Tests', () => {
         isAllowed(identifier: string): boolean {
           const now = Date.now();
           const requests = this.requests.get(identifier) || [];
-          
+
           // Remove expired requests
-          const validRequests = requests.filter(timestamp => 
-            now - timestamp < this.windowMs
+          const validRequests = requests.filter(
+            timestamp => now - timestamp < this.windowMs
           );
-          
+
           // Check if limit exceeded
           if (validRequests.length >= this.maxRequests) {
             return false;
           }
-          
+
           // Add current request
           validRequests.push(now);
           this.requests.set(identifier, validRequests);
-          
+
           return true;
         }
 
         getRemainingRequests(identifier: string): number {
           const now = Date.now();
           const requests = this.requests.get(identifier) || [];
-          const validRequests = requests.filter(timestamp => 
-            now - timestamp < this.windowMs
+          const validRequests = requests.filter(
+            timestamp => now - timestamp < this.windowMs
           );
-          
+
           return Math.max(0, this.maxRequests - validRequests.length);
         }
 
         getResetTime(identifier: string): number {
           const requests = this.requests.get(identifier) || [];
           if (requests.length === 0) return 0;
-          
+
           const oldestRequest = Math.min(...requests);
           return oldestRequest + this.windowMs;
         }
@@ -470,7 +501,7 @@ describe('Security Tests', () => {
       class MockRateLimiter {
         private requests: Map<string, number[]> = new Map();
         private mockTime = Date.now();
-        
+
         constructor(
           private maxRequests: number,
           private windowMs: number
@@ -483,18 +514,18 @@ describe('Security Tests', () => {
         isAllowed(identifier: string): boolean {
           const now = this.mockTime;
           const requests = this.requests.get(identifier) || [];
-          
-          const validRequests = requests.filter(timestamp => 
-            now - timestamp < this.windowMs
+
+          const validRequests = requests.filter(
+            timestamp => now - timestamp < this.windowMs
           );
-          
+
           if (validRequests.length >= this.maxRequests) {
             return false;
           }
-          
+
           validRequests.push(now);
           this.requests.set(identifier, validRequests);
-          
+
           return true;
         }
       }
@@ -527,12 +558,12 @@ describe('Security Tests', () => {
         if (a.length !== b.length) {
           return false;
         }
-        
+
         let result = 0;
         for (let i = 0; i < a.length; i++) {
           result |= a.charCodeAt(i) ^ b.charCodeAt(i);
         }
-        
+
         return result === 0;
       }
 
@@ -548,25 +579,28 @@ describe('Security Tests', () => {
     test('should implement delay on failed authentication attempts', async () => {
       class AuthenticationService {
         private failedAttempts: Map<string, number> = new Map();
-        
-        async authenticateWithDelay(userId: string, password: string): Promise<boolean> {
+
+        async authenticateWithDelay(
+          userId: string,
+          password: string
+        ): Promise<boolean> {
           const attempts = this.failedAttempts.get(userId) || 0;
-          
+
           // Implement exponential backoff delay
           if (attempts > 0) {
             const delay = Math.min(1000 * Math.pow(2, attempts - 1), 30000); // Max 30 seconds
             await new Promise(resolve => setTimeout(resolve, delay));
           }
-          
+
           // Mock authentication (always fails for test)
           const isValid = false;
-          
+
           if (!isValid) {
             this.failedAttempts.set(userId, attempts + 1);
           } else {
             this.failedAttempts.delete(userId);
           }
-          
+
           return isValid;
         }
 
@@ -599,19 +633,21 @@ describe('Security Tests', () => {
   describe('Cryptographic Operations', () => {
     test('should use cryptographically secure random values', () => {
       const crypto = require('crypto');
-      
+
       // Generate random bytes
       const randomBytes = crypto.randomBytes(32);
       expect(randomBytes).toHaveLength(32);
-      
+
       // Generate random hex string
       const randomHex = crypto.randomBytes(16).toString('hex');
       expect(randomHex).toHaveLength(32);
       expect(randomHex).toMatch(/^[a-f0-9]+$/);
-      
+
       // Generate random UUID
       const uuid = crypto.randomUUID();
-      expect(uuid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+      expect(uuid).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+      );
     });
 
     test('should properly handle encryption/decryption', () => {
@@ -619,37 +655,37 @@ describe('Security Tests', () => {
       const algorithm = 'aes-256-gcm';
       const key = crypto.randomBytes(32);
       const iv = crypto.randomBytes(16);
-      
+
       function encrypt(text: string): { encrypted: string; authTag: string } {
         const cipher = crypto.createCipher(algorithm, key);
         cipher.setAAD(Buffer.from('pbcex-encryption', 'utf8'));
-        
+
         let encrypted = cipher.update(text, 'utf8', 'hex');
         encrypted += cipher.final('hex');
-        
+
         const authTag = cipher.getAuthTag().toString('hex');
-        
+
         return { encrypted, authTag };
       }
-      
+
       function decrypt(encrypted: string, authTag: string): string {
         const decipher = crypto.createDecipher(algorithm, key);
         decipher.setAAD(Buffer.from('pbcex-encryption', 'utf8'));
         decipher.setAuthTag(Buffer.from(authTag, 'hex'));
-        
+
         let decrypted = decipher.update(encrypted, 'hex', 'utf8');
         decrypted += decipher.final('utf8');
-        
+
         return decrypted;
       }
-      
+
       const plaintext = 'sensitive-user-data-12345';
       const { encrypted, authTag } = encrypt(plaintext);
-      
+
       expect(encrypted).toBeDefined();
       expect(encrypted).not.toBe(plaintext);
       expect(authTag).toBeDefined();
-      
+
       const decrypted = decrypt(encrypted, authTag);
       expect(decrypted).toBe(plaintext);
     });
@@ -679,16 +715,22 @@ describe('Security Tests', () => {
           if (!value) {
             errors.push(`Missing required environment variable: ${envVar}`);
           } else if (value.length < 16) {
-            errors.push(`Environment variable ${envVar} is too short (minimum 16 characters)`);
+            errors.push(
+              `Environment variable ${envVar} is too short (minimum 16 characters)`
+            );
           } else if (value === 'default' || value === 'changeme') {
-            errors.push(`Environment variable ${envVar} uses default/insecure value`);
+            errors.push(
+              `Environment variable ${envVar} uses default/insecure value`
+            );
           }
         });
 
         optionalSecurityEnvVars.forEach(envVar => {
           const value = process.env[envVar];
           if (!value) {
-            warnings.push(`Optional security environment variable not set: ${envVar}`);
+            warnings.push(
+              `Optional security environment variable not set: ${envVar}`
+            );
           }
         });
 
@@ -696,13 +738,15 @@ describe('Security Tests', () => {
       }
 
       // Set test environment variables
-      process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing-only-16-chars-minimum';
-      process.env.DATABASE_URL = 'postgresql://user:password@localhost:5432/testdb';
+      process.env.JWT_SECRET =
+        'test-jwt-secret-key-for-testing-only-16-chars-minimum';
+      process.env.DATABASE_URL =
+        'postgresql://user:password@localhost:5432/testdb';
       process.env.REDIS_URL = 'redis://localhost:6379';
 
       const validation = validateEnvironment();
       expect(validation.errors).toHaveLength(0);
-      
+
       // Clean up
       delete process.env.JWT_SECRET;
       delete process.env.DATABASE_URL;
@@ -712,10 +756,10 @@ describe('Security Tests', () => {
     test('should detect insecure environment configurations', () => {
       const insecureConfigs = {
         NODE_ENV: 'development', // Should be production in prod
-        DEBUG: 'true',           // Should be false in prod
-        CORS_ORIGIN: '*',        // Should be specific origins
-        SSL_VERIFY: 'false',     // Should be true
-        LOG_LEVEL: 'debug',      // Should be warn/error in prod
+        DEBUG: 'true', // Should be false in prod
+        CORS_ORIGIN: '*', // Should be specific origins
+        SSL_VERIFY: 'false', // Should be true
+        LOG_LEVEL: 'debug', // Should be warn/error in prod
       };
 
       function detectInsecureConfig(config: Record<string, string>): string[] {
