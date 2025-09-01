@@ -125,6 +125,7 @@ const App = () => (
           <Route path="/pay/bills" element={<BillPay />} />
           <Route path="/pay/request" element={<RequestPayment />} />
           <Route path="/send/recurring" element={<RecurringTransfers />} />
+          <Route path="/trade/dca" element={<DCA />} />
             <Route path="/support/help-center" element={<HelpCenter />} />
             <Route path="/support/security" element={<Security />} />
             <Route path="/support/compliance" element={<Compliance />} />
