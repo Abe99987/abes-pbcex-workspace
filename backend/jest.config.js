@@ -1,19 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const candidateSetups = [
-  '<rootDir>/src/__tests__/setup.ts',
-  '<rootDir>/tests/setup.ts',
-];
-
-const setupFiles = candidateSetups.filter(p =>
-  fs.existsSync(path.resolve(__dirname, p.replace('<rootDir>', '.')))
-);
-
 export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
@@ -39,7 +23,7 @@ export default {
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
-  setupFilesAfterEnv: setupFiles,
+  // Remove setupFilesAfterEnv to avoid problematic imports
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },

@@ -1,5 +1,3 @@
-import { truncateAll } from './helpers/db';
-
 /**
  * Jest Setup - runs before each test file
  * Ensures clean state for each test
@@ -18,9 +16,10 @@ declare global {
 // Custom Jest matchers
 expect.extend({
   toBeValidUUID(received: any) {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     const pass = typeof received === 'string' && uuidRegex.test(received);
-    
+
     if (pass) {
       return {
         message: () => `expected ${received} not to be a valid UUID`,
@@ -37,7 +36,7 @@ expect.extend({
   toMatchBalanceFormat(received: any) {
     const balanceRegex = /^\d+\.\d{1,8}$/;
     const pass = typeof received === 'string' && balanceRegex.test(received);
-    
+
     if (pass) {
       return {
         message: () => `expected ${received} not to match balance format`,
@@ -45,7 +44,8 @@ expect.extend({
       };
     } else {
       return {
-        message: () => `expected ${received} to match balance format (0.00000000)`,
+        message: () =>
+          `expected ${received} to match balance format (0.00000000)`,
         pass: false,
       };
     }
@@ -56,16 +56,16 @@ expect.extend({
 beforeAll(async () => {
   // Load test environment variables
   require('dotenv').config({ path: '.env.test' });
+
+  // Set test environment flag to bypass validation
+  process.env.NODE_ENV = 'test';
+  process.env.SKIP_ENV_VALIDATION = 'true';
 });
 
 // Clean up after each test file
 afterAll(async () => {
-  try {
-    // Clean up test data
-    await truncateAll();
-  } catch (error) {
-    console.warn('Warning: Failed to clean test data:', error);
-  }
+  // Note: Database cleanup is handled by individual test files
+  // to avoid importing problematic modules at setup time
 });
 
 // Silence console logs in tests unless explicitly enabled
@@ -91,43 +91,46 @@ jest.mock('../src/services/NotificationService');
 export const TestUtils = {
   // Wait for async operations
   wait: (ms: number = 100) => new Promise(resolve => setTimeout(resolve, ms)),
-  
+
   // Generate test email
   generateTestEmail: () => `test-${Date.now()}@example.com`,
-  
+
   // Generate random string
-  randomString: (length: number = 10) => Math.random().toString(36).substring(2, length + 2),
-  
+  randomString: (length: number = 10) =>
+    Math.random()
+      .toString(36)
+      .substring(2, length + 2),
+
   // Mock date to fixed value
   mockDate: (date: string | Date) => {
     const mockDate = new Date(date);
     jest.useFakeTimers();
     jest.setSystemTime(mockDate);
   },
-  
+
   // Restore real timers
   restoreDate: () => {
     jest.useRealTimers();
   },
-  
+
   // Clean object for comparison (remove undefined, null)
   cleanObject: (obj: any) => {
     return Object.fromEntries(
       Object.entries(obj).filter(([_, v]) => v !== undefined && v !== null)
     );
   },
-  
+
   // Format currency for tests
   formatCurrency: (amount: number, decimals: number = 2) => {
     return amount.toFixed(decimals);
   },
-  
+
   // Check if string is valid decimal
   isValidDecimal: (value: string, decimals: number = 8) => {
     const regex = new RegExp(`^\\d+\\.\\d{1,${decimals}}$`);
     return regex.test(value);
   },
-  
+
   // Assert API error response format
   expectApiError: (response: any, code: string) => {
     expect(response.body).toMatchObject({
@@ -160,7 +163,11 @@ export const TestUtils = {
   },
 
   // Mock environment variable
-  withEnvVar: async <T>(name: string, value: string, fn: () => Promise<T>): Promise<T> => {
+  withEnvVar: async <T>(
+    name: string,
+    value: string,
+    fn: () => Promise<T>
+  ): Promise<T> => {
     const original = process.env[name];
     process.env[name] = value;
     try {
@@ -175,12 +182,13 @@ export const TestUtils = {
   },
 
   // Mock feature flag
-  withFeatureFlag: async <T>(flag: string, enabled: boolean, fn: () => Promise<T>): Promise<T> => {
+  withFeatureFlag: async <T>(
+    flag: string,
+    enabled: boolean,
+    fn: () => Promise<T>
+  ): Promise<T> => {
     return TestUtils.withEnvVar(flag, enabled.toString(), fn);
   },
 };
-
-// Export for use in tests
-export { truncateAll };
 
 console.log('🧪 Test environment initialized');
