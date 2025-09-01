@@ -12,6 +12,7 @@ import { Mail, MessageSquare, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FranchiseAndPartnershipsForm from "@/components/FranchiseAndPartnershipsForm";
 import PressForm from "@/components/PressForm";
+import FranchiseDemandCounter from "@/components/FranchiseDemandCounter";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -85,7 +86,7 @@ const Contact = () => {
       
       <main className="py-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
                 Contact Us
@@ -244,6 +245,9 @@ const Contact = () => {
           </div>
         </div>
       </main>
+
+      {/* Franchise Demand Counter */}
+      <FranchiseDemandCounter />
 
       <Footer />
     </div>

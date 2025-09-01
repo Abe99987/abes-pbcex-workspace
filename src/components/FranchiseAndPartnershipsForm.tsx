@@ -175,6 +175,7 @@ const FranchiseAndPartnershipsForm = () => {
     countryOfIncorporation: 'United States',
     regulatoryStatus: '',
     assetsUnderManagement: '',
+    numberOfLocations: '',
     contactTitle: '',
     partnershipAreas: [] as string[],
     regulatoryApproval: null as File | null,
@@ -269,6 +270,8 @@ const FranchiseAndPartnershipsForm = () => {
           newErrors.regulatoryStatus = 'Regulatory status is required';
         if (!formData.contactTitle.trim())
           newErrors.contactTitle = 'Contact title is required';
+        if (!formData.numberOfLocations.trim())
+          newErrors.numberOfLocations = 'Number of locations is required';
         break;
 
       case 'commodity_provider':
@@ -807,6 +810,26 @@ const FranchiseAndPartnershipsForm = () => {
               placeholder='Optional'
             />
           </div>
+          <div>
+            <Label htmlFor='numberOfLocations'>Number of Locations *</Label>
+            <Input
+              id='numberOfLocations'
+              type='number'
+              min='1'
+              value={formData.numberOfLocations || ''}
+              onChange={e =>
+                handleInputChange('numberOfLocations', e.target.value)
+              }
+              data-error={!!errors.numberOfLocations}
+              className={errors.numberOfLocations ? 'border-destructive' : ''}
+              placeholder='Total number of branch locations'
+            />
+            {errors.numberOfLocations && (
+              <p className='text-sm text-destructive mt-1'>
+                {errors.numberOfLocations}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -980,10 +1003,7 @@ const FranchiseAndPartnershipsForm = () => {
         {/* Intro Pitch */}
         <div className='p-4 bg-muted/20 rounded-lg border-l-4 border-primary'>
           <p className='text-sm leading-relaxed'>
-            Join the PBCEx global supply network — connect your commodities
-            directly to our marketplace. Approved providers can set pricing
-            margins, fulfill in-country, and access institutional buyers
-            worldwide.
+            Join the PBCEx global supply network. Connect your commodities directly to our marketplace and participate as a co-market maker with us. Approved providers can set pricing margins, fulfill orders locally, and reach institutional buyers worldwide. As we expand through Phases 1, 3, and 4B, eligible partners gain additional routes for settlement, hedging, and distribution.
           </p>
         </div>
 
@@ -1610,37 +1630,52 @@ const FranchiseAndPartnershipsForm = () => {
                     <TabsList className='flex w-full overflow-x-auto whitespace-nowrap p-1'>
                       <TabsTrigger
                         value='franchise_applicant'
-                        className='flex-1 text-xs p-2 min-w-fit'
+                        className='flex-1 text-xs p-3 min-w-fit h-12 leading-tight text-center'
                       >
-                        Franchise Applicant
+                        <div className='flex flex-col items-center'>
+                          <span>Franchise</span>
+                          <span>Applicant</span>
+                        </div>
                       </TabsTrigger>
                       <TabsTrigger
                         value='bank_partner'
-                        className='flex-1 text-xs p-2 min-w-fit'
+                        className='flex-1 text-xs p-3 min-w-fit h-12 leading-tight text-center'
                       >
-                        Bank Partner
+                        <div className='flex flex-col items-center'>
+                          <span>Bank</span>
+                          <span>Partner</span>
+                        </div>
                       </TabsTrigger>
                       <TabsTrigger
                         value='commodity_provider'
-                        className='flex-1 text-xs p-2 min-w-fit'
+                        className='flex-1 text-xs p-3 min-w-fit h-12 leading-tight text-center'
                       >
-                        Commodity Provider
+                        <div className='flex flex-col items-center'>
+                          <span>Commodity</span>
+                          <span>Provider</span>
+                        </div>
                       </TabsTrigger>
                       <TabsTrigger
                         value='customer_vote'
-                        className='flex-1 text-xs p-2 min-w-fit'
+                        className='flex-1 text-xs p-3 min-w-fit h-12 leading-tight text-center'
                       >
-                        Customer Vote
+                        <div className='flex flex-col items-center'>
+                          <span>Customer</span>
+                          <span>Vote</span>
+                        </div>
                       </TabsTrigger>
                       <TabsTrigger
                         value='general_business_inquiry'
-                        className='flex-1 text-xs p-2 min-w-fit'
+                        className='flex-1 text-xs p-3 min-w-fit h-12 leading-tight text-center'
                       >
-                        General Inquiry
+                        <div className='flex flex-col items-center'>
+                          <span>General</span>
+                          <span>Inquiry</span>
+                        </div>
                       </TabsTrigger>
                       <TabsTrigger
                         value='investor'
-                        className='flex-1 text-xs p-2 min-w-fit'
+                        className='flex-1 text-xs p-3 min-w-fit h-12 leading-tight text-center'
                       >
                         Investor
                       </TabsTrigger>
