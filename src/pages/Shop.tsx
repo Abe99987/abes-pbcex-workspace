@@ -29,6 +29,8 @@ import {
   BarChart3,
   Truck,
   Home,
+  Users,
+  Coins,
 } from 'lucide-react';
 import BuyAssetModal from '@/components/BuyAssetModal';
 import SellAssetModal from '@/components/SellAssetModal';
