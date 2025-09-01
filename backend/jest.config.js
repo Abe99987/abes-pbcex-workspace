@@ -8,6 +8,7 @@ module.exports = {
     '/dist/',
     '.*\\.skip$',
     '.*\\.skip\\.ts$',
+    '.*skip.*',
   ],
   transform: {
     '^.+\\.ts$': 'ts-jest',
@@ -27,4 +28,6 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   testTimeout: 10000,
+  verbose: true,
+  detectOpenHandles: true,
 };
