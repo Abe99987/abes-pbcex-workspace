@@ -174,8 +174,10 @@ const safe = (id: string): string => {
 
 const safeOrderBy = (orderBy: string): string => {
   const [col, dir] = String(orderBy).split(/\s+/);
-  const safeCol = safe(col);
-  const safeDir = /^(ASC|DESC)$/i.test(dir || '') ? dir.toUpperCase() : 'ASC';
+  const safeCol = safe(col || 'id'); // Default to 'id' if no column specified
+  const safeDir = /^(ASC|DESC)$/i.test(dir || '')
+    ? (dir || 'ASC').toUpperCase()
+    : 'ASC';
   return `${safeCol} ${safeDir}`;
 };
 
