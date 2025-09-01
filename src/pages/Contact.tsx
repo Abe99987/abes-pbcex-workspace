@@ -19,7 +19,7 @@ const Contact = () => {
             <div>
               <div className="text-center mb-8">
                 <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                  Franchise & Partnerships
+                  Contact US
                 </h2>
                 <p className="text-lg text-muted-foreground">
                   Join our network or explore partnership opportunities
