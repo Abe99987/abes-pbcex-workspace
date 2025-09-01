@@ -101,9 +101,20 @@ const App = () => (
             <Route path="/account/identity" element={<Account />} />
             <Route path="/account/security" element={<Account />} />
             <Route path="/account/payments" element={<Account />} />
-            <Route path="/account/notifications" element={<Account />} />
-            <Route path="/account/api-keys" element={<Account />} />
-            <Route path="/account/tax" element={<Account />} />
+          <Route path="/account/notifications" element={<Account />} />
+          <Route path="/account/api-keys" element={<Account />} />
+          <Route path="/account/tax" element={<Account />} />
+          
+          {/* Send/Pay Routes */}
+          <Route path="/send/internal" element={<InternalTransfer />} />
+          <Route path="/send/crypto" element={<CryptoWithdrawal />} />
+          <Route path="/send/bank" element={<BankTransfer />} />
+          <Route path="/pay/qr" element={<PayWithQR />} />
+          <Route path="/receive/qr" element={<ReceiveWithQR />} />
+          <Route path="/card/spend" element={<CardSpend />} />
+          <Route path="/pay/bills" element={<BillPay />} />
+          <Route path="/pay/request" element={<RequestPayment />} />
+          <Route path="/send/recurring" element={<RecurringTransfers />} />
             <Route path="/support/help-center" element={<HelpCenter />} />
             <Route path="/support/security" element={<Security />} />
             <Route path="/support/compliance" element={<Compliance />} />

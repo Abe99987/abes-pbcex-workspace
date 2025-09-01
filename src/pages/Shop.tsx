@@ -491,22 +491,64 @@ const Shop = () => {
             asset={selectedAsset}
           />
           
-          {/* Send = Development Modal */}
+          {/* Send = Choice Modal */}
           <Dialog open={sendModalOpen} onOpenChange={setSendModalOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Send/Receive {selectedAsset?.name}</DialogTitle>
+                <DialogTitle>Send {selectedAsset?.name}</DialogTitle>
                 <DialogDescription>
-                  This feature is under development. Please use the
-                  corresponding trading page for sending/receiving.
+                  Choose how you'd like to send this asset
                 </DialogDescription>
               </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <Button
+                    variant="outline"
+                    className="w-full h-16 flex items-center justify-start p-4"
+                    onClick={() => {
+                      setSendModalOpen(false);
+                      navigate(`/send/internal?asset=${selectedAsset?.symbol}`);
+                    }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Users className="w-5 h-5" />
+                      <div className="text-left">
+                        <div className="font-medium">Send to PBCEx User</div>
+                        <div className="text-sm text-muted-foreground">Instant transfer, no fees</div>
+                      </div>
+                    </div>
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    className="w-full h-16 flex items-center justify-start p-4"
+                    onClick={() => {
+                      setSendModalOpen(false);
+                      navigate(`/send/crypto?asset=${selectedAsset?.symbol}`);
+                    }}
+                    disabled={!['PAXG', 'USDC', 'ETH', 'BTC'].includes(selectedAsset?.symbol || '')}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Coins className="w-5 h-5" />
+                      <div className="text-left">
+                        <div className="font-medium">Send to External Crypto Account</div>
+                        <div className="text-sm text-muted-foreground">
+                          {!['PAXG', 'USDC', 'ETH', 'BTC'].includes(selectedAsset?.symbol || '') 
+                            ? 'Not available for this asset yet'
+                            : 'Withdraw to external wallet'
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </Button>
+                </div>
+              </div>
               <DialogFooter>
                 <Button
                   variant='outline'
                   onClick={() => setSendModalOpen(false)}
                 >
-                  Close
+                  Cancel
                 </Button>
               </DialogFooter>
             </DialogContent>
