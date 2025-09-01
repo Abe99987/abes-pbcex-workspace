@@ -57,19 +57,13 @@ const envSchema = z.object({
   FEDEX_CLIENT_ID: z.string().optional(),
   FEDEX_CLIENT_SECRET: z.string().optional(),
   FEDEX_ACCOUNT_NUMBER: z.string().optional(),
-  FEDEX_BASE_URL: z
-    .string()
-    .url()
-    .default('https://apis-sandbox.fedex.com'),
+  FEDEX_BASE_URL: z.string().url().default('https://apis-sandbox.fedex.com'),
 
   // Payments
   STRIPE_SECRET_KEY: z.string().optional(),
 
   // Messaging & Communication
-  EMAIL_FROM: z
-    .string()
-    .email()
-    .default('contact@pbcex.com'),
+  EMAIL_FROM: z.string().email().default('contact@pbcex.com'),
   RESEND_API_KEY: z.string().optional(),
   SENDGRID_API_KEY: z.string().optional(),
   TWILIO_ACCOUNT_SID: z.string().optional(),
@@ -83,14 +77,8 @@ const envSchema = z.object({
   VANTA_API_KEY: z.string().optional(),
 
   // API Configuration
-  API_BASE_URL: z
-    .string()
-    .url()
-    .default('http://localhost:3000'),
-  APP_BASE_URL: z
-    .string()
-    .url()
-    .default('http://localhost:8080'),
+  API_BASE_URL: z.string().url().default('http://localhost:3000'),
+  APP_BASE_URL: z.string().url().default('http://localhost:8080'),
   COINGECKO_BASE_URL: z
     .string()
     .url()
@@ -128,12 +116,111 @@ const envSchema = z.object({
   // A/B Testing Configuration
   EXPERIMENTS_JSON: z.string().optional(),
 
+  // Feature Flags
+  MONEY_MOVEMENT_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  DCA_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  SHOP_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('true'),
+  TRADING_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('true'),
+  INTERNAL_TRANSFERS_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  CRYPTO_WITHDRAWALS_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  BANK_TRANSFERS_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  QR_PAYMENTS_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  PAYMENT_REQUESTS_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  BILL_PAY_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  RECURRING_TRANSFERS_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  CARD_FUNDING_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  DCA_BACKTESTING_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  PHYSICAL_ORDERS_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('true'),
+  SELL_CONVERT_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('true'),
+  SPOT_TRADING_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('true'),
+  MARGIN_TRADING_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  TWO_FACTOR_AUTH_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+  KYC_REQUIRED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('true'),
+  ADVANCED_SECURITY_ENABLED: z
+    .string()
+    .transform(val => val === 'true')
+    .pipe(z.boolean())
+    .default('false'),
+
   // API & Application Info
   API_VERSION: z.string().default('1.0.0'),
-  NEXT_PUBLIC_APP_URL: z
-    .string()
-    .url()
-    .default('http://localhost:8080'),
+  NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:8080'),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
@@ -145,12 +232,24 @@ export type EnvConfig = z.infer<typeof envSchema>;
 const productionSchema = envSchema.extend({
   // Critical integrations required in production
   RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required in production'),
-  TWILIO_ACCOUNT_SID: z.string().min(1, 'TWILIO_ACCOUNT_SID is required in production'),
-  TWILIO_AUTH_TOKEN: z.string().min(1, 'TWILIO_AUTH_TOKEN is required in production'),
-  TWILIO_VERIFY_SERVICE_SID: z.string().min(1, 'TWILIO_VERIFY_SERVICE_SID is required in production'),
-  FEDEX_CLIENT_ID: z.string().min(1, 'FEDEX_CLIENT_ID is required in production'),
-  FEDEX_CLIENT_SECRET: z.string().min(1, 'FEDEX_CLIENT_SECRET is required in production'),
-  FEDEX_ACCOUNT_NUMBER: z.string().min(1, 'FEDEX_ACCOUNT_NUMBER is required in production'),
+  TWILIO_ACCOUNT_SID: z
+    .string()
+    .min(1, 'TWILIO_ACCOUNT_SID is required in production'),
+  TWILIO_AUTH_TOKEN: z
+    .string()
+    .min(1, 'TWILIO_AUTH_TOKEN is required in production'),
+  TWILIO_VERIFY_SERVICE_SID: z
+    .string()
+    .min(1, 'TWILIO_VERIFY_SERVICE_SID is required in production'),
+  FEDEX_CLIENT_ID: z
+    .string()
+    .min(1, 'FEDEX_CLIENT_ID is required in production'),
+  FEDEX_CLIENT_SECRET: z
+    .string()
+    .min(1, 'FEDEX_CLIENT_SECRET is required in production'),
+  FEDEX_ACCOUNT_NUMBER: z
+    .string()
+    .min(1, 'FEDEX_ACCOUNT_NUMBER is required in production'),
 });
 
 /**
@@ -160,7 +259,7 @@ const productionSchema = envSchema.extend({
 function validateEnv(): EnvConfig {
   const isProduction = process.env.NODE_ENV === 'production';
   const schema = isProduction ? productionSchema : envSchema;
-  
+
   try {
     return schema.parse(process.env);
   } catch (error) {
@@ -210,12 +309,20 @@ export const integrations = {
   jmBullion: !!(env.JM_BULLION_API_KEY && env.JM_BULLION_API_SECRET),
   dillonGage: !!(env.DILLON_GAGE_API_KEY && env.DILLON_GAGE_API_SECRET),
   fedex: !!(env.FEDEX_CLIENT_ID && env.FEDEX_CLIENT_SECRET),
-  fedexFull: !!(env.FEDEX_CLIENT_ID && env.FEDEX_CLIENT_SECRET && env.FEDEX_ACCOUNT_NUMBER),
+  fedexFull: !!(
+    env.FEDEX_CLIENT_ID &&
+    env.FEDEX_CLIENT_SECRET &&
+    env.FEDEX_ACCOUNT_NUMBER
+  ),
   stripe: !!env.STRIPE_SECRET_KEY,
   resend: !!env.RESEND_API_KEY,
   sendgrid: !!env.SENDGRID_API_KEY,
   twilio: !!(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN),
-  twilioVerify: !!(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && env.TWILIO_VERIFY_SERVICE_SID),
+  twilioVerify: !!(
+    env.TWILIO_ACCOUNT_SID &&
+    env.TWILIO_AUTH_TOKEN &&
+    env.TWILIO_VERIFY_SERVICE_SID
+  ),
   intercom: !!env.INTERCOM_ACCESS_TOKEN,
   datadog: !!env.DATADOG_API_KEY,
   vanta: !!env.VANTA_API_KEY,

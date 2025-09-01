@@ -21,6 +21,30 @@ class DatabaseManager {
     return DatabaseManager.instance;
   }
 
+  private getSSLConfig() {
+    const databaseSSL = process.env.DATABASE_SSL === 'true';
+    const databaseSSLRejectUnauthorized =
+      process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'true';
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    // Default behavior: SSL disabled in dev/test unless explicitly enabled
+    if (!databaseSSL) {
+      return false;
+    }
+
+    // Production: default to secure SSL unless explicitly disabled
+    if (isProduction) {
+      return {
+        rejectUnauthorized: databaseSSLRejectUnauthorized !== false,
+      };
+    }
+
+    // Development: allow insecure SSL for local development
+    return {
+      rejectUnauthorized: databaseSSLRejectUnauthorized || false,
+    };
+  }
+
   private initialize() {
     const databaseUrl = process.env.DATABASE_URL || process.env.DIRECT_URL;
 
@@ -30,11 +54,12 @@ class DatabaseManager {
     }
 
     try {
+      // Configure SSL based on environment
+      const sslConfig = this.getSSLConfig();
+
       this.pool = new Pool({
         connectionString: databaseUrl,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl: sslConfig,
         max: 20, // Maximum number of clients in the pool
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
