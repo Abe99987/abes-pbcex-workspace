@@ -4,7 +4,7 @@
   "description": "PBCEx Backend API Server",
   "main": "dist/server.js",
   "engines": {
-    "node": "20.x",
+    "node": "24.x",
     "npm": ">=10.0.0"
   },
   "scripts": {

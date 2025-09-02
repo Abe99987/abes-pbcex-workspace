@@ -123,12 +123,20 @@ export default function MySpending() {
   const totalSpending = SPENDING_CATEGORIES.reduce((sum, cat) => sum + cat.amount, 0);
   const currentMonthSpend = MONTHLY_SPEND_DATA[MONTHLY_SPEND_DATA.length - 1];
   const previousMonthSpend = MONTHLY_SPEND_DATA[MONTHLY_SPEND_DATA.length - 2];
-  const monthlyChange = ((currentMonthSpend.amount - previousMonthSpend.amount) / previousMonthSpend.amount) * 100;
+  
+  // Safe calculations with fallbacks
+  const monthlyChange = currentMonthSpend && previousMonthSpend 
+    ? ((currentMonthSpend.amount - previousMonthSpend.amount) / previousMonthSpend.amount) * 100 
+    : 0;
 
   // Calculate burn rate and savings rate (mock data)
   const monthlyIncome = 7500; // Mock monthly income
-  const savingsRate = ((monthlyIncome - currentMonthSpend.amount) / monthlyIncome) * 100;
-  const burnRate = (currentMonthSpend.amount / monthlyIncome) * 100;
+  const savingsRate = currentMonthSpend 
+    ? ((monthlyIncome - currentMonthSpend.amount) / monthlyIncome) * 100 
+    : 0;
+  const burnRate = currentMonthSpend 
+    ? (currentMonthSpend.amount / monthlyIncome) * 100 
+    : 0;
 
   if (authLoading) {
     return (
@@ -200,7 +208,7 @@ export default function MySpending() {
               <DollarSign className="h-5 w-5 text-gray-400" />
             </div>
             <div className="text-2xl font-bold text-gray-900 mb-2">
-              ${currentMonthSpend.amount.toLocaleString()}
+              ${currentMonthSpend?.amount.toLocaleString() || '0'}
             </div>
             <div className={`flex items-center text-sm ${monthlyChange >= 0 ? 'text-red-600' : 'text-green-600'}`}>
               {monthlyChange >= 0 ? (
@@ -219,10 +227,10 @@ export default function MySpending() {
               <ShoppingBag className="h-5 w-5 text-gray-400" />
             </div>
             <div className="text-2xl font-bold text-gray-900 mb-2">
-              ${currentMonthSpend.discretionary.toLocaleString()}
+              ${currentMonthSpend?.discretionary.toLocaleString() || '0'}
             </div>
             <div className="text-sm text-gray-600">
-              {((currentMonthSpend.discretionary / currentMonthSpend.amount) * 100).toFixed(1)}% of total
+              {currentMonthSpend ? ((currentMonthSpend.discretionary / currentMonthSpend.amount) * 100).toFixed(1) : '0'}% of total
             </div>
           </div>
 

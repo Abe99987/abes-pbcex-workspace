@@ -88,7 +88,6 @@ export default function SymbolDetail() {
   const getRelatedSymbols = (currentSymbol: string) => {
     // Find the category of the current symbol
     for (const [category, symbols] of Object.entries(SYMBOLS)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (Object.values(symbols).includes(currentSymbol as any)) {
         return Object.values(symbols)
           .filter(s => s !== currentSymbol)

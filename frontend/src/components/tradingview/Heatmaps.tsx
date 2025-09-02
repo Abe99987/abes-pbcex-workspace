@@ -173,5 +173,4 @@ export const ForexHeatmap: React.FC<ForexHeatmapProps> = ({
 };
 
 // Export all heatmap components
-export { StockHeatmap, CryptoHeatmap, ForexHeatmap };
 export default StockHeatmap;
