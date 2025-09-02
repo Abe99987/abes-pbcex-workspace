@@ -40,7 +40,7 @@ const envSchema = z.object({
     .default('false'),
 
   // Market Data
-  TRADINGVIEW_API_KEY: z.string().optional(),
+  // TRADINGVIEW_API_KEY moved to TradingView Configuration section
 
   // KYC & Identity Verification
   PLAID_CLIENT_ID: z.string().optional(),
