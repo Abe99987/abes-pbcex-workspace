@@ -60,6 +60,13 @@ jobs:
           cd backend
           npm run build:check
       - name: Test backend
+        env:
+          # Test environment variables for DB-less mode (PR #14 scoped)
+          DATABASE_URL: ${{ github.head_ref == 'feat/stubs-integrations-phase-1-3-4-B' && 'postgresql://test:test@localhost/test' || '' }}
+          REDIS_URL: ${{ github.head_ref == 'feat/stubs-integrations-phase-1-3-4-B' && 'redis://localhost:6379' || '' }}
+          JWT_SECRET: ${{ github.head_ref == 'feat/stubs-integrations-phase-1-3-4-B' && 'test-jwt-secret-32-characters-long' || '' }}
+          SESSION_SECRET: ${{ github.head_ref == 'feat/stubs-integrations-phase-1-3-4-B' && 'test-session-secret-32-characters-long' || '' }}
+          ENCRYPTION_KEY: ${{ github.head_ref == 'feat/stubs-integrations-phase-1-3-4-B' && 'test-encryption-key-32-chars-long' || '' }}
         run: |
           cd backend
           if [[ "${{ github.head_ref }}" == "feat/stubs-integrations-phase-1-3-4-B" ]]; then
