@@ -364,7 +364,7 @@ describe('Shop Modals API Endpoints', () => {
         })
         .expect(401);
 
-      expect(response.body.code).toBe('UNAUTHORIZED');
+      expect(response.body.code).toBe('AUTHENTICATION_ERROR');
     });
   });
 
@@ -447,7 +447,7 @@ describe('Shop Modals API Endpoints', () => {
         })
         .expect(401);
 
-      expect(response.body.code).toBe('UNAUTHORIZED');
+      expect(response.body.code).toBe('AUTHENTICATION_ERROR');
     });
   });
 });
