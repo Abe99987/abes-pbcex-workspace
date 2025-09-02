@@ -30,8 +30,11 @@ export interface VerificationResult {
 export class VerifyService {
   private static twilioClient: Twilio | null = null;
   private static isInitialized = false;
-  private static rateLimitStore = new Map<string, { attempts: number; lastAttempt: Date }>();
-  
+  private static rateLimitStore = new Map<
+    string,
+    { attempts: number; lastAttempt: Date }
+  >();
+
   // Rate limiting constants
   private static readonly MAX_ATTEMPTS_PER_PHONE = 5;
   private static readonly RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
@@ -49,12 +52,16 @@ export class VerifyService {
     logInfo('Initializing VerifyService with Twilio Verify');
 
     try {
-      if (integrations.twilioVerify && env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN) {
+      if (
+        integrations.twilioVerify &&
+        env.TWILIO_ACCOUNT_SID &&
+        env.TWILIO_AUTH_TOKEN
+      ) {
         VerifyService.twilioClient = new Twilio(
           env.TWILIO_ACCOUNT_SID,
           env.TWILIO_AUTH_TOKEN
         );
-        
+
         // Test connection by fetching service
         if (env.TWILIO_VERIFY_SERVICE_SID) {
           await VerifyService.twilioClient.verify.v2
@@ -65,12 +72,13 @@ export class VerifyService {
           logWarn('TWILIO_VERIFY_SERVICE_SID not configured');
         }
       } else {
-        logWarn('Twilio Verify not fully configured, verification will be mocked');
+        logWarn(
+          'Twilio Verify not fully configured, verification will be mocked'
+        );
       }
 
       VerifyService.isInitialized = true;
       logInfo('VerifyService initialized');
-
     } catch (error) {
       logError('Failed to initialize VerifyService', error as Error);
       // Continue with mock service
@@ -85,8 +93,8 @@ export class VerifyService {
     options: Partial<VerificationStartOptions> = {}
   ): Promise<VerificationResult> {
     const correlationId = Math.random().toString(36).substr(2, 9);
-    
-    logInfo('Starting phone verification', { 
+
+    logInfo('Starting phone verification', {
       phone: VerifyService.maskPhone(phone),
       channel: options.channel || 'sms',
       correlationId,
@@ -108,7 +116,7 @@ export class VerifyService {
     const normalizedPhone = VerifyService.normalizePhoneNumber(phone);
     if (!normalizedPhone) {
       const error = 'Invalid phone number format';
-      logError(error, { 
+      logError(error, {
         phone: VerifyService.maskPhone(phone),
         correlationId,
       });
@@ -137,12 +145,15 @@ export class VerifyService {
     }
 
     try {
-      if (integrations.twilioVerify && VerifyService.twilioClient && env.TWILIO_VERIFY_SERVICE_SID) {
+      if (
+        integrations.twilioVerify &&
+        VerifyService.twilioClient &&
+        env.TWILIO_VERIFY_SERVICE_SID
+      ) {
         // Send via Twilio Verify
         const verification = await VerifyService.twilioClient.verify.v2
           .services(env.TWILIO_VERIFY_SERVICE_SID)
-          .verifications
-          .create({
+          .verifications.create({
             to: normalizedPhone,
             channel: options.channel || 'sms',
             ...(options.locale && { locale: options.locale }),
@@ -151,7 +162,7 @@ export class VerifyService {
         // Track rate limiting
         VerifyService.updateRateLimit(normalizedPhone);
 
-        logInfo('Verification started via Twilio', { 
+        logInfo('Verification started via Twilio', {
           phone: VerifyService.maskPhone(normalizedPhone),
           status: verification.status,
           sid: verification.sid,
@@ -165,14 +176,15 @@ export class VerifyService {
           provider: 'TWILIO',
           correlationId,
         };
-
       } else {
         // Mock verification for development
-        logInfo('Verification started (mock)', { 
+        logInfo('Verification started (mock)', {
           phone: VerifyService.maskPhone(normalizedPhone),
           channel: options.channel || 'sms',
           correlationId,
-          reason: integrations.twilioVerify ? 'Missing service configuration' : 'Twilio Verify not configured',
+          reason: integrations.twilioVerify
+            ? 'Missing service configuration'
+            : 'Twilio Verify not configured',
         });
 
         // Track rate limiting even in mock mode
@@ -186,14 +198,13 @@ export class VerifyService {
           correlationId,
         };
       }
-
     } catch (error) {
-      logError('Failed to start verification', { 
+      logError('Failed to start verification', {
         error: error as Error,
         phone: VerifyService.maskPhone(normalizedPhone),
         correlationId,
       });
-      
+
       return {
         success: false,
         error: (error as Error).message,
@@ -211,8 +222,8 @@ export class VerifyService {
     code: string
   ): Promise<VerificationResult> {
     const correlationId = Math.random().toString(36).substr(2, 9);
-    
-    logInfo('Checking verification code', { 
+
+    logInfo('Checking verification code', {
       phone: VerifyService.maskPhone(phone),
       codeLength: code?.length,
       correlationId,
@@ -234,7 +245,7 @@ export class VerifyService {
     const normalizedPhone = VerifyService.normalizePhoneNumber(phone);
     if (!normalizedPhone) {
       const error = 'Invalid phone number format';
-      logError(error, { 
+      logError(error, {
         phone: VerifyService.maskPhone(phone),
         correlationId,
       });
@@ -259,19 +270,22 @@ export class VerifyService {
     }
 
     try {
-      if (integrations.twilioVerify && VerifyService.twilioClient && env.TWILIO_VERIFY_SERVICE_SID) {
+      if (
+        integrations.twilioVerify &&
+        VerifyService.twilioClient &&
+        env.TWILIO_VERIFY_SERVICE_SID
+      ) {
         // Check via Twilio Verify
         const verificationCheck = await VerifyService.twilioClient.verify.v2
           .services(env.TWILIO_VERIFY_SERVICE_SID)
-          .verificationChecks
-          .create({
+          .verificationChecks.create({
             to: normalizedPhone,
             code: code,
           });
 
         const isApproved = verificationCheck.status === 'approved';
 
-        logInfo('Verification check completed via Twilio', { 
+        logInfo('Verification check completed via Twilio', {
           phone: VerifyService.maskPhone(normalizedPhone),
           status: verificationCheck.status,
           approved: isApproved,
@@ -285,16 +299,17 @@ export class VerifyService {
           provider: 'TWILIO',
           correlationId,
         };
-
       } else {
         // Mock verification check
         const isApproved = VerifyService.shouldApproveMockVerification(code);
-        
-        logInfo('Verification check completed (mock)', { 
+
+        logInfo('Verification check completed (mock)', {
           phone: VerifyService.maskPhone(normalizedPhone),
           approved: isApproved,
           correlationId,
-          reason: integrations.twilioVerify ? 'Missing service configuration' : 'Twilio Verify not configured',
+          reason: integrations.twilioVerify
+            ? 'Missing service configuration'
+            : 'Twilio Verify not configured',
         });
 
         return {
@@ -305,14 +320,13 @@ export class VerifyService {
           correlationId,
         };
       }
-
     } catch (error) {
-      logError('Failed to check verification', { 
+      logError('Failed to check verification', {
         error: error as Error,
         phone: VerifyService.maskPhone(normalizedPhone),
         correlationId,
       });
-      
+
       return {
         success: false,
         error: (error as Error).message,
@@ -347,22 +361,24 @@ export class VerifyService {
   private static normalizePhoneNumber(phone: string): string | null {
     // Remove all non-digit characters
     const digits = phone.replace(/\D/g, '');
-    
+
     // Handle US numbers (add +1 if missing)
     if (digits.length === 10 && digits[0] !== '1') {
       return `+1${digits}`;
     }
-    
+
     // Handle international numbers (add + if missing)
     if (digits.length >= 10 && digits.length <= 15) {
-      return digits.startsWith('1') || digits.startsWith('+') ? `+${digits}` : `+${digits}`;
+      return digits.startsWith('1') || digits.startsWith('+')
+        ? `+${digits}`
+        : `+${digits}`;
     }
-    
+
     // If already in E.164 format
     if (phone.startsWith('+') && /^\+\d{10,15}$/.test(phone)) {
       return phone;
     }
-    
+
     return null;
   }
 
@@ -371,7 +387,7 @@ export class VerifyService {
    */
   private static maskPhone(phone: string): string {
     if (!phone) return '***';
-    
+
     // Show only first 3 and last 2 digits
     const digits = phone.replace(/\D/g, '');
     if (digits.length >= 6) {
@@ -383,8 +399,8 @@ export class VerifyService {
   /**
    * Check if request is within rate limits
    */
-  private static checkRateLimit(phone: string): { 
-    allowed: boolean; 
+  private static checkRateLimit(phone: string): {
+    allowed: boolean;
     remainingTime?: number;
   } {
     const now = new Date();
@@ -396,7 +412,7 @@ export class VerifyService {
     }
 
     const timeSinceLastAttempt = now.getTime() - record.lastAttempt.getTime();
-    
+
     // Reset if outside window
     if (timeSinceLastAttempt > VerifyService.RATE_LIMIT_WINDOW_MS) {
       VerifyService.rateLimitStore.delete(key);
@@ -405,9 +421,10 @@ export class VerifyService {
 
     // Check if exceeded max attempts
     if (record.attempts >= VerifyService.MAX_ATTEMPTS_PER_PHONE) {
-      const remainingTime = VerifyService.RATE_LIMIT_WINDOW_MS - timeSinceLastAttempt;
-      return { 
-        allowed: false, 
+      const remainingTime =
+        VerifyService.RATE_LIMIT_WINDOW_MS - timeSinceLastAttempt;
+      return {
+        allowed: false,
         remainingTime,
       };
     }
@@ -461,21 +478,32 @@ export class VerifyService {
    */
   static async shutdown(): Promise<void> {
     logInfo('Shutting down VerifyService');
-    
+
     // Clean up rate limiting store
     VerifyService.rateLimitStore.clear();
-    
+
     VerifyService.twilioClient = null;
     VerifyService.isInitialized = false;
     logInfo('VerifyService shut down');
   }
 
-  // Setup periodic cleanup of rate limits
-  static {
-    if (typeof setInterval !== 'undefined') {
-      setInterval(() => {
+  // Lifecycle management for cleanup timer
+  private static cleanupTimer: NodeJS.Timeout | null = null;
+
+  static start(): void {
+    if (this.cleanupTimer || process.env.NODE_ENV === 'test') return;
+    this.cleanupTimer = setInterval(
+      () => {
         VerifyService.cleanupRateLimits();
-      }, 5 * 60 * 1000); // Every 5 minutes
+      },
+      5 * 60 * 1000
+    ); // Every 5 minutes
+  }
+
+  static stop(): void {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = null;
     }
   }
 }

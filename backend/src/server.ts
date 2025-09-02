@@ -407,6 +407,11 @@ async function initializeServices(): Promise<void> {
     // await BlockchainService.initialize();
 
     logInfo('🎉 All services initialized successfully');
+
+    // Start VerifyService cleanup timer (only outside tests)
+    if (process.env.NODE_ENV !== 'test') {
+      VerifyService.start();
+    }
   } catch (error) {
     logError('❌ Service initialization failed', error as Error);
     throw error;
@@ -426,6 +431,9 @@ async function shutdownServices(): Promise<void> {
     await EmailService.shutdown();
     await VerifyService.shutdown();
     await FedexService.shutdown();
+
+    // Stop VerifyService cleanup timer
+    VerifyService.stop();
     // await DatabaseService.shutdown();
     // await RedisService.shutdown();
 
@@ -441,86 +449,106 @@ async function startServer(): Promise<void> {
     // Initialize all services first
     await initializeServices();
 
-    // Start HTTP server
-    const server = app.listen(env.PORT, () => {
-      logInfo('🚀 PBCEx API Server started', {
-        port: env.PORT,
-        environment: env.NODE_ENV,
-        nodeVersion: process.version,
-        pid: process.pid,
-        corsOrigins,
+    // Start HTTP server (only outside tests)
+    let server: any;
+    if (process.env.NODE_ENV !== 'test') {
+      server = app.listen(env.PORT, () => {
+        logInfo('🚀 PBCEx API Server started', {
+          port: env.PORT,
+          environment: env.NODE_ENV,
+          nodeVersion: process.version,
+          pid: process.pid,
+          corsOrigins,
+        });
+
+        // Log integration status
+        const integrationStatus = {
+          database: !!env.DATABASE_URL,
+          redis: !!env.REDIS_URL,
+          plaid: !!(env.PLAID_CLIENT_ID && env.PLAID_SECRET),
+          stripe: !!env.STRIPE_SECRET_KEY,
+          sendgrid: !!env.SENDGRID_API_KEY,
+          twilio: !!(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN),
+          intercom: !!env.INTERCOM_ACCESS_TOKEN,
+          tradingView: !!env.TRADINGVIEW_API_KEY,
+          datadog: !!env.DATADOG_API_KEY,
+        };
+
+        logInfo('📊 Integration Status:', integrationStatus);
+
+        const configuredCount =
+          Object.values(integrationStatus).filter(Boolean).length;
+        const totalCount = Object.keys(integrationStatus).length;
+
+        if (configuredCount < totalCount) {
+          logInfo(
+            `💡 ${totalCount - configuredCount} integrations need configuration for full functionality`
+          );
+        }
       });
+    }
 
-      // Log integration status
-      const integrationStatus = {
-        database: !!env.DATABASE_URL,
-        redis: !!env.REDIS_URL,
-        plaid: !!(env.PLAID_CLIENT_ID && env.PLAID_SECRET),
-        stripe: !!env.STRIPE_SECRET_KEY,
-        sendgrid: !!env.SENDGRID_API_KEY,
-        twilio: !!(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN),
-        intercom: !!env.INTERCOM_ACCESS_TOKEN,
-        tradingView: !!env.TRADINGVIEW_API_KEY,
-        datadog: !!env.DATADOG_API_KEY,
-      };
-
-      logInfo('📊 Integration Status:', integrationStatus);
-
-      const configuredCount =
-        Object.values(integrationStatus).filter(Boolean).length;
-      const totalCount = Object.keys(integrationStatus).length;
-
-      if (configuredCount < totalCount) {
-        logInfo(
-          `💡 ${totalCount - configuredCount} integrations need configuration for full functionality`
-        );
-      }
-    });
-
-    // Graceful shutdown handling
+    // Graceful shutdown handling (only when server exists)
     const gracefulShutdownHandler = (signal: string) => {
       logInfo(`Received ${signal}. Starting graceful shutdown...`);
 
-      server.close(async () => {
-        logInfo('HTTP server closed.');
+      if (server) {
+        server.close(async () => {
+          logInfo('HTTP server closed.');
 
-        try {
-          await shutdownServices();
-          process.exit(0);
-        } catch (error) {
-          logError('Error during shutdown', error as Error);
+          try {
+            await shutdownServices();
+            process.exit(0);
+          } catch (error) {
+            logError('Error during shutdown', error as Error);
+            process.exit(1);
+          }
+        });
+
+        // Force close after 15 seconds
+        setTimeout(() => {
+          logError(
+            'Could not close connections in time, forcefully shutting down'
+          );
           process.exit(1);
-        }
-      });
-
-      // Force close after 15 seconds
-      setTimeout(() => {
-        logError(
-          'Could not close connections in time, forcefully shutting down'
-        );
-        process.exit(1);
-      }, 15000);
+        }, 15000);
+      } else {
+        // No server to close, just shutdown services
+        shutdownServices()
+          .then(() => process.exit(0))
+          .catch(() => process.exit(1));
+      }
     };
 
     process.on('SIGTERM', () => gracefulShutdownHandler('SIGTERM'));
     process.on('SIGINT', () => gracefulShutdownHandler('SIGINT'));
 
-    // Handle server errors
-    server.on('error', (error: NodeJS.ErrnoException) => {
-      if (error.code === 'EADDRINUSE') {
-        logError(`Port ${env.PORT} is already in use`);
-        process.exit(1);
-      } else {
-        logError('Server error', error);
-        process.exit(1);
-      }
-    });
+    // Handle server errors (only when server exists)
+    if (server) {
+      server.on('error', (error: NodeJS.ErrnoException) => {
+        if (error.code === 'EADDRINUSE') {
+          logError(`Port ${env.PORT} is already in use`);
+          if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
+            throw error;
+          } else {
+            process.exit(1);
+          }
+        } else {
+          logError('Server error', error);
+          if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
+            throw error;
+          } else {
+            process.exit(1);
+          }
+        }
+      });
 
-    // Handle server startup events
-    server.on('listening', () => {
-      const address = server.address();
-      logInfo('Server is listening', { address });
-    });
+      // Handle server startup events
+      server.on('listening', () => {
+        const address = server.address();
+        logInfo('Server is listening', { address });
+      });
+    }
   } catch (error) {
     logError('Failed to start server', error as Error);
     process.exit(1);
