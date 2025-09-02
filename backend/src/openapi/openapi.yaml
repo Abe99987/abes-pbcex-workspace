@@ -115,44 +115,6 @@ components:
           type: string
           format: date-time
 
-    CryptoWithdrawal:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        asset:
-          type: string
-        network:
-          type: string
-        address:
-          type: string
-        amount:
-          type: string
-        status:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-
-    Beneficiary:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        type:
-          type: string
-        displayName:
-          type: string
-        details:
-          type: object
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-
     PaymentRequest:
       type: object
       properties:
@@ -278,6 +240,42 @@ components:
           type: string
           format: date-time
 
+    Beneficiary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+        displayName:
+          type: string
+        details:
+          type: object
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    Transfer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+        amount:
+          type: string
+        asset:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
   responses:
     ValidationError:
       description: Validation error
@@ -325,6 +323,8 @@ tags:
     description: User authentication and authorization
 
 paths:
+<<<<<<< HEAD
+=======
   # Money Movement Endpoints
 
   # Transfers
@@ -3054,6 +3054,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       x-feature-flag: MONEY_MOVEMENT_ENABLED
 
+>>>>>>> d7466f9 (docs(openapi): ensure full parity with backend routes; fill missing groups; validate spec)
   # Health endpoint
   /health:
     get:

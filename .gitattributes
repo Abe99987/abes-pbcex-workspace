@@ -1,0 +1,3 @@
+backend/src/openapi/openapi.yaml merge=ours
+backend/HEALTH_SUMMARY.md merge=theirs
+backend/tests/unit/tradingEngine.test.ts merge=theirs
