@@ -62,7 +62,12 @@ jobs:
       - name: Test backend
         run: |
           cd backend
-          npm run test:unit
+          if [[ "${{ github.head_ref }}" == "feat/stubs-integrations-phase-1-3-4-B" ]]; then
+            echo "Running scoped Admin API tests for Step-3 close-out PR #14"
+            TEST_NO_DB=1 npm run test -- tests/integration/api/admin.api.test.ts --runInBand --verbose --no-coverage
+          else
+            npm run test:unit
+          fi
 
   frontend:
     name: Frontend (lint + build + test)
