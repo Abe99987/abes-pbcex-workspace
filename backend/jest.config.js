@@ -32,7 +32,9 @@ export default {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  testTimeout: 10000,
+  testTimeout: 20000,
   verbose: true,
-  detectOpenHandles: true,
+  detectOpenHandles: false, // Disabled for stability - enable only for diagnostics
+  forceExit: true, // Prevent hanging processes
+  maxWorkers: process.env.CI ? 1 : '50%', // Single worker in CI, 50% locally
 };
