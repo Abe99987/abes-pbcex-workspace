@@ -11,7 +11,6 @@ interface TradingViewWidgetProps {
   /** Widget type (e.g., 'ticker-tape', 'advanced-chart', 'symbol-overview') */
   widgetType: string;
   /** Widget configuration object */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   config: Record<string, any>;
   /** Container CSS classes */
   className?: string;
@@ -95,7 +94,9 @@ export const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({
 
       // Create widget container div
       const widgetContainer = document.createElement('div');
-      widgetContainer.id = containerIdRef.current;
+      if (containerIdRef.current) {
+        widgetContainer.id = containerIdRef.current;
+      }
       widgetContainer.className = 'tradingview-widget-container__widget';
 
       // Append elements
@@ -120,6 +121,7 @@ export const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({
       const timer = setTimeout(loadWidget, 100);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isClient, loadWidget]);
 
   // Cleanup on unmount

@@ -221,13 +221,15 @@ export default function PnL() {
       const dateStr = currentDate.toISOString().split('T')[0];
       const dayData = pnlData.dailyPnL.find(d => d.date === dateStr);
 
-      days.push({
-        date: dateStr,
-        pnl: dayData?.pnl || 0,
-        trades: dayData?.trades || 0,
-        isToday: dateStr === today,
-        isCurrentMonth: currentDate.getMonth() === month,
-      });
+      if (dateStr) {
+        days.push({
+          date: dateStr,
+          pnl: dayData?.pnl || 0,
+          trades: dayData?.trades || 0,
+          isToday: dateStr === today,
+          isCurrentMonth: currentDate.getMonth() === month,
+        });
+      }
     }
 
     return days;

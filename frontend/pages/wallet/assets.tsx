@@ -92,7 +92,6 @@ export default function MyAssets() {
     onClick,
     variant = 'default',
   }: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     icon: any;
     label: string;
     onClick: () => void;
