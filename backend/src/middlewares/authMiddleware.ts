@@ -14,6 +14,9 @@ declare global {
         email: string;
         role: string;
         kycStatus: string;
+        // Admin terminal extensions
+        roles?: string[];
+        attributes?: Record<string, any>;
       };
     }
   }

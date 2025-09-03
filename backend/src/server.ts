@@ -48,6 +48,11 @@ import quotesRoutes from '@/routes/quotesRoutes';
 import ordersRoutes from '@/routes/ordersRoutes';
 import moneyMovementRoutes from '@/routes/moneyMovement';
 
+// Import admin terminal modules
+// TODO: Re-enable after fixing TypeScript errors  
+// import { healthRoutes } from '@/modules/health';
+// import adminTerminalRoutes from '@/routes/adminTerminalRoutes';
+
 // Import controllers for direct endpoints
 import { TradeControllerDb } from '@/controllers/TradeControllerDb';
 import { db } from '@/db';
@@ -307,6 +312,11 @@ app.use('/api/trade', tradeRoutes);
 app.use('/api/shop', shopRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Admin Terminal Routes
+// Admin Terminal Core Routes
+import { adminTerminalCoreRoutes } from '@/routes/adminTerminalCoreRoutes';
+app.use('/api/admin/terminal', adminTerminalCoreRoutes);
+
 // Phase-3 Routes (feature flagged)
 app.use('/api/redeem', redemptionRoutes);
 app.use('/api/vault', vaultRoutes);
@@ -451,7 +461,11 @@ async function startServer(): Promise<void> {
 
     // Start HTTP server (only outside tests)
     let server: any;
-    if (process.env.NODE_ENV !== 'test') {
+    
+    // Export app for testing (when not starting server)
+    if (process.env.NODE_ENV === 'test') {
+      // Don't start server in test mode
+    } else {
       server = app.listen(env.PORT, () => {
         logInfo('🚀 PBCEx API Server started', {
           port: env.PORT,
