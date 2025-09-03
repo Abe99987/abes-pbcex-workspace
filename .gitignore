@@ -126,4 +126,4 @@ docker-compose.override.yml
 # Terraform
 *.tfstate
 *.tfstate.*
-.terraform/
+.terraform/backend_corrupted/
