@@ -94,8 +94,7 @@ ALTER TABLE admin_config ENABLE ROW LEVEL SECURITY;
 CREATE POLICY admin_audit_log_read ON admin_audit_log
     FOR SELECT TO authenticated
     USING (
-        current_setting('app.user_role', true) IN ('admin', 'super_admin') OR
-        user_id = current_setting('app.user_id', true)
+        current_setting('app.user_role', true) IN ('admin', 'super_admin')
     );
 
 CREATE POLICY admin_audit_log_insert ON admin_audit_log

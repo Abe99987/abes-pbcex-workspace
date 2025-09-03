@@ -52,7 +52,12 @@ function extractToken(authHeader: string | undefined): string | null {
  */
 function verifyToken(token: string): JwtPayload | null {
   try {
-    const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, env.JWT_SECRET, {
+      audience: 'pbcex-users',
+      issuer: 'pbcex-api',
+      algorithms: ['HS256'],
+      clockTolerance: 30, // 30 seconds clock skew tolerance
+    }) as JwtPayload;
     return decoded;
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
@@ -262,8 +267,12 @@ export function generateRefreshToken(userId: string): string {
  */
 export function verifyRefreshToken(token: string): { userId: string } | null {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const decoded = jwt.verify(token, env.JWT_SECRET) as any;
+    const decoded = jwt.verify(token, env.JWT_SECRET, {
+      audience: 'pbcex-refresh',
+      issuer: 'pbcex-api', 
+      algorithms: ['HS256'],
+      clockTolerance: 30,
+    }) as jwt.JwtPayload & { userId: string; type?: string };
 
     if (decoded.type !== 'refresh') {
       logWarn('Invalid refresh token type', { type: decoded.type });

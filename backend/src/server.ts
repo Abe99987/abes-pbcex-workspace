@@ -315,7 +315,9 @@ app.use('/api/admin', adminRoutes);
 // Admin Terminal Routes
 // Admin Terminal Core Routes
 import { adminTerminalCoreRoutes } from '@/routes/adminTerminalCoreRoutes';
+import adminTerminalRoutes from '@/routes/adminTerminalRoutes';
 app.use('/api/admin/terminal', adminTerminalCoreRoutes);
+app.use('/api/admin/terminal', adminTerminalRoutes);
 
 // Phase-3 Routes (feature flagged)
 app.use('/api/redeem', redemptionRoutes);
