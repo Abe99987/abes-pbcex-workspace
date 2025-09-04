@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import Navigation from "@/components/Navigation";
+import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  TrendingUp,
+  TrendingDown,
+} from 'lucide-react';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis } from 'recharts';
-import { 
-  format, 
-  startOfMonth, 
-  endOfMonth, 
-  eachDayOfInterval, 
-  isSameDay, 
-  addMonths, 
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameDay,
+  addMonths,
   subMonths,
   isToday,
   startOfWeek,
-  addDays
+  addDays,
 } from 'date-fns';
 
 // Mock data for demonstration
 const generateMockData = () => {
   const balanceData = [];
   const currentDate = new Date();
-  
+
   // Generate 30 days of mock balance data
   for (let i = 29; i >= 0; i--) {
     const date = new Date();
@@ -38,7 +43,7 @@ const generateMockData = () => {
   const currentMonth = startOfMonth(currentDate);
   const daysInMonth = eachDayOfInterval({
     start: currentMonth,
-    end: endOfMonth(currentMonth)
+    end: endOfMonth(currentMonth),
   });
 
   daysInMonth.forEach(day => {
@@ -55,22 +60,26 @@ const generateMockData = () => {
 const PnL = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [data, setData] = useState(generateMockData);
-  const [metricsTimeframe, setMetricsTimeframe] = useState<'day' | 'month' | 'year'>('month');
-  const [chartTimeframe, setChartTimeframe] = useState<'day' | 'month' | 'year'>('month');
+  const [metricsTimeframe, setMetricsTimeframe] = useState<
+    'day' | 'month' | 'year'
+  >('month');
+  const [chartTimeframe, setChartTimeframe] = useState<
+    'day' | 'month' | 'year'
+  >('month');
 
   // Mock performance metrics
   const performanceMetrics = {
     totalPnL: 1847.32,
     winRate: 68.4,
     profitFactor: 1.85,
-    avgWin: 125.50,
-    avgLoss: -67.80,
+    avgWin: 125.5,
+    avgLoss: -67.8,
     bestDayPercent: 12.4,
-    dayWinPercent: 71.2
+    dayWinPercent: 71.2,
   };
 
   const navigateMonth = (direction: 'prev' | 'next') => {
-    setCurrentMonth(prev => 
+    setCurrentMonth(prev =>
       direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1)
     );
   };
@@ -79,17 +88,18 @@ const PnL = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
     const calendarStart = startOfWeek(monthStart);
-    
+
     const days = [];
     let day = calendarStart;
-    
+
     // Generate calendar grid
-    for (let i = 0; i < 42; i++) { // 6 weeks × 7 days
+    for (let i = 0; i < 42; i++) {
+      // 6 weeks × 7 days
       const dayKey = format(day, 'yyyy-MM-dd');
       const dayPnL = data.monthlyPnL[dayKey];
       const isCurrentMonth = day >= monthStart && day <= monthEnd;
       const isCurrentDay = isToday(day);
-      
+
       days.push(
         <div
           key={dayKey}
@@ -100,17 +110,19 @@ const PnL = () => {
             hover:bg-muted/20 transition-colors
           `}
         >
-          <div className="text-sm text-muted-foreground mb-1">
+          <div className='text-sm text-muted-foreground mb-1'>
             {format(day, 'd')}
           </div>
           {dayPnL && isCurrentMonth && (
-            <div className="space-y-1">
-              <div className={`text-xs font-medium ${
-                dayPnL.pnl >= 0 ? 'text-green-400' : 'text-red-400'
-              }`}>
+            <div className='space-y-1'>
+              <div
+                className={`text-xs font-medium ${
+                  dayPnL.pnl >= 0 ? 'text-green-400' : 'text-red-400'
+                }`}
+              >
                 {dayPnL.pnl >= 0 ? '+' : ''}${dayPnL.pnl.toFixed(0)}
               </div>
-              <div className="text-xs text-muted-foreground">
+              <div className='text-xs text-muted-foreground'>
                 {dayPnL.trades} trades
               </div>
             </div>
@@ -127,7 +139,7 @@ const PnL = () => {
     const weeks = [];
     let weekTotal = 0;
     let weekStart = startOfWeek(startOfMonth(currentMonth));
-    
+
     for (let week = 0; week < 6; week++) {
       weekTotal = 0;
       for (let day = 0; day < 7; day++) {
@@ -136,40 +148,44 @@ const PnL = () => {
         const dayPnL = data.monthlyPnL[dayKey];
         if (dayPnL) weekTotal += dayPnL.pnl;
       }
-      
+
       weeks.push(
-        <div key={week} className={`
+        <div
+          key={week}
+          className={`
           p-2 text-center text-sm font-medium border border-border/20
           ${weekTotal >= 0 ? 'text-green-400 bg-green-500/10' : 'text-red-400 bg-red-500/10'}
-        `}>
+        `}
+        >
           {weekTotal >= 0 ? '+' : ''}${weekTotal.toFixed(0)}
         </div>
       );
       weekStart = addDays(weekStart, 7);
     }
-    
+
     return weeks;
   };
 
-  const TimeframeSelector = ({ 
-    activeTimeframe, 
-    onTimeframeChange, 
-    className = "" 
-  }: { 
+  const TimeframeSelector = ({
+    activeTimeframe,
+    onTimeframeChange,
+    className = '',
+  }: {
     activeTimeframe: 'day' | 'month' | 'year';
     onTimeframeChange: (timeframe: 'day' | 'month' | 'year') => void;
     className?: string;
   }) => (
     <div className={`flex bg-muted/30 rounded-lg p-1 ${className}`}>
-      {(['day', 'month', 'year'] as const).map((timeframe) => (
+      {(['day', 'month', 'year'] as const).map(timeframe => (
         <button
           key={timeframe}
           onClick={() => onTimeframeChange(timeframe)}
           className={`
             px-3 py-1 text-xs font-medium rounded-md transition-all
-            ${activeTimeframe === timeframe 
-              ? 'bg-gold text-primary-foreground shadow-sm' 
-              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            ${
+              activeTimeframe === timeframe
+                ? 'bg-gold text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }
           `}
         >
@@ -180,61 +196,79 @@ const PnL = () => {
   );
 
   console.log('PnL component rendering, Navigation:', Navigation);
-  
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className='min-h-screen bg-background'>
       <Navigation />
-      
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Profit & Loss Analytics</h1>
-          <p className="text-muted-foreground">Track your trading performance and analyze your results</p>
+
+      <div className='container mx-auto px-4 py-8 max-w-7xl'>
+        <div className='mb-8'>
+          <h1 className='text-3xl font-bold mb-2'>Profit & Loss Analytics</h1>
+          <p className='text-muted-foreground'>
+            Track your trading performance and analyze your results
+          </p>
         </div>
 
         {/* Performance Summary Dashboard */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+        <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 mb-8'>
           {/* Total PnL */}
-          <Card className="bg-card border-border">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total PnL ({metricsTimeframe === 'day' ? 'Latest Day' : metricsTimeframe === 'month' ? 'This Month' : 'This Year'})
+          <Card className='bg-card border-border'>
+            <CardHeader className='pb-2 flex flex-row items-center justify-between space-y-0'>
+              <CardTitle className='text-sm font-medium text-muted-foreground'>
+                Total PnL (
+                {metricsTimeframe === 'day'
+                  ? 'Latest Day'
+                  : metricsTimeframe === 'month'
+                    ? 'This Month'
+                    : 'This Year'}
+                )
               </CardTitle>
-              <TimeframeSelector 
+              <TimeframeSelector
                 activeTimeframe={metricsTimeframe}
                 onTimeframeChange={setMetricsTimeframe}
-                className="hidden sm:flex"
+                className='hidden sm:flex'
               />
             </CardHeader>
             <CardContent>
-              <div className="flex items-center space-x-2">
-                <span className={`text-2xl font-bold ${
-                  performanceMetrics.totalPnL >= 0 ? 'text-green-400' : 'text-red-400'
-                }`}>
-                  {performanceMetrics.totalPnL >= 0 ? '+' : ''}${performanceMetrics.totalPnL.toLocaleString()}
+              <div className='flex items-center space-x-2'>
+                <span
+                  className={`text-2xl font-bold ${
+                    performanceMetrics.totalPnL >= 0
+                      ? 'text-green-400'
+                      : 'text-red-400'
+                  }`}
+                >
+                  {performanceMetrics.totalPnL >= 0 ? '+' : ''}$
+                  {performanceMetrics.totalPnL.toLocaleString()}
                 </span>
-                {performanceMetrics.totalPnL >= 0 ? 
-                  <TrendingUp className="h-5 w-5 text-green-400" /> : 
-                  <TrendingDown className="h-5 w-5 text-red-400" />
-                }
+                {performanceMetrics.totalPnL >= 0 ? (
+                  <TrendingUp className='h-5 w-5 text-green-400' />
+                ) : (
+                  <TrendingDown className='h-5 w-5 text-red-400' />
+                )}
               </div>
             </CardContent>
           </Card>
 
           {/* Win Rate */}
-          <Card className="bg-card border-border">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Win Rate</CardTitle>
-              <TimeframeSelector 
+          <Card className='bg-card border-border'>
+            <CardHeader className='pb-2 flex flex-row items-center justify-between space-y-0'>
+              <CardTitle className='text-sm font-medium text-muted-foreground'>
+                Win Rate
+              </CardTitle>
+              <TimeframeSelector
                 activeTimeframe={metricsTimeframe}
                 onTimeframeChange={setMetricsTimeframe}
-                className="hidden sm:flex"
+                className='hidden sm:flex'
               />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{performanceMetrics.winRate}%</div>
-              <div className="w-full bg-secondary rounded-full h-2 mt-2">
-                <div 
-                  className="bg-green-400 h-2 rounded-full transition-all"
+              <div className='text-2xl font-bold'>
+                {performanceMetrics.winRate}%
+              </div>
+              <div className='w-full bg-secondary rounded-full h-2 mt-2'>
+                <div
+                  className='bg-green-400 h-2 rounded-full transition-all'
                   style={{ width: `${performanceMetrics.winRate}%` }}
                 />
               </div>
@@ -242,38 +276,44 @@ const PnL = () => {
           </Card>
 
           {/* Profit Factor */}
-          <Card className="bg-card border-border">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Profit Factor</CardTitle>
-              <TimeframeSelector 
+          <Card className='bg-card border-border'>
+            <CardHeader className='pb-2 flex flex-row items-center justify-between space-y-0'>
+              <CardTitle className='text-sm font-medium text-muted-foreground'>
+                Profit Factor
+              </CardTitle>
+              <TimeframeSelector
                 activeTimeframe={metricsTimeframe}
                 onTimeframeChange={setMetricsTimeframe}
-                className="hidden sm:flex"
+                className='hidden sm:flex'
               />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{performanceMetrics.profitFactor}</div>
-              <div className="text-sm text-muted-foreground mt-1">
+              <div className='text-2xl font-bold'>
+                {performanceMetrics.profitFactor}
+              </div>
+              <div className='text-sm text-muted-foreground mt-1'>
                 Total Gains / Total Losses
               </div>
             </CardContent>
           </Card>
 
           {/* Best Day % */}
-          <Card className="bg-card border-border">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Best Day %</CardTitle>
-              <TimeframeSelector 
+          <Card className='bg-card border-border'>
+            <CardHeader className='pb-2 flex flex-row items-center justify-between space-y-0'>
+              <CardTitle className='text-sm font-medium text-muted-foreground'>
+                Best Day %
+              </CardTitle>
+              <TimeframeSelector
                 activeTimeframe={metricsTimeframe}
                 onTimeframeChange={setMetricsTimeframe}
-                className="hidden sm:flex"
+                className='hidden sm:flex'
               />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-400">
+              <div className='text-2xl font-bold text-green-400'>
                 {performanceMetrics.bestDayPercent}%
               </div>
-              <div className="text-sm text-muted-foreground mt-1">
+              <div className='text-sm text-muted-foreground mt-1'>
                 Of Total Profit
               </div>
             </CardContent>
@@ -281,44 +321,52 @@ const PnL = () => {
         </div>
 
         {/* Avg Win/Loss & Day Win % */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card className="bg-card border-border">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8'>
+          <Card className='bg-card border-border'>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-6'>
               <CardTitle>Average Win / Loss</CardTitle>
-              <TimeframeSelector 
+              <TimeframeSelector
                 activeTimeframe={metricsTimeframe}
                 onTimeframeChange={setMetricsTimeframe}
-                className="hidden sm:flex"
+                className='hidden sm:flex'
               />
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Avg Win</span>
-                  <span className="text-green-400 font-bold">+${performanceMetrics.avgWin}</span>
+              <div className='space-y-4'>
+                <div className='flex justify-between items-center'>
+                  <span className='text-muted-foreground'>Avg Win</span>
+                  <span className='text-green-400 font-bold'>
+                    +${performanceMetrics.avgWin}
+                  </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Avg Loss</span>
-                  <span className="text-red-400 font-bold">${performanceMetrics.avgLoss}</span>
+                <div className='flex justify-between items-center'>
+                  <span className='text-muted-foreground'>Avg Loss</span>
+                  <span className='text-red-400 font-bold'>
+                    ${performanceMetrics.avgLoss}
+                  </span>
                 </div>
-                <div className="flex h-4 rounded-full overflow-hidden">
-                  <div className="bg-green-400 flex-[3]" />
-                  <div className="bg-red-400 flex-[2]" />
+                <div className='flex h-4 rounded-full overflow-hidden'>
+                  <div className='bg-green-400 flex-[3]' />
+                  <div className='bg-red-400 flex-[2]' />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
+          <Card className='bg-card border-border'>
             <CardHeader>
               <CardTitle>Day Win Percentage</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">{performanceMetrics.dayWinPercent}%</div>
-              <div className="text-muted-foreground text-sm mb-4">Profitable trading days</div>
-              <div className="w-full bg-secondary rounded-full h-3">
-                <div 
-                  className="bg-green-400 h-3 rounded-full transition-all"
+              <div className='text-3xl font-bold mb-2'>
+                {performanceMetrics.dayWinPercent}%
+              </div>
+              <div className='text-muted-foreground text-sm mb-4'>
+                Profitable trading days
+              </div>
+              <div className='w-full bg-secondary rounded-full h-3'>
+                <div
+                  className='bg-green-400 h-3 rounded-full transition-all'
                   style={{ width: `${performanceMetrics.dayWinPercent}%` }}
                 />
               </div>
@@ -327,36 +375,48 @@ const PnL = () => {
         </div>
 
         {/* Daily Account Balance Chart */}
-        <Card className="bg-card border-border mb-8">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
+        <Card className='bg-card border-border mb-8'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-6'>
             <CardTitle>
-              Daily Account Balance ({chartTimeframe === 'day' ? 'Hourly Today' : chartTimeframe === 'month' ? 'Daily This Month' : 'Monthly This Year'})
+              Daily Account Balance (
+              {chartTimeframe === 'day'
+                ? 'Hourly Today'
+                : chartTimeframe === 'month'
+                  ? 'Daily This Month'
+                  : 'Monthly This Year'}
+              )
             </CardTitle>
-            <TimeframeSelector 
+            <TimeframeSelector
               activeTimeframe={chartTimeframe}
               onTimeframeChange={setChartTimeframe}
             />
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className='h-[300px] w-full'>
+              <ResponsiveContainer width='100%' height='100%'>
                 <LineChart data={data.balanceData}>
-                  <XAxis 
-                    dataKey="date" 
+                  <XAxis
+                    dataKey='date'
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    tick={{
+                      fill: 'hsl(var(--muted-foreground))',
+                      fontSize: 12,
+                    }}
                   />
-                  <YAxis 
+                  <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    tick={{
+                      fill: 'hsl(var(--muted-foreground))',
+                      fontSize: 12,
+                    }}
                     domain={['dataMin - 100', 'dataMax + 100']}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="balance" 
-                    stroke="white" 
+                  <Line
+                    type='monotone'
+                    dataKey='balance'
+                    stroke='white'
                     strokeWidth={2}
                     dot={false}
                   />
@@ -367,15 +427,17 @@ const PnL = () => {
         </Card>
 
         {/* Calendar View */}
-        <Card className="bg-card border-border">
+        <Card className='bg-card border-border'>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className='flex items-center justify-between'>
               <CardTitle>Monthly Calendar View</CardTitle>
-              <div className="flex items-center space-x-4">
+              <div className='flex items-center space-x-4'>
                 <select
                   value={format(currentMonth, 'yyyy-MM')}
-                  onChange={(e) => setCurrentMonth(new Date(e.target.value + '-01'))}
-                  className="bg-background border border-input rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  onChange={e =>
+                    setCurrentMonth(new Date(e.target.value + '-01'))
+                  }
+                  className='bg-background border border-input rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring'
                 >
                   {Array.from({ length: 12 }, (_, i) => {
                     const date = new Date();
@@ -388,40 +450,56 @@ const PnL = () => {
                   })}
                 </select>
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant='outline'
+                  size='sm'
                   onClick={() => navigateMonth('prev')}
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className='h-4 w-4' />
                 </Button>
-                <span className="text-lg font-medium min-w-[120px] text-center">
+                <span className='text-lg font-medium min-w-[120px] text-center'>
                   {format(currentMonth, 'MMMM yyyy')}
                 </span>
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant='outline'
+                  size='sm'
                   onClick={() => navigateMonth('next')}
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-8 gap-0 border border-border rounded-lg overflow-hidden">
+            <div className='grid grid-cols-8 gap-0 border border-border rounded-lg overflow-hidden'>
               {/* Calendar Headers */}
-              <div className="bg-muted p-3 text-center text-sm font-medium">Sun</div>
-              <div className="bg-muted p-3 text-center text-sm font-medium">Mon</div>
-              <div className="bg-muted p-3 text-center text-sm font-medium">Tue</div>
-              <div className="bg-muted p-3 text-center text-sm font-medium">Wed</div>
-              <div className="bg-muted p-3 text-center text-sm font-medium">Thu</div>
-              <div className="bg-muted p-3 text-center text-sm font-medium">Fri</div>
-              <div className="bg-muted p-3 text-center text-sm font-medium">Sat</div>
-              <div className="bg-muted p-3 text-center text-sm font-medium">Week PnL</div>
-              
+              <div className='bg-muted p-3 text-center text-sm font-medium'>
+                Sun
+              </div>
+              <div className='bg-muted p-3 text-center text-sm font-medium'>
+                Mon
+              </div>
+              <div className='bg-muted p-3 text-center text-sm font-medium'>
+                Tue
+              </div>
+              <div className='bg-muted p-3 text-center text-sm font-medium'>
+                Wed
+              </div>
+              <div className='bg-muted p-3 text-center text-sm font-medium'>
+                Thu
+              </div>
+              <div className='bg-muted p-3 text-center text-sm font-medium'>
+                Fri
+              </div>
+              <div className='bg-muted p-3 text-center text-sm font-medium'>
+                Sat
+              </div>
+              <div className='bg-muted p-3 text-center text-sm font-medium'>
+                Week PnL
+              </div>
+
               {/* Calendar Days */}
               {renderCalendar()}
-              
+
               {/* Weekly Totals */}
               {weeklyTotals()}
             </div>

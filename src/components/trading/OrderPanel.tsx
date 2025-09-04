@@ -1,13 +1,19 @@
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import ScaleOrderModal from "./ScaleOrderModal";
-import { FEATURE_FLAGS } from "@/config/features";
+import { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import ScaleOrderModal from './ScaleOrderModal';
+import { FEATURE_FLAGS } from '@/config/features';
 
 interface OrderPanelProps {
   pair: string;
@@ -15,95 +21,98 @@ interface OrderPanelProps {
 }
 
 const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
-  const [orderType, setOrderType] = useState("limit");
-  const [price, setPrice] = useState("");
-  const [amount, setAmount] = useState("");
+  const [orderType, setOrderType] = useState('limit');
+  const [price, setPrice] = useState('');
+  const [amount, setAmount] = useState('');
   const [scaleModalOpen, setScaleModalOpen] = useState(false);
   const { toast } = useToast();
 
   // Mock provider accepted assets
-  const mockProviderAssets = ["PAXG", "XAU-s", "USD", "USDC"];
+  const mockProviderAssets = ['PAXG', 'XAU-s', 'USD', 'USDC'];
 
-  const handleSubmitOrder = (side: "buy" | "sell") => {
+  const handleSubmitOrder = (side: 'buy' | 'sell') => {
     if (!price || !amount) {
       toast({
-        title: "Invalid Order",
-        description: "Please enter both price and amount",
-        variant: "destructive",
+        title: 'Invalid Order',
+        description: 'Please enter both price and amount',
+        variant: 'destructive',
       });
       return;
     }
 
     toast({
-      title: "Order Placed",
-      description: `${side.toUpperCase()} order for ${amount} ${pair.split("/")[0]} at $${price}`,
+      title: 'Order Placed',
+      description: `${side.toUpperCase()} order for ${amount} ${pair.split('/')[0]} at $${price}`,
     });
 
-    setPrice("");
-    setAmount("");
+    setPrice('');
+    setAmount('');
   };
 
-  const total = price && amount ? (parseFloat(price) * parseFloat(amount)).toFixed(2) : "0.00";
+  const total =
+    price && amount
+      ? (parseFloat(price) * parseFloat(amount)).toFixed(2)
+      : '0.00';
 
   return (
-    <div className="h-full bg-black">
+    <div className='h-full bg-black'>
       {/* Header */}
-      <div className="p-3 border-b border-gray-800">
-        <h3 className="text-sm font-semibold text-white mb-3">Place Order</h3>
-        
+      <div className='p-3 border-b border-gray-800'>
+        <h3 className='text-sm font-semibold text-white mb-3'>Place Order</h3>
+
         {/* Order Type Selection */}
-        <div className="grid grid-cols-3 gap-1 bg-gray-900 rounded-md p-1 mb-4">
+        <div className='grid grid-cols-3 gap-1 bg-gray-900 rounded-md p-1 mb-4'>
           <Button
-            variant={orderType === "limit" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => setOrderType("limit")}
-            className="text-xs h-8"
+            variant={orderType === 'limit' ? 'default' : 'ghost'}
+            size='sm'
+            onClick={() => setOrderType('limit')}
+            className='text-xs h-8'
           >
             Limit
           </Button>
           <Button
-            variant={orderType === "market" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => setOrderType("market")}
-            className="text-xs h-8"
+            variant={orderType === 'market' ? 'default' : 'ghost'}
+            size='sm'
+            onClick={() => setOrderType('market')}
+            className='text-xs h-8'
           >
             Market
           </Button>
           <Button
-            variant={orderType === "scale" ? "default" : "ghost"}
-            size="sm"
+            variant={orderType === 'scale' ? 'default' : 'ghost'}
+            size='sm'
             onClick={() => {
-              setOrderType("scale");
+              setOrderType('scale');
               setScaleModalOpen(true);
             }}
-            className="text-xs h-8"
+            className='text-xs h-8'
           >
             Scale
           </Button>
         </div>
 
         {/* Direct Fulfill Button */}
-        <div className="mb-4">
+        <div className='mb-4'>
           <Button
             disabled
-            variant="ghost"
-            size="sm"
-            className="w-full text-xs h-8 text-gray-500 border border-gray-700 hover:bg-gray-800"
-            title="Only available for 100-ton+ wholesale commodity trades"
+            variant='ghost'
+            size='sm'
+            className='w-full text-xs h-8 text-gray-500 border border-gray-700 hover:bg-gray-800'
+            title='Only available for 100-ton+ wholesale commodity trades'
           >
             Direct Fill
           </Button>
         </div>
       </div>
-      
-      <div className="p-3 space-y-3">
+
+      <div className='p-3 space-y-3'>
         {/* Provider Accepts Pills */}
-        {FEATURE_FLAGS.providerMarketplaceMock && orderType !== "scale" && (
-          <div className="mb-4">
-            <Label className="text-gray-300 text-xs">Provider accepts:</Label>
-            <div className="flex flex-wrap gap-1 mt-1">
-              {mockProviderAssets.map((asset) => (
-                <Badge key={asset} variant="secondary" className="text-xs">
+        {FEATURE_FLAGS.providerMarketplaceMock && orderType !== 'scale' && (
+          <div className='mb-4'>
+            <Label className='text-gray-300 text-xs'>Provider accepts:</Label>
+            <div className='flex flex-wrap gap-1 mt-1'>
+              {mockProviderAssets.map(asset => (
+                <Badge key={asset} variant='secondary' className='text-xs'>
                   {asset}
                 </Badge>
               ))}
@@ -112,23 +121,19 @@ const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
         )}
 
         {/* Source of funds selector */}
-        {orderType !== "scale" && (
+        {orderType !== 'scale' && (
           <div>
-            <Label htmlFor="funding-source" className="text-gray-300 text-xs">
+            <Label htmlFor='funding-source' className='text-gray-300 text-xs'>
               Source of funds
             </Label>
-            <div className="grid grid-cols-2 gap-1 bg-gray-900 rounded-md p-1 mt-1">
-              <Button
-                variant="default"
-                size="sm"
-                className="text-xs h-8"
-              >
+            <div className='grid grid-cols-2 gap-1 bg-gray-900 rounded-md p-1 mt-1'>
+              <Button variant='default' size='sm' className='text-xs h-8'>
                 Trading Balance
               </Button>
               <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs h-8 text-gray-400"
+                variant='ghost'
+                size='sm'
+                className='text-xs h-8 text-gray-400'
               >
                 Transfer from Funding...
               </Button>
@@ -137,115 +142,139 @@ const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
         )}
 
         {/* Price Input */}
-        {orderType !== "market" && orderType !== "scale" && (
+        {orderType !== 'market' && orderType !== 'scale' && (
           <div>
-            <Label htmlFor="price" className="text-gray-300 text-xs">
+            <Label htmlFor='price' className='text-gray-300 text-xs'>
               Price (USD)
             </Label>
             <Input
-              id="price"
-              type="number"
+              id='price'
+              type='number'
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="2,380.50"
-              className="mt-1 bg-gray-900 border-gray-700 text-white text-sm h-9"
+              onChange={e => setPrice(e.target.value)}
+              placeholder='2,380.50'
+              className='mt-1 bg-gray-900 border-gray-700 text-white text-sm h-9'
             />
           </div>
         )}
 
         {/* Amount Input */}
-        {orderType !== "scale" && (
-        <div>
-          <div className="flex justify-between items-center mb-1">
-            <Label htmlFor="amount" className="text-gray-300 text-xs">
-              Amount (grams)
-            </Label>
-            <div className="flex space-x-1">
-              <Button size="sm" variant="ghost" className="text-xs h-5 px-1 text-gray-400">25%</Button>
-              <Button size="sm" variant="ghost" className="text-xs h-5 px-1 text-gray-400">50%</Button>
-              <Button size="sm" variant="ghost" className="text-xs h-5 px-1 text-gray-400">75%</Button>
-              <Button size="sm" variant="ghost" className="text-xs h-5 px-1 text-gray-400">Max</Button>
+        {orderType !== 'scale' && (
+          <div>
+            <div className='flex justify-between items-center mb-1'>
+              <Label htmlFor='amount' className='text-gray-300 text-xs'>
+                Amount (grams)
+              </Label>
+              <div className='flex space-x-1'>
+                <Button
+                  size='sm'
+                  variant='ghost'
+                  className='text-xs h-5 px-1 text-gray-400'
+                >
+                  25%
+                </Button>
+                <Button
+                  size='sm'
+                  variant='ghost'
+                  className='text-xs h-5 px-1 text-gray-400'
+                >
+                  50%
+                </Button>
+                <Button
+                  size='sm'
+                  variant='ghost'
+                  className='text-xs h-5 px-1 text-gray-400'
+                >
+                  75%
+                </Button>
+                <Button
+                  size='sm'
+                  variant='ghost'
+                  className='text-xs h-5 px-1 text-gray-400'
+                >
+                  Max
+                </Button>
+              </div>
             </div>
+            <Input
+              id='amount'
+              type='number'
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              placeholder='0.00'
+              className='bg-gray-900 border-gray-700 text-white text-sm h-9'
+            />
           </div>
-          <Input
-            id="amount"
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="0.00"
-            className="bg-gray-900 border-gray-700 text-white text-sm h-9"
-          />
-        </div>
         )}
 
         {/* Advanced Options */}
-        {orderType !== "scale" && (
-        <div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="text-xs text-gray-400 hover:text-white p-0 h-6"
-          >
-            + Set Take Profit / Stop Loss
-          </Button>
-        </div>
+        {orderType !== 'scale' && (
+          <div>
+            <Button
+              variant='ghost'
+              size='sm'
+              className='text-xs text-gray-400 hover:text-white p-0 h-6'
+            >
+              + Set Take Profit / Stop Loss
+            </Button>
+          </div>
         )}
 
         {/* Total */}
-        {orderType !== "scale" && (
-        <div className="p-2 bg-gray-900 rounded border border-gray-700">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-400 text-xs">Total:</span>
-            <span className="text-white font-mono text-sm">
-              ${total}
-            </span>
+        {orderType !== 'scale' && (
+          <div className='p-2 bg-gray-900 rounded border border-gray-700'>
+            <div className='flex justify-between items-center'>
+              <span className='text-gray-400 text-xs'>Total:</span>
+              <span className='text-white font-mono text-sm'>${total}</span>
+            </div>
           </div>
-        </div>
         )}
 
         {/* Buy/Sell Buttons */}
-        {orderType !== "scale" && (
-        <div className="space-y-2">
-          <Button
-            onClick={() => handleSubmitOrder("buy")}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium h-10"
-            disabled={!amount || (!price && orderType === "limit")}
-          >
-            Buy {pair.split("/")[0]}
-          </Button>
-          <Button
-            onClick={() => handleSubmitOrder("sell")}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-medium h-10"
-            disabled={!amount || (!price && orderType === "limit")}
-          >
-            Sell {pair.split("/")[0]}
-          </Button>
-        </div>
+        {orderType !== 'scale' && (
+          <div className='space-y-2'>
+            <Button
+              onClick={() => handleSubmitOrder('buy')}
+              className='w-full bg-green-600 hover:bg-green-700 text-white font-medium h-10'
+              disabled={!amount || (!price && orderType === 'limit')}
+            >
+              Buy {pair.split('/')[0]}
+            </Button>
+            <Button
+              onClick={() => handleSubmitOrder('sell')}
+              className='w-full bg-red-600 hover:bg-red-700 text-white font-medium h-10'
+              disabled={!amount || (!price && orderType === 'limit')}
+            >
+              Sell {pair.split('/')[0]}
+            </Button>
+          </div>
         )}
 
         {/* Scale Order Message */}
-        {orderType === "scale" && (
-          <div className="text-center py-8">
-            <p className="text-gray-400 text-sm mb-2">Scale Order Mode</p>
-            <p className="text-xs text-gray-500">Configure your scale order in the modal above</p>
+        {orderType === 'scale' && (
+          <div className='text-center py-8'>
+            <p className='text-gray-400 text-sm mb-2'>Scale Order Mode</p>
+            <p className='text-xs text-gray-500'>
+              Configure your scale order in the modal above
+            </p>
           </div>
         )}
       </div>
 
       {/* Balance Info */}
-      <div className="p-3 border-t border-gray-800 bg-gray-900/50">
-        <div className="space-y-1 text-xs">
-          <div className="flex justify-between">
-            <span className="text-gray-400">Available USD:</span>
-            <span className="text-white font-mono">$12,450.00</span>
+      <div className='p-3 border-t border-gray-800 bg-gray-900/50'>
+        <div className='space-y-1 text-xs'>
+          <div className='flex justify-between'>
+            <span className='text-gray-400'>Available USD:</span>
+            <span className='text-white font-mono'>$12,450.00</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-400">Available Gold:</span>
-            <span className="text-gold font-mono">24.5g</span>
+          <div className='flex justify-between'>
+            <span className='text-gray-400'>Available Gold:</span>
+            <span className='text-gold font-mono'>24.5g</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-400">Buying Power:</span>
-            <span className="text-green-400 font-mono">$12,450.00</span>
+          <div className='flex justify-between'>
+            <span className='text-gray-400'>Buying Power:</span>
+            <span className='text-green-400 font-mono'>$12,450.00</span>
           </div>
         </div>
       </div>

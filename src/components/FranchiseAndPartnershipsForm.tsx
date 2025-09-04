@@ -359,7 +359,12 @@ const FranchiseAndPartnershipsForm = () => {
     const countFranchiseAsFive = (window as { countFranchiseAsFive?: unknown })
       .countFranchiseAsFive;
 
-    if (store && typeof store === 'object' && 'addRecord' in store && typeof store.addRecord === 'function') {
+    if (
+      store &&
+      typeof store === 'object' &&
+      'addRecord' in store &&
+      typeof store.addRecord === 'function'
+    ) {
       if (formType === 'customer_vote') {
         const result = (store as any).addRecord({
           city: formData.cityWanted,
@@ -1003,7 +1008,12 @@ const FranchiseAndPartnershipsForm = () => {
         {/* Intro Pitch */}
         <div className='p-4 bg-muted/20 rounded-lg border-l-4 border-primary'>
           <p className='text-sm leading-relaxed'>
-            Join the PBCEx global supply network. Connect your commodities directly to our marketplace and participate as a co-market maker with us. Approved providers can set pricing margins, fulfill orders locally, and reach institutional buyers worldwide. As we expand through Phases 1, 3, and 4B, eligible partners gain additional routes for settlement, hedging, and distribution.
+            Join the PBCEx global supply network. Connect your commodities
+            directly to our marketplace and participate as a co-market maker
+            with us. Approved providers can set pricing margins, fulfill orders
+            locally, and reach institutional buyers worldwide. As we expand
+            through Phases 1, 3, and 4B, eligible partners gain additional
+            routes for settlement, hedging, and distribution.
           </p>
         </div>
 

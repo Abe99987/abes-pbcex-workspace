@@ -43,13 +43,25 @@ All colors MUST be HSL.
     --silver-light: 220 15% 85%;
     --oil: 0 0% 11%;
 
-    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-light)));
-    --gradient-silver: linear-gradient(135deg, hsl(var(--silver)), hsl(var(--silver-light)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(var(--muted)));
-    
+    --gradient-gold: linear-gradient(
+      135deg,
+      hsl(var(--gold)),
+      hsl(var(--gold-light))
+    );
+    --gradient-silver: linear-gradient(
+      135deg,
+      hsl(var(--silver)),
+      hsl(var(--silver-light))
+    );
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(var(--background)),
+      hsl(var(--muted))
+    );
+
     --shadow-gold: 0 10px 30px -10px hsl(var(--gold) / 0.3);
     --shadow-elegant: 0 20px 40px -15px hsl(var(--foreground) / 0.1);
-    
+
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --radius: 0.5rem;

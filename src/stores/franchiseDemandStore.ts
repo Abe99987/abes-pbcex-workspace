@@ -41,14 +41,17 @@ class FranchiseDemandStore {
     if (record.email) {
       const key = `${record.email}-${record.city}-${record.country}`;
       if (this.sessionVotes.has(key)) {
-        return { success: false, message: "Vote already counted for this location." };
+        return {
+          success: false,
+          message: 'Vote already counted for this location.',
+        };
       }
       this.sessionVotes.add(key);
     }
 
     this.records.push({
       ...record,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     this.notify();
     return { success: true };
@@ -60,13 +63,13 @@ class FranchiseDemandStore {
 
     this.records.forEach(record => {
       const key = `${record.city}-${record.country}`;
-      
+
       if (!grouped.has(key)) {
         grouped.set(key, {
           city: record.city,
           country: record.country,
           votes: 0,
-          sources: { vote: 0, franchise: 0 }
+          sources: { vote: 0, franchise: 0 },
         });
       }
 
@@ -88,27 +91,92 @@ class FranchiseDemandStore {
     if (this.records.length > 0) return; // Only seed once
 
     const demoData = [
-      { city: "Lagos", country: "Nigeria", weight: 42, source: 'vote' as const },
-      { city: "Mumbai", country: "India", weight: 26, source: 'vote' as const },
-      { city: "Mumbai", country: "India", weight: 5, source: 'franchise' as const },
-      { city: "Dubai", country: "United Arab Emirates", weight: 18, source: 'vote' as const },
-      { city: "Pittsburgh", country: "United States", weight: 12, source: 'vote' as const },
-      { city: "Austin", country: "United States", weight: 9, source: 'vote' as const },
-      { city: "London", country: "United Kingdom", weight: 14, source: 'vote' as const },
-      { city: "Singapore", country: "Singapore", weight: 11, source: 'vote' as const },
-      { city: "Toronto", country: "Canada", weight: 8, source: 'vote' as const },
-      { city: "São Paulo", country: "Brazil", weight: 15, source: 'vote' as const },
-      { city: "Tokyo", country: "Japan", weight: 13, source: 'vote' as const },
-      { city: "Sydney", country: "Australia", weight: 7, source: 'vote' as const },
-      { city: "Frankfurt", country: "Germany", weight: 10, source: 'vote' as const },
-      { city: "Hong Kong", country: "Hong Kong", weight: 16, source: 'vote' as const },
-      { city: "Riyadh", country: "Saudi Arabia", weight: 6, source: 'vote' as const }
+      {
+        city: 'Lagos',
+        country: 'Nigeria',
+        weight: 42,
+        source: 'vote' as const,
+      },
+      { city: 'Mumbai', country: 'India', weight: 26, source: 'vote' as const },
+      {
+        city: 'Mumbai',
+        country: 'India',
+        weight: 5,
+        source: 'franchise' as const,
+      },
+      {
+        city: 'Dubai',
+        country: 'United Arab Emirates',
+        weight: 18,
+        source: 'vote' as const,
+      },
+      {
+        city: 'Pittsburgh',
+        country: 'United States',
+        weight: 12,
+        source: 'vote' as const,
+      },
+      {
+        city: 'Austin',
+        country: 'United States',
+        weight: 9,
+        source: 'vote' as const,
+      },
+      {
+        city: 'London',
+        country: 'United Kingdom',
+        weight: 14,
+        source: 'vote' as const,
+      },
+      {
+        city: 'Singapore',
+        country: 'Singapore',
+        weight: 11,
+        source: 'vote' as const,
+      },
+      {
+        city: 'Toronto',
+        country: 'Canada',
+        weight: 8,
+        source: 'vote' as const,
+      },
+      {
+        city: 'São Paulo',
+        country: 'Brazil',
+        weight: 15,
+        source: 'vote' as const,
+      },
+      { city: 'Tokyo', country: 'Japan', weight: 13, source: 'vote' as const },
+      {
+        city: 'Sydney',
+        country: 'Australia',
+        weight: 7,
+        source: 'vote' as const,
+      },
+      {
+        city: 'Frankfurt',
+        country: 'Germany',
+        weight: 10,
+        source: 'vote' as const,
+      },
+      {
+        city: 'Hong Kong',
+        country: 'Hong Kong',
+        weight: 16,
+        source: 'vote' as const,
+      },
+      {
+        city: 'Riyadh',
+        country: 'Saudi Arabia',
+        weight: 6,
+        source: 'vote' as const,
+      },
     ];
 
     demoData.forEach(data => {
       this.records.push({
         ...data,
-        timestamp: Date.now() - Math.random() * 86400000 * 7 // Random timestamp within last week
+        timestamp: Date.now() - Math.random() * 86400000 * 7, // Random timestamp within last week
       });
     });
 
@@ -132,13 +200,22 @@ class FranchiseDemandStore {
   getTodayStats() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const todayRecords = this.records.filter(r => r.timestamp >= today.getTime());
-    
-    const todayAgg = new Map<string, { city: string; country: string; votes: number }>();
+    const todayRecords = this.records.filter(
+      r => r.timestamp >= today.getTime()
+    );
+
+    const todayAgg = new Map<
+      string,
+      { city: string; country: string; votes: number }
+    >();
     todayRecords.forEach(record => {
       const key = `${record.city}-${record.country}`;
       if (!todayAgg.has(key)) {
-        todayAgg.set(key, { city: record.city, country: record.country, votes: 0 });
+        todayAgg.set(key, {
+          city: record.city,
+          country: record.country,
+          votes: 0,
+        });
       }
       todayAgg.get(key)!.votes += record.weight;
     });
@@ -150,7 +227,7 @@ class FranchiseDemandStore {
 
     return {
       totalVotes: todayRecords.reduce((sum, r) => sum + r.weight, 0),
-      topCity: todayCities[0] || null
+      topCity: todayCities[0] || null,
     };
   }
 }

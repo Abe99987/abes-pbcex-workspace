@@ -1,91 +1,103 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  TrendingUp, 
-  Coins, 
-  ArrowRightLeft, 
-  Package, 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  TrendingUp,
+  Coins,
+  ArrowRightLeft,
+  Package,
   CreditCard,
   DollarSign,
   Building2,
   Globe,
   Shield,
-  Users
-} from "lucide-react";
-import Navigation from "@/components/Navigation";
-import FranchiseAndPartnershipsForm from "@/components/FranchiseAndPartnershipsForm";
-import FranchiseDemandCounter from "@/components/FranchiseDemandCounter";
-import Footer from "@/components/Footer";
+  Users,
+} from 'lucide-react';
+import Navigation from '@/components/Navigation';
+import FranchiseAndPartnershipsForm from '@/components/FranchiseAndPartnershipsForm';
+import FranchiseDemandCounter from '@/components/FranchiseDemandCounter';
+import Footer from '@/components/Footer';
 
 const Franchise = () => {
-
   const revenueStreams = [
     {
       icon: Coins,
-      title: "Gold & Silver Spread Revenue",
-      description: "Earn from buy/sell spreads on precious metals trading"
+      title: 'Gold & Silver Spread Revenue',
+      description: 'Earn from buy/sell spreads on precious metals trading',
     },
     {
       icon: TrendingUp,
-      title: "Asset-Backed Mortgages & Loans",
-      description: "Revenue from home and vehicle mortgages, and collateralized loans backed by tokenized assets like gold, silver, or crypto"
+      title: 'Asset-Backed Mortgages & Loans',
+      description:
+        'Revenue from home and vehicle mortgages, and collateralized loans backed by tokenized assets like gold, silver, or crypto',
     },
     {
       icon: ArrowRightLeft,
-      title: "FX Remittance Margins",
-      description: "Profit from foreign exchange and remittance services"
+      title: 'FX Remittance Margins',
+      description: 'Profit from foreign exchange and remittance services',
     },
     {
       icon: Package,
-      title: "Physical Delivery Fulfillment",
-      description: "Markups on delivery and packaging"
+      title: 'Physical Delivery Fulfillment',
+      description: 'Markups on delivery and packaging',
     },
     {
       icon: CreditCard,
-      title: "POS and QR Payment Margins",
-      description: "Transaction fees from payment processing services"
+      title: 'POS and QR Payment Margins',
+      description: 'Transaction fees from payment processing services',
     },
     {
       icon: CreditCard,
-      title: "Card Services",
-      description: "Earn revenue from card transactions and service fees"
-    }
+      title: 'Card Services',
+      description: 'Earn revenue from card transactions and service fees',
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className='min-h-screen bg-background'>
       <Navigation />
-      
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-primary/5 border-b">
-        <div className="container mx-auto px-4 py-20">
-          <div className="max-w-4xl mx-auto text-center">
-            <Badge variant="secondary" className="mb-6">
-              <Building2 className="w-4 h-4 mr-2" />
+      <section className='relative overflow-hidden bg-gradient-to-br from-background via-background to-primary/5 border-b'>
+        <div className='container mx-auto px-4 py-20'>
+          <div className='max-w-4xl mx-auto text-center'>
+            <Badge variant='secondary' className='mb-6'>
+              <Building2 className='w-4 h-4 mr-2' />
               Franchise Opportunity
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent mb-6">
+            <h1 className='text-4xl md:text-6xl font-bold bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent mb-6'>
               Open a PBCEx Franchise
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-4 leading-relaxed">
-              118 elements exist. 25 commodities make the world work. Yet we trade in 180 fiat currencies and over 10,000 cryptocurrencies.
+            <p className='text-xl md:text-2xl text-muted-foreground mb-4 leading-relaxed'>
+              118 elements exist. 25 commodities make the world work. Yet we
+              trade in 180 fiat currencies and over 10,000 cryptocurrencies.
             </p>
-            <p className="text-2xl font-semibold text-foreground mb-2">
+            <p className='text-2xl font-semibold text-foreground mb-2'>
               Bank the Things That Matter.
             </p>
-            <p className="text-lg text-muted-foreground mb-6">
-              Partner with us and include PBCEx rails in your bank or institution.
+            <p className='text-lg text-muted-foreground mb-6'>
+              Partner with us and include PBCEx rails in your bank or
+              institution.
             </p>
-            <p className="text-base text-muted-foreground mb-8">
-              Franchises unlock access to PBCEx global settlement — trade, payments, and fulfillment integrated directly into your city or institution.
+            <p className='text-base text-muted-foreground mb-8'>
+              Franchises unlock access to PBCEx global settlement — trade,
+              payments, and fulfillment integrated directly into your city or
+              institution.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <div className="flex items-center text-lg">
-                <DollarSign className="w-5 h-5 mr-2 text-primary" />
-                <span>Starting at <strong>$55K</strong></span>
+            <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
+              <div className='flex items-center text-lg'>
+                <DollarSign className='w-5 h-5 mr-2 text-primary' />
+                <span>
+                  Starting at <strong>$55K</strong>
+                </span>
               </div>
-              <div className="flex items-center text-lg">
-                <Globe className="w-5 h-5 mr-2 text-primary" />
+              <div className='flex items-center text-lg'>
+                <Globe className='w-5 h-5 mr-2 text-primary' />
                 <span>Operate in underserved markets</span>
               </div>
             </div>
@@ -94,29 +106,33 @@ const Franchise = () => {
       </section>
 
       {/* Revenue Streams Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className='py-20'>
+        <div className='container mx-auto px-4'>
+          <div className='max-w-6xl mx-auto'>
+            <div className='text-center mb-16'>
+              <h2 className='text-3xl md:text-4xl font-bold mb-4'>
                 Multiple Revenue Streams
               </h2>
-              <p className="text-xl text-muted-foreground">
-                Generate income from various business verticals with automated compliance and logistics
+              <p className='text-xl text-muted-foreground'>
+                Generate income from various business verticals with automated
+                compliance and logistics
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12'>
               {revenueStreams.map((stream, index) => (
-                <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20">
+                <Card
+                  key={index}
+                  className='group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20'
+                >
                   <CardHeader>
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                      <stream.icon className="w-6 h-6 text-primary" />
+                    <div className='w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors'>
+                      <stream.icon className='w-6 h-6 text-primary' />
                     </div>
-                    <CardTitle className="text-lg">{stream.title}</CardTitle>
+                    <CardTitle className='text-lg'>{stream.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-base">
+                    <CardDescription className='text-base'>
                       {stream.description}
                     </CardDescription>
                   </CardContent>
@@ -125,30 +141,30 @@ const Franchise = () => {
             </div>
 
             {/* Additional Benefits */}
-            <div className="grid md:grid-cols-3 gap-6">
-              <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-                <CardHeader className="text-center">
-                  <Shield className="w-8 h-8 text-primary mx-auto mb-2" />
+            <div className='grid md:grid-cols-3 gap-6'>
+              <Card className='bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20'>
+                <CardHeader className='text-center'>
+                  <Shield className='w-8 h-8 text-primary mx-auto mb-2' />
                   <CardTitle>Vault Support</CardTitle>
                   <CardDescription>
                     Secure storage solutions with full insurance coverage
                   </CardDescription>
                 </CardHeader>
               </Card>
-              
-              <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-                <CardHeader className="text-center">
-                  <Package className="w-8 h-8 text-primary mx-auto mb-2" />
+
+              <Card className='bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20'>
+                <CardHeader className='text-center'>
+                  <Package className='w-8 h-8 text-primary mx-auto mb-2' />
                   <CardTitle>API Integration</CardTitle>
                   <CardDescription>
                     Automated fulfillment via Dillon Gage partnership
                   </CardDescription>
                 </CardHeader>
               </Card>
-              
-              <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-                <CardHeader className="text-center">
-                  <Users className="w-8 h-8 text-primary mx-auto mb-2" />
+
+              <Card className='bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20'>
+                <CardHeader className='text-center'>
+                  <Users className='w-8 h-8 text-primary mx-auto mb-2' />
                   <CardTitle>Full Support</CardTitle>
                   <CardDescription>
                     Complete training and ongoing operational assistance
@@ -162,10 +178,10 @@ const Franchise = () => {
 
       {/* Contact Form Section */}
       <FranchiseAndPartnershipsForm />
-      
+
       {/* Franchise Demand Counter */}
       <FranchiseDemandCounter />
-      
+
       <Footer />
     </div>
   );

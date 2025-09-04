@@ -24,7 +24,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Branch } from "@/types/branch";
+import { Branch } from '@/types/branch';
 import { ASSET_FORMATS } from '@/constants/assetFormats';
 import BranchLocator from './BranchLocator';
 
@@ -110,10 +110,10 @@ const BuyPhysicalModal = ({
   const getAssetConfig = () => {
     // Map shop symbols to format symbols
     const symbolMap: Record<string, string> = {
-      'AU': 'XAU',
-      'AG': 'XAG'
+      AU: 'XAU',
+      AG: 'XAG',
     };
-    
+
     const configSymbol = symbolMap[asset.symbol] || asset.symbol;
     return ASSET_FORMATS[configSymbol] || { unit: 'units', formats: [] };
   };
@@ -281,7 +281,10 @@ const BuyPhysicalModal = ({
                       <RadioGroupItem value={fmt.id} id={fmt.id} />
                       <div className='text-2xl'>{fmt.icon}</div>
                       <div className='flex-1'>
-                        <Label htmlFor={fmt.id} className='font-medium cursor-pointer'>
+                        <Label
+                          htmlFor={fmt.id}
+                          className='font-medium cursor-pointer'
+                        >
                           {fmt.name}
                         </Label>
                         <div className='text-sm text-muted-foreground'>
@@ -299,11 +302,13 @@ const BuyPhysicalModal = ({
                     </div>
                   ))}
                 </RadioGroup>
-                
+
                 {/* Premium information */}
                 <div className='text-xs text-muted-foreground p-3 bg-muted/20 rounded-lg'>
-                  <strong>Premium Note:</strong> Bars typically have lower premiums (closer to spot price); 
-                  coins and collectible products generally carry higher premiums due to minting costs and collectability.
+                  <strong>Premium Note:</strong> Bars typically have lower
+                  premiums (closer to spot price); coins and collectible
+                  products generally carry higher premiums due to minting costs
+                  and collectability.
                 </div>
               </div>
 
@@ -342,7 +347,8 @@ const BuyPhysicalModal = ({
                         </strong>
                         <br />
                         <span className='text-orange-700'>
-                          ETA 3–5 weeks via MRST Shipping. Minimum order: 1 ton per format.
+                          ETA 3–5 weeks via MRST Shipping. Minimum order: 1 ton
+                          per format.
                         </span>
                       </div>
                     </div>

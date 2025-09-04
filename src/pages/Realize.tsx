@@ -216,7 +216,7 @@ const Realize = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div 
+                  <div
                     className='lg:col-span-4'
                     onClick={e => e.stopPropagation()}
                     onMouseDown={e => e.stopPropagation()}
@@ -234,14 +234,17 @@ const Realize = () => {
                                 setBuyModalOpen(true);
                               }}
                               aria-label={`Buy ${asset.name}`}
-                              data-testid="buy-btn"
+                              data-testid='buy-btn'
                             >
                               <ShoppingCart className='w-4 h-4 mr-2' />
                               Buy
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Purchase tokens using USD, USDC, PAXG, bank wire, or debit card</p>
+                            <p>
+                              Purchase tokens using USD, USDC, PAXG, bank wire,
+                              or debit card
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -257,7 +260,7 @@ const Realize = () => {
                                 setRealizeModalOpen(true);
                               }}
                               aria-label={`Sell ${asset.name}`}
-                              data-testid="sell-btn"
+                              data-testid='sell-btn'
                             >
                               <CreditCard className='w-4 h-4 mr-2' />
                               Sell
@@ -280,14 +283,17 @@ const Realize = () => {
                                 setBuyPhysicalModalOpen(true);
                               }}
                               aria-label={`Order ${asset.name}`}
-                              data-testid="order-btn"
+                              data-testid='order-btn'
                             >
                               <Truck className='w-4 h-4 mr-2' />
                               Order
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Physical delivery (bars/coins/Goldbacks) with format selection</p>
+                            <p>
+                              Physical delivery (bars/coins/Goldbacks) with
+                              format selection
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -306,7 +312,7 @@ const Realize = () => {
                                 setSendModalOpen(true);
                               }}
                               aria-label={`Send ${asset.name}`}
-                              data-testid="send-btn"
+                              data-testid='send-btn'
                             >
                               <Send className='w-4 h-4 mr-2' />
                               Send
@@ -329,7 +335,7 @@ const Realize = () => {
                                 setDepositModalOpen(true);
                               }}
                               aria-label={`Deposit ${asset.name}`}
-                              data-testid="deposit-btn"
+                              data-testid='deposit-btn'
                             >
                               <Upload className='w-4 h-4 mr-2' />
                               Deposit
@@ -359,7 +365,10 @@ const Realize = () => {
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Asset-backed financing with {asset.name} as collateral</p>
+                            <p>
+                              Asset-backed financing with {asset.name} as
+                              collateral
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -419,9 +428,12 @@ const Realize = () => {
           <Dialog open={depositModalOpen} onOpenChange={setDepositModalOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Crypto Deposit - {selectedAsset?.name}</DialogTitle>
+                <DialogTitle>
+                  Crypto Deposit - {selectedAsset?.name}
+                </DialogTitle>
                 <DialogDescription>
-                  This feature is under development. Please use the main deposit flow for now.
+                  This feature is under development. Please use the main deposit
+                  flow for now.
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
@@ -445,7 +457,10 @@ const Realize = () => {
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant='outline' onClick={() => setSendModalOpen(false)}>
+                <Button
+                  variant='outline'
+                  onClick={() => setSendModalOpen(false)}
+                >
                   Close
                 </Button>
               </DialogFooter>

@@ -18,14 +18,16 @@ export const ASSET_FORMATS: Record<string, AssetConfig> = {
       {
         id: 'bar',
         name: 'Gold Bar',
-        description: 'Pure 24k gold bars in standard weights. Lower premium (closer to spot).',
+        description:
+          'Pure 24k gold bars in standard weights. Lower premium (closer to spot).',
         minAmount: 1.0,
         icon: '🥇',
       },
       {
         id: 'coins',
         name: 'Gold Coins',
-        description: 'American Eagle or Maple Leaf coins. Higher premium (collectability & mint costs).',
+        description:
+          'American Eagle or Maple Leaf coins. Higher premium (collectability & mint costs).',
         minAmount: 0.1,
         icon: '🪙',
       },
@@ -51,7 +53,8 @@ export const ASSET_FORMATS: Record<string, AssetConfig> = {
       {
         id: 'coins',
         name: 'Silver Coins',
-        description: 'American Eagle or Maple Leaf coins. Higher premium (collectability & mint costs).',
+        description:
+          'American Eagle or Maple Leaf coins. Higher premium (collectability & mint costs).',
         minAmount: 1.0,
         icon: '🪙',
       },
@@ -70,14 +73,16 @@ export const ASSET_FORMATS: Record<string, AssetConfig> = {
       {
         id: 'bar',
         name: 'Platinum Bar',
-        description: 'Pure .9995 platinum bars. Lower premium (closer to spot).',
+        description:
+          'Pure .9995 platinum bars. Lower premium (closer to spot).',
         minAmount: 1.0,
         icon: '⚪',
       },
       {
         id: 'coins',
         name: 'Platinum Coins',
-        description: 'American Eagle platinum coins. Higher premium (collectability & mint costs).',
+        description:
+          'American Eagle platinum coins. Higher premium (collectability & mint costs).',
         minAmount: 0.1,
         icon: '🪙',
       },
@@ -89,14 +94,16 @@ export const ASSET_FORMATS: Record<string, AssetConfig> = {
       {
         id: 'bar',
         name: 'Palladium Bar',
-        description: 'Pure .9995 palladium bars. Lower premium (closer to spot).',
+        description:
+          'Pure .9995 palladium bars. Lower premium (closer to spot).',
         minAmount: 1.0,
         icon: '⚫',
       },
       {
         id: 'coins',
         name: 'Palladium Coins',
-        description: 'Canadian Maple Leaf palladium coins. Higher premium (collectability & mint costs).',
+        description:
+          'Canadian Maple Leaf palladium coins. Higher premium (collectability & mint costs).',
         minAmount: 0.1,
         icon: '🪙',
       },

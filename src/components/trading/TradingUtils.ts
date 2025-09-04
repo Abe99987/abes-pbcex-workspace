@@ -15,20 +15,30 @@ export interface OrderBookEntry {
   total: number;
 }
 
-export const generateCandlestickData = (count: number, timeframe: string): CandlestickData[] => {
+export const generateCandlestickData = (
+  count: number,
+  timeframe: string
+): CandlestickData[] => {
   const data: CandlestickData[] = [];
   let basePrice = 2380;
   const now = new Date();
-  
+
   const getTimeInterval = (tf: string): number => {
     switch (tf) {
-      case "1m": return 60 * 1000;
-      case "5m": return 5 * 60 * 1000;
-      case "15m": return 15 * 60 * 1000;
-      case "1h": return 60 * 60 * 1000;
-      case "4h": return 4 * 60 * 60 * 1000;
-      case "1d": return 24 * 60 * 60 * 1000;
-      default: return 60 * 60 * 1000;
+      case '1m':
+        return 60 * 1000;
+      case '5m':
+        return 5 * 60 * 1000;
+      case '15m':
+        return 15 * 60 * 1000;
+      case '1h':
+        return 60 * 60 * 1000;
+      case '4h':
+        return 4 * 60 * 60 * 1000;
+      case '1d':
+        return 24 * 60 * 60 * 1000;
+      default:
+        return 60 * 60 * 1000;
     }
   };
 
@@ -67,7 +77,7 @@ export const generateOrderBookData = () => {
     const price = basePrice - (i + 1) * 0.5 - Math.random() * 2;
     const amount = Math.random() * 5 + 0.1;
     const total = price * amount;
-    
+
     bids.push({
       price: parseFloat(price.toFixed(2)),
       amount: parseFloat(amount.toFixed(3)),
@@ -80,7 +90,7 @@ export const generateOrderBookData = () => {
     const price = basePrice + (i + 1) * 0.5 + Math.random() * 2;
     const amount = Math.random() * 5 + 0.1;
     const total = price * amount;
-    
+
     asks.push({
       price: parseFloat(price.toFixed(2)),
       amount: parseFloat(amount.toFixed(3)),
@@ -104,6 +114,9 @@ export const formatVolume = (volume: number): string => {
   return volume.toString();
 };
 
-export const calculatePercentageChange = (current: number, previous: number): number => {
+export const calculatePercentageChange = (
+  current: number,
+  previous: number
+): number => {
   return ((current - previous) / previous) * 100;
 };
