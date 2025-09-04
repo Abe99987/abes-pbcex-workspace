@@ -1,372 +1,1395 @@
 export const FORM_CONFIGS = {
   personal: {
-    "United States": {
+    'United States': {
       sections: [
         {
-          title: "Personal Basics",
+          title: 'Personal Basics',
           fields: [
-            { name: "fullName", label: "Full Legal Name", type: "text", required: true },
-            { name: "dateOfBirth", label: "Date of Birth", type: "date", required: true },
-            { name: "citizenship", label: "Citizenship/Nationality", type: "select", required: true, options: ["US Citizen", "Permanent Resident", "Other"] },
-            { name: "residentialAddress", label: "Residential Address", type: "textarea", required: true },
-            { name: "phone", label: "Phone", type: "tel", required: true, helpText: "OTP verification required" },
-            { name: "email", label: "Email", type: "email", required: true, helpText: "OTP verification required" },
-            { name: "idType", label: "Government ID Type", type: "select", required: true, options: ["Passport", "Driver's License", "National ID"] },
-            { name: "idNumber", label: "Government ID Number", type: "text", required: true },
-            { name: "ssn", label: "SSN/ITIN", type: "text", required: false }
-          ]
+            {
+              name: 'fullName',
+              label: 'Full Legal Name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'dateOfBirth',
+              label: 'Date of Birth',
+              type: 'date',
+              required: true,
+            },
+            {
+              name: 'citizenship',
+              label: 'Citizenship/Nationality',
+              type: 'select',
+              required: true,
+              options: ['US Citizen', 'Permanent Resident', 'Other'],
+            },
+            {
+              name: 'residentialAddress',
+              label: 'Residential Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'phone',
+              label: 'Phone',
+              type: 'tel',
+              required: true,
+              helpText: 'OTP verification required',
+            },
+            {
+              name: 'email',
+              label: 'Email',
+              type: 'email',
+              required: true,
+              helpText: 'OTP verification required',
+            },
+            {
+              name: 'idType',
+              label: 'Government ID Type',
+              type: 'select',
+              required: true,
+              options: ['Passport', "Driver's License", 'National ID'],
+            },
+            {
+              name: 'idNumber',
+              label: 'Government ID Number',
+              type: 'text',
+              required: true,
+            },
+            { name: 'ssn', label: 'SSN/ITIN', type: 'text', required: false },
+          ],
         },
         {
-          title: "Billing Information",
+          title: 'Billing Information',
           fields: [
-            { name: "billingAddress", label: "Billing Address", type: "textarea", required: true },
-            { name: "paymentMethod", label: "Payment Method", type: "select", required: true, options: ["ACH", "Wire", "Card", "USDC", "PAXG"] },
-            { name: "settlementCurrency", label: "Preferred Settlement Currency", type: "select", required: true, options: ["USD", "USDC", "PAXG"] }
-          ]
+            {
+              name: 'billingAddress',
+              label: 'Billing Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'paymentMethod',
+              label: 'Payment Method',
+              type: 'select',
+              required: true,
+              options: ['ACH', 'Wire', 'Card', 'USDC', 'PAXG'],
+            },
+            {
+              name: 'settlementCurrency',
+              label: 'Preferred Settlement Currency',
+              type: 'select',
+              required: true,
+              options: ['USD', 'USDC', 'PAXG'],
+            },
+          ],
         },
         {
-          title: "Shipping Information",
+          title: 'Shipping Information',
           fields: [
-            { name: "shippingAddress", label: "Shipping Address", type: "textarea", required: true },
-            { name: "deliveryContactName", label: "Delivery Contact Name", type: "text", required: true },
-            { name: "deliveryPhone", label: "Delivery Phone", type: "tel", required: true },
-            { name: "deliveryEmail", label: "Delivery Email", type: "email", required: true },
-            { name: "deliveryInstructions", label: "Delivery Instructions", type: "textarea", required: false },
-            { name: "deliveryPreferences", label: "Delivery Preferences", type: "select", required: true, options: ["Express [FedEx/UPS/DHL]", "Freight [Maersk/Other]", "Bonded/Insured"] },
-            { name: "signatureRequired", label: "Signature Requirement", type: "select", required: true, options: ["Yes", "No"] },
-            { name: "insuranceCoverage", label: "Insurance Coverage Declaration", type: "select", required: true, options: ["Use PBCEx Insurance", "Use My Own"] }
-          ]
+            {
+              name: 'shippingAddress',
+              label: 'Shipping Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'deliveryContactName',
+              label: 'Delivery Contact Name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'deliveryPhone',
+              label: 'Delivery Phone',
+              type: 'tel',
+              required: true,
+            },
+            {
+              name: 'deliveryEmail',
+              label: 'Delivery Email',
+              type: 'email',
+              required: true,
+            },
+            {
+              name: 'deliveryInstructions',
+              label: 'Delivery Instructions',
+              type: 'textarea',
+              required: false,
+            },
+            {
+              name: 'deliveryPreferences',
+              label: 'Delivery Preferences',
+              type: 'select',
+              required: true,
+              options: [
+                'Express [FedEx/UPS/DHL]',
+                'Freight [Maersk/Other]',
+                'Bonded/Insured',
+              ],
+            },
+            {
+              name: 'signatureRequired',
+              label: 'Signature Requirement',
+              type: 'select',
+              required: true,
+              options: ['Yes', 'No'],
+            },
+            {
+              name: 'insuranceCoverage',
+              label: 'Insurance Coverage Declaration',
+              type: 'select',
+              required: true,
+              options: ['Use PBCEx Insurance', 'Use My Own'],
+            },
+          ],
         },
         {
-          title: "Identity & Compliance (KYC)",
+          title: 'Identity & Compliance (KYC)',
           fields: [
-            { name: "proofOfAddress", label: "Proof of Address Upload", type: "file", required: true },
-            { name: "idUpload", label: "ID Upload", type: "file", required: true },
-            { name: "selfieWithId", label: "Selfie with ID", type: "file", required: true },
-            { name: "sanctionsConsent", label: "Sanctions/PEP Screening consent", type: "checkbox", required: true },
-            { name: "taxForm", label: "Tax Form", type: "select", required: true, options: ["W-9", "W-8BEN"] },
-            { name: "sourceOfFunds", label: "Source of Funds", type: "select", required: true, options: ["Employment", "Savings", "Investments", "Other"] },
-            { name: "occupation", label: "Occupation", type: "select", required: true, options: ["Professional", "Business Owner", "Student", "Retired", "Other"] },
-            { name: "employerName", label: "Employer Name", type: "text", required: false },
-            { name: "tradingActivity", label: "Expected Trading Activity", type: "select", required: true, options: ["<$10k/mo", "$10–50k", "$50–250k", "$250k+"] },
-            { name: "residencyStatus", label: "Residency Status", type: "select", required: true, options: ["Permanent", "Temporary", "Dual Citizen"] }
-          ]
+            {
+              name: 'proofOfAddress',
+              label: 'Proof of Address Upload',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'idUpload',
+              label: 'ID Upload',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'selfieWithId',
+              label: 'Selfie with ID',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'sanctionsConsent',
+              label: 'Sanctions/PEP Screening consent',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'taxForm',
+              label: 'Tax Form',
+              type: 'select',
+              required: true,
+              options: ['W-9', 'W-8BEN'],
+            },
+            {
+              name: 'sourceOfFunds',
+              label: 'Source of Funds',
+              type: 'select',
+              required: true,
+              options: ['Employment', 'Savings', 'Investments', 'Other'],
+            },
+            {
+              name: 'occupation',
+              label: 'Occupation',
+              type: 'select',
+              required: true,
+              options: [
+                'Professional',
+                'Business Owner',
+                'Student',
+                'Retired',
+                'Other',
+              ],
+            },
+            {
+              name: 'employerName',
+              label: 'Employer Name',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'tradingActivity',
+              label: 'Expected Trading Activity',
+              type: 'select',
+              required: true,
+              options: ['<$10k/mo', '$10–50k', '$50–250k', '$250k+'],
+            },
+            {
+              name: 'residencyStatus',
+              label: 'Residency Status',
+              type: 'select',
+              required: true,
+              options: ['Permanent', 'Temporary', 'Dual Citizen'],
+            },
+          ],
         },
         {
-          title: "Agreements",
+          title: 'Agreements',
           fields: [
-            { name: "acceptTerms", label: "Accept Terms & Conditions", type: "checkbox", required: true },
-            { name: "acceptPrivacy", label: "Accept Privacy Policy", type: "checkbox", required: true },
-            { name: "marketingOptIn", label: "Marketing Opt-in", type: "checkbox", required: false }
-          ]
-        }
-      ]
+            {
+              name: 'acceptTerms',
+              label: 'Accept Terms & Conditions',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'acceptPrivacy',
+              label: 'Accept Privacy Policy',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'marketingOptIn',
+              label: 'Marketing Opt-in',
+              type: 'checkbox',
+              required: false,
+            },
+          ],
+        },
+      ],
     },
-    "European Union": {
+    'European Union': {
       sections: [
         {
-          title: "Personal Basics",
+          title: 'Personal Basics',
           fields: [
-            { name: "fullName", label: "Full Legal Name", type: "text", required: true },
-            { name: "dateOfBirth", label: "Date of Birth", type: "date", required: true },
-            { name: "citizenship", label: "Citizenship/Nationality", type: "select", required: true, options: ["EU Citizen", "EU Resident", "Other"] },
-            { name: "residentialAddress", label: "Residential Address", type: "textarea", required: true },
-            { name: "phone", label: "Phone", type: "tel", required: true, helpText: "OTP verification required" },
-            { name: "email", label: "Email", type: "email", required: true, helpText: "OTP verification required" },
-            { name: "idType", label: "Government ID Type", type: "select", required: true, options: ["Passport", "National ID", "Driver's License"] },
-            { name: "idNumber", label: "Government ID Number", type: "text", required: true },
-            { name: "gdprConsent", label: "GDPR consent", type: "checkbox", required: true },
-            { name: "iban", label: "IBAN", type: "text", required: false }
-          ]
+            {
+              name: 'fullName',
+              label: 'Full Legal Name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'dateOfBirth',
+              label: 'Date of Birth',
+              type: 'date',
+              required: true,
+            },
+            {
+              name: 'citizenship',
+              label: 'Citizenship/Nationality',
+              type: 'select',
+              required: true,
+              options: ['EU Citizen', 'EU Resident', 'Other'],
+            },
+            {
+              name: 'residentialAddress',
+              label: 'Residential Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'phone',
+              label: 'Phone',
+              type: 'tel',
+              required: true,
+              helpText: 'OTP verification required',
+            },
+            {
+              name: 'email',
+              label: 'Email',
+              type: 'email',
+              required: true,
+              helpText: 'OTP verification required',
+            },
+            {
+              name: 'idType',
+              label: 'Government ID Type',
+              type: 'select',
+              required: true,
+              options: ['Passport', 'National ID', "Driver's License"],
+            },
+            {
+              name: 'idNumber',
+              label: 'Government ID Number',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'gdprConsent',
+              label: 'GDPR consent',
+              type: 'checkbox',
+              required: true,
+            },
+            { name: 'iban', label: 'IBAN', type: 'text', required: false },
+          ],
         },
         {
-          title: "Billing Information",
+          title: 'Billing Information',
           fields: [
-            { name: "billingAddress", label: "Billing Address", type: "textarea", required: true },
-            { name: "paymentMethod", label: "Payment Method", type: "select", required: true, options: ["SEPA", "Wire", "Card", "USDC", "PAXG"] },
-            { name: "settlementCurrency", label: "Preferred Settlement Currency", type: "select", required: true, options: ["EUR", "USD", "USDC", "PAXG"] }
-          ]
+            {
+              name: 'billingAddress',
+              label: 'Billing Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'paymentMethod',
+              label: 'Payment Method',
+              type: 'select',
+              required: true,
+              options: ['SEPA', 'Wire', 'Card', 'USDC', 'PAXG'],
+            },
+            {
+              name: 'settlementCurrency',
+              label: 'Preferred Settlement Currency',
+              type: 'select',
+              required: true,
+              options: ['EUR', 'USD', 'USDC', 'PAXG'],
+            },
+          ],
         },
         {
-          title: "Shipping Information",
+          title: 'Shipping Information',
           fields: [
-            { name: "shippingAddress", label: "Shipping Address", type: "textarea", required: true },
-            { name: "deliveryContactName", label: "Delivery Contact Name", type: "text", required: true },
-            { name: "deliveryPhone", label: "Delivery Phone", type: "tel", required: true },
-            { name: "deliveryEmail", label: "Delivery Email", type: "email", required: true },
-            { name: "deliveryInstructions", label: "Delivery Instructions", type: "textarea", required: false },
-            { name: "deliveryPreferences", label: "Delivery Preferences", type: "select", required: true, options: ["Express [DHL/UPS/FedEx]", "Freight [Maersk/Other]", "Bonded/Insured"] },
-            { name: "signatureRequired", label: "Signature Requirement", type: "select", required: true, options: ["Yes", "No"] },
-            { name: "insuranceCoverage", label: "Insurance Coverage Declaration", type: "select", required: true, options: ["Use PBCEx Insurance", "Use My Own"] }
-          ]
+            {
+              name: 'shippingAddress',
+              label: 'Shipping Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'deliveryContactName',
+              label: 'Delivery Contact Name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'deliveryPhone',
+              label: 'Delivery Phone',
+              type: 'tel',
+              required: true,
+            },
+            {
+              name: 'deliveryEmail',
+              label: 'Delivery Email',
+              type: 'email',
+              required: true,
+            },
+            {
+              name: 'deliveryInstructions',
+              label: 'Delivery Instructions',
+              type: 'textarea',
+              required: false,
+            },
+            {
+              name: 'deliveryPreferences',
+              label: 'Delivery Preferences',
+              type: 'select',
+              required: true,
+              options: [
+                'Express [DHL/UPS/FedEx]',
+                'Freight [Maersk/Other]',
+                'Bonded/Insured',
+              ],
+            },
+            {
+              name: 'signatureRequired',
+              label: 'Signature Requirement',
+              type: 'select',
+              required: true,
+              options: ['Yes', 'No'],
+            },
+            {
+              name: 'insuranceCoverage',
+              label: 'Insurance Coverage Declaration',
+              type: 'select',
+              required: true,
+              options: ['Use PBCEx Insurance', 'Use My Own'],
+            },
+          ],
         },
         {
-          title: "Identity & Compliance (KYC)",
+          title: 'Identity & Compliance (KYC)',
           fields: [
-            { name: "proofOfAddress", label: "Proof of Address Upload", type: "file", required: true },
-            { name: "idUpload", label: "ID Upload", type: "file", required: true },
-            { name: "selfieWithId", label: "Selfie with ID", type: "file", required: true },
-            { name: "sanctionsConsent", label: "Sanctions/PEP Screening consent", type: "checkbox", required: true },
-            { name: "taxForm", label: "Tax Form", type: "select", required: true, options: ["W-8BEN", "Local Tax Form"] },
-            { name: "sourceOfFunds", label: "Source of Funds", type: "select", required: true, options: ["Employment", "Savings", "Investments", "Other"] },
-            { name: "occupation", label: "Occupation", type: "select", required: true, options: ["Professional", "Business Owner", "Student", "Retired", "Other"] },
-            { name: "employerName", label: "Employer Name", type: "text", required: false },
-            { name: "tradingActivity", label: "Expected Trading Activity", type: "select", required: true, options: ["<€10k/mo", "€10–50k", "€50–250k", "€250k+"] },
-            { name: "residencyStatus", label: "Residency Status", type: "select", required: true, options: ["Permanent", "Temporary", "Dual Citizen"] }
-          ]
+            {
+              name: 'proofOfAddress',
+              label: 'Proof of Address Upload',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'idUpload',
+              label: 'ID Upload',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'selfieWithId',
+              label: 'Selfie with ID',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'sanctionsConsent',
+              label: 'Sanctions/PEP Screening consent',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'taxForm',
+              label: 'Tax Form',
+              type: 'select',
+              required: true,
+              options: ['W-8BEN', 'Local Tax Form'],
+            },
+            {
+              name: 'sourceOfFunds',
+              label: 'Source of Funds',
+              type: 'select',
+              required: true,
+              options: ['Employment', 'Savings', 'Investments', 'Other'],
+            },
+            {
+              name: 'occupation',
+              label: 'Occupation',
+              type: 'select',
+              required: true,
+              options: [
+                'Professional',
+                'Business Owner',
+                'Student',
+                'Retired',
+                'Other',
+              ],
+            },
+            {
+              name: 'employerName',
+              label: 'Employer Name',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'tradingActivity',
+              label: 'Expected Trading Activity',
+              type: 'select',
+              required: true,
+              options: ['<€10k/mo', '€10–50k', '€50–250k', '€250k+'],
+            },
+            {
+              name: 'residencyStatus',
+              label: 'Residency Status',
+              type: 'select',
+              required: true,
+              options: ['Permanent', 'Temporary', 'Dual Citizen'],
+            },
+          ],
         },
         {
-          title: "Agreements",
+          title: 'Agreements',
           fields: [
-            { name: "acceptTerms", label: "Accept Terms & Conditions", type: "checkbox", required: true },
-            { name: "acceptPrivacy", label: "Accept Privacy Policy", type: "checkbox", required: true },
-            { name: "gdprAgreement", label: "GDPR Data Processing Agreement", type: "checkbox", required: true },
-            { name: "marketingOptIn", label: "Marketing Opt-in", type: "checkbox", required: false }
-          ]
-        }
-      ]
+            {
+              name: 'acceptTerms',
+              label: 'Accept Terms & Conditions',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'acceptPrivacy',
+              label: 'Accept Privacy Policy',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'gdprAgreement',
+              label: 'GDPR Data Processing Agreement',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'marketingOptIn',
+              label: 'Marketing Opt-in',
+              type: 'checkbox',
+              required: false,
+            },
+          ],
+        },
+      ],
     },
-    "United Kingdom": {
+    'United Kingdom': {
       sections: [
         {
-          title: "Personal Basics",
+          title: 'Personal Basics',
           fields: [
-            { name: "fullName", label: "Full Legal Name", type: "text", required: true },
-            { name: "dateOfBirth", label: "Date of Birth", type: "date", required: true },
-            { name: "citizenship", label: "Citizenship/Nationality", type: "select", required: true, options: ["UK Citizen", "UK Resident", "Other"] },
-            { name: "residentialAddress", label: "Residential Address", type: "textarea", required: true },
-            { name: "phone", label: "Phone", type: "tel", required: true, helpText: "OTP verification required" },
-            { name: "email", label: "Email", type: "email", required: true, helpText: "OTP verification required" },
-            { name: "idType", label: "Government ID Type", type: "select", required: true, options: ["Passport", "Driver's License", "National ID"] },
-            { name: "idNumber", label: "Government ID Number", type: "text", required: true },
-            { name: "nationalInsurance", label: "National Insurance Number", type: "text", required: false }
-          ]
+            {
+              name: 'fullName',
+              label: 'Full Legal Name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'dateOfBirth',
+              label: 'Date of Birth',
+              type: 'date',
+              required: true,
+            },
+            {
+              name: 'citizenship',
+              label: 'Citizenship/Nationality',
+              type: 'select',
+              required: true,
+              options: ['UK Citizen', 'UK Resident', 'Other'],
+            },
+            {
+              name: 'residentialAddress',
+              label: 'Residential Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'phone',
+              label: 'Phone',
+              type: 'tel',
+              required: true,
+              helpText: 'OTP verification required',
+            },
+            {
+              name: 'email',
+              label: 'Email',
+              type: 'email',
+              required: true,
+              helpText: 'OTP verification required',
+            },
+            {
+              name: 'idType',
+              label: 'Government ID Type',
+              type: 'select',
+              required: true,
+              options: ['Passport', "Driver's License", 'National ID'],
+            },
+            {
+              name: 'idNumber',
+              label: 'Government ID Number',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'nationalInsurance',
+              label: 'National Insurance Number',
+              type: 'text',
+              required: false,
+            },
+          ],
         },
         {
-          title: "Billing Information",
+          title: 'Billing Information',
           fields: [
-            { name: "billingAddress", label: "Billing Address", type: "textarea", required: true },
-            { name: "paymentMethod", label: "Payment Method", type: "select", required: true, options: ["Bank Transfer", "Wire", "Card", "USDC", "PAXG"] },
-            { name: "settlementCurrency", label: "Preferred Settlement Currency", type: "select", required: true, options: ["GBP", "USD", "USDC", "PAXG"] }
-          ]
+            {
+              name: 'billingAddress',
+              label: 'Billing Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'paymentMethod',
+              label: 'Payment Method',
+              type: 'select',
+              required: true,
+              options: ['Bank Transfer', 'Wire', 'Card', 'USDC', 'PAXG'],
+            },
+            {
+              name: 'settlementCurrency',
+              label: 'Preferred Settlement Currency',
+              type: 'select',
+              required: true,
+              options: ['GBP', 'USD', 'USDC', 'PAXG'],
+            },
+          ],
         },
         {
-          title: "Shipping Information",
+          title: 'Shipping Information',
           fields: [
-            { name: "shippingAddress", label: "Shipping Address", type: "textarea", required: true },
-            { name: "deliveryContactName", label: "Delivery Contact Name", type: "text", required: true },
-            { name: "deliveryPhone", label: "Delivery Phone", type: "tel", required: true },
-            { name: "deliveryEmail", label: "Delivery Email", type: "email", required: true },
-            { name: "deliveryInstructions", label: "Delivery Instructions", type: "textarea", required: false },
-            { name: "deliveryPreferences", label: "Delivery Preferences", type: "select", required: true, options: ["Express [DPD/Royal Mail/UPS]", "Freight", "Bonded/Insured"] },
-            { name: "signatureRequired", label: "Signature Requirement", type: "select", required: true, options: ["Yes", "No"] },
-            { name: "insuranceCoverage", label: "Insurance Coverage Declaration", type: "select", required: true, options: ["Use PBCEx Insurance", "Use My Own"] }
-          ]
+            {
+              name: 'shippingAddress',
+              label: 'Shipping Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'deliveryContactName',
+              label: 'Delivery Contact Name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'deliveryPhone',
+              label: 'Delivery Phone',
+              type: 'tel',
+              required: true,
+            },
+            {
+              name: 'deliveryEmail',
+              label: 'Delivery Email',
+              type: 'email',
+              required: true,
+            },
+            {
+              name: 'deliveryInstructions',
+              label: 'Delivery Instructions',
+              type: 'textarea',
+              required: false,
+            },
+            {
+              name: 'deliveryPreferences',
+              label: 'Delivery Preferences',
+              type: 'select',
+              required: true,
+              options: [
+                'Express [DPD/Royal Mail/UPS]',
+                'Freight',
+                'Bonded/Insured',
+              ],
+            },
+            {
+              name: 'signatureRequired',
+              label: 'Signature Requirement',
+              type: 'select',
+              required: true,
+              options: ['Yes', 'No'],
+            },
+            {
+              name: 'insuranceCoverage',
+              label: 'Insurance Coverage Declaration',
+              type: 'select',
+              required: true,
+              options: ['Use PBCEx Insurance', 'Use My Own'],
+            },
+          ],
         },
         {
-          title: "Identity & Compliance (KYC)",
+          title: 'Identity & Compliance (KYC)',
           fields: [
-            { name: "proofOfAddress", label: "Proof of Address Upload", type: "file", required: true },
-            { name: "idUpload", label: "ID Upload", type: "file", required: true },
-            { name: "selfieWithId", label: "Selfie with ID", type: "file", required: true },
-            { name: "sanctionsConsent", label: "Sanctions/PEP Screening consent", type: "checkbox", required: true },
-            { name: "taxForm", label: "Tax Form", type: "select", required: true, options: ["UK Tax Form", "W-8BEN"] },
-            { name: "sourceOfFunds", label: "Source of Funds", type: "select", required: true, options: ["Employment", "Savings", "Investments", "Other"] },
-            { name: "occupation", label: "Occupation", type: "select", required: true, options: ["Professional", "Business Owner", "Student", "Retired", "Other"] },
-            { name: "employerName", label: "Employer Name", type: "text", required: false },
-            { name: "tradingActivity", label: "Expected Trading Activity", type: "select", required: true, options: ["<£10k/mo", "£10–50k", "£50–250k", "£250k+"] },
-            { name: "residencyStatus", label: "Residency Status", type: "select", required: true, options: ["Permanent", "Temporary", "Dual Citizen"] }
-          ]
+            {
+              name: 'proofOfAddress',
+              label: 'Proof of Address Upload',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'idUpload',
+              label: 'ID Upload',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'selfieWithId',
+              label: 'Selfie with ID',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'sanctionsConsent',
+              label: 'Sanctions/PEP Screening consent',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'taxForm',
+              label: 'Tax Form',
+              type: 'select',
+              required: true,
+              options: ['UK Tax Form', 'W-8BEN'],
+            },
+            {
+              name: 'sourceOfFunds',
+              label: 'Source of Funds',
+              type: 'select',
+              required: true,
+              options: ['Employment', 'Savings', 'Investments', 'Other'],
+            },
+            {
+              name: 'occupation',
+              label: 'Occupation',
+              type: 'select',
+              required: true,
+              options: [
+                'Professional',
+                'Business Owner',
+                'Student',
+                'Retired',
+                'Other',
+              ],
+            },
+            {
+              name: 'employerName',
+              label: 'Employer Name',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'tradingActivity',
+              label: 'Expected Trading Activity',
+              type: 'select',
+              required: true,
+              options: ['<£10k/mo', '£10–50k', '£50–250k', '£250k+'],
+            },
+            {
+              name: 'residencyStatus',
+              label: 'Residency Status',
+              type: 'select',
+              required: true,
+              options: ['Permanent', 'Temporary', 'Dual Citizen'],
+            },
+          ],
         },
         {
-          title: "Agreements",
+          title: 'Agreements',
           fields: [
-            { name: "acceptTerms", label: "Accept Terms & Conditions", type: "checkbox", required: true },
-            { name: "acceptPrivacy", label: "Accept Privacy Policy", type: "checkbox", required: true },
-            { name: "marketingOptIn", label: "Marketing Opt-in", type: "checkbox", required: false }
-          ]
-        }
-      ]
+            {
+              name: 'acceptTerms',
+              label: 'Accept Terms & Conditions',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'acceptPrivacy',
+              label: 'Accept Privacy Policy',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'marketingOptIn',
+              label: 'Marketing Opt-in',
+              type: 'checkbox',
+              required: false,
+            },
+          ],
+        },
+      ],
     },
     // Add other countries for personal forms as needed
   },
   business: {
-    "United States": {
+    'United States': {
       sections: [
         {
-          title: "Company Basics",
+          title: 'Company Basics',
           fields: [
-            { name: "companyLegalName", label: "Company Legal Name", type: "text", required: true },
-            { name: "dbaName", label: "DBA/Trade Name", type: "text", required: false },
-            { name: "countryOfIncorporation", label: "Country of Incorporation", type: "select", required: true, options: ["United States", "Other"] },
-            { name: "entityType", label: "Entity Type", type: "select", required: true, options: ["C-Corp", "S-Corp", "LLC", "Partnership", "Sole Proprietor", "Non-Profit", "Government", "University/Research"] },
-            { name: "industry", label: "Industry", type: "select", required: true, options: ["Financial Services", "Technology", "Manufacturing", "Mining", "Energy", "Healthcare", "Other"] }
-          ]
+            {
+              name: 'companyLegalName',
+              label: 'Company Legal Name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'dbaName',
+              label: 'DBA/Trade Name',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'countryOfIncorporation',
+              label: 'Country of Incorporation',
+              type: 'select',
+              required: true,
+              options: ['United States', 'Other'],
+            },
+            {
+              name: 'entityType',
+              label: 'Entity Type',
+              type: 'select',
+              required: true,
+              options: [
+                'C-Corp',
+                'S-Corp',
+                'LLC',
+                'Partnership',
+                'Sole Proprietor',
+                'Non-Profit',
+                'Government',
+                'University/Research',
+              ],
+            },
+            {
+              name: 'industry',
+              label: 'Industry',
+              type: 'select',
+              required: true,
+              options: [
+                'Financial Services',
+                'Technology',
+                'Manufacturing',
+                'Mining',
+                'Energy',
+                'Healthcare',
+                'Other',
+              ],
+            },
+          ],
         },
         {
-          title: "Registration IDs",
+          title: 'Registration IDs',
           fields: [
-            { name: "ein", label: "EIN / Tax ID", type: "text", required: true },
-            { name: "duns", label: "DUNS / LEI", type: "text", required: false },
-            { name: "importerExporter", label: "Importer/Exporter Code", type: "text", required: false },
-            { name: "resaleCertificate", label: "State Resale/Exemption Certificate", type: "file", required: false }
-          ]
+            {
+              name: 'ein',
+              label: 'EIN / Tax ID',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'duns',
+              label: 'DUNS / LEI',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'importerExporter',
+              label: 'Importer/Exporter Code',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'resaleCertificate',
+              label: 'State Resale/Exemption Certificate',
+              type: 'file',
+              required: false,
+            },
+          ],
         },
         {
-          title: "Addresses",
+          title: 'Addresses',
           fields: [
-            { name: "billingAddress", label: "Billing Address", type: "textarea", required: true },
-            { name: "shippingAddress", label: "Shipping / Receiving Address", type: "textarea", required: true },
-            { name: "warehouseLocations", label: "Warehouse / Facility Locations", type: "textarea", required: false }
-          ]
+            {
+              name: 'billingAddress',
+              label: 'Billing Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'shippingAddress',
+              label: 'Shipping / Receiving Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'warehouseLocations',
+              label: 'Warehouse / Facility Locations',
+              type: 'textarea',
+              required: false,
+            },
+          ],
         },
         {
-          title: "Contacts",
+          title: 'Contacts',
           fields: [
-            { name: "primaryContactName", label: "Primary Contact Name", type: "text", required: true },
-            { name: "contactRole", label: "Contact Role", type: "select", required: true, options: ["CEO", "CFO", "Compliance Officer", "Shipping Manager"] },
-            { name: "contactPhone", label: "Phone", type: "tel", required: true },
-            { name: "contactEmail", label: "Email", type: "email", required: true },
-            { name: "secondaryContact", label: "Secondary Contact", type: "text", required: false }
-          ]
+            {
+              name: 'primaryContactName',
+              label: 'Primary Contact Name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'contactRole',
+              label: 'Contact Role',
+              type: 'select',
+              required: true,
+              options: ['CEO', 'CFO', 'Compliance Officer', 'Shipping Manager'],
+            },
+            {
+              name: 'contactPhone',
+              label: 'Phone',
+              type: 'tel',
+              required: true,
+            },
+            {
+              name: 'contactEmail',
+              label: 'Email',
+              type: 'email',
+              required: true,
+            },
+            {
+              name: 'secondaryContact',
+              label: 'Secondary Contact',
+              type: 'text',
+              required: false,
+            },
+          ],
         },
         {
-          title: "Shipping Preferences",
+          title: 'Shipping Preferences',
           fields: [
-            { name: "shippingMode", label: "Default Shipping Mode", type: "select", required: true, options: ["Automated PBCEx", "Freight Forwarder", "Express", "Self-Arranged"] },
-            { name: "carrierAccount", label: "Carrier Account + SCAC Code", type: "text", required: false },
-            { name: "incoterms", label: "Incoterms", type: "select", required: true, options: ["FOB", "CIF", "DDP", "EXW"] }
-          ]
+            {
+              name: 'shippingMode',
+              label: 'Default Shipping Mode',
+              type: 'select',
+              required: true,
+              options: [
+                'Automated PBCEx',
+                'Freight Forwarder',
+                'Express',
+                'Self-Arranged',
+              ],
+            },
+            {
+              name: 'carrierAccount',
+              label: 'Carrier Account + SCAC Code',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'incoterms',
+              label: 'Incoterms',
+              type: 'select',
+              required: true,
+              options: ['FOB', 'CIF', 'DDP', 'EXW'],
+            },
+          ],
         },
         {
-          title: "Bill of Lading Info",
+          title: 'Bill of Lading Info',
           fields: [
-            { name: "consigneeName", label: "Consignee Name", type: "text", required: true },
-            { name: "notifyParty", label: "Notify Party", type: "text", required: false },
-            { name: "customsBroker", label: "Customs Broker", type: "text", required: false },
-            { name: "hsCodes", label: "Harmonized Tariff Codes (HS Codes)", type: "text", required: false },
-            { name: "scacCode", label: "SCAC Code", type: "text", required: false }
-          ]
+            {
+              name: 'consigneeName',
+              label: 'Consignee Name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'notifyParty',
+              label: 'Notify Party',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'customsBroker',
+              label: 'Customs Broker',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'hsCodes',
+              label: 'Harmonized Tariff Codes (HS Codes)',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'scacCode',
+              label: 'SCAC Code',
+              type: 'text',
+              required: false,
+            },
+          ],
         },
         {
-          title: "Licensing (Commodity-Specific)",
+          title: 'Licensing (Commodity-Specific)',
           fields: [
-            { name: "preciousMetalsLicense", label: "Precious Metals Dealer License", type: "file", required: false },
-            { name: "ofacClearance", label: "OFAC/Export-Control Clearance", type: "checkbox", required: false },
-            { name: "specialLicenses", label: "Special Commodity Licenses", type: "text", required: false },
-            { name: "hazmatCert", label: "Hazmat Certification", type: "file", required: false },
-            { name: "bondedWarehouse", label: "Bonded Warehouse Declaration", type: "textarea", required: false }
-          ]
+            {
+              name: 'preciousMetalsLicense',
+              label: 'Precious Metals Dealer License',
+              type: 'file',
+              required: false,
+            },
+            {
+              name: 'ofacClearance',
+              label: 'OFAC/Export-Control Clearance',
+              type: 'checkbox',
+              required: false,
+            },
+            {
+              name: 'specialLicenses',
+              label: 'Special Commodity Licenses',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'hazmatCert',
+              label: 'Hazmat Certification',
+              type: 'file',
+              required: false,
+            },
+            {
+              name: 'bondedWarehouse',
+              label: 'Bonded Warehouse Declaration',
+              type: 'textarea',
+              required: false,
+            },
+          ],
         },
         {
-          title: "Financial & Custody",
+          title: 'Financial & Custody',
           fields: [
-            { name: "paymentMethod", label: "Payment Method", type: "select", required: true, options: ["ACH", "Wire", "Card", "USDC", "PAXG"] },
-            { name: "custodyPreferences", label: "Custody Preferences", type: "select", required: true, options: ["PBCEx Custody", "Self-Custody"] },
-            { name: "settlementCurrency", label: "Settlement Currency", type: "select", required: true, options: ["USD", "USDC", "PAXG"] }
-          ]
+            {
+              name: 'paymentMethod',
+              label: 'Payment Method',
+              type: 'select',
+              required: true,
+              options: ['ACH', 'Wire', 'Card', 'USDC', 'PAXG'],
+            },
+            {
+              name: 'custodyPreferences',
+              label: 'Custody Preferences',
+              type: 'select',
+              required: true,
+              options: ['PBCEx Custody', 'Self-Custody'],
+            },
+            {
+              name: 'settlementCurrency',
+              label: 'Settlement Currency',
+              type: 'select',
+              required: true,
+              options: ['USD', 'USDC', 'PAXG'],
+            },
+          ],
         },
         {
-          title: "Insurance & Risk",
+          title: 'Insurance & Risk',
           fields: [
-            { name: "insuranceCoverage", label: "Insurance Coverage Declaration", type: "select", required: true, options: ["PBCEx Insurance", "Own Policy"] },
-            { name: "insuranceProvider", label: "Insurance Provider", type: "text", required: false },
-            { name: "customsPort", label: "Preferred Customs Port of Entry", type: "select", required: false, options: ["New York", "Los Angeles", "Miami", "Houston", "Chicago"] }
-          ]
+            {
+              name: 'insuranceCoverage',
+              label: 'Insurance Coverage Declaration',
+              type: 'select',
+              required: true,
+              options: ['PBCEx Insurance', 'Own Policy'],
+            },
+            {
+              name: 'insuranceProvider',
+              label: 'Insurance Provider',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'customsPort',
+              label: 'Preferred Customs Port of Entry',
+              type: 'select',
+              required: false,
+              options: [
+                'New York',
+                'Los Angeles',
+                'Miami',
+                'Houston',
+                'Chicago',
+              ],
+            },
+          ],
         },
         {
-          title: "Authorized Parties",
+          title: 'Authorized Parties',
           fields: [
-            { name: "authorizedSignatories", label: "Authorized Signatories", type: "textarea", required: true, helpText: "Name, title, email, phone for each signatory" },
-            { name: "amlOfficer", label: "AML Officer Contact", type: "text", required: true }
-          ]
+            {
+              name: 'authorizedSignatories',
+              label: 'Authorized Signatories',
+              type: 'textarea',
+              required: true,
+              helpText: 'Name, title, email, phone for each signatory',
+            },
+            {
+              name: 'amlOfficer',
+              label: 'AML Officer Contact',
+              type: 'text',
+              required: true,
+            },
+          ],
         },
         {
-          title: "Compliance (KYB)",
+          title: 'Compliance (KYB)',
           fields: [
-            { name: "articlesOfIncorporation", label: "Articles of Incorporation", type: "file", required: true },
-            { name: "businessLicense", label: "Business License", type: "file", required: true },
-            { name: "ownershipStructure", label: "Ownership Structure (≥10%)", type: "textarea", required: true },
-            { name: "uboIds", label: "UBO IDs", type: "file", required: true },
-            { name: "authorizedSignerIds", label: "Authorized Signer ID + Proof of Address", type: "file", required: true },
-            { name: "boardResolution", label: "Board Resolution (sign-up authorization)", type: "file", required: true },
-            { name: "sanctionsConsent", label: "Sanctions/PEP screening consent", type: "checkbox", required: true },
-            { name: "taxForm", label: "Tax Form", type: "select", required: true, options: ["W-9", "W-8BEN-E"] },
-            { name: "sourceOfFunds", label: "Source of Funds & Expected Activity", type: "textarea", required: true },
-            { name: "amlProgram", label: "AML/Compliance Program", type: "file", required: false },
-            { name: "goodStandingCert", label: "Certificate of Good Standing", type: "file", required: false }
-          ]
-        }
-      ]
+            {
+              name: 'articlesOfIncorporation',
+              label: 'Articles of Incorporation',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'businessLicense',
+              label: 'Business License',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'ownershipStructure',
+              label: 'Ownership Structure (≥10%)',
+              type: 'textarea',
+              required: true,
+            },
+            { name: 'uboIds', label: 'UBO IDs', type: 'file', required: true },
+            {
+              name: 'authorizedSignerIds',
+              label: 'Authorized Signer ID + Proof of Address',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'boardResolution',
+              label: 'Board Resolution (sign-up authorization)',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'sanctionsConsent',
+              label: 'Sanctions/PEP screening consent',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'taxForm',
+              label: 'Tax Form',
+              type: 'select',
+              required: true,
+              options: ['W-9', 'W-8BEN-E'],
+            },
+            {
+              name: 'sourceOfFunds',
+              label: 'Source of Funds & Expected Activity',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'amlProgram',
+              label: 'AML/Compliance Program',
+              type: 'file',
+              required: false,
+            },
+            {
+              name: 'goodStandingCert',
+              label: 'Certificate of Good Standing',
+              type: 'file',
+              required: false,
+            },
+          ],
+        },
+      ],
     },
-    "European Union": {
+    'European Union': {
       sections: [
         {
-          title: "Company Basics",
+          title: 'Company Basics',
           fields: [
-            { name: "companyLegalName", label: "Company Legal Name", type: "text", required: true },
-            { name: "dbaName", label: "Trade Name", type: "text", required: false },
-            { name: "countryOfIncorporation", label: "Country of Incorporation", type: "select", required: true, options: ["Germany", "France", "Netherlands", "Other EU"] },
-            { name: "entityType", label: "Entity Type", type: "select", required: true, options: ["GmbH", "AG", "SARL", "SAS", "BV", "NV", "Other"] },
-            { name: "industry", label: "Industry", type: "select", required: true, options: ["Financial Services", "Technology", "Manufacturing", "Mining", "Energy", "Healthcare", "Other"] },
-            { name: "vatNumber", label: "VAT Number", type: "text", required: true },
-            { name: "companyRegNumber", label: "Company Registration Number", type: "text", required: true },
-            { name: "eori", label: "EORI", type: "text", required: false },
-            { name: "gdprConsent", label: "GDPR consent", type: "checkbox", required: true },
-            { name: "ibanBic", label: "IBAN/BIC", type: "text", required: false }
-          ]
+            {
+              name: 'companyLegalName',
+              label: 'Company Legal Name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'dbaName',
+              label: 'Trade Name',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'countryOfIncorporation',
+              label: 'Country of Incorporation',
+              type: 'select',
+              required: true,
+              options: ['Germany', 'France', 'Netherlands', 'Other EU'],
+            },
+            {
+              name: 'entityType',
+              label: 'Entity Type',
+              type: 'select',
+              required: true,
+              options: ['GmbH', 'AG', 'SARL', 'SAS', 'BV', 'NV', 'Other'],
+            },
+            {
+              name: 'industry',
+              label: 'Industry',
+              type: 'select',
+              required: true,
+              options: [
+                'Financial Services',
+                'Technology',
+                'Manufacturing',
+                'Mining',
+                'Energy',
+                'Healthcare',
+                'Other',
+              ],
+            },
+            {
+              name: 'vatNumber',
+              label: 'VAT Number',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'companyRegNumber',
+              label: 'Company Registration Number',
+              type: 'text',
+              required: true,
+            },
+            { name: 'eori', label: 'EORI', type: 'text', required: false },
+            {
+              name: 'gdprConsent',
+              label: 'GDPR consent',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'ibanBic',
+              label: 'IBAN/BIC',
+              type: 'text',
+              required: false,
+            },
+          ],
         },
         {
-          title: "Registration IDs",
+          title: 'Registration IDs',
           fields: [
-            { name: "taxId", label: "Tax ID", type: "text", required: true },
-            { name: "duns", label: "DUNS / LEI", type: "text", required: false },
-            { name: "importerExporter", label: "Importer/Exporter Code", type: "text", required: false }
-          ]
+            { name: 'taxId', label: 'Tax ID', type: 'text', required: true },
+            {
+              name: 'duns',
+              label: 'DUNS / LEI',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'importerExporter',
+              label: 'Importer/Exporter Code',
+              type: 'text',
+              required: false,
+            },
+          ],
         },
         {
-          title: "Addresses",
+          title: 'Addresses',
           fields: [
-            { name: "billingAddress", label: "Billing Address", type: "textarea", required: true },
-            { name: "shippingAddress", label: "Shipping / Receiving Address", type: "textarea", required: true },
-            { name: "warehouseLocations", label: "Warehouse / Facility Locations", type: "textarea", required: false }
-          ]
+            {
+              name: 'billingAddress',
+              label: 'Billing Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'shippingAddress',
+              label: 'Shipping / Receiving Address',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'warehouseLocations',
+              label: 'Warehouse / Facility Locations',
+              type: 'textarea',
+              required: false,
+            },
+          ],
         },
         {
-          title: "Contacts",
+          title: 'Contacts',
           fields: [
-            { name: "primaryContactName", label: "Primary Contact Name", type: "text", required: true },
-            { name: "contactRole", label: "Contact Role", type: "select", required: true, options: ["CEO", "CFO", "Compliance Officer", "Shipping Manager"] },
-            { name: "contactPhone", label: "Phone", type: "tel", required: true },
-            { name: "contactEmail", label: "Email", type: "email", required: true },
-            { name: "secondaryContact", label: "Secondary Contact", type: "text", required: false }
-          ]
+            {
+              name: 'primaryContactName',
+              label: 'Primary Contact Name',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'contactRole',
+              label: 'Contact Role',
+              type: 'select',
+              required: true,
+              options: ['CEO', 'CFO', 'Compliance Officer', 'Shipping Manager'],
+            },
+            {
+              name: 'contactPhone',
+              label: 'Phone',
+              type: 'tel',
+              required: true,
+            },
+            {
+              name: 'contactEmail',
+              label: 'Email',
+              type: 'email',
+              required: true,
+            },
+            {
+              name: 'secondaryContact',
+              label: 'Secondary Contact',
+              type: 'text',
+              required: false,
+            },
+          ],
         },
         {
-          title: "Shipping Preferences",
+          title: 'Shipping Preferences',
           fields: [
-            { name: "shippingMode", label: "Default Shipping Mode", type: "select", required: true, options: ["Automated PBCEx", "Freight Forwarder", "Express", "Self-Arranged"] },
-            { name: "carrierAccount", label: "Carrier Account + Code", type: "text", required: false },
-            { name: "incoterms", label: "Incoterms", type: "select", required: true, options: ["FOB", "CIF", "DDP", "EXW"] }
-          ]
+            {
+              name: 'shippingMode',
+              label: 'Default Shipping Mode',
+              type: 'select',
+              required: true,
+              options: [
+                'Automated PBCEx',
+                'Freight Forwarder',
+                'Express',
+                'Self-Arranged',
+              ],
+            },
+            {
+              name: 'carrierAccount',
+              label: 'Carrier Account + Code',
+              type: 'text',
+              required: false,
+            },
+            {
+              name: 'incoterms',
+              label: 'Incoterms',
+              type: 'select',
+              required: true,
+              options: ['FOB', 'CIF', 'DDP', 'EXW'],
+            },
+          ],
         },
         {
-          title: "Compliance (KYB)",
+          title: 'Compliance (KYB)',
           fields: [
-            { name: "articlesOfIncorporation", label: "Articles of Incorporation", type: "file", required: true },
-            { name: "businessLicense", label: "Business License", type: "file", required: true },
-            { name: "ownershipStructure", label: "Ownership Structure (≥10%)", type: "textarea", required: true },
-            { name: "uboIds", label: "UBO IDs", type: "file", required: true },
-            { name: "authorizedSignerIds", label: "Authorized Signer ID + Proof of Address", type: "file", required: true },
-            { name: "boardResolution", label: "Board Resolution (sign-up authorization)", type: "file", required: true },
-            { name: "sanctionsConsent", label: "Sanctions/PEP screening consent", type: "checkbox", required: true },
-            { name: "taxForm", label: "Tax Form", type: "select", required: true, options: ["W-8BEN-E", "Local Tax Form"] },
-            { name: "sourceOfFunds", label: "Source of Funds & Expected Activity", type: "textarea", required: true },
-            { name: "gdprAgreement", label: "GDPR Data Processing Agreement", type: "checkbox", required: true }
-          ]
-        }
-      ]
+            {
+              name: 'articlesOfIncorporation',
+              label: 'Articles of Incorporation',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'businessLicense',
+              label: 'Business License',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'ownershipStructure',
+              label: 'Ownership Structure (≥10%)',
+              type: 'textarea',
+              required: true,
+            },
+            { name: 'uboIds', label: 'UBO IDs', type: 'file', required: true },
+            {
+              name: 'authorizedSignerIds',
+              label: 'Authorized Signer ID + Proof of Address',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'boardResolution',
+              label: 'Board Resolution (sign-up authorization)',
+              type: 'file',
+              required: true,
+            },
+            {
+              name: 'sanctionsConsent',
+              label: 'Sanctions/PEP screening consent',
+              type: 'checkbox',
+              required: true,
+            },
+            {
+              name: 'taxForm',
+              label: 'Tax Form',
+              type: 'select',
+              required: true,
+              options: ['W-8BEN-E', 'Local Tax Form'],
+            },
+            {
+              name: 'sourceOfFunds',
+              label: 'Source of Funds & Expected Activity',
+              type: 'textarea',
+              required: true,
+            },
+            {
+              name: 'gdprAgreement',
+              label: 'GDPR Data Processing Agreement',
+              type: 'checkbox',
+              required: true,
+            },
+          ],
+        },
+      ],
     },
     // Add other countries for business forms as needed
-  }
+  },
 };

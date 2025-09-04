@@ -162,7 +162,10 @@ const Shop = () => {
   };
 
   const handleDepositClick = (asset: Asset) => {
-    track('shop_action_deposit', { symbol: asset.symbol, source_page: '/shop' });
+    track('shop_action_deposit', {
+      symbol: asset.symbol,
+      source_page: '/shop',
+    });
     setSelectedAsset(asset);
     setDepositModalOpen(true);
   };
@@ -174,7 +177,10 @@ const Shop = () => {
   };
 
   const handleMortgageClick = (asset: Asset) => {
-    track('shop_action_mortgage', { symbol: asset.symbol, source_page: '/shop' });
+    track('shop_action_mortgage', {
+      symbol: asset.symbol,
+      source_page: '/shop',
+    });
     setSelectedAsset(asset);
     setMortgageModalOpen(true);
   };
@@ -232,14 +238,14 @@ const Shop = () => {
                       handleRowCardClick(asset);
                     }
                   }}
-                   data-testid='row-card-link'
-                   aria-label={`Open ${asset.name} details`}
-                 >
-                   {/* Asset Info - Left Side (Ticker Click Area) */}
-                   <div 
-                     className='lg:col-span-3 flex items-center space-x-4'
-                     data-testid="ticker-click-area"
-                   >
+                  data-testid='row-card-link'
+                  aria-label={`Open ${asset.name} details`}
+                >
+                  {/* Asset Info - Left Side (Ticker Click Area) */}
+                  <div
+                    className='lg:col-span-3 flex items-center space-x-4'
+                    data-testid='ticker-click-area'
+                  >
                     <div className='text-3xl group-hover:scale-110 transition-transform'>
                       {asset.icon}
                     </div>
@@ -313,14 +319,17 @@ const Shop = () => {
                               className='h-10 px-4 min-h-[40px]'
                               onClick={() => handleBuyClick(asset)}
                               aria-label={`Buy ${asset.name}`}
-                              data-testid="buy-btn"
+                              data-testid='buy-btn'
                             >
                               <ShoppingCart className='w-4 h-4 mr-2' />
                               Buy
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Purchase tokens using USD, USDC, PAXG, bank wire, or debit card</p>
+                            <p>
+                              Purchase tokens using USD, USDC, PAXG, bank wire,
+                              or debit card
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -333,7 +342,7 @@ const Shop = () => {
                               className='h-10 px-4 min-h-[40px]'
                               onClick={() => handleSellClick(asset)}
                               aria-label={`Sell ${asset.name}`}
-                              data-testid="sell-btn"
+                              data-testid='sell-btn'
                             >
                               <CreditCard className='w-4 h-4 mr-2' />
                               Sell
@@ -353,14 +362,17 @@ const Shop = () => {
                               className='h-10 px-4 min-h-[40px] bg-black text-white hover:bg-black/90'
                               onClick={() => handleOrderClick(asset)}
                               aria-label={`Order ${asset.name}`}
-                              data-testid="order-btn"
+                              data-testid='order-btn'
                             >
                               <Truck className='w-4 h-4 mr-2' />
                               Order
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Physical delivery (bars/coins/Goldbacks) with format selection</p>
+                            <p>
+                              Physical delivery (bars/coins/Goldbacks) with
+                              format selection
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -376,7 +388,7 @@ const Shop = () => {
                               className='h-10 px-4 min-h-[40px]'
                               onClick={() => handleSendClick(asset)}
                               aria-label={`Send ${asset.name}`}
-                              data-testid="send-btn"
+                              data-testid='send-btn'
                             >
                               <Send className='w-4 h-4 mr-2' />
                               Send
@@ -396,7 +408,7 @@ const Shop = () => {
                               className='h-10 px-4 min-h-[40px]'
                               onClick={() => handleDepositClick(asset)}
                               aria-label={`Deposit ${asset.name}`}
-                              data-testid="deposit-btn"
+                              data-testid='deposit-btn'
                             >
                               <Upload className='w-4 h-4 mr-2' />
                               Deposit
@@ -416,14 +428,17 @@ const Shop = () => {
                               className='h-10 px-4 min-h-[40px]'
                               onClick={() => handleMortgageClick(asset)}
                               aria-label={`Mortgage with ${asset.name}`}
-                              data-testid="mortgage-btn"
+                              data-testid='mortgage-btn'
                             >
                               <Home className='w-4 h-4 mr-2' />
                               Mortgage
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Asset-backed financing with {asset.name} as collateral</p>
+                            <p>
+                              Asset-backed financing with {asset.name} as
+                              collateral
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -464,35 +479,35 @@ const Shop = () => {
             onClose={() => setBuyModalOpen(false)}
             asset={selectedAsset}
           />
-          
-           {/* Sell = Convert/Withdraw */}
-           <SellAssetModal
-             isOpen={sellModalOpen}
-             onClose={() => setSellModalOpen(false)}
-             asset={selectedAsset}
-           />
-          
+
+          {/* Sell = Convert/Withdraw */}
+          <SellAssetModal
+            isOpen={sellModalOpen}
+            onClose={() => setSellModalOpen(false)}
+            asset={selectedAsset}
+          />
+
           {/* Order = Physical Delivery with Format Selection */}
           <BuyPhysicalModal
             isOpen={orderModalOpen}
             onClose={() => setOrderModalOpen(false)}
             asset={selectedAsset}
           />
-          
+
           {/* Deposit = Crypto Deposit */}
           <CryptoDepositModal
             isOpen={depositModalOpen}
             onClose={() => setDepositModalOpen(false)}
             asset={selectedAsset}
           />
-          
+
           {/* Mortgage = Asset-Backed Financing */}
           <BorrowingModal
             isOpen={mortgageModalOpen}
             onClose={() => setMortgageModalOpen(false)}
             asset={selectedAsset}
           />
-          
+
           {/* Send = Choice Modal */}
           <Dialog open={sendModalOpen} onOpenChange={setSendModalOpen}>
             <DialogContent>
@@ -502,43 +517,52 @@ const Shop = () => {
                   Choose how you'd like to send this asset
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-3">
+              <div className='space-y-4'>
+                <div className='space-y-3'>
                   <Button
-                    variant="outline"
-                    className="w-full h-16 flex items-center justify-start p-4"
+                    variant='outline'
+                    className='w-full h-16 flex items-center justify-start p-4'
                     onClick={() => {
                       setSendModalOpen(false);
                       navigate(`/send/internal?asset=${selectedAsset?.symbol}`);
                     }}
                   >
-                    <div className="flex items-center space-x-3">
-                      <Users className="w-5 h-5" />
-                      <div className="text-left">
-                        <div className="font-medium">Send to PBCEx User</div>
-                        <div className="text-sm text-muted-foreground">Instant transfer, no fees</div>
+                    <div className='flex items-center space-x-3'>
+                      <Users className='w-5 h-5' />
+                      <div className='text-left'>
+                        <div className='font-medium'>Send to PBCEx User</div>
+                        <div className='text-sm text-muted-foreground'>
+                          Instant transfer, no fees
+                        </div>
                       </div>
                     </div>
                   </Button>
-                  
+
                   <Button
-                    variant="outline"
-                    className="w-full h-16 flex items-center justify-start p-4"
+                    variant='outline'
+                    className='w-full h-16 flex items-center justify-start p-4'
                     onClick={() => {
                       setSendModalOpen(false);
                       navigate(`/send/crypto?asset=${selectedAsset?.symbol}`);
                     }}
-                    disabled={!['PAXG', 'USDC', 'ETH', 'BTC'].includes(selectedAsset?.symbol || '')}
+                    disabled={
+                      !['PAXG', 'USDC', 'ETH', 'BTC'].includes(
+                        selectedAsset?.symbol || ''
+                      )
+                    }
                   >
-                    <div className="flex items-center space-x-3">
-                      <Coins className="w-5 h-5" />
-                      <div className="text-left">
-                        <div className="font-medium">Send to External Crypto Account</div>
-                        <div className="text-sm text-muted-foreground">
-                          {!['PAXG', 'USDC', 'ETH', 'BTC'].includes(selectedAsset?.symbol || '') 
+                    <div className='flex items-center space-x-3'>
+                      <Coins className='w-5 h-5' />
+                      <div className='text-left'>
+                        <div className='font-medium'>
+                          Send to External Crypto Account
+                        </div>
+                        <div className='text-sm text-muted-foreground'>
+                          {!['PAXG', 'USDC', 'ETH', 'BTC'].includes(
+                            selectedAsset?.symbol || ''
+                          )
                             ? 'Not available for this asset yet'
-                            : 'Withdraw to external wallet'
-                          }
+                            : 'Withdraw to external wallet'}
                         </div>
                       </div>
                     </div>

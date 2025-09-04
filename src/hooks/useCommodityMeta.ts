@@ -3,11 +3,11 @@ import { CommodityMeta } from '@/types/commodities';
 
 export const useCommodityMeta = (symbol: string): CommodityMeta => {
   const meta = commodities[symbol.toUpperCase()];
-  
+
   if (!meta) {
     throw new Error(`Commodity metadata not found for symbol: ${symbol}`);
   }
-  
+
   return meta;
 };
 

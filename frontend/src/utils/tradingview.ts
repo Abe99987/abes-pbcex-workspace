@@ -284,7 +284,7 @@ export function getSymbolDisplayName(symbol: string): string {
  */
 export function isValidSymbol(symbol: string): boolean {
   for (const category of Object.values(SYMBOLS)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     if (Object.values(category).includes(symbol as any)) {
       return true;
     }

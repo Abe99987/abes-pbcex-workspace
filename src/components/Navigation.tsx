@@ -82,12 +82,12 @@ const Navigation = () => {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
 
     return () => subscription.unsubscribe();
   }, []);
@@ -113,7 +113,11 @@ const Navigation = () => {
         },
         { label: 'FX Trading', description: 'USD, EUR, GBP, AED, LYD, JPY' },
         { label: 'Margin Trading', description: 'Coming Soon' },
-        { label: 'Dollar-Cost Average Strategies', href: '/trade/dca', description: 'Automate asset purchases' },
+        {
+          label: 'Dollar-Cost Average Strategies',
+          href: '/trade/dca',
+          description: 'Automate asset purchases',
+        },
         { label: 'Trade Analytics' },
         { label: 'Market Reports' },
         { label: 'News' },
@@ -159,7 +163,11 @@ const Navigation = () => {
       label: 'Shop',
       icon: Package,
       items: [
-        { label: 'Shop All', href: '/shop', description: 'View all commodities' },
+        {
+          label: 'Shop All',
+          href: '/shop',
+          description: 'View all commodities',
+        },
         { label: 'Buy Physical Gold', href: '/shop/XAU' },
         { label: 'Buy Physical Silver', href: '/shop/XAG' },
         { label: 'Buy Physical Platinum', href: '/shop/XPT' },
@@ -248,9 +256,9 @@ const Navigation = () => {
           className='flex items-center space-x-2 hover:opacity-80 transition-opacity'
         >
           <img
-            src='/lovable-uploads/85edd95a-cedc-4291-a8a7-8884e15ead12.png'
-            alt='PBCEX'
-            className='h-8 w-auto'
+            src='/brand/pbcex-logo.svg'
+            alt='PBCEx'
+            className='h-7 w-auto object-contain'
           />
         </button>
 
@@ -458,62 +466,62 @@ const Navigation = () => {
                       ? 'text-gray-300 hover:text-white hover:bg-gray-800'
                       : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
-                  aria-label="Account menu"
+                  aria-label='Account menu'
                 >
                   <User className='w-4 h-4' />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="end" 
-                className="w-56 bg-popover border shadow-md"
+              <DropdownMenuContent
+                align='end'
+                className='w-56 bg-popover border shadow-md'
               >
                 <DropdownMenuItem
                   onClick={() => navigate('/account')}
-                  className="cursor-pointer hover:bg-accent"
+                  className='cursor-pointer hover:bg-accent'
                 >
-                  <User className="mr-2 h-4 w-4" />
+                  <User className='mr-2 h-4 w-4' />
                   Account
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate('/account/identity')}
-                  className="cursor-pointer hover:bg-accent"
+                  className='cursor-pointer hover:bg-accent'
                 >
-                  <UserCheck className="mr-2 h-4 w-4" />
+                  <UserCheck className='mr-2 h-4 w-4' />
                   Identity / KYC
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate('/account/security')}
-                  className="cursor-pointer hover:bg-accent"
+                  className='cursor-pointer hover:bg-accent'
                 >
-                  <Shield className="mr-2 h-4 w-4" />
+                  <Shield className='mr-2 h-4 w-4' />
                   Security
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate('/account/payments')}
-                  className="cursor-pointer hover:bg-accent"
+                  className='cursor-pointer hover:bg-accent'
                 >
-                  <CreditCard className="mr-2 h-4 w-4" />
+                  <CreditCard className='mr-2 h-4 w-4' />
                   Payment Methods
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate('/account/notifications')}
-                  className="cursor-pointer hover:bg-accent"
+                  className='cursor-pointer hover:bg-accent'
                 >
-                  <Bell className="mr-2 h-4 w-4" />
+                  <Bell className='mr-2 h-4 w-4' />
                   Notifications
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate('/account/api-keys')}
-                  className="cursor-pointer hover:bg-accent"
+                  className='cursor-pointer hover:bg-accent'
                 >
-                  <Key className="mr-2 h-4 w-4" />
+                  <Key className='mr-2 h-4 w-4' />
                   API Keys
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate('/account/tax')}
-                  className="cursor-pointer hover:bg-accent"
+                  className='cursor-pointer hover:bg-accent'
                 >
-                  <FileText className="mr-2 h-4 w-4" />
+                  <FileText className='mr-2 h-4 w-4' />
                   Tax Documents
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -522,9 +530,9 @@ const Navigation = () => {
                     await supabase.auth.signOut();
                     navigate('/');
                   }}
-                  className="cursor-pointer hover:bg-accent text-red-600"
+                  className='cursor-pointer hover:bg-accent text-red-600'
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className='mr-2 h-4 w-4' />
                   Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -539,7 +547,7 @@ const Navigation = () => {
                   : 'text-muted-foreground hover:text-foreground hover:bg-accent'
               }`}
               onClick={() => setAuthModalOpen(true)}
-              aria-label="Account access"
+              aria-label='Account access'
             >
               <User className='w-4 h-4' />
             </Button>

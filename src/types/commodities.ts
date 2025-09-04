@@ -19,7 +19,12 @@ export interface CommodityMeta {
   // Fulfillment & Logistics
   deliverySLA: { domestic: string; international: string };
   carriers: string[];
-  vaultsOrWarehouses: Array<{ name: string; city: string; country: string; type: string }>;
+  vaultsOrWarehouses: Array<{
+    name: string;
+    city: string;
+    country: string;
+    type: string;
+  }>;
   custodyModel: string;
   assayPolicy: string;
   redemption: string;
