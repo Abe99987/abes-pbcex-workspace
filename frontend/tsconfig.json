@@ -27,7 +27,7 @@
       "@/pages/*": ["./pages/*"],
       "@/utils/*": ["./src/utils/*", "./utils/*"],
       "@/hooks/*": ["./src/hooks/*", "./hooks/*"],
-      "@/styles/*": ["./src/styles/*"],
+      "@/styles/*": ["./styles/*"],
       "@/types/*": ["./src/types/*"]
     },
     "baseUrl": ".",

@@ -94,6 +94,11 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# Corrupted/backup directories
+backend_corrupted/
+backend_modules_temp/
+.logs/
+
 # OS generated files
 .DS_Store
 .DS_Store?

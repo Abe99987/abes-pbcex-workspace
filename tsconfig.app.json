@@ -13,6 +13,8 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "types": ["vite/client"],
+    "typeRoots": ["./types", "./node_modules/@types"],
 
     /* Linting */
     "strict": false,
@@ -26,5 +28,13 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "dist",
+    "build",
+    "coverage",
+    "backend/**",
+    "backend_corrupted/**",
+    "node_modules/**"
+  ]
 }
