@@ -284,7 +284,6 @@ export function getSymbolDisplayName(symbol: string): string {
  */
 export function isValidSymbol(symbol: string): boolean {
   for (const category of Object.values(SYMBOLS)) {
-     
     if (Object.values(category).includes(symbol as any)) {
       return true;
     }
