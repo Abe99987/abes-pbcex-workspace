@@ -332,6 +332,101 @@ export class PricesController {
       },
     });
   });
+
+  /**
+   * GET /api/prices/stream
+   * Server-Sent Events stream for live prices
+   * Query: symbols=CSV (e.g., XAU,BTC,ETH,PAXG,USDC)
+   */
+  static streamPricesSSE = asyncHandler(async (req: Request, res: Response) => {
+    // Last-Event-ID support (resume semantics)
+    const lastEventIdHeader = (req.headers['last-event-id'] as string) || '';
+
+    const symbolsParam = (req.query.symbols as string) || '';
+    const symbols = symbolsParam
+      .split(',')
+      .map(s => s.trim().toUpperCase())
+      .filter(s => s.length > 0);
+
+    if (symbols.length === 0) {
+      throw createError.badRequest('symbols query is required, e.g. symbols=XAU,BTC');
+    }
+
+    // Setup SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders?.();
+
+    let isClosed = false;
+    req.on('close', () => {
+      isClosed = true;
+      clearInterval(heartbeatTimer);
+    });
+
+    // Simple backoff state per symbol
+    const backoff: Record<string, number> = {};
+
+    // Heartbeat every ~20s to keep connection alive
+    const heartbeatTimer = setInterval(() => {
+      if (!isClosed) {
+        res.write(`:hb\n\n`);
+      }
+    }, 20000);
+
+    const sendTick = async () => {
+      if (isClosed) return;
+      const now = Date.now();
+
+      for (const symbol of symbols) {
+        try {
+          const result = await PricesService.getTicker(symbol);
+          if (result.success && result.data) {
+            const payload = {
+              symbol: result.data.symbol,
+              usd: result.data.usd,
+              ts: result.data.ts,
+              source: result.data.source,
+            };
+            // Include an id line for Last-Event-ID support
+            res.write(`id: ${result.data.ts}\n`);
+            res.write(`data: ${JSON.stringify(payload)}\n\n`);
+            backoff[symbol] = 0; // reset backoff on success
+          } else {
+            // Emit last-known-from-cache-like placeholder with server ts
+            const payload = {
+              symbol,
+              usd: undefined,
+              ts: now,
+              source: 'CACHE',
+            };
+            res.write(`id: ${now}\n`);
+            res.write(`data: ${JSON.stringify(payload)}\n\n`);
+            backoff[symbol] = Math.min((backoff[symbol] || 0) + 1, 5);
+          }
+        } catch {
+          const payload = {
+            symbol,
+            usd: undefined,
+            ts: now,
+            source: 'CACHE',
+          };
+          res.write(`id: ${now}\n`);
+          res.write(`data: ${JSON.stringify(payload)}\n\n`);
+          backoff[symbol] = Math.min((backoff[symbol] || 0) + 1, 5);
+        }
+      }
+
+      // cadence ~1–2s with simple backoff modifier
+      const delayMs = 1000 + 500 * Math.max(0, ...Object.values(backoff));
+      if (!isClosed) setTimeout(sendTick, delayMs);
+    };
+
+    // Kick off loop
+    res.write(`event: ready\n`);
+    res.write(`data: {"ok":true}\n\n`);
+    setTimeout(sendTick, 250);
+  });
 }
 
 export default PricesController;
