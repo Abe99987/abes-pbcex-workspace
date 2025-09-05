@@ -60,6 +60,13 @@ router.get('/health', PricesController.getHealthStatus);
 router.get('/symbols', pricesLimiter, PricesController.getSupportedSymbols);
 
 /**
+ * GET /api/prices/stream
+ * SSE price stream for live updates
+ * Note: must be defined BEFORE '/:symbol' to avoid route conflicts
+ */
+router.get('/stream', PricesController.streamPricesSSE);
+
+/**
  * GET /api/prices/:symbol
  * Get price for a specific symbol
  * Rate limited and input validated

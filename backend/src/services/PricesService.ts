@@ -34,8 +34,13 @@ export class PricesService {
   
   // CoinGecko API mapping
   private static readonly SYMBOL_TO_COINGECKO_ID = {
+    // Metals mapping: map XAU to Pax Gold (PAXG) for USD proxy
+    'XAU': 'pax-gold',
     'PAXG': 'pax-gold',
     'USDC': 'usd-coin',
+    // Crypto
+    'BTC': 'bitcoin',
+    'ETH': 'ethereum',
     // Future metals could be added here
     // 'XAU': 'gold',
     // 'XAG': 'silver',

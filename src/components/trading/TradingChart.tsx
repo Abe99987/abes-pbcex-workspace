@@ -1,94 +1,66 @@
-import { useState, useEffect } from 'react';
-import {
-  ComposedChart,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Line,
-} from 'recharts';
-import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { generateCandlestickData } from './TradingUtils';
-const blocksChart = '/lovable-uploads/21364ad9-6a4b-4411-ab5d-8e565d4c1cbe.png';
+import {
+  subscribePrices,
+  pairToBaseSymbol,
+  type PriceTick,
+} from '@/lib/pricesSSE';
 
 interface TradingChartProps {
   pair: string;
-}
-
-interface CandlestickData {
-  time: number;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-}
-
-interface CandlestickProps {
-  payload?: CandlestickData;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
 }
 
 const timeframes = ['1m', '5m', '15m', '1h', '4h', '1d'];
 
 const TradingChart = ({ pair }: TradingChartProps) => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('1h');
-  const [chartType, setChartType] = useState('candles');
-  const [chartData, setChartData] = useState<CandlestickData[]>([]);
+  const [chartType, setChartType] = useState('line');
+  const [lastPrice, setLastPrice] = useState<number | null>(null);
+  const [series, setSeries] = useState<Array<{ t: number; p: number }>>([]);
+  const unsubRef = useRef<null | (() => void)>(null);
 
   useEffect(() => {
-    // Generate mock candlestick data
-    const data = generateCandlestickData(100, selectedTimeframe);
-    setChartData(data);
-  }, [pair, selectedTimeframe]);
-
-  const config = {
-    price: {
-      label: 'Price',
-      color: 'hsl(var(--gold))',
-    },
-    volume: {
-      label: 'Volume',
-      color: 'hsl(var(--gold-light))',
-    },
-  };
-
-  // Custom candlestick component
-  const Candlestick = (props: CandlestickProps) => {
-    const { payload, x, y, width, height } = props;
-    if (!payload) return null;
-
-    const { open, high, low, close } = payload;
-    const isGreen = close > open;
-    const bodyHeight = (Math.abs(close - open) * height) / (high - low);
-    const bodyY = y + ((Math.min(close, open) - low) * height) / (high - low);
-
-    return (
-      <g>
-        {/* Wick */}
-        <line
-          x1={x + width / 2}
-          y1={y}
-          x2={x + width / 2}
-          y2={y + height}
-          stroke={isGreen ? '#10b981' : '#ef4444'}
-          strokeWidth={1}
-        />
-        {/* Body */}
-        <rect
-          x={x + width * 0.2}
-          y={bodyY}
-          width={width * 0.6}
-          height={bodyHeight}
-          fill={isGreen ? '#10b981' : '#ef4444'}
-          stroke={isGreen ? '#10b981' : '#ef4444'}
-        />
-      </g>
+    // subscribe to SSE for base symbol
+    const base = pairToBaseSymbol(pair);
+    if (unsubRef.current) unsubRef.current();
+    unsubRef.current = subscribePrices(
+      [base],
+      (tick: PriceTick) => {
+        if (typeof tick.usd === 'number') {
+          setLastPrice(tick.usd);
+          setSeries(prev => {
+            const next = [...prev, { t: tick.ts, p: tick.usd! }];
+            // keep ≤300 points
+            return next.length > 300 ? next.slice(next.length - 300) : next;
+          });
+        }
+      },
+      { maxPerSecond: 2 }
     );
-  };
+
+    return () => {
+      if (unsubRef.current) {
+        unsubRef.current();
+        unsubRef.current = null;
+      }
+    };
+  }, [pair]);
+
+  const pathD = useMemo(() => {
+    if (series.length < 2) return '';
+    const width = 1000; // virtual width
+    const height = 300; // virtual height
+    const times = series.map(d => d.t);
+    const prices = series.map(d => d.p);
+    const tMin = Math.min(...times);
+    const tMax = Math.max(...times);
+    const pMin = Math.min(...prices);
+    const pMax = Math.max(...prices);
+    const nx = (t: number) => (t - tMin) / Math.max(1, tMax - tMin);
+    const ny = (p: number) => 1 - (p - pMin) / Math.max(1e-9, pMax - pMin);
+    const pts = series.map(d => `${nx(d.t) * width},${ny(d.p) * height}`);
+    return `M ${pts[0]} L ${pts.slice(1).join(' ')}`;
+  }, [series]);
 
   return (
     <div className='h-full flex flex-col bg-black'>
@@ -106,13 +78,16 @@ const TradingChart = ({ pair }: TradingChartProps) => {
 
           <div className='flex items-center space-x-4 text-xs text-slate-400'>
             <div>
-              24h High: <span className='text-white'>$2,395.80</span>
+              Last:{' '}
+              <span className='text-white'>
+                {lastPrice ? `$${lastPrice.toFixed(2)}` : '—'}
+              </span>
             </div>
             <div>
-              24h Low: <span className='text-white'>$2,351.20</span>
+              Points: <span className='text-white'>{series.length}</span>
             </div>
             <div>
-              Volume: <span className='text-white'>1.2M</span>
+              TF: <span className='text-white'>{selectedTimeframe}</span>
             </div>
           </div>
         </div>
@@ -174,15 +149,31 @@ const TradingChart = ({ pair }: TradingChartProps) => {
         </div>
       </div>
 
-      {/* Chart - Replace with blocks and bands visualization */}
+      {/* Lightweight live line chart (SVG) */}
       <div className='flex-1 bg-black relative'>
-        <img
-          src={blocksChart}
-          alt='Order Blocks and Liquidity Bands Visualization'
-          className='w-full h-full object-cover'
-        />
+        <svg
+          viewBox='0 0 1000 300'
+          preserveAspectRatio='none'
+          className='w-full h-full'
+        >
+          <defs>
+            <linearGradient id='goldLine' x1='0' x2='0' y1='0' y2='1'>
+              <stop offset='0%' stopColor='#f5c542' />
+              <stop offset='100%' stopColor='#b8860b' />
+            </linearGradient>
+          </defs>
+          <rect x='0' y='0' width='1000' height='300' fill='transparent' />
+          {pathD && (
+            <path
+              d={pathD}
+              fill='none'
+              stroke='url(#goldLine)'
+              strokeWidth='2'
+            />
+          )}
+        </svg>
         <div className='absolute top-4 right-4 bg-black/80 text-white text-xs px-3 py-2 rounded border border-gray-600 backdrop-blur-sm'>
-          TradingView integration coming soon — showing sample liquidity view
+          Live prices via SSE — {lastPrice ? 'updating' : 'waiting...'}
         </div>
       </div>
     </div>
