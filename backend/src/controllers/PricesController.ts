@@ -3,6 +3,8 @@ import { createError, asyncHandler } from '@/middlewares/errorMiddleware';
 import { logInfo, logWarn, logError } from '@/utils/logger';
 import { PricesService } from '@/services/PricesService';
 import { CANONICAL_SYMBOLS, normalizeSymbol } from '@/lib/symbols';
+import { nowUtcMs, toUtcIso } from '@/lib/time';
+import { cache } from '@/cache/redis';
 
 /**
  * Prices Controller for PBCEx
@@ -245,7 +247,7 @@ export class PricesController {
           ...healthStatus,
           cacheStatus,
         },
-        timestamp: new Date().toISOString(),
+        timestamp: toUtcIso(),
       });
     } catch (error) {
       logError('Price service health check error', {
@@ -359,6 +361,8 @@ export class PricesController {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.write(`retry: 2000\n\n`);
     res.flushHeaders?.();
 
     let isClosed = false;
@@ -377,9 +381,12 @@ export class PricesController {
       }
     }, 20000);
 
+    // per-symbol monotonic id using Redis as a counter when available
+    const nextIdKey = (s: string) => `sse:id:${s}`;
+
     const sendTick = async () => {
       if (isClosed) return;
-      const now = Date.now();
+      const now = nowUtcMs();
 
       for (const symbol of symbols) {
         try {
@@ -391,8 +398,9 @@ export class PricesController {
               ts: result.data.ts,
               source: result.data.source,
             };
-            // Include an id line for Last-Event-ID support
-            res.write(`id: ${result.data.ts}\n`);
+            // Monotonic id via Redis incr when available, else fallback to ts
+            const nextId = (await cache.increment(nextIdKey(symbol))) ?? result.data.ts;
+            res.write(`id: ${nextId}\n`);
             res.write(`data: ${JSON.stringify(payload)}\n\n`);
             backoff[symbol] = 0; // reset backoff on success
           } else {
@@ -424,6 +432,18 @@ export class PricesController {
       const delayMs = 1000 + 500 * Math.max(0, ...Object.values(backoff));
       if (!isClosed) setTimeout(sendTick, delayMs);
     };
+
+    // Before loop: replay last cached ticks for requested symbols
+    for (const symbol of symbols) {
+      const cacheKey = `price:${symbol}:USD`;
+      const cached = await cache.getJson<{ symbol: string; usd: number; ts: number; source: string }>(cacheKey);
+      if (cached) {
+        const replayId = (await cache.increment(nextIdKey(symbol))) ?? cached.ts;
+        res.write(`id: ${replayId}\n`);
+        res.write(`event: replay\n`);
+        res.write(`data: ${JSON.stringify(cached)}\n\n`);
+      }
+    }
 
     // Kick off loop
     res.write(`event: ready\n`);
