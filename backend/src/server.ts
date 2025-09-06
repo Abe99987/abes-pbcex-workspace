@@ -47,6 +47,7 @@ import priceOracleRoutes from '@/routes/priceOracleRoutes';
 import quotesRoutes from '@/routes/quotesRoutes';
 import ordersRoutes from '@/routes/ordersRoutes';
 import moneyMovementRoutes from '@/routes/moneyMovement';
+import ledgerRoutes from '@/routes/ledgerRoutes';
 
 // Import admin terminal modules
 // TODO: Re-enable after fixing TypeScript errors  
@@ -304,6 +305,7 @@ app.use('/api/quotes', quotesRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api', priceOracleRoutes);
 app.use('/api/kyc', kycRoutes);
+app.use('/api', ledgerRoutes);
 
 // Money Movement Routes (feature flagged)
 app.use('/api', moneyMovementRoutes);
