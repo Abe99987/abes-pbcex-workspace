@@ -1,7 +1,5 @@
 reporter: apiary
-custom:
-  # Custom API endpoint
-  apiEndpoint: http://localhost:4001
+# Custom settings
 dry-run: false
 hookfiles: tests/contract/dredd-hooks.ts
 language: typescript
@@ -10,6 +8,8 @@ server: npm start
 server-wait: 3
 init: false
 custom:
+  # Custom API endpoint
+  apiEndpoint: http://localhost:4001
   # Test only a subset of endpoints for faster execution
   names:
     - Health > GET /health
@@ -43,8 +43,8 @@ skip:
 
 # Headers for authenticated requests
 header:
-  - "Content-Type: application/json"
-  - "Accept: application/json"
+  - 'Content-Type: application/json'
+  - 'Accept: application/json'
 
 # Sort requests by method
 sorted: true

@@ -8,7 +8,6 @@ import {
 } from '@/utils/validators';
 import { WalletController } from '@/controllers/WalletController';
 import { WalletControllerDb } from '@/controllers/WalletControllerDb';
-import { WalletControllerDb } from '@/controllers/WalletControllerDb';
 import { z } from 'zod';
 
 const router = Router();

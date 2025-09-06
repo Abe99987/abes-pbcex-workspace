@@ -38,6 +38,10 @@ CREATE TABLE IF NOT EXISTS ledger_balances (
 CREATE INDEX IF NOT EXISTS idx_ledger_entries_journal ON ledger_entries(journal_id);
 CREATE INDEX IF NOT EXISTS idx_ledger_entries_account_asset ON ledger_entries(account_id, asset);
 CREATE INDEX IF NOT EXISTS idx_ledger_journal_ts ON ledger_journal(ts);
+-- Enforce idempotency on reference; allow many NULLs, unique when provided
+CREATE UNIQUE INDEX IF NOT EXISTS ux_ledger_journal_reference
+  ON ledger_journal(reference)
+  WHERE reference IS NOT NULL;
 
 -- Helper view for trial balance by asset
 CREATE OR REPLACE VIEW ledger_trial_balance AS

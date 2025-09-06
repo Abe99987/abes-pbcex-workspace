@@ -1,0 +1,33 @@
+{
+  "startedAt": "2025-09-06T16:57:46.163Z",
+  "finishedAt": "2025-09-06T16:57:47.630Z",
+  "durationsMs": {
+    "tradesBuy": {
+      "name": "trades.buy",
+      "count": 10,
+      "p50": 6,
+      "p95": 16,
+      "p99": 21,
+      "min": 4,
+      "max": 22
+    },
+    "tradesSell": {
+      "name": "trades.sell",
+      "count": 10,
+      "p50": 7,
+      "p95": 10,
+      "p99": 11,
+      "min": 3,
+      "max": 11
+    },
+    "pricesSymbols": {
+      "name": "prices.symbols",
+      "count": 10,
+      "p50": 1,
+      "p95": 1,
+      "p99": 1,
+      "min": 0,
+      "max": 1
+    }
+  }
+}

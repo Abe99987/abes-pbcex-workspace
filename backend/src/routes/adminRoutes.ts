@@ -49,6 +49,16 @@ router.get('/trades',
 );
 
 /**
+ * GET /api/admin/metrics
+ */
+router.get('/metrics', AdminController.getMetrics);
+
+/**
+ * GET /api/admin/export/balances
+ */
+router.get('/export/balances', AdminController.exportBalancesCsv);
+
+/**
  * GET /api/admin/shop
  * Get shop statistics and inventory
  */

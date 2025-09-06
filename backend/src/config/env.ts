@@ -228,6 +228,16 @@ const envSchema = z.object({
   // API & Application Info
   API_VERSION: z.string().default('1.0.0'),
   NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:8080'),
+
+  // Trading Fees (bps and optional minimum PAXG fee)
+  FEE_BPS: z
+    .string()
+    .transform(val => parseInt(val, 10))
+    .pipe(z.number().min(0).max(5000))
+    .default('50'), // 0.50%
+  FEE_MIN_PAXG: z
+    .string()
+    .default('0.00000000'),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
