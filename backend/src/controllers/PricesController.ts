@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { createError, asyncHandler } from '@/middlewares/errorMiddleware';
 import { logInfo, logWarn, logError } from '@/utils/logger';
 import { PricesService } from '@/services/PricesService';
+import { CANONICAL_SYMBOLS, normalizeSymbol } from '@/lib/symbols';
 
 /**
  * Prices Controller for PBCEx
@@ -39,7 +40,8 @@ export class PricesController {
       throw createError.badRequest('Symbol is required');
     }
 
-    const upperSymbol = symbol.toUpperCase();
+    const normalized = normalizeSymbol(symbol);
+    const upperSymbol = normalized ?? symbol.toUpperCase();
 
     // Validate symbol format (basic)
     if (!/^[A-Z]{3,5}$/.test(upperSymbol)) {
@@ -144,7 +146,8 @@ export class PricesController {
         throw createError.badRequest('All symbols must be strings');
       }
 
-      const upperSymbol = symbol.toUpperCase();
+      const normalized = normalizeSymbol(symbol);
+      const upperSymbol = normalized ?? symbol.toUpperCase();
       if (!/^[A-Z]{3,5}$/.test(upperSymbol)) {
         throw createError.badRequest(`Invalid symbol format: ${symbol}`);
       }
@@ -275,8 +278,8 @@ export class PricesController {
       res.status(200).json({
         success: true,
         data: {
-          symbols: healthStatus.supportedSymbols,
-          count: healthStatus.supportedSymbols.length,
+          symbols: CANONICAL_SYMBOLS,
+          count: CANONICAL_SYMBOLS.length,
         },
         meta: {
           requestId,

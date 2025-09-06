@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosError } from 'axios';
 import { logInfo, logWarn, logError } from '@/utils/logger';
 import { env } from '@/config/env';
 import { cache } from '@/cache/redis';
+import { CANONICAL_SYMBOLS, normalizeSymbol } from '@/lib/symbols';
 
 /**
  * Internal Price Service for PBCEx
@@ -37,7 +38,7 @@ export class PricesService {
     // Metals mapping: map XAU to Pax Gold (PAXG) for USD proxy
     'XAU': 'pax-gold',
     'PAXG': 'pax-gold',
-    'USDC': 'usd-coin',
+    'USD': 'usd-coin',
     // Crypto
     'BTC': 'bitcoin',
     'ETH': 'ethereum',
@@ -137,11 +138,11 @@ export class PricesService {
   static async getUSDCUSD(): Promise<PriceResult> {
     const correlationId = Math.random().toString(36).substr(2, 9);
 
-    logInfo('Getting USDC/USD price', { correlationId });
+    logInfo('Getting USD/USD proxy price', { correlationId });
 
     try {
       // Check cache first
-      const cachedResult = await PricesService.getCachedPrice('USDC');
+      const cachedResult = await PricesService.getCachedPrice('USD');
       if (cachedResult) {
         logInfo('USDC price served from cache', { 
           price: cachedResult.usd,
@@ -155,10 +156,10 @@ export class PricesService {
       }
 
       // Get fresh price and perform sanity check
-      const result = await PricesService.fetchPriceFromCoinGecko('USDC', correlationId);
+      const result = await PricesService.fetchPriceFromCoinGecko('USD', correlationId);
       
       if (result.success && result.data) {
-        // Sanity check: USDC should be close to $1.00 (allow 5% deviation)
+        // Sanity check: USD proxy (USDC) should be close to $1.00 (allow 5% deviation)
         const price = result.data.usd;
         if (price < 0.95 || price > 1.05) {
           logWarn('USDC price outside expected range', { 
@@ -168,7 +169,7 @@ export class PricesService {
         }
 
         // Cache the result
-        await PricesService.cachePrice('USDC', result.data);
+        await PricesService.cachePrice('USD', result.data);
       }
 
       return result;
@@ -192,7 +193,8 @@ export class PricesService {
    */
   static async getTicker(symbol: string): Promise<PriceResult> {
     const correlationId = Math.random().toString(36).substr(2, 9);
-    const upperSymbol = symbol.toUpperCase();
+    const normalized = normalizeSymbol(symbol);
+    const upperSymbol = normalized ?? symbol.toUpperCase();
 
     logInfo('Getting ticker price', { 
       symbol: upperSymbol,
@@ -200,7 +202,7 @@ export class PricesService {
     });
 
     try {
-      // Validate symbol
+      // Validate symbol (canonical only)
       if (!PricesService.SYMBOL_TO_COINGECKO_ID[upperSymbol as keyof typeof PricesService.SYMBOL_TO_COINGECKO_ID]) {
         return {
           success: false,
@@ -293,7 +295,7 @@ export class PricesService {
       configured: !!env.COINGECKO_BASE_URL,
       baseUrl: env.COINGECKO_BASE_URL,
       cacheEnabled: true, // Redis is always used if available
-      supportedSymbols: Object.keys(PricesService.SYMBOL_TO_COINGECKO_ID),
+      supportedSymbols: CANONICAL_SYMBOLS as unknown as string[],
     };
   }
 
@@ -449,14 +451,17 @@ export class PricesService {
     // Generate somewhat realistic mock prices
     const basePrices = {
       'PAXG': 2000 + (Math.random() - 0.5) * 100, // Gold ~$2000 ± $50
-      'USDC': 1.0 + (Math.random() - 0.5) * 0.02, // USDC ~$1.00 ± $0.01
-    };
+      'USD': 1.0 + (Math.random() - 0.5) * 0.02, // USD proxy ~$1.00 ± $0.01
+      'BTC': 65000 + (Math.random() - 0.5) * 2000,
+      'ETH': 3500 + (Math.random() - 0.5) * 200,
+      'XAU': 2000 + (Math.random() - 0.5) * 100,
+    } as Record<string, number>;
 
     const basePrice = basePrices[symbol as keyof typeof basePrices] || 100;
 
     return {
       symbol,
-      usd: parseFloat(basePrice.toFixed(symbol === 'USDC' ? 4 : 2)),
+      usd: parseFloat(basePrice.toFixed(symbol === 'USD' ? 4 : 2)),
       ts: Date.now(),
       source: 'MOCK',
     };
