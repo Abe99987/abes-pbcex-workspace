@@ -345,11 +345,15 @@ export class PricesService {
         const priceData: PriceData = JSON.parse(cached);
         
         // Verify cache data is valid and not corrupted
-        if (priceData.symbol && priceData.usd && priceData.ts) {
+        if (typeof priceData.symbol === 'string' && 
+            typeof priceData.usd === 'number' && 
+            typeof priceData.ts === 'number') {
           return {
             ...priceData,
             source: 'CACHE',
-            cachedAt: priceData.ts,
+            cachedAt: typeof (priceData as any).cachedAt === 'number' 
+              ? (priceData as any).cachedAt 
+              : Date.now(),
           };
         }
       }

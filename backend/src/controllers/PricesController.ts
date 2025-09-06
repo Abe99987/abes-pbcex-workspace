@@ -350,8 +350,8 @@ export class PricesController {
     const symbolsParam = (req.query.symbols as string) || '';
     const symbols = symbolsParam
       .split(',')
-      .map(s => s.trim().toUpperCase())
-      .filter(s => s.length > 0);
+      .map(s => normalizeSymbol(s) ?? s.trim().toUpperCase())
+      .filter(s => /^[A-Z]{3,5}$/.test(s));
 
     if (symbols.length === 0) {
       throw createError.badRequest('symbols query is required, e.g. symbols=XAU,BTC');

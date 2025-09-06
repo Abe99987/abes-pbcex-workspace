@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
+    "prestart": "npm run build",
     "start": "node dist/server.js",
     "test": "jest --runInBand --ci --no-cache --detectOpenHandles=false --forceExit",
     "test:watch": "jest --watch --maxWorkers=50%",
