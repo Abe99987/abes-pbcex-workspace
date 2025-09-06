@@ -28,7 +28,7 @@ router.post(
   '/transfer',
   requireKyc(['APPROVED']),
   validateBody(transferSchema),
-  WalletController.transfer
+  WalletControllerDb.transfer
 );
 
 /**

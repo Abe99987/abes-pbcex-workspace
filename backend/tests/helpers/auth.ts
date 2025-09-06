@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { Factory, FactoryUser } from './factory';
+import { Factory } from './factory';
 import { User } from '../../src/models/User';
 import { env } from '../../src/config/env';
 import { query } from './db';
@@ -24,7 +24,7 @@ export interface LoginCredentials {
 /**
  * Register a new user and return auth tokens
  */
-export async function registerUser(userData: FactoryUser = {}): Promise<AuthResult> {
+export async function registerUser(userData: any = {}): Promise<AuthResult> {
   const password = userData.password || 'password123';
   
   // Create user with factory
@@ -39,12 +39,13 @@ export async function registerUser(userData: FactoryUser = {}): Promise<AuthResu
       userId: user.id,
       email: user.email,
       role: user.role,
+      kycStatus: user.kycStatus ?? 'APPROVED',
     },
     env.JWT_SECRET,
-    { 
-      expiresIn: env.JWT_EXPIRES_IN,
-      issuer: 'pbcex-test',
-      audience: 'pbcex-api',
+    {
+      expiresIn: '1h',
+      issuer: 'pbcex-api',
+      audience: 'pbcex-users',
     }
   );
   
@@ -89,6 +90,8 @@ export async function loginUser(credentials: LoginCredentials): Promise<AuthResu
     phone: userRow.phone,
     twoFactorEnabled: userRow.two_factor_enabled,
     lastLoginAt: userRow.last_login_at,
+    loginCount: userRow.login_count ?? 0,
+    isActive: userRow.is_active ?? true,
     createdAt: userRow.created_at,
     updatedAt: userRow.updated_at,
   };
@@ -99,12 +102,13 @@ export async function loginUser(credentials: LoginCredentials): Promise<AuthResu
       userId: user.id,
       email: user.email,
       role: user.role,
+      kycStatus: user.kycStatus ?? 'APPROVED',
     },
     env.JWT_SECRET,
-    { 
-      expiresIn: env.JWT_EXPIRES_IN,
-      issuer: 'pbcex-test',
-      audience: 'pbcex-api',
+    {
+      expiresIn: '1h',
+      issuer: 'pbcex-api',
+      audience: 'pbcex-users',
     }
   );
   
@@ -120,7 +124,7 @@ export async function loginUser(credentials: LoginCredentials): Promise<AuthResu
 /**
  * Create and login admin user
  */
-export async function loginAdmin(overrides: Partial<FactoryUser> = {}): Promise<AuthResult> {
+export async function loginAdmin(overrides: any = {}): Promise<AuthResult> {
   const adminUser = await Factory.createAdminUser(overrides);
   const password = overrides.password || 'password123';
   
@@ -133,7 +137,7 @@ export async function loginAdmin(overrides: Partial<FactoryUser> = {}): Promise<
 /**
  * Create and login support user
  */
-export async function loginSupport(overrides: Partial<FactoryUser> = {}): Promise<AuthResult> {
+export async function loginSupport(overrides: any = {}): Promise<AuthResult> {
   const supportUser = await Factory.createSupportUser(overrides);
   const password = overrides.password || 'password123';
   
@@ -146,7 +150,7 @@ export async function loginSupport(overrides: Partial<FactoryUser> = {}): Promis
 /**
  * Create and login teller user
  */
-export async function loginTeller(overrides: Partial<FactoryUser> = {}): Promise<AuthResult> {
+export async function loginTeller(overrides: any = {}): Promise<AuthResult> {
   const tellerUser = await Factory.createTellerUser(overrides);
   const password = overrides.password || 'password123';
   
@@ -159,7 +163,7 @@ export async function loginTeller(overrides: Partial<FactoryUser> = {}): Promise
 /**
  * Create and login regular user
  */
-export async function loginRegularUser(overrides: FactoryUser = {}): Promise<AuthResult> {
+export async function loginRegularUser(overrides: any = {}): Promise<AuthResult> {
   return await registerUser({
     role: 'USER',
     kycStatus: 'APPROVED',
@@ -176,12 +180,13 @@ export function generateToken(user: User): string {
       userId: user.id,
       email: user.email,
       role: user.role,
+      kycStatus: (user as any).kycStatus ?? 'APPROVED',
     },
     env.JWT_SECRET,
-    { 
-      expiresIn: env.JWT_EXPIRES_IN,
-      issuer: 'pbcex-test',
-      audience: 'pbcex-api',
+    {
+      expiresIn: '1h',
+      issuer: 'pbcex-api',
+      audience: 'pbcex-users',
     }
   );
 }
@@ -243,7 +248,7 @@ export function mockJwtForRole(role: 'USER' | 'ADMIN' | 'SUPPORT' | 'TELLER'): s
  */
 export async function createUserWithKycStatus(
   status: 'NOT_STARTED' | 'PENDING' | 'APPROVED' | 'REJECTED',
-  overrides: FactoryUser = {}
+  overrides: any = {}
 ): Promise<AuthResult> {
   return await registerUser({
     kycStatus: status,
@@ -329,6 +334,26 @@ export async function logoutUser(token: string): Promise<void> {
   }
 }
 
+export async function registerAndLogin(arg1?: any, arg2?: any): Promise<any> {
+  if (typeof arg1 === 'string') {
+    let email = arg1;
+    const password = typeof arg2 === 'string' ? arg2 : 'password123';
+    // Ensure the mocked user id exists in DB with accounts so the mocked auth maps correctly
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+    if (email.includes('@')) {
+      const [local, domain] = email.split('@');
+      email = `${local}+${suffix}@${domain}`;
+    } else {
+      email = `${email}+${suffix}@example.com`;
+    }
+    await Factory.createUserWithAccounts({ email, password, kycStatus: 'APPROVED' } as any);
+    const auth = await loginUser({ email, password });
+    return auth.accessToken;
+  }
+  // Fallback to returning full auth result for tests expecting it
+  return await loginRegularUser(arg1 as any);
+}
+
 export default {
   registerUser,
   loginUser,
@@ -345,4 +370,5 @@ export default {
   AuthHeaders,
   AuthScenarios,
   logoutUser,
+  registerAndLogin,
 };

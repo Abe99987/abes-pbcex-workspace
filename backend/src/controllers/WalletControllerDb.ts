@@ -5,6 +5,8 @@ import { logInfo, logError, logWarn } from '@/utils/logger';
 import { WalletController } from './WalletController';
 import { createObjectCsvWriter } from 'csv-writer';
 import * as fastCsv from 'fast-csv';
+import LedgerService from '@/services/LedgerService';
+import { PricesService } from '@/services/PricesService';
 
 /**
  * Database-backed wallet operations
@@ -70,26 +72,48 @@ export class WalletControllerDb {
         return WalletController.getBalances(req, res, () => {});
       }
 
-      // Get balances for each account
-      const fundingBalances = await findMany<DbBalance>('balances', {
-        account_id: fundingAccount.id,
-      });
-      const tradingBalances = await findMany<DbBalance>('balances', {
-        account_id: tradingAccount.id,
-      });
+      // Prefer ledger_balances if available
+      let fundingBalances: Array<{ asset: string; amount: string }> = [];
+      let tradingBalances: Array<{ asset: string; amount: string }> = [];
+      try {
+        const q = `SELECT account_id, asset, balance::text AS amount FROM ledger_balances WHERE account_id = $1`;
+        const fb = await db.query<{ account_id: string; asset: string; amount: string }>(q, [fundingAccount.id]);
+        const tb = await db.query<{ account_id: string; asset: string; amount: string }>(q, [tradingAccount.id]);
+        fundingBalances = fb.rows.map(r => ({ asset: r.asset, amount: r.amount }));
+        tradingBalances = tb.rows.map(r => ({ asset: r.asset, amount: r.amount }));
+      } catch {
+        // Fallback to balances table
+        const fb = await findMany<DbBalance>('balances', { account_id: fundingAccount.id });
+        const tb = await findMany<DbBalance>('balances', { account_id: tradingAccount.id });
+        fundingBalances = fb.map(b => ({ asset: b.asset, amount: b.amount }));
+        tradingBalances = tb.map(b => ({ asset: b.asset, amount: b.amount }));
+      }
 
-      // Format response to match existing API
-      const formatBalances = (balances: DbBalance[]) =>
-        balances.map(balance => ({
-          asset: balance.asset,
-          amount: balance.amount,
-          lockedAmount: '0.00', // Not implemented yet
-          availableAmount: balance.amount,
-          usdValue: balance.usd_value,
-        }));
+      // Fetch prices for USD valuation (PAXG drives XAU-s)
+      const paxgPrice = await PricesService.getTicker('PAXG');
+      const usdPerPaxg = paxgPrice.success && paxgPrice.data ? paxgPrice.data.usd : 0;
 
-      const fundingFormatted = formatBalances(fundingBalances);
-      const tradingFormatted = formatBalances(tradingBalances);
+      const priceOf = (asset: string): number => {
+        if (asset === 'PAXG' || asset === 'XAU-s') return usdPerPaxg;
+        if (asset === 'USD') return 1;
+        return 0;
+      };
+
+      const formatBalances = (rows: Array<{ asset: string; amount: string }>, renameXauSynthetic: boolean) =>
+        rows.map(row => {
+          const asset = renameXauSynthetic && row.asset === 'PAXG' ? 'XAU-s' : row.asset;
+          const usd = (parseFloat(row.amount || '0') * priceOf(asset)).toFixed(2);
+          return {
+            asset,
+            amount: row.amount,
+            lockedAmount: '0.00',
+            availableAmount: row.amount,
+            usdValue: usd,
+          };
+        });
+
+      const fundingFormatted = formatBalances(fundingBalances, false);
+      const tradingFormatted = formatBalances(tradingBalances, true);
 
       const fundingTotal = fundingFormatted
         .reduce((sum, b) => sum + parseFloat(b.usdValue), 0)
@@ -341,4 +365,68 @@ export class WalletControllerDb {
       return WalletControllerDb.exportTransactionsCsv(req, res, () => {});
     }
   );
+
+  /**
+   * POST /api/wallet/transfer - Database-backed via ledger journal
+   */
+  static transfer = asyncHandler(async (req: Request, res: Response) => {
+    const { from, to, asset, amount } = req.body as { from: 'FUNDING'|'TRADING'; to: 'FUNDING'|'TRADING'; asset: string; amount: string };
+    const userId = req.user!.id;
+
+    if (!db.isConnected()) {
+      throw createError.serviceUnavailable('Database not available');
+    }
+
+    if (!['FUNDING','TRADING'].includes(from) || !['FUNDING','TRADING'].includes(to) || from === to) {
+      throw createError.badRequest('Invalid transfer direction');
+    }
+
+    // Only PAXG <-> XAU-s supported (1:1). Represent as PAXG in ledger with UI rename for trading.
+    if (!['PAXG','XAU-s'].includes(asset)) {
+      throw createError.badRequest('Only PAXG/XAU-s supported');
+    }
+
+    // Lookup accounts
+    const accounts = await findMany<DbAccount>('accounts', { user_id: userId });
+    const source = accounts.find(a => a.type === from)!;
+    const target = accounts.find(a => a.type === to)!;
+    if (!source || !target) throw createError.notFound('Account');
+
+    const amt = parseFloat(amount);
+    if (!(amt > 0)) throw createError.badRequest('Amount must be > 0');
+
+    // Check source balance from ledger_balances
+    const balRes = await db.query<{ balance: string }>(
+      `SELECT balance::text FROM ledger_balances WHERE account_id = $1 AND asset = 'PAXG'`,
+      [source.id]
+    );
+    const have = parseFloat(balRes.rows[0]?.balance || '0');
+    if (have < amt) throw createError.badRequest('Insufficient balance');
+
+    // Journal: CREDIT source PAXG, DEBIT target PAXG
+    const journal = {
+      userId,
+      reference: `WALLET-XFER-${Date.now()}`,
+      description: `${from}->${to} ${amount} ${asset}`,
+      entries: [
+        { accountId: source.id, asset: 'PAXG', direction: 'CREDIT' as const, amount: amount },
+        { accountId: target.id, asset: 'PAXG', direction: 'DEBIT' as const, amount: amount },
+      ],
+    };
+
+    const result = await LedgerService.postJournal(journal);
+
+    res.status(201).json({
+      code: 'SUCCESS',
+      data: {
+        journalId: result.id,
+        from,
+        to,
+        asset,
+        amount,
+        conversionRate: '1.0000',
+        completedAt: new Date().toISOString(),
+      },
+    });
+  });
 }

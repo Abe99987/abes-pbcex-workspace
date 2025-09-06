@@ -4,12 +4,13 @@
   "description": "PBCEx Backend API Server",
   "main": "dist/server.js",
   "engines": {
-    "node": "24.x",
+    "node": "20.x",
     "npm": ">=10.0.0"
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
+    "prestart": "npm run build",
     "start": "node dist/server.js",
     "test": "jest --runInBand --ci --no-cache --detectOpenHandles=false --forceExit",
     "test:watch": "jest --watch --maxWorkers=50%",
@@ -136,7 +137,7 @@
     "typescript": "^5.1.6"
   },
   "engines": {
-    "node": ">=20.0.0 <25",
-    "npm": ">=9.0.0"
+    "node": "20.x",
+    "npm": ">=10.0.0"
   }
 }

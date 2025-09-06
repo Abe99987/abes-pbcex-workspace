@@ -75,13 +75,21 @@ export async function truncateAll(): Promise<void> {
     }
     
     // Disable foreign key checks and truncate
-    await client.query('SET session_replication_role = replica');
+    try {
+      await client.query('SET session_replication_role = replica');
+    } catch {
+      // ignore if not permitted
+    }
     
     for (const table of tables) {
       await client.query(`TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE`);
     }
     
-    await client.query('SET session_replication_role = DEFAULT');
+    try {
+      await client.query('SET session_replication_role = DEFAULT');
+    } catch {
+      // ignore if not permitted
+    }
     
     console.log(`🧹 Truncated ${tables.length} tables:`, tables.join(', '));
   } catch (error) {

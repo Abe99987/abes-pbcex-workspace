@@ -34,6 +34,7 @@ type FactoryAccount = {
   name?: string;
   type?: 'FUNDING' | 'TRADING';
   isActive?: boolean;
+  [key: string]: any;
 };
 
 type FactoryBalance = {
@@ -43,6 +44,7 @@ type FactoryBalance = {
   amount?: string;
   lockedAmount?: string;
   createdAt?: Date;
+  [key: string]: any;
 };
 
 type FactoryTrade = {
@@ -711,6 +713,7 @@ export const Factory = {
   createAdminUser,
   createSupportUser,
   createTellerUser,
+  createTransaction: async (overrides: any = {}) => ({ id: uuidv4(), ...overrides }),
 };
 
 export default Factory;

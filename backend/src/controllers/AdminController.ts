@@ -8,6 +8,7 @@ import { AuthController } from './AuthController';
 import { WalletController } from './WalletController';
 import { TradeController } from './TradeController';
 import { ShopController } from './ShopController';
+import { db } from '@/db';
 
 /**
  * Admin Controller for PBCEx
@@ -72,6 +73,47 @@ export class AdminController {
         lastUpdated: new Date().toISOString(),
       },
     });
+  });
+
+  /**
+   * GET /api/admin/metrics
+   * Basic metrics: tradeCount24h, totalFeesPaxg, trial-balance deltas per asset
+   */
+  static getMetrics = asyncHandler(async (req: Request, res: Response) => {
+    // Trade receipts recorded in ledger_journal.metadata.receipt_v
+    const tradeCount24h = db.isConnected()
+      ? (await db.query(`SELECT COUNT(*)::int AS c FROM ledger_journal WHERE (metadata->>'receipt_v') IS NOT NULL AND ts >= NOW() - INTERVAL '24 hours'`)).rows[0]?.c || 0
+      : 0;
+    const feeSum = db.isConnected()
+      ? (await db.query(`SELECT COALESCE(SUM( (metadata->>'fee')::numeric ),0)::text AS s FROM ledger_journal WHERE (metadata->>'fee') IS NOT NULL AND ts >= NOW() - INTERVAL '24 hours'`)).rows[0]?.s || '0'
+      : '0';
+    const tb = db.isConnected()
+      ? (await db.query(`SELECT asset, (COALESCE(total_debits,0)-COALESCE(total_credits,0))::text AS delta FROM ledger_trial_balance`)).rows
+      : [];
+
+    res.json({
+      code: 'SUCCESS',
+      data: {
+        tradeCount24h,
+        totalFeesPaxg: feeSum,
+        trialBalance: tb,
+      },
+    });
+  });
+
+  /**
+   * GET /api/admin/export/balances
+   * Export ledger_balances as CSV
+   */
+  static exportBalancesCsv = asyncHandler(async (req: Request, res: Response) => {
+    const rows = db.isConnected()
+      ? (await db.query(`SELECT account_id, asset, balance::text AS balance, COALESCE(updated_at, NOW()) AS updated_at FROM ledger_balances ORDER BY account_id, asset`)).rows
+      : [];
+    const header = 'account_id,asset,balance,updated_at';
+    const lines = rows.map((r: any) => `${r.account_id},${r.asset},${r.balance},${new Date(r.updated_at).toISOString()}`);
+    const csv = [header, ...lines].join('\n');
+    res.setHeader('Content-Type', 'text/csv');
+    res.status(200).send(csv);
   });
 
   /**
