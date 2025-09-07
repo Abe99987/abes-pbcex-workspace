@@ -10,7 +10,9 @@ import {
 import {
   getSymbolDisplayName,
   isValidSymbol,
+  getCanonicalSymbol,
   SYMBOLS,
+  REQUIRED_TIMEFRAMES,
 } from '@/src/utils/tradingview';
 import {
   ArrowLeft,
@@ -23,7 +25,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { api } from '@/utils/api';
+import { api, type TradeReceipt } from '@/utils/api';
+import { nanoid } from 'nanoid';
 
 export default function SymbolDetail() {
   const router = useRouter();
@@ -32,13 +35,17 @@ export default function SymbolDetail() {
 
   const symbolStr = Array.isArray(symbol) ? symbol[0] : symbol;
   const isValid = symbolStr ? isValidSymbol(symbolStr) : false;
+  
+  // Get canonical symbol for TradingView widgets
+  const canonicalSymbol = symbolStr ? getCanonicalSymbol(symbolStr) : undefined;
 
-  // Simple order ticket state (defined before any early return to satisfy hooks rules)
-  const [fromAsset, setFromAsset] = useState<string>('XAU-s');
-  const [toAsset, setToAsset] = useState<string>('XAG-s');
-  const [amount, setAmount] = useState<string>('');
+  // Order ticket state for new buy/sell API (defined before any early return to satisfy hooks rules)
+  const [orderSide, setOrderSide] = useState<'buy' | 'sell'>('buy');
+  const [orderSymbol, setOrderSymbol] = useState<string>('XAU-s');
+  const [orderQty, setOrderQty] = useState<string>('');
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const [receipt, setReceipt] = useState<TradeReceipt | null>(null);
 
   if (authLoading) {
     return (
@@ -111,13 +118,13 @@ export default function SymbolDetail() {
 
   const validateOrder = (): boolean => {
     setErrorMsg('');
-    const amt = parseFloat(amount);
-    if (!amount || isNaN(amt) || amt <= 0) {
-      setErrorMsg('Enter a valid amount > 0');
+    const qty = parseFloat(orderQty);
+    if (!orderQty || isNaN(qty) || qty <= 0) {
+      setErrorMsg('Enter a valid quantity > 0');
       return false;
     }
-    if (fromAsset === toAsset) {
-      setErrorMsg('From and To assets must differ');
+    if (!['XAU-s', 'PAXG'].includes(orderSymbol)) {
+      setErrorMsg('Only XAU-s and PAXG are supported');
       return false;
     }
     return true;
@@ -125,20 +132,41 @@ export default function SymbolDetail() {
 
   const handleSubmitOrder = async () => {
     if (!validateOrder()) return;
+    
+    // Generate idempotency key
+    const requestId = nanoid();
+    
     try {
       setSubmitting(true);
-      await api.trade.placeOrder({ fromAsset, toAsset, amount });
-      toast.success('Order filled');
-      // Trigger a single balances refresh (no client math)
-      try {
-        await api.wallet.getBalances();
-      } catch (e) {
-        // Non-fatal: balances refresh best-effort
+      setErrorMsg('');
+      
+      // Use new idempotent trade API
+      const response = orderSide === 'buy' 
+        ? await api.trade.buy({ symbol: orderSymbol, qty: orderQty, request_id: requestId })
+        : await api.trade.sell({ symbol: orderSymbol, qty: orderQty, request_id: requestId });
+      
+      if (response.data.code === 'SUCCESS' && response.data.data) {
+        const receiptData = response.data.data;
+        setReceipt(receiptData);
+        toast.success(`${orderSide.charAt(0).toUpperCase() + orderSide.slice(1)} order filled`);
+        
+        // Refetch balances using standard query
+        try {
+          await api.wallet.getBalances();
+        } catch (e) {
+          console.warn('Balance refetch failed (non-fatal):', e);
+        }
+        
+        // Clear form
+        setOrderQty('');
+      } else {
+        setErrorMsg(response.data.message || 'Trade failed');
       }
-      setAmount('');
-    } catch (err) {
-      console.error('Order submit failed', err);
-      toast.error('Order failed. Please try again (err: ORD-001)');
+    } catch (err: any) {
+      console.error('Trade submit failed:', err);
+      const errorMessage = err.response?.data?.message || err.message || 'Trade failed';
+      setErrorMsg(errorMessage);
+      toast.error('Trade failed. Please try again');
     } finally {
       setSubmitting(false);
     }
@@ -206,7 +234,7 @@ export default function SymbolDetail() {
               </div>
               <div className='bg-white rounded-lg shadow-sm border p-6'>
                 <SymbolOverview
-                  symbols={[[symbolStr, `${displayName}|1D`]]}
+                  symbols={[[canonicalSymbol || symbolStr, `${displayName}|1D`]]}
                   height={350}
                   showVolume={true}
                   showMA={false}
@@ -226,10 +254,11 @@ export default function SymbolDetail() {
               </div>
               <div className='bg-white rounded-lg shadow-sm border p-6'>
                 <AdvancedChart
-                  symbol={symbolStr}
+                  symbol={canonicalSymbol || symbolStr}
                   height={600}
-                  interval='D'
+                  interval='1D'
                   allowSymbolChange={true}
+                  enableCrosshair={true}
                   studies={['Volume@tv-basicstudies']}
                 />
               </div>
@@ -246,50 +275,72 @@ export default function SymbolDetail() {
                 </h3>
                 <div className='space-y-3'>
                   <div>
-                    <label className='block text-sm text-gray-600 mb-1'>From</label>
+                    <label className='block text-sm text-gray-600 mb-1'>Side</label>
+                    <div className='flex space-x-2'>
+                      <button
+                        onClick={() => setOrderSide('buy')}
+                        disabled={submitting}
+                        className={`flex-1 px-3 py-2 text-sm rounded-lg transition-colors ${
+                          orderSide === 'buy'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        Buy
+                      </button>
+                      <button
+                        onClick={() => setOrderSide('sell')}
+                        disabled={submitting}
+                        className={`flex-1 px-3 py-2 text-sm rounded-lg transition-colors ${
+                          orderSide === 'sell'
+                            ? 'bg-red-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        Sell
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className='block text-sm text-gray-600 mb-1'>Symbol</label>
                     <select
-                      data-testid='order-from'
+                      data-testid='order-symbol'
                       className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      value={fromAsset}
-                      onChange={e => setFromAsset(e.target.value)}
+                      value={orderSymbol}
+                      onChange={e => setOrderSymbol(e.target.value)}
                       disabled={submitting}
                     >
-                      {/* Real and synthetic assets allowed */}
-                      {['PAXG', 'USD', 'USDC', 'XAU-s', 'XAG-s', 'XPT-s', 'XPD-s', 'XCU-s'].map(a => (
-                        <option key={a} value={a}>{a}</option>
-                      ))}
+                      <option value='XAU-s'>XAU-s (Gold Synthetic)</option>
+                      <option value='PAXG'>PAXG (Pax Gold)</option>
                     </select>
                   </div>
                   <div>
-                    <label className='block text-sm text-gray-600 mb-1'>To</label>
-                    <select
-                      data-testid='order-to'
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      value={toAsset}
-                      onChange={e => setToAsset(e.target.value)}
-                      disabled={submitting}
-                    >
-                      {['PAXG', 'USD', 'USDC', 'XAU-s', 'XAG-s', 'XPT-s', 'XPD-s', 'XCU-s'].map(a => (
-                        <option key={a} value={a}>{a}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className='block text-sm text-gray-600 mb-1'>Amount</label>
+                    <label className='block text-sm text-gray-600 mb-1'>Quantity</label>
                     <input
-                      data-testid='order-amount'
+                      data-testid='order-qty'
                       type='number'
                       step='any'
                       min='0'
                       className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      value={amount}
-                      onChange={e => setAmount(e.target.value)}
+                      value={orderQty}
+                      onChange={e => setOrderQty(e.target.value)}
                       disabled={submitting}
                       placeholder='0.00'
                     />
                   </div>
                   {errorMsg && (
                     <div className='text-sm text-red-600'>{errorMsg}</div>
+                  )}
+                  {receipt && (
+                    <div className='text-sm bg-green-50 border border-green-200 rounded-lg p-3'>
+                      <div className='font-semibold text-green-800'>Order Receipt</div>
+                      <div className='text-green-700 mt-1'>
+                        {receipt.side} {receipt.qty} {receipt.symbol} at ${receipt.price}
+                      </div>
+                      <div className='text-xs text-green-600 mt-1'>
+                        Fee: ${receipt.fee} | ID: {receipt.journal_id.slice(0, 8)}
+                      </div>
+                    </div>
                   )}
                   <button
                     data-testid='order-submit'
@@ -298,7 +349,7 @@ export default function SymbolDetail() {
                     aria-disabled={submitting}
                     className={`w-full px-4 py-2 rounded-lg text-white transition-colors ${submitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
                   >
-                    {submitting ? 'Submitting…' : 'Submit Order'}
+                    {submitting ? 'Submitting…' : `${orderSide.charAt(0).toUpperCase() + orderSide.slice(1)} ${orderSymbol}`}
                   </button>
                 </div>
               </div>
@@ -375,7 +426,7 @@ export default function SymbolDetail() {
                           {getSymbolDisplayName(relatedSymbol)}
                         </div>
                         <MiniChart
-                          symbol={relatedSymbol}
+                          symbol={getCanonicalSymbol(relatedSymbol)}
                           width='100%'
                           height={150}
                           dateRange='1M'

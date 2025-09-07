@@ -6,21 +6,61 @@
 // Widget themes
 export type TradingViewTheme = 'light' | 'dark';
 
+// Required timeframes for TradingView parity
+export const REQUIRED_TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1D'] as const;
+export type Timeframe = typeof REQUIRED_TIMEFRAMES[number];
+
+// Execution markers interface for trade visualization
+export interface ExecutionMarker {
+  id: string;
+  time: number; // Unix timestamp
+  position: 'above' | 'below';
+  color: string;
+  shape: 'circle' | 'square' | 'arrow_up' | 'arrow_down';
+  text?: string;
+  size?: 'tiny' | 'small' | 'normal' | 'large';
+}
+
+// Execution markers provider interface
+export interface ExecutionMarkersProvider {
+  getMarkers: (symbol: string, timeframe: Timeframe) => Promise<ExecutionMarker[]>;
+  subscribeToMarkers?: (symbol: string, callback: (markers: ExecutionMarker[]) => void) => () => void;
+}
+
+// Canonical symbol mappings (aligned with backend PriceFeedService)
+export const CANONICAL_SYMBOL_MAP = {
+  // PBCEx asset codes to TradingView symbols (matches backend)
+  'XAU': 'OANDA:XAUUSD',
+  'AU': 'OANDA:XAUUSD',  // Gold
+  'XAG': 'OANDA:XAGUSD', 
+  'AG': 'OANDA:XAGUSD',  // Silver
+  'XPT': 'OANDA:XPTUSD',
+  'PT': 'OANDA:XPTUSD',  // Platinum
+  'XPD': 'OANDA:XPDUSD',
+  'PD': 'OANDA:XPDUSD',  // Palladium
+  'XCU': 'COMEX:HG1!',
+  'CU': 'COMEX:HG1!',    // Copper
+  'BTC': 'BINANCE:BTCUSDT',
+  'ETH': 'BINANCE:ETHUSDT',
+  'USD': 'OANDA:EURUSD', // For USD index
+  'PAXG': 'OANDA:XAUUSD', // PAXG tracks gold
+} as const;
+
 // Common trading symbols organized by category
 export const SYMBOLS = {
-  // Precious Metals (Primary focus for PBCEx)
+  // Precious Metals (Primary focus for PBCEx) - Using canonical mappings
   METALS: {
-    GOLD: 'XAUUSD',
-    SILVER: 'XAGUSD',
-    PLATINUM: 'XPTUSD',
-    PALLADIUM: 'XPDUSD',
-    COPPER: 'HG1!', // Copper futures
+    GOLD: 'OANDA:XAUUSD',
+    SILVER: 'OANDA:XAGUSD',
+    PLATINUM: 'OANDA:XPTUSD',
+    PALLADIUM: 'OANDA:XPDUSD',
+    COPPER: 'COMEX:HG1!', // Copper futures
   },
 
-  // Cryptocurrencies
+  // Cryptocurrencies - Using canonical mappings
   CRYPTO: {
-    BITCOIN: 'BTCUSD',
-    ETHEREUM: 'ETHUSD',
+    BITCOIN: 'BINANCE:BTCUSDT',
+    ETHEREUM: 'BINANCE:ETHUSDT',
     LITECOIN: 'LTCUSD',
     RIPPLE: 'XRPUSD',
     CARDANO: 'ADAUSD',
@@ -262,9 +302,48 @@ export function getWidgetScriptUrl(widgetType: string): string {
 }
 
 /**
+ * Convert PBCEx asset code to canonical TradingView symbol
+ */
+export function getCanonicalSymbol(assetCode: string): string {
+  return CANONICAL_SYMBOL_MAP[assetCode as keyof typeof CANONICAL_SYMBOL_MAP] || assetCode;
+}
+
+/**
  * Get symbol display name for UI
  */
 export function getSymbolDisplayName(symbol: string): string {
+  // Check canonical mappings first
+  for (const [key, value] of Object.entries(CANONICAL_SYMBOL_MAP)) {
+    if (value === symbol || key === symbol) {
+      // Return asset-friendly name
+      switch (key) {
+        case 'AU':
+        case 'XAU':
+          return 'Gold';
+        case 'AG':
+        case 'XAG':
+          return 'Silver';
+        case 'PT':
+        case 'XPT':
+          return 'Platinum';
+        case 'PD':
+        case 'XPD':
+          return 'Palladium';
+        case 'CU':
+        case 'XCU':
+          return 'Copper';
+        case 'BTC':
+          return 'Bitcoin';
+        case 'ETH':
+          return 'Ethereum';
+        case 'PAXG':
+          return 'Pax Gold';
+        default:
+          break;
+      }
+    }
+  }
+  
   // Find the symbol in our constants and return a friendly name
   for (const category of Object.values(SYMBOLS)) {
     for (const [key, value] of Object.entries(category)) {
