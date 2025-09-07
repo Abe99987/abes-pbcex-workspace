@@ -217,6 +217,8 @@ npm run reset:db     # Clear and reseed all development data
 npm run test         # Run unit and integration tests
 npm run lint         # Check code style and types
 npm run build        # Build for production
+npm run test:api     # Run integration API tests only
+npm run test:focused # Run only *.only.test.ts or *.focused.test.ts files
 ```
 
 ## Development Data

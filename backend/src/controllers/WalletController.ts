@@ -22,6 +22,10 @@ export class WalletController {
    */
   static getBalances = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.id;
+    const startTs = Date.now();
+    if (process.env.E2E_TEST_ENABLED === 'true') {
+      console.log('E2E_BALANCES_START', { userId, ts: new Date().toISOString() });
+    }
 
     // Get user accounts
     const userAccounts = AuthController.getUserAccounts(userId);
@@ -85,6 +89,10 @@ export class WalletController {
         },
       },
     });
+
+    if (process.env.E2E_TEST_ENABLED === 'true') {
+      console.log('E2E_BALANCES_DONE', { userId, durationMs: Date.now() - startTs });
+    }
   });
 
   /**
@@ -558,4 +566,32 @@ export class WalletController {
     return balances.filter(b => accountIds.includes(b.accountId));
   };
   static getBalanceChanges = (): BalanceChange[] => balanceChanges;
+  /**
+   * Test-only seeding helper for E2E: set a specific balance for a user's account type and asset
+   */
+  static async seedBalanceForTest(
+    userId: string,
+    accountType: 'FUNDING' | 'TRADING',
+    asset: string,
+    amount: string
+  ): Promise<void> {
+    const userAccounts = AuthController.getUserAccounts(userId);
+    const account = userAccounts.find(a => a.type === accountType);
+    if (!account) throw createError.notFound('Account');
+    const bal = WalletController.getBalance(account.id, asset);
+    const previous = bal.amount;
+    bal.amount = amount;
+    bal.lastUpdated = new Date();
+    balanceChanges.push({
+      id: uuidv4(),
+      balanceId: bal.id,
+      changeType: 'CREDIT',
+      amount,
+      previousAmount: previous,
+      newAmount: amount,
+      reference: 'E2E-SEED',
+      description: `E2E seed ${asset}=${amount} on ${accountType}`,
+      createdAt: new Date(),
+    });
+  }
 }

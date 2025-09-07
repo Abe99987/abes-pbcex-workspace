@@ -4,6 +4,7 @@ import { createError, asyncHandler } from '@/middlewares/errorMiddleware';
 import { AuthenticatedRequest } from '@/middlewares/auth';
 import { logInfo, logError } from '@/utils/logger';
 import { ValidationService } from '@/services/ValidationService';
+import OrdersService from '@/services/OrdersService';
 import { CommodityConfigService } from '@/services/CommodityConfigService';
 import { QuotesService } from '@/services/QuotesService';
 import { db } from '@/db';
@@ -41,6 +42,48 @@ export interface SellConvertRequest {
 }
 
 export class OrdersController {
+  /**
+   * POST /api/orders
+   * Create a new order with a 10-minute price lock
+   */
+  static createOrder = asyncHandler(async (req: any, res: Response) => {
+    const { metal, qty } = req.body as { metal: string; qty: number };
+
+    // minimal validation occurs in route layer; just create
+    const result = await OrdersService.createOrder({ metal, qty });
+    return res.status(201).json(result);
+  });
+
+  /**
+   * POST /api/orders/:id/relock
+   * Relock an order if expired.
+   */
+  static relockOrder = asyncHandler(async (req: any, res: Response) => {
+    const { id } = req.params as { id: string };
+    const outcome = OrdersService.relockOrder(id);
+    if (!outcome.ok) {
+      if (outcome.reason === 'NOT_FOUND') return res.status(404).json({ code: 'NOT_FOUND' });
+      if (outcome.reason === 'NOT_EXPIRED') return res.status(409).json({ code: 'CONFLICT', message: 'Lock not expired' });
+      return res.status(409).json({ code: 'CONFLICT', message: 'Invalid state' });
+    }
+    return res.status(200).json(outcome.result);
+  });
+
+  /**
+   * POST /api/orders/:id/cancel
+   * Cancel an order if not paid/fulfilled.
+   */
+  static cancelOrder = asyncHandler(async (req: any, res: Response) => {
+    const { id } = req.params as { id: string };
+    const outcome = OrdersService.cancelOrder(id);
+    if (!outcome.ok) {
+      if (outcome.reason === 'NOT_FOUND') return res.status(404).json({ code: 'NOT_FOUND' });
+      if (outcome.reason === 'ALREADY_FINALIZED') return res.status(409).json({ code: 'CONFLICT', message: 'Already paid or fulfilled' });
+      return res.status(409).json({ code: 'CONFLICT' });
+    }
+    return res.status(200).json(outcome.result);
+  });
+
   /**
    * POST /api/orders/physical
    * Place physical commodity order

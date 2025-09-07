@@ -71,6 +71,22 @@ export interface ApiResponse<T = unknown> {
   errors?: Array<{ path: string; message: string }>;
 }
 
+// Trade receipt for idempotent buy/sell endpoints
+export interface TradeReceipt {
+  journal_id: string;
+  request_id: string;
+  symbol: string;
+  qty: string;
+  price: number;
+  fee: string;
+  spread_bps: number;
+  ts: string;
+  price_source: string;
+  side: 'BUY' | 'SELL';
+  synthetic_symbol?: string;
+  receipt_v: string;
+}
+
 // Generic API functions
 export const api = {
   // Authentication
@@ -123,6 +139,11 @@ export const api = {
       }),
     placeOrder: (data: TradeOrderData) =>
       apiClient.post<ApiResponse<{ trade: Trade }>>('/api/trade/order', data),
+    // New idempotent trade endpoints
+    buy: (data: { symbol: string; qty: string; slippage?: number; request_id: string }) =>
+      apiClient.post<ApiResponse<TradeReceipt>>('/api/trades/buy', data),
+    sell: (data: { symbol: string; qty: string; slippage?: number; request_id: string }) =>
+      apiClient.post<ApiResponse<TradeReceipt>>('/api/trades/sell', data),
     getHistory: (limit?: number, offset?: number) =>
       apiClient.get<ApiResponse<TradeHistoryResponse>>('/api/trade/history', {
         params: { limit, offset },

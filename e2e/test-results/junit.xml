@@ -1,0 +1,11 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="10.868816">
+<testsuite name="happy-path.e2e.spec.ts" timestamp="2025-09-07T00:32:37.252Z" hostname="chromium" tests="1" failures="0" skipped="0" time="0.552" errors="0">
+<testcase name="signup → KYC approved → seed deposit → trade → balances" classname="happy-path.e2e.spec.ts" time="0.552">
+<system-out>
+<![CDATA[SEED_OK {"email":"user1757205157534@example.com","accounts":{"fundingId":"42d504cb-25c2-432e-9d4d-09fb62d48fa6","tradingId":"e4a3e065-e95c-40ca-a5b5-121537706dab"},"assets":["USD","PAXG","XAU-s"]}
+BAL_IDS {"fundingId":"877f85a9-b9fc-44c6-b4bf-fe6b7c665f87","tradingId":"f35e0048-b92b-4550-b0e6-d3b4d009fa5a"}
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

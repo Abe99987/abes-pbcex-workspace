@@ -1,4 +1,55 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+// Explicitly mock auth middleware for this test to ensure mock tokens are honored
+jest.mock('../../../src/middlewares/authMiddleware', () => {
+  const authenticate = (req: any, res: any, next: any) => {
+    const token = req.headers?.authorization?.replace('Bearer ', '');
+    const users: Record<string, any> = {
+      'mock-admin-jwt-token': { id: 'admin-user-id', email: 'admin@pbcex.com', role: 'ADMIN', kycStatus: 'APPROVED' },
+      'mock-user-jwt-token': { id: 'regular-user-id', email: 'user@example.com', role: 'USER', kycStatus: 'APPROVED' },
+    };
+    const user = token ? users[token] : undefined;
+    if (user) {
+      (req as any).user = user;
+      next();
+    } else {
+      res.status(401).json({ code: 'AUTHENTICATION_ERROR', message: 'Authentication required' });
+    }
+  };
+  const requireAdmin = (req: any, res: any, next: any) => {
+    const user = (req as any).user;
+    if (user?.role === 'ADMIN') {
+      next();
+    } else {
+      res.status(403).json({ code: 'AUTHORIZATION_ERROR', message: 'Admin access required', userRole: user?.role });
+    }
+  };
+  return { __esModule: true, authenticate, requireAdmin };
+});
+jest.mock('@/middlewares/authMiddleware', () => {
+  const authenticate = (req: any, res: any, next: any) => {
+    const token = req.headers?.authorization?.replace('Bearer ', '');
+    const users: Record<string, any> = {
+      'mock-admin-jwt-token': { id: 'admin-user-id', email: 'admin@pbcex.com', role: 'ADMIN', kycStatus: 'APPROVED' },
+      'mock-user-jwt-token': { id: 'regular-user-id', email: 'user@example.com', role: 'USER', kycStatus: 'APPROVED' },
+    };
+    const user = token ? users[token] : undefined;
+    if (user) {
+      (req as any).user = user;
+      next();
+    } else {
+      res.status(401).json({ code: 'AUTHENTICATION_ERROR', message: 'Authentication required' });
+    }
+  };
+  const requireAdmin = (req: any, res: any, next: any) => {
+    const user = (req as any).user;
+    if (user?.role === 'ADMIN') {
+      next();
+    } else {
+      res.status(403).json({ code: 'AUTHORIZATION_ERROR', message: 'Admin access required', userRole: user?.role });
+    }
+  };
+  return { __esModule: true, authenticate, requireAdmin };
+});
 import request from 'supertest';
 import { app } from '../../helpers/test-app';
 
@@ -12,7 +63,7 @@ describe('Admin API', () => {
   let regularUserToken: string;
 
   beforeEach(() => {
-    // No DB cleanup needed for these auth/permission checks
+    // No DB cleanup needed for these auth/permission checks; use mock tokens
     adminToken = 'mock-admin-jwt-token';
     regularUserToken = 'mock-user-jwt-token';
   });

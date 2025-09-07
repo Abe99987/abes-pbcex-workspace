@@ -9,9 +9,10 @@
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
+    "test:e2e:ci": "playwright test --project=chromium --workers=1",
     "test:debug": "playwright test --debug",
     "test:auth": "playwright test tests/auth.e2e.spec.ts",
-    "test:kyc": "playwright test tests/kyc.e2e.spec.ts", 
+    "test:kyc": "playwright test tests/kyc.e2e.spec.ts",
     "test:trade": "playwright test tests/trade.e2e.spec.ts",
     "test:shop": "playwright test tests/shop.e2e.spec.ts",
     "test:support": "playwright test tests/support.e2e.spec.ts",
@@ -43,7 +44,7 @@
   "keywords": [
     "playwright",
     "e2e",
-    "testing", 
+    "testing",
     "pbcex",
     "automation"
   ],

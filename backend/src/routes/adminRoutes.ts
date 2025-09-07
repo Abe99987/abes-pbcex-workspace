@@ -1,14 +1,35 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import { authenticate, requireAdmin } from '@/middlewares/authMiddleware';
 import { validateBody } from '@/utils/validators';
 import { AdminController } from '@/controllers/AdminController';
 import { z } from 'zod';
+import { RATE_LIMITS } from '@/utils/constants';
+import { adminAudit } from '@/middlewares/adminAudit';
+import { AdminAuditService } from '@/services/AdminAuditService';
 
 const router = Router();
 
 // All admin routes require authentication and admin role
 router.use(authenticate);
 router.use(requireAdmin);
+
+// Generic admin limiter to protect sensitive operations
+const adminLimiter = rateLimit({
+  windowMs: RATE_LIMITS.GENERAL.windowMs,
+  max: Math.max(50, Math.floor(RATE_LIMITS.GENERAL.max / 10)),
+  message: {
+    code: 'RATE_LIMITED',
+    message: 'Too many admin requests, please slow down.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+router.use(adminLimiter);
+
+// Record audit for admin write operations
+router.use(adminAudit);
 
 /**
  * GET /api/admin/exposure
@@ -59,27 +80,17 @@ router.get('/metrics', AdminController.getMetrics);
 router.get('/export/balances', AdminController.exportBalancesCsv);
 
 /**
- * GET /api/admin/shop
- * Get shop statistics and inventory
+ * GET /api/admin/kpi/overview
  */
-router.get('/shop',
-  AdminController.getShop
-);
+router.get('/kpi/overview', AdminController.getKpiOverview);
 
 /**
- * POST /api/admin/maintenance
- * Trigger system maintenance operations
+ * GET /api/admin/audit/recent
  */
-router.post('/maintenance',
-  validateBody(z.object({
-    operation: z.enum([
-      'UPDATE_PRICES',
-      'CLEANUP_EXPIRED_QUOTES',
-      'RECALCULATE_BALANCES',
-      'GENERATE_REPORTS',
-    ]),
-  })),
-  AdminController.maintenance
-);
+router.get('/audit/recent', (req, res) => {
+  const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50));
+  const events = AdminAuditService.getRecentEvents(limit);
+  res.json({ code: 'SUCCESS', data: { events } });
+});
 
 export default router;

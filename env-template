@@ -38,6 +38,8 @@ ENCRYPTION_KEY=dev_encryption_key_32_chars_long
 DEV_FAKE_LOGIN=true
 PRICE_UPDATE_MS=3000
 LOG_LEVEL=info
+E2E_TEST_ENABLED=false
+SKIP_ENV_VALIDATION=false
 
 # =======================
 # Market Data & Pricing

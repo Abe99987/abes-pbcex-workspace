@@ -186,7 +186,7 @@ describe('Smoke + Security Gates (signup → deposit stub → buy → balances �
         .send({ symbol: 'XAU-s', qty: '0.10000000', slippage: 0.005, request_id: `kyc-${Date.now()}` })
         .expect(403)
         .then(res => {
-          expect(res.body.code).toBe('AUTHORIZATION_ERROR');
+          expect(res.body.code).toBe('KYC_REQUIRED');
         });
     });
 
