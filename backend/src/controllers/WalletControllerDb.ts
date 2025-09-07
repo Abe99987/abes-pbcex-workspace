@@ -54,6 +54,11 @@ export class WalletControllerDb {
   static getBalances = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.id;
 
+    // E2E test mode: force in-memory fallback to avoid DB/network stalls
+    if (process.env.E2E_TEST_ENABLED === 'true') {
+      return WalletController.getBalances(req, res, () => {});
+    }
+
     if (!db.isConnected()) {
       logWarn('Database not available, falling back to in-memory');
       return WalletController.getBalances(req, res, () => {});

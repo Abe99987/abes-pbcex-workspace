@@ -208,6 +208,20 @@ export const errorHandler: ErrorRequestHandler = (
     appError = handleDatabaseError(error);
   } else if (error.code && error.code.startsWith('LIMIT_')) {
     appError = handleMulterError(error);
+  } else if (
+    error?.type === 'entity.too.large' ||
+    error?.name === 'PayloadTooLargeError' ||
+    error?.status === 413 ||
+    error?.statusCode === 413
+  ) {
+    // Body parser (express.json / urlencoded) payload too large
+    appError = new AppError(
+      'Payload too large',
+      413,
+      API_CODES.VALIDATION_ERROR,
+      true,
+      { limit: '100kb' }
+    );
   } else if (error.code === 'ECONNREFUSED') {
     appError = createError.serviceUnavailable('External service', 'Connection refused');
   } else if (error.code === 'ETIMEDOUT') {

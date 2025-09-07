@@ -49,6 +49,7 @@ import ordersRoutes from '@/routes/ordersRoutes';
 import tradesRoutes from '@/routes/tradesRoutes';
 import moneyMovementRoutes from '@/routes/moneyMovement';
 import ledgerRoutes from '@/routes/ledgerRoutes';
+import testRoutes from '@/routes/testRoutes';
 
 // Import admin terminal modules
 // TODO: Re-enable after fixing TypeScript errors  
@@ -100,6 +101,8 @@ app.use(
       },
     },
     crossOriginEmbedderPolicy: false, // Disable for API server
+    frameguard: { action: 'deny' },
+    referrerPolicy: { policy: 'no-referrer' },
   })
 );
 
@@ -130,14 +133,14 @@ app.use(
 // Body parsing middleware
 app.use(
   express.json({
-    limit: '10mb',
+    limit: '100kb',
     verify: (req, res, buf) => {
       // Store raw body for webhook verification if needed
       (req as { rawBody?: Buffer }).rawBody = buf;
     },
   })
 );
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 
 // General rate limiting
 const generalLimiter = rateLimit({
@@ -200,6 +203,19 @@ app.use('/api', (req, res, next) => {
 
   next();
 });
+
+// E2E timing probes for wallet routes (test-only)
+if (env.NODE_ENV !== 'production' && process.env.E2E_TEST_ENABLED === 'true') {
+  app.use('/api/wallet', (req, res, next) => {
+    const start = Date.now();
+    logInfo('E2E_TIMING_START', { method: req.method, path: req.path, ts: new Date().toISOString() });
+    res.on('finish', () => {
+      const durationMs = Date.now() - start;
+      logInfo('E2E_TIMING_DONE', { method: req.method, path: req.path, status: res.statusCode, durationMs });
+    });
+    next();
+  });
+}
 
 // Health check endpoint with service status
 app.get('/health', async (req, res) => {
@@ -315,6 +331,12 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/trade', tradeRoutes);
 app.use('/api/shop', shopRoutes);
 app.use('/api/admin', adminRoutes);
+
+// Test-only utilities (disabled in production, gated by flag)
+if (env.NODE_ENV !== 'production' && process.env.E2E_TEST_ENABLED === 'true') {
+  logInfo('🧪 Test routes enabled');
+  app.use('/api/test', testRoutes);
+}
 
 // Admin Terminal Routes
 // Admin Terminal Core Routes

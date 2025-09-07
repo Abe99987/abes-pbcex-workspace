@@ -243,6 +243,57 @@ export class AdminController {
   });
 
   /**
+   * GET /api/admin/kpi/overview
+   * Returns simple read-only KPIs for admin tiles
+   */
+  static getKpiOverview = asyncHandler(async (req: Request, res: Response) => {
+    const users = AuthController.getAllUsers();
+    const userCount = users.length;
+
+    const balances = WalletController.getAllBalances();
+    const syntheticAssets = ['XAU-s', 'XAG-s', 'XPT-s', 'XPD-s', 'XCU-s'] as const;
+    const byAsset: Record<string, { exposure: string }> = syntheticAssets.reduce((acc, a) => {
+      acc[a] = { exposure: '0.00000000' };
+      return acc;
+    }, {} as Record<string, { exposure: string }>);
+    for (const b of balances) {
+      if (Object.prototype.hasOwnProperty.call(byAsset, b.asset)) {
+        const current = parseFloat((byAsset as any)[b.asset].exposure);
+        const next = current + parseFloat(b.amount);
+        (byAsset as any)[b.asset].exposure = next.toFixed(8);
+      }
+    }
+
+    let feesAmount = '0';
+    let feesPendingSource = true;
+    try {
+      if (db.isConnected()) {
+        const r = await db.query(
+          `SELECT COALESCE(SUM( (metadata->>'fee')::numeric ),0)::text AS s FROM ledger_journal WHERE (metadata->>'fee') IS NOT NULL`
+        );
+        feesAmount = r.rows[0]?.s || '0';
+        feesPendingSource = false;
+      }
+    } catch {
+      // keep defaults
+    }
+
+    // reservesIOU has no source yet
+    const reserves = { amount: '0', pendingSource: true } as const;
+
+    res.json({
+      code: 'SUCCESS',
+      data: {
+        userCount,
+        byAsset,
+        feesToDate: { amount: feesAmount, pendingSource: feesPendingSource },
+        reservesIOU: reserves,
+        generatedAt: new Date().toISOString(),
+      },
+    });
+  });
+
+  /**
    * GET /api/admin/shop
    * Get shop statistics and inventory
    */

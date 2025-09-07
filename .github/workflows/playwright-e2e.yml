@@ -1,0 +1,163 @@
+name: CI Checks and E2E
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Fast checks (typecheck, lint, backend tests)
+    runs-on: ubuntu-latest
+    env:
+      CI: 'true'
+      SKIP_ENV_VALIDATION: 'true'
+      NODE_ENV: 'test'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint:check
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: ./backend
+
+      - name: Backend tests
+        run: npm run test:ci
+        working-directory: ./backend
+        env:
+          BACKEND_TEST_PATTERN: 'backend/tests/(unit|integration/api)/.*\.test\.ts$'
+
+      - name: Frontend tests
+        run: |
+          npm ci
+          npm run test:ci
+        working-directory: ./frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          NODE_ENV: 'test'
+
+      - name: Upload frontend test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-unit-test-results
+          path: |
+            frontend/junit.xml
+            frontend/coverage/**
+          retention-days: 14
+
+  e2e:
+    name: Playwright E2E (happy path)
+    runs-on: ubuntu-latest
+    needs: checks
+    env:
+      CI: 'true'
+      NODE_ENV: 'development'
+      E2E_TEST_ENABLED: 'true'
+      DEV_FAKE_LOGIN: 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install e2e dependencies
+        run: npm ci
+        working-directory: ./e2e
+
+      - name: Install Playwright browsers
+        uses: microsoft/playwright-github-action@v1
+
+      - name: Start application servers
+        run: bash scripts/dev-e2e.sh > e2e_server.log 2>&1 &
+
+      - name: Wait for servers (frontend:3000, backend:4001)
+        shell: bash
+        run: |
+          set -e
+          timeout=120
+          start=$(date +%s)
+          printf 'Waiting for frontend (3000)';
+          until curl -fsS http://localhost:3000 >/dev/null; do
+            now=$(date +%s)
+            if [ $((now-start)) -ge $timeout ]; then
+              echo "\nFrontend did not become ready within ${timeout}s";
+              echo "--- Last 200 lines of server log ---"
+              tail -n 200 e2e_server.log || true
+              exit 1
+            fi
+            printf '.'; sleep 3
+          done
+          echo " OK"
+
+          printf 'Waiting for backend health (4001/health)';
+          until curl -fsS http://localhost:4001/health >/dev/null; do
+            now=$(date +%s)
+            if [ $((now-start)) -ge $timeout ]; then
+              echo "\nBackend did not become ready within ${timeout}s";
+              echo "--- Last 200 lines of server log ---"
+              tail -n 200 e2e_server.log || true
+              exit 1
+            fi
+            printf '.'; sleep 3
+          done
+          echo " OK"
+
+          if grep -qi "UnhandledPromiseRejection" e2e_server.log; then
+            echo "Detected UnhandledPromiseRejection in server log";
+            tail -n 200 e2e_server.log || true
+            exit 1
+          fi
+
+      - name: Run Playwright (happy path only)
+        working-directory: ./e2e
+        run: npx playwright test tests/happy-path.e2e.spec.ts --project=chromium --workers=1
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: |
+            e2e/test-results/**
+            e2e/playwright-report/**
+            e2e_server.log
+          retention-days: 14
+
+      - name: Diff stat (guardrail)
+        if: always()
+        run: git diff --stat || true
+
+      - name: Kill orphan Node processes
+        if: always()
+        run: pkill -f node || true

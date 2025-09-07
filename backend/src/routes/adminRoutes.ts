@@ -1,14 +1,35 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import { authenticate, requireAdmin } from '@/middlewares/authMiddleware';
 import { validateBody } from '@/utils/validators';
 import { AdminController } from '@/controllers/AdminController';
 import { z } from 'zod';
+import { RATE_LIMITS } from '@/utils/constants';
+import { adminAudit } from '@/middlewares/adminAudit';
+import { AdminAuditService } from '@/services/AdminAuditService';
 
 const router = Router();
 
 // All admin routes require authentication and admin role
 router.use(authenticate);
 router.use(requireAdmin);
+
+// Generic admin limiter to protect sensitive operations
+const adminLimiter = rateLimit({
+  windowMs: RATE_LIMITS.GENERAL.windowMs,
+  max: Math.max(50, Math.floor(RATE_LIMITS.GENERAL.max / 10)),
+  message: {
+    code: 'RATE_LIMITED',
+    message: 'Too many admin requests, please slow down.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+router.use(adminLimiter);
+
+// Record audit for admin write operations
+router.use(adminAudit);
 
 /**
  * GET /api/admin/exposure
@@ -52,6 +73,21 @@ router.get('/trades',
  * GET /api/admin/metrics
  */
 router.get('/metrics', AdminController.getMetrics);
+
+/**
+ * GET /api/admin/kpi/overview
+ */
+router.get('/kpi/overview', AdminController.getKpiOverview);
+
+/**
+ * GET /api/admin/audit/recent
+ * Returns recent admin audit events (read-only)
+ */
+router.get('/audit/recent', (req, res) => {
+  const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50));
+  const events = AdminAuditService.getRecentEvents(limit);
+  res.json({ code: 'SUCCESS', data: { events } });
+});
 
 /**
  * GET /api/admin/export/balances
