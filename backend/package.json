@@ -37,7 +37,7 @@
     "dev:fedex-smoke": "ts-node -r tsconfig-paths/register scripts/dev-fedex-smoke.ts",
     "lint:check": "eslint \"{src,tests}/**/*.ts\" --max-warnings 0",
     "type-check": "tsc --noEmit",
-    "test:ci": "BACKEND_TEST_PATTERN=backend/tests/(unit|integration/api)/.*\\.test\\.ts$ jest --ci --coverage --watchAll=false --runInBand --no-cache --detectOpenHandles=false --forceExit --testPathPattern=$BACKEND_TEST_PATTERN",
+    "test:ci": "BACKEND_TEST_PATTERN=backend/tests/\\(unit\\|integration/api\\)/.*\\.test\\.ts$ jest --ci --coverage --watchAll=false --runInBand --no-cache --detectOpenHandles=false --forceExit --testPathPattern=\"$BACKEND_TEST_PATTERN\"",
     "build:check": "npm run type-check && npm run build",
     "unstick": "pkill -f 'node.*jest' 2>/dev/null || true && npx jest --clearCache && npm ci --prefer-offline --no-audit --no-fund",
     "test:admin-dbless": "npm run unstick && TEST_NO_DB=1 npm run test -- tests/integration/api/admin.api.test.ts --verbose --no-coverage",
