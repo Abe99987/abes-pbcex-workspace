@@ -75,47 +75,18 @@ router.get('/trades',
 router.get('/metrics', AdminController.getMetrics);
 
 /**
+ * GET /api/admin/export/balances
+ */
+router.get('/export/balances', AdminController.exportBalancesCsv);
+
+/**
  * GET /api/admin/kpi/overview
  */
 router.get('/kpi/overview', AdminController.getKpiOverview);
 
 /**
  * GET /api/admin/audit/recent
- * Returns recent admin audit events (read-only)
  */
-router.get('/audit/recent', (req, res) => {
-  const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50));
-  const events = AdminAuditService.getRecentEvents(limit);
-  res.json({ code: 'SUCCESS', data: { events } });
-});
-
-/**
- * GET /api/admin/export/balances
- */
-router.get('/export/balances', AdminController.exportBalancesCsv);
-
-/**
- * GET /api/admin/shop
- * Get shop statistics and inventory
- */
-router.get('/shop',
-  AdminController.getShop
-);
-
-/**
- * POST /api/admin/maintenance
- * Trigger system maintenance operations
- */
-router.post('/maintenance',
-  validateBody(z.object({
-    operation: z.enum([
-      'UPDATE_PRICES',
-      'CLEANUP_EXPIRED_QUOTES',
-      'RECALCULATE_BALANCES',
-      'GENERATE_REPORTS',
-    ]),
-  })),
-  AdminController.maintenance
-);
+router.get('/audit/recent', AdminController.getRecentAudit);
 
 export default router;

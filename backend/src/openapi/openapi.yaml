@@ -741,6 +741,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+components:
+  schemas:
+    TradeReceipt:
+      type: object
+      properties:
+        journal_id:
+          type: string
+          format: uuid
+        request_id:
+          type: string
+        symbol:
+          type: string
+        qty:
+          type: string
+        price:
+          type: number
+        fee:
+          type: string
+        ts:
+          type: string
+          format: date-time
+        price_source:
+          type: string
+        side:
+          type: string
+          enum: [BUY, SELL]
+        synthetic_symbol:
+          type: string
+          nullable: true
+        receipt_v:
+          type: string
+          example: v1
+        spread_bps:
+          type: integer
+          description: Price change vs prior snapshot in basis points
+
   /api/transfers/internal/{id}:
     get:
       tags: [Transfers]
