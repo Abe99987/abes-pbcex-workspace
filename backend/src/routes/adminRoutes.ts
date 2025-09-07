@@ -87,6 +87,10 @@ router.get('/kpi/overview', AdminController.getKpiOverview);
 /**
  * GET /api/admin/audit/recent
  */
-router.get('/audit/recent', AdminController.getRecentAudit);
+router.get('/audit/recent', (req, res) => {
+  const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50));
+  const events = AdminAuditService.getRecentEvents(limit);
+  res.json({ code: 'SUCCESS', data: { events } });
+});
 
 export default router;
