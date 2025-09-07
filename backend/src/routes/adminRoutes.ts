@@ -93,4 +93,9 @@ router.get('/audit/recent', (req, res) => {
   res.json({ code: 'SUCCESS', data: { events } });
 });
 
+/**
+ * GET /api/admin/health/ledger-drift
+ */
+router.get('/health/ledger-drift', AdminController.getLedgerDriftHealth);
+
 export default router;

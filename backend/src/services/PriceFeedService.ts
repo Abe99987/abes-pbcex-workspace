@@ -3,6 +3,7 @@ import WebSocket from 'ws';
 import { logInfo, logWarn, logError } from '@/utils/logger';
 import { env, integrations } from '@/config/env';
 import { createError } from '@/middlewares/errorMiddleware';
+import AlertService from '@/services/AlertService';
 
 /**
  * Price Feed Service for PBCEx
@@ -308,6 +309,11 @@ export class PriceFeedService {
         logError('Error updating slow assets', error as Error);
       }
     }, 30000); // Every 30 seconds
+
+    // Price stall detection every 15 seconds (per SLO spec)
+    setInterval(() => {
+      PriceFeedService.checkPriceStalls();
+    }, 15000); // Every 15 seconds
   }
 
   private static async updateAllPrices(): Promise<void> {
@@ -448,6 +454,32 @@ export class PriceFeedService {
       timestamp: latestTimestamp,
       source: 'TRADINGVIEW', // Primary source
     };
+  }
+
+  /**
+   * Check for price stalls and emit alerts per SLO
+   * Alert threshold: 30 seconds without update
+   */
+  private static checkPriceStalls(): void {
+    const stallThreshold = 30 * 1000; // 30 seconds per SLO
+    const now = Date.now();
+
+    for (const [asset, priceData] of PriceFeedService.priceCache.entries()) {
+      const staleDuration = now - priceData.timestamp.getTime();
+      
+      if (staleDuration > stallThreshold) {
+        const staleDurationSeconds = Math.floor(staleDuration / 1000);
+        
+        logWarn('Price stall detected', {
+          asset,
+          staleDurationSeconds,
+          threshold: 30,
+          lastUpdate: priceData.timestamp.toISOString(),
+        });
+
+        AlertService.emitPriceStall(asset, staleDurationSeconds);
+      }
+    }
   }
 
   /**
