@@ -575,7 +575,7 @@ export default function PnL() {
               <AdvancedChart
                 symbol='XAUUSD'
                 height={400}
-                interval='H'
+                interval='1h'
                 allowSymbolChange={true}
                 studies={['Volume@tv-basicstudies', 'RSI@tv-basicstudies']}
               />
