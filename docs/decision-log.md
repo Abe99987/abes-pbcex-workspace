@@ -35,3 +35,4 @@ Added: /legal hub, /legal/tos, /legal/privacy, /legal/risk-disclosures, /legal/s
 - Root scripts: `e2e:staging` (uses `STAGING_WEB_BASE_URL`), `e2e:report`
 - CI policy: Plan to re-enable “Fast checks” as Required post-merge once green
 - Scope: Frontend/e2e only; no DB schema, auth, payments/custody changes
+- Merge: Squash with message "feat(uat): stabilize SSR region override and align CI summary path"; all required checks green; CodeRabbit approved.
