@@ -19,7 +19,7 @@ export default defineConfig({
     process.env.CI ? ['github'] : ['list'],
   ],
   use: {
-    baseURL: process.env.E2E_BASE_URL || 'http://localhost:3000',
+    baseURL: process.env.E2E_BASE_URL || process.env.BASE_URL || process.env.STAGING_WEB_BASE_URL || 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -38,7 +38,7 @@ export default defineConfig({
     { name: 'mobile-safari', use: { ...devices['iPhone 12'] } },
     { name: 'tablet', use: { ...devices['iPad Pro'] } },
   ],
-  testMatch: '**/*.e2e.spec.ts',
+  testMatch: ['**/*.e2e.spec.ts', 'uat/**/*.spec.ts'],
   globalSetup: fileURLToPath(new URL('./utils/global-setup.min.ts', import.meta.url)),
   globalTeardown: fileURLToPath(new URL('./utils/global-teardown.ts', import.meta.url)),
   outputDir: 'test-results/artifacts',
@@ -48,7 +48,14 @@ export default defineConfig({
     cwd: '../',
     timeout: 180000,
     reuseExistingServer: true,
-    env: { E2E_TEST_ENABLED: 'true', DEV_FAKE_LOGIN: 'true' },
+    env: {
+      E2E_TEST_ENABLED: 'true',
+      DEV_FAKE_LOGIN: 'true',
+      // Pass region gating vars through for local dev UAT
+      PUBLIC_REGION_GATING: process.env.PUBLIC_REGION_GATING || 'off',
+      PUBLIC_SUPPORTED_REGIONS: process.env.PUBLIC_SUPPORTED_REGIONS || 'US,CA,GB',
+      PUBLIC_REGION_MESSAGE: process.env.PUBLIC_REGION_MESSAGE || 'Service availability varies by region. See Supported Regions & Disclosures.',
+    },
   },
   timeout: 30000,
   expect: {
