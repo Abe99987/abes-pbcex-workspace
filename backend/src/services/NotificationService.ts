@@ -4,6 +4,7 @@ import axios from 'axios';
 import { logInfo, logWarn, logError } from '@/utils/logger';
 import { env, integrations } from '@/config/env';
 import { createError } from '@/middlewares/errorMiddleware';
+import AlertService from '@/services/AlertService';
 
 /**
  * Notification Service for PBCEx
@@ -44,12 +45,27 @@ interface NotificationResult {
   messageId?: string;
   error?: string;
   provider: 'SENDGRID' | 'TWILIO' | 'INTERCOM' | 'MOCK';
+  retryCount?: number;
+  exhaustedRetries?: boolean;
+}
+
+interface RetryableNotification {
+  id: string;
+  type: 'email' | 'sms';
+  payload: EmailOptions | SMSOptions;
+  retryCount: number;
+  maxRetries: number;
+  nextRetryAt: Date;
+  lastError?: string;
 }
 
 export class NotificationService {
   private static emailTransporter: nodemailer.Transporter | null = null;
   private static twilioClient: Twilio | null = null;
   private static isInitialized = false;
+  private static retryQueue: Map<string, RetryableNotification> = new Map();
+  private static retryInterval: NodeJS.Timeout | null = null;
+  private static readonly MAX_RETRIES = 3; // Per SLO specification
 
   /**
    * Initialize notification service with all providers
@@ -638,6 +654,209 @@ export class NotificationService {
     });
 
     return results;
+  }
+
+  /**
+   * Send notification with retry logic per SLO
+   */
+  static async sendWithRetry(
+    type: 'email' | 'sms',
+    payload: EmailOptions | SMSOptions
+  ): Promise<NotificationResult> {
+    const notificationId = `${type}_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    
+    try {
+      // Attempt initial send
+      const result = await NotificationService.attemptSend(type, payload);
+      
+      if (result.success) {
+        return result;
+      }
+
+      // If failed, queue for retry
+      const retryNotification: RetryableNotification = {
+        id: notificationId,
+        type,
+        payload,
+        retryCount: 0,
+        maxRetries: NotificationService.MAX_RETRIES,
+        nextRetryAt: NotificationService.calculateNextRetry(0),
+        lastError: result.error,
+      };
+
+      NotificationService.retryQueue.set(notificationId, retryNotification);
+      NotificationService.startRetryProcessor();
+
+      logWarn('Notification failed, queued for retry', {
+        notificationId,
+        type,
+        error: result.error,
+      });
+
+      return {
+        ...result,
+        retryCount: 0,
+      };
+
+    } catch (error) {
+      logError('Notification send failed', error as Error);
+      return {
+        success: false,
+        error: (error as Error).message,
+        provider: 'MOCK',
+        retryCount: 0,
+      };
+    }
+  }
+
+  /**
+   * Process retry queue
+   */
+  private static processRetryQueue(): void {
+    const now = new Date();
+
+    for (const [id, notification] of NotificationService.retryQueue.entries()) {
+      if (now >= notification.nextRetryAt) {
+        NotificationService.retryNotification(id, notification);
+      }
+    }
+  }
+
+  /**
+   * Retry a failed notification
+   */
+  private static async retryNotification(
+    id: string, 
+    notification: RetryableNotification
+  ): Promise<void> {
+    try {
+      const result = await NotificationService.attemptSend(
+        notification.type,
+        notification.payload
+      );
+
+      if (result.success) {
+        logInfo('Notification retry succeeded', { 
+          notificationId: id,
+          retryCount: notification.retryCount + 1,
+        });
+        
+        NotificationService.retryQueue.delete(id);
+        return;
+      }
+
+      // Increment retry count
+      notification.retryCount++;
+      notification.lastError = result.error;
+
+      if (notification.retryCount >= notification.maxRetries) {
+        // Retry exhausted - emit alert
+        const recipient = notification.type === 'email' 
+          ? (notification.payload as EmailOptions).to
+          : (notification.payload as SMSOptions).to;
+
+        AlertService.emitWebhookRetryExhausted(
+          notification.type,
+          recipient,
+          notification.retryCount,
+          notification.lastError || 'Unknown error'
+        );
+
+        logError('Notification retry exhausted', {
+          notificationId: id,
+          type: notification.type,
+          retryCount: notification.retryCount,
+          lastError: notification.lastError,
+        });
+
+        NotificationService.retryQueue.delete(id);
+      } else {
+        // Schedule next retry with exponential backoff
+        notification.nextRetryAt = NotificationService.calculateNextRetry(notification.retryCount);
+        
+        logWarn('Notification retry failed, scheduling next attempt', {
+          notificationId: id,
+          retryCount: notification.retryCount,
+          nextRetryAt: notification.nextRetryAt.toISOString(),
+        });
+      }
+
+    } catch (error) {
+      logError('Error during notification retry', error as Error);
+    }
+  }
+
+  /**
+   * Attempt to send notification (wrapper for existing methods)
+   */
+  private static async attemptSend(
+    type: 'email' | 'sms',
+    payload: EmailOptions | SMSOptions
+  ): Promise<NotificationResult> {
+    if (type === 'email') {
+      return await NotificationService.sendEmail(payload as EmailOptions);
+    } else {
+      return await NotificationService.sendSMS(payload as SMSOptions);
+    }
+  }
+
+  /**
+   * Calculate next retry time with exponential backoff
+   */
+  private static calculateNextRetry(retryCount: number): Date {
+    // Exponential backoff: 1s, 2s, 4s, 8s, etc.
+    const delayMs = Math.min(1000 * Math.pow(2, retryCount), 30000); // Max 30s delay
+    return new Date(Date.now() + delayMs);
+  }
+
+  /**
+   * Start retry processor if not already running
+   */
+  private static startRetryProcessor(): void {
+    if (!NotificationService.retryInterval) {
+      NotificationService.retryInterval = setInterval(() => {
+        NotificationService.processRetryQueue();
+      }, 1000); // Process every second
+
+      logInfo('Notification retry processor started');
+    }
+  }
+
+  /**
+   * Stop retry processor and clear queue
+   */
+  static stopRetryProcessor(): void {
+    if (NotificationService.retryInterval) {
+      clearInterval(NotificationService.retryInterval);
+      NotificationService.retryInterval = null;
+    }
+    
+    NotificationService.retryQueue.clear();
+    logInfo('Notification retry processor stopped');
+  }
+
+  /**
+   * Get retry queue status (for monitoring)
+   */
+  static getRetryQueueStatus(): {
+    queueLength: number;
+    oldestRetry?: Date;
+    retryTypes: Record<string, number>;
+  } {
+    const queue = Array.from(NotificationService.retryQueue.values());
+    const retryTypes: Record<string, number> = {};
+
+    queue.forEach(notification => {
+      retryTypes[notification.type] = (retryTypes[notification.type] || 0) + 1;
+    });
+
+    return {
+      queueLength: queue.length,
+      oldestRetry: queue.length > 0 
+        ? new Date(Math.min(...queue.map(n => n.nextRetryAt.getTime())))
+        : undefined,
+      retryTypes,
+    };
   }
 }
 

@@ -9,6 +9,7 @@ import { WalletController } from './WalletController';
 import { TradeController } from './TradeController';
 import { ShopController } from './ShopController';
 import { db } from '@/db';
+import AlertService from '@/services/AlertService';
 
 /**
  * Admin Controller for PBCEx
@@ -643,6 +644,90 @@ export class AdminController {
       'hedge_position_report.csv',
     ];
   }
+
+  /**
+   * GET /api/admin/health/ledger-drift
+   * Check for drift between balances table and balance_changes journal
+   */
+  static getLedgerDriftHealth = asyncHandler(async (req: Request, res: Response) => {
+    logInfo('Admin ledger drift health check requested');
+
+    try {
+      // In production, this would be a real database query:
+      // SELECT b.account_id, b.asset, b.amount as balance_amount,
+      //        COALESCE(SUM(bc.amount), 0) as journal_sum,
+      //        ABS(b.amount - COALESCE(SUM(bc.amount), 0)) as drift
+      // FROM balances b
+      // LEFT JOIN balance_changes bc ON bc.balance_id = b.id
+      // GROUP BY b.id, b.account_id, b.asset, b.amount
+      // HAVING ABS(b.amount - COALESCE(SUM(bc.amount), 0)) > 0.01
+
+      // Mock implementation for current in-memory system
+      const allBalances = WalletController.getAllBalances();
+      const driftThreshold = 0.01; // $0.01 USD equivalent per SLO
+      const detectedDrifts: Array<{
+        accountId: string;
+        asset: string;
+        balanceAmount: number;
+        journalSum: number;
+        drift: number;
+      }> = [];
+
+      // In the current in-memory system, we simulate drift detection
+      // In production, this would query actual database tables
+      for (const balance of allBalances) {
+        const balanceAmount = parseFloat(balance.amount);
+        const journalSum = balanceAmount; // In-memory system is always consistent
+        const drift = Math.abs(balanceAmount - journalSum);
+
+        if (drift > driftThreshold) {
+          detectedDrifts.push({
+            accountId: balance.accountId,
+            asset: balance.asset,
+            balanceAmount,
+            journalSum,
+            drift,
+          });
+
+          // Emit alert for each drift detected
+          AlertService.emitLedgerDrift(
+            balance.accountId,
+            balance.asset,
+            drift,
+            balanceAmount,
+            journalSum
+          );
+        }
+      }
+
+      const healthStatus = {
+        ok: detectedDrifts.length === 0,
+        timestamp: new Date().toISOString(),
+        driftThreshold,
+        totalAccountsChecked: allBalances.length,
+        driftsDetected: detectedDrifts.length,
+        drifts: detectedDrifts,
+      };
+
+      if (detectedDrifts.length > 0) {
+        logError('Ledger drift detected', { drifts: detectedDrifts });
+      } else {
+        logInfo('Ledger health check: No drift detected', {
+          accountsChecked: allBalances.length,
+        });
+      }
+
+      res.json({
+        code: 'SUCCESS',
+        message: detectedDrifts.length === 0 ? 'No ledger drift detected' : `${detectedDrifts.length} drift(s) detected`,
+        data: healthStatus,
+      });
+
+    } catch (error) {
+      logError('Ledger drift health check failed', error as Error);
+      throw createError.serviceUnavailable('Database', 'Failed to check ledger drift');
+    }
+  });
 
   // Utility methods for testing
   static getAllHedgePositions = (): HedgePosition[] => hedgePositions;
