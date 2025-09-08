@@ -1,5 +1,5 @@
 import React from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 interface ExternalLinkProps {
   href: string;
