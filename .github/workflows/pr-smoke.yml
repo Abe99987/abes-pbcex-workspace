@@ -1,0 +1,57 @@
+name: PR Smoke
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'frontend/**'
+      - 'e2e/**'
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+
+concurrency:
+  group: pr-smoke-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: PR Smoke (Playwright @smoke)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CI: 'true'
+      NODE_ENV: 'development'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install root deps
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Install e2e deps
+        run: npm ci --prefer-offline --no-audit --no-fund
+        working-directory: ./e2e
+
+      - name: Install Playwright browsers
+        uses: microsoft/playwright-github-action@v1
+
+      - name: Run PR smoke
+        run: npm run e2e:smoke
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-smoke-report
+          path: e2e/test-results/html-report
+          retention-days: 7
