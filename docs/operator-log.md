@@ -51,3 +51,19 @@
     - origin/feat/integrations-fedex-twilio-resend-prices
     - origin/integrations-clean-start-2025-08-30-1946
   - Action: Pending approval to prune the above remote branches and local tracking refs.
+
+### Workflow Dry-Runs
+
+- Release Production: tag-triggered run for `v0.0.0-beta-ios-1757351332` → https://github.com/Abe99987/abes-pbcex-workspace/actions/runs/17558555083 (2025-09-08T17:10:10Z → success). Jobs: Build (frontend+backend), Smoke (no-op), Deploy (gated stub). Artifacts: `web-build`, `api-build`, `release-notes`.
+- Rollback Production: cannot dispatch from feature branch via CLI; workflow not present on default branch yet (HTTP 404). Will trigger via `workflow_dispatch` after merge to `main` and record link.
+
+### PR Bundle
+
+- **PR #36**: https://github.com/Abe99987/abes-pbcex-workspace/pull/36 — Bundles production pipeline v1, Public Beta informational badge, and iOS wrapper decision docs. Squash-merged at 2025-09-08T19:55:37Z (commit 717bcb6).
+
+### Rollback (post-merge) run
+
+- **Date**: 2025-09-08T20:00:52Z
+- **Branch**: main
+- **Run URL**: https://github.com/Abe99987/abes-pbcex-workspace/actions/runs/17562567586
+- **Notes**: No-op plan as designed; workflow_dispatch with release_tag=v0.0.0-post-merge-test
