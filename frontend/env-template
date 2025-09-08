@@ -45,3 +45,8 @@ PUBLIC_BETA_LIMITS_JSON=
 # NEXT_PUBLIC_SUPPORTED_REGIONS=US,CA,GB
 # NEXT_PUBLIC_REGION_MESSAGE=Service availability varies by region. See Supported Regions & Disclosures.
 # NEXT_PUBLIC_BETA_MODE=off
+
+# iOS Wrapper Configuration
+PUBLIC_IOS_DEEP_LINK_SCHEME=pbcex
+PUBLIC_EXTERNAL_LINK_HOST_ALLOWLIST=tradingview.com,pbcex.com
+PUBLIC_IOS_WRAPPER=false
