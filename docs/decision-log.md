@@ -27,3 +27,11 @@ Added: /legal hub, /legal/tos, /legal/privacy, /legal/risk-disclosures, /legal/s
 - Legal hub online and accessible
 - Region banner is informational only (non-blocking)
 - Tests added for all legal pages and banner logic
+
+## Sprint 30 — UAT Staging Harness + Fast Checks (2025-09-08)
+
+- Adopted Playwright-based UAT smoke suite with HTML reports (`e2e/test-results/html-report`)
+- Added minimal, test-only region override via `?pbce_region=XX` when `NODE_ENV!=='production'`
+- Root scripts: `e2e:staging` (uses `STAGING_WEB_BASE_URL`), `e2e:report`
+- CI policy: Plan to re-enable “Fast checks” as Required post-merge once green
+- Scope: Frontend/e2e only; no DB schema, auth, payments/custody changes
