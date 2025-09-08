@@ -30,6 +30,6 @@
 
 - **PRs merged**: #31 (f7a5391), #33 (d6ebf22)
 - **Main CI**: ✅ Frontend; ✅ Backend; ✅ CI Summary (PR Smoke runs on PR only)
-- **PR Smoke**: Added pr-smoke.yml; runs 2 @smoke tests on PRs; uploads HTML to `e2e/test-results/html-report`
+- **PR Smoke**: Added pr-smoke.yml; runs 2 @smoke tests on PRs; uploads HTML to `e2e/test-results/html-report`; JUnit at `e2e/test-results/junit.xml`
 - **Staging smoke**: Skipped (no STAGING_WEB_BASE_URL). If set, run: `BASE_URL=$STAGING_WEB_BASE_URL npm run e2e:smoke`
-- **Next**: Monitor PR Smoke for 10 clean PRs; then consider flipping to Required. See follow-up issue.
+- **Next**: Monitor PR Smoke for 10 clean PRs; then consider flipping to Required. See follow-up issue (#34).
