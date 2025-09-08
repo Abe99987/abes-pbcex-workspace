@@ -19,6 +19,27 @@ function useRegionPreference() {
     }
   }, []);
 
+  // Test-only override: allow query param to set region for UAT (non-production only)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') return;
+    try {
+      const search = typeof window !== 'undefined' ? window.location.search : '';
+      const params = new URLSearchParams(search);
+      const override = params.get('pbce_region');
+      if (override) {
+        const normalized = override.toUpperCase();
+        setSelectedRegion(normalized);
+        try {
+          window.localStorage.setItem('userRegion', normalized);
+        } catch {
+          // ignore storage errors
+        }
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, []);
+
   useEffect(() => {
     try {
       window.localStorage.setItem('userRegion', selectedRegion);

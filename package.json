@@ -29,7 +29,8 @@
     "prepare": "husky install",
     "test": "echo 'No frontend tests configured yet'",
     "type-check": "tsc --noEmit",
-    "lint:check": "eslint . --max-warnings 0",
+    "e2e:staging": "cd e2e && BASE_URL=$STAGING_WEB_BASE_URL npx playwright test --config playwright.config.ts",
+    "e2e:report": "cd e2e && npx playwright show-report test-results/html-report",
     "prepush": "npx gitleaks detect --verbose --no-git || exit 0"
   },
   "dependencies": {
@@ -61,7 +62,6 @@
     "@radix-ui/react-toast": "^1.2.1",
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-toggle-group": "^1.1.0",
-    "@radix-ui/react-tooltip": "^1.1.4",
     "@supabase/supabase-js": "^2.56.1",
     "@tanstack/react-query": "^5.56.2",
     "class-variance-authority": "^0.7.1",
