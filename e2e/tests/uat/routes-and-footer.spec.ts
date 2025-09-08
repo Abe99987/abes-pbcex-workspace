@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 const BASE = process.env.E2E_BASE_URL || process.env.BASE_URL || process.env.STAGING_WEB_BASE_URL || 'http://localhost:3000';
 
 test.describe('UAT: Routes and footer links', () => {
-  test('Routes reachability with visible h1', async ({ page, request }) => {
+  test('Routes reachability with visible h1 @smoke', async ({ page, request }) => {
     const routes = [
       '/',
       '/legal',
