@@ -35,7 +35,13 @@ PUBLIC_REGION_GATING=off
 PUBLIC_SUPPORTED_REGIONS=US,CA,GB
 PUBLIC_REGION_MESSAGE=Service availability varies by region. See Supported Regions & Disclosures.
 
+# Public Beta informational gating (purely informational)
+PUBLIC_BETA_MODE=off
+PUBLIC_SUPPORTED_REGIONS=
+PUBLIC_BETA_LIMITS_JSON=
+
 # Alternatively, use Next.js prefixed variants
 # NEXT_PUBLIC_REGION_GATING=off
 # NEXT_PUBLIC_SUPPORTED_REGIONS=US,CA,GB
 # NEXT_PUBLIC_REGION_MESSAGE=Service availability varies by region. See Supported Regions & Disclosures.
+# NEXT_PUBLIC_BETA_MODE=off

@@ -1,0 +1,100 @@
+name: Release Production
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: release-prod-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build (frontend + backend)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install root deps
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Install backend deps
+        working-directory: ./backend
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build:check
+
+      - name: Install frontend deps
+        working-directory: ./frontend
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Create release notes stub
+        run: |
+          echo "PBCEx Release Notes (stub)" > release-notes.txt
+          echo "Tag: $GITHUB_REF" >> release-notes.txt
+          echo "Generated: $(date -u)" >> release-notes.txt
+
+      - name: Upload build artifacts (frontend)
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: |
+            frontend/.next
+            frontend/next.config.js
+            frontend/package.json
+          retention-days: 7
+
+      - name: Upload build artifacts (backend)
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-build
+          path: |
+            backend/dist
+            backend/package.json
+          retention-days: 7
+
+      - name: Upload release notes
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: release-notes.txt
+          retention-days: 30
+
+  smoke:
+    name: Smoke (no-op)
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 3
+    steps:
+      - name: Smoke check
+        run: echo "✅ Smoke OK (no-op)"
+
+  deploy:
+    name: Deploy (gated stub)
+    runs-on: ubuntu-latest
+    needs: smoke
+    environment: production
+    steps:
+      - name: Deployment plan (stub)
+        run: |
+          echo "Production deploy is gated via environment approval."
+          echo "This is a stub step; no deployment executed."

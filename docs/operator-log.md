@@ -33,3 +33,10 @@
 - **PR Smoke**: Added pr-smoke.yml; runs 2 @smoke tests on PRs; uploads HTML to `e2e/test-results/html-report`; JUnit at `e2e/test-results/junit.xml`
 - **Staging smoke**: Skipped (no STAGING_WEB_BASE_URL). If set, run: `BASE_URL=$STAGING_WEB_BASE_URL npm run e2e:smoke`
 - **Next**: Monitor PR Smoke for 10 clean PRs; then consider flipping to Required. See follow-up issue (#34).
+
+## 2025-09-08 — Sprint 31–33 Workstream
+
+- **Release Workflows**: Added `release-prod.yml` and `rollback-prod.yml`. Both are no-op by default; release requires environment approval.
+- **Public Beta**: Informational badge toggled by `PUBLIC_BETA_MODE`/`NEXT_PUBLIC_BETA_MODE`. Links to `/legal/risk-disclosures`.
+- **UAT**: Added `e2e/tests/uat/beta-gating.spec.ts` with @smoke tags. HTML report remains at `e2e/test-results/html-report` (ignored in VCS).
+- **Docs**: Added `docs/release-runbook.md` and `docs/ios-wrapper-decision.md`.
