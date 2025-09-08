@@ -22,3 +22,8 @@
 ## Sprint 28A — Compliance Surface: Legal Hub & Region Gating (2025-09-08)
 
 Added: /legal hub, /legal/tos, /legal/privacy, /legal/risk-disclosures, /legal/supported-regions; footer links; env-driven, non-blocking region banner (PUBLIC_REGION_GATING, PUBLIC_SUPPORTED_REGIONS, PUBLIC_REGION_MESSAGE); tests (unit/integration + light E2E); docs/compliance/readme.md. Scope: frontend-only; no backend or payments changes.
+
+- PR #29 merged successfully (commit 111963a)
+- Legal hub online and accessible
+- Region banner is informational only (non-blocking)
+- Tests added for all legal pages and banner logic
