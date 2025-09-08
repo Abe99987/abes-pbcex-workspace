@@ -85,11 +85,11 @@ describe('Region gating banner logic', () => {
 
   beforeEach(() => {
     jest.resetModules();
-    // @ts-ignore
+    // @ts-expect-error
     delete (global as any).localStorage;
     // Simple localStorage mock
     const store: Record<string, string> = {};
-    // @ts-ignore
+    // @ts-expect-error
     global.localStorage = {
       getItem: (k: string) => store[k] ?? null,
       setItem: (k: string, v: string) => (store[k] = v),
@@ -102,7 +102,7 @@ describe('Region gating banner logic', () => {
 
   afterEach(() => {
     process.env = { ...realEnv };
-    // @ts-ignore
+    // @ts-expect-error
     global.localStorage = realLocalStorage;
   });
 
