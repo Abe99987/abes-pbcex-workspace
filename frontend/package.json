@@ -11,6 +11,7 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "test": "NODE_PATH=../backend/node_modules:../node_modules node ../backend/node_modules/jest/bin/jest.js --config ./jest.config.cjs --runInBand --ci --coverage",
     "test:ci": "NODE_PATH=../backend/node_modules:../node_modules node ../backend/node_modules/jest/bin/jest.js --config ./jest.config.cjs --runInBand --ci --coverage"
   },
   "dependencies": {
