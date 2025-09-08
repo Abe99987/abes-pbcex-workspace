@@ -19,3 +19,9 @@
 - **Report Path**: `e2e/test-results/html-report`
 - **Env Used**: `BASE_URL=http://localhost:3000`; region gating defaults from `frontend/env-template`
 - **Notes**: Artifacts ignored via .gitignore; staging script added (`npm run e2e:staging`).
+
+### PR #30 - Merge Result
+
+- **Squash Commit**: feat(uat): stabilize SSR region override and align CI summary path
+- **CI**: All required checks green; CodeRabbit approved
+- **Summary**: SSR-safe override confined to client-only effect; CI lint/build path alignment; no production behavior changed.
