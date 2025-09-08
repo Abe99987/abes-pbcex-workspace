@@ -3,7 +3,9 @@ import { test, expect } from '@playwright/test';
 const BASE = process.env.E2E_BASE_URL || process.env.BASE_URL || process.env.STAGING_WEB_BASE_URL || 'http://localhost:3000';
 
 test.describe('UAT: Routes and footer links', () => {
+  const isCI = !!process.env.CI;
   test('Routes reachability with visible h1 @smoke', async ({ page, request }) => {
+    test.skip(isCI, 'Skip page navigation in CI (no web server)');
     const routes = [
       '/',
       '/legal',

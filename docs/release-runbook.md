@@ -13,6 +13,14 @@ This runbook defines the release process for promoting builds from staging to pr
 - Required approver: Release Manager (production environment gate)
 - Optional approvers: Backend Lead, Frontend Lead
 
+## Manual Approval Gate: Production Environment
+
+- Deploy job requires GitHub Environments approval for `production`.
+- Ensure approver validates:
+  - Artifact versions match the intended tag
+  - Monitoring dashboards stable (no new alerts)
+  - Rollback readiness confirmed (prior tag available)
+
 ## Freeze Window
 
 - Avoid releases Friday 17:00–Monday 08:00 UTC unless emergency

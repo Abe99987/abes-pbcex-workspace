@@ -43,10 +43,13 @@ We need an iOS wrapper for the authenticated PWA, with App Store compliance, min
 
 - Choose Capacitor wrapper for authenticated PWA
 - Keep native surface minimal; prioritize web functionality
+- Explicitly avoid native in-app payments to reduce App Store review risk
 
 ## Next Steps (Step-2 Spike)
 
-- Prototype Capacitor shell, deep links, and optional push
-- Validate App Store submission checklist and privacy labels
+- Prototype Capacitor shell with:
+  1. Universal links/deep links
+  2. File picker/attachments where needed
+  3. Review App Store policy notes (no native payments), and confirm privacy labels
 - Exercise auth/session flows and external URL handling
 - Document build pipeline for iOS CI
