@@ -20,8 +20,7 @@ on:
         default: false
         type: boolean
 
-# Restrict to iOS build environment
-environment: ios
+# Restrict to iOS build environment (set per-job below)
 
 # Minimal permissions for security
 permissions:
@@ -37,9 +36,10 @@ jobs:
   ios-build-stub:
     name: iOS Build Placeholder
     runs-on: macos-latest
+    environment: ios
 
     # Skip if not ready for iOS builds
-    if: ${{ vars.IOS_BUILD_ENABLED == 'true' }}
+    if: ${{ vars.IOS_WORKFLOW_ENABLED == 'true' }}
 
     timeout-minutes: 60
 
