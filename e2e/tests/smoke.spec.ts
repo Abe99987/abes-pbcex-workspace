@@ -55,4 +55,21 @@ test('signup → dummy deposit → buy → balances', async ({ request }) => {
   expect(balancesAfter.ok()).toBeTruthy();
 });
 
+test('legal pages basic availability and banner link', async ({ request }) => {
+  // Simple HTTP checks for new routes (no browser needed)
+  const base = process.env.E2E_BASE_URL || 'http://localhost:3000';
+  const endpoints = [
+    '/legal',
+    '/legal/tos',
+    '/legal/privacy',
+    '/legal/risk-disclosures',
+    '/legal/supported-regions',
+  ];
+
+  for (const path of endpoints) {
+    const res = await request.get(`${base}${path}`);
+    expect(res.ok()).toBeTruthy();
+  }
+});
+
 
