@@ -25,3 +25,11 @@
 - **Squash Commit**: feat(uat): stabilize SSR region override and align CI summary path
 - **CI**: All required checks green; CodeRabbit approved
 - **Summary**: SSR-safe override confined to client-only effect; CI lint/build path alignment; no production behavior changed.
+
+### Sprint 30 Close — Merge Verify
+
+- **PRs merged**: #31 (f7a5391), #33 (d6ebf22)
+- **Main CI**: ✅ Frontend; ✅ Backend; ✅ CI Summary (PR Smoke runs on PR only)
+- **PR Smoke**: Added pr-smoke.yml; runs 2 @smoke tests on PRs; uploads HTML to `e2e/test-results/html-report`
+- **Staging smoke**: Skipped (no STAGING_WEB_BASE_URL). If set, run: `BASE_URL=$STAGING_WEB_BASE_URL npm run e2e:smoke`
+- **Next**: Monitor PR Smoke for 10 clean PRs; then consider flipping to Required. See follow-up issue.
