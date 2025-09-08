@@ -28,3 +28,14 @@ NEXT_PUBLIC_MIXPANEL_TOKEN=
 
 # Support/Chat
 NEXT_PUBLIC_INTERCOM_APP_ID=
+
+# Region gating (informational banner)
+# Accepts either PUBLIC_* or NEXT_PUBLIC_* variables
+PUBLIC_REGION_GATING=off
+PUBLIC_SUPPORTED_REGIONS=US,CA,GB
+PUBLIC_REGION_MESSAGE=Service availability varies by region. See Supported Regions & Disclosures.
+
+# Alternatively, use Next.js prefixed variants
+# NEXT_PUBLIC_REGION_GATING=off
+# NEXT_PUBLIC_SUPPORTED_REGIONS=US,CA,GB
+# NEXT_PUBLIC_REGION_MESSAGE=Service availability varies by region. See Supported Regions & Disclosures.
