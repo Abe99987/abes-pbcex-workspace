@@ -37,3 +37,11 @@ Added: /legal hub, /legal/tos, /legal/privacy, /legal/risk-disclosures, /legal/s
 - Scope: Frontend/e2e only; no DB schema, auth, payments/custody changes
 - Merges: #31 (docs/UAT notes), #33 (PR Smoke workflow), earlier #30 (UAT harness)
 - Staging smoke: Skipped (no `STAGING_WEB_BASE_URL` in env at close). If provided, run smoke against staging and record report path.
+
+## Sprint 31–33 — Prod Pipeline v1, Public Beta Gating, iOS Wrapper
+
+- Production pipeline skeleton added: `.github/workflows/release-prod.yml` (dispatch + `v*` tags) with build → smoke (no-op) → gated deploy stub
+- Rollback workflow added: `.github/workflows/rollback-prod.yml` (dispatch, prints plan only)
+- Public Beta gating (informational) added: `PUBLIC_BETA_MODE` (+ `NEXT_PUBLIC_BETA_MODE`) shows a "Public Beta" badge with link to disclosures; no blocking behavior
+- UAT e2e added: `e2e/tests/uat/beta-gating.spec.ts` with @smoke-tagged checks for badge off/on and disclosures route 200
+- iOS wrapper decision doc: `docs/ios-wrapper-decision.md` with Capacitor vs RN analysis; provisional decision: Capacitor wrapper for authenticated PWA; no native payments

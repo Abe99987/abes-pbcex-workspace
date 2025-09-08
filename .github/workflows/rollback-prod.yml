@@ -1,0 +1,30 @@
+name: Rollback Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to rollback to (e.g., v1.2.3)'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    name: Print rollback plan (no-op)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show inputs
+        run: |
+          echo "Requested rollback to tag: ${{ github.event.inputs.release_tag }}"
+
+      - name: Plan steps (stub)
+        run: |
+          echo "Planned rollback steps:"
+          echo "1) Verify tag exists and artifacts are available"
+          echo "2) Prepare environment for rollback (maintenance page, cache headers)"
+          echo "3) Deploy backend artifact for ${{ github.event.inputs.release_tag }}"
+          echo "4) Deploy frontend artifact for ${{ github.event.inputs.release_tag }}"
+          echo "5) Run smoke checks and post-rollback verifications"
+          echo "6) Exit maintenance mode"

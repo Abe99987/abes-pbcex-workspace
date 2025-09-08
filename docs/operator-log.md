@@ -33,3 +33,21 @@
 - **PR Smoke**: Added pr-smoke.yml; runs 2 @smoke tests on PRs; uploads HTML to `e2e/test-results/html-report`; JUnit at `e2e/test-results/junit.xml`
 - **Staging smoke**: Skipped (no STAGING_WEB_BASE_URL). If set, run: `BASE_URL=$STAGING_WEB_BASE_URL npm run e2e:smoke`
 - **Next**: Monitor PR Smoke for 10 clean PRs; then consider flipping to Required. See follow-up issue (#34).
+
+## 2025-09-08 — Sprint 31–33 Workstream
+
+- **Release Workflows**: Added `release-prod.yml` and `rollback-prod.yml`. Both are no-op by default; release requires environment approval.
+- **Public Beta**: Informational badge toggled by `PUBLIC_BETA_MODE`/`NEXT_PUBLIC_BETA_MODE`. Links to `/legal/risk-disclosures`.
+- **UAT**: Added `e2e/tests/uat/beta-gating.spec.ts` with @smoke tags. HTML report remains at `e2e/test-results/html-report` (ignored in VCS).
+- **Docs**: Added `docs/release-runbook.md` and `docs/ios-wrapper-decision.md`.
+- **PR Smoke Runtime**: Local CI-mode run completed in ~1.74s with all @smoke tests skipped due to no web server (intended in CI PR job). Upload path unchanged: `e2e/test-results/html-report`.
+- **Branch Hygiene Report**:
+  - main vs origin/main: ahead 0 / behind 0 (linear)
+  - Fully merged remote branches (unique-commit check empty vs origin/main):
+    - origin/chore/coderabbit-config-final
+    - origin/chore/simplify-and-test-phase-1
+    - origin/feat/admin-build-phase-2
+    - origin/feat/chainlink-oracle-integration
+    - origin/feat/integrations-fedex-twilio-resend-prices
+    - origin/integrations-clean-start-2025-08-30-1946
+  - Action: Pending approval to prune the above remote branches and local tracking refs.

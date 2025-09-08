@@ -106,6 +106,25 @@ function RegionGatingBanner() {
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
+      {/* Public Beta informational badge */}
+      {(() => {
+        const betaMode = (process.env.PUBLIC_BETA_MODE || process.env.NEXT_PUBLIC_BETA_MODE || 'off').toLowerCase();
+        if (betaMode === 'on' || betaMode === 'true' || betaMode === '1') {
+          return (
+            <div className='w-full bg-indigo-50 border-b border-indigo-200' role='status' aria-live='polite'>
+              <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between'>
+                <div className='text-indigo-900 text-sm font-medium' data-testid='public-beta-badge'>
+                  Public Beta
+                </div>
+                <div className='text-sm'>
+                  <Link className='underline text-indigo-900' href='/legal/risk-disclosures'>Read disclosures</Link>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        return null;
+      })()}
       <RegionGatingBanner />
       <Component {...pageProps} />
       {/* Global footer navigation */}
