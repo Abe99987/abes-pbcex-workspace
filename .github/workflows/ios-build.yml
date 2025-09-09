@@ -38,9 +38,6 @@ jobs:
     runs-on: macos-latest
     environment: ios
 
-    # Skip if not ready for iOS builds
-    if: ${{ vars.IOS_WORKFLOW_ENABLED == 'true' }}
-
     timeout-minutes: 60
 
     steps:
