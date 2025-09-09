@@ -74,6 +74,12 @@ This document outlines the plan for wrapping the PBCEx web application in an iOS
   - `ASC_KEY_ID`
   - `ASC_API_KEY_P8_BASE64`
 
+### Public Disclosures and ASC Metadata
+
+- Public disclosures page: `/disclosures` (Supported Regions, Privacy baseline, Export stance)
+- ASC metadata source: `docs/asc-metadata.md`
+- Ensure App Privacy answers match the shipped SDK set (MVP: Data Not Collected)
+
 ## External Links Policy
 
 ### Centralized Policy Enforcement
