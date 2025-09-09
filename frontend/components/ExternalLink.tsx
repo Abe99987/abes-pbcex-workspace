@@ -1,5 +1,6 @@
 import React from 'react';
 import { toast } from 'react-hot-toast';
+import { openExternal } from '../lib/wrapperBridge';
 
 interface ExternalLinkProps {
   href: string;
@@ -55,7 +56,7 @@ export default function ExternalLink({
     );
   };
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     const hostname = getHostname(href);
     
     if (!hostname) {
@@ -68,11 +69,12 @@ export default function ExternalLink({
     
     if (!isHostAllowed(hostname, allowlist)) {
       e.preventDefault();
-      toast.error(`External link to ${hostname} is not allowed`);
+      toast.error(`Opening externally: ${hostname}`);
+      await openExternal(href);
       return;
     }
 
-    // Allow the link to proceed - it's in the allowlist
+    // Allow the link to proceed in-app - it's in the allowlist
   };
 
   const target = targetPolicy === 'blank' ? '_blank' : '_self';

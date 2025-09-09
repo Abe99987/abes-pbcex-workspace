@@ -1,3 +1,16 @@
+# Build and cache directories
+.next/
+dist/
+build/
+coverage/
+.eslintcache
+*.tsbuildinfo
+
+# Native platform outputs (never commit)
+ios/build
+ios/Pods
+ios/App/build
+android/build
 # Dependencies
 node_modules/
 .pnp
