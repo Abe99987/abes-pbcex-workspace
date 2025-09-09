@@ -45,8 +45,3 @@ Added: /legal hub, /legal/tos, /legal/privacy, /legal/risk-disclosures, /legal/s
 - Public Beta gating (informational) added: `PUBLIC_BETA_MODE` (+ `NEXT_PUBLIC_BETA_MODE`) shows a "Public Beta" badge with link to disclosures; no blocking behavior
 - UAT e2e added: `e2e/tests/uat/beta-gating.spec.ts` with @smoke-tagged checks for badge off/on and disclosures route 200
 - iOS wrapper decision doc: `docs/ios-wrapper-decision.md` with Capacitor vs RN analysis; provisional decision: Capacitor wrapper for authenticated PWA; no native payments
-
-## Sprint 34 — iOS Wrapper Bundle B Close-Out (2025-09-09)
-
-- AASA hosting finalized: `/.well-known/apple-app-site-association` served by Next static with `Content-Type: application/json`; minimal applinks payload; TeamID placeholder to be replaced when available; short TTL via default static headers
-- Disclosures page shipped: `/disclosures` with Privacy baseline “Data Not Collected”, Export compliance (TLS-only, mass market exemption), and Supported Regions = US (initial)
