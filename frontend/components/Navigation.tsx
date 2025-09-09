@@ -110,6 +110,18 @@ export default function Navigation() {
                 Markets
               </Link>
 
+              {/* Disclosures Link */}
+              <Link
+                href='/disclosures'
+                className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${
+                  router.pathname === '/disclosures'
+                    ? 'border-b-2 border-blue-500 text-gray-900'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Disclosures
+              </Link>
+
               {/* Wallet Dropdown */}
               <div className='relative'>
                 <button

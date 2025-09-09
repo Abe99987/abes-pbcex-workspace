@@ -4,129 +4,37 @@
 
 This document outlines the privacy labels required for the PBCEx iOS app submission to the Apple App Store, based on current data collection practices and planned iOS wrapper functionality.
 
-## Data Collection Summary
+## Data Collection Summary (MVP Baseline)
 
-### Data Linked to User Identity
+For the initial iOS wrapper MVP, we will declare **Data Not Collected** in App Store Connect. All data collection toggles are OFF by default. Future phases may enable optional services below.
 
-#### Contact Info
+| Data Category           | Examples               | Current State                      |
+| ----------------------- | ---------------------- | ---------------------------------- |
+| Contact Info            | Email, phone           | Not Collected                      |
+| Financial Info          | Payments, balances     | Not Collected (no native payments) |
+| Identifiers             | User/device IDs        | Not Collected                      |
+| Usage Data              | Product interaction    | Not Collected                      |
+| Diagnostics             | Crash/performance logs | Not Collected                      |
+| Location                | Precise/coarse         | Not Collected                      |
+| Contacts                | Address book           | Not Collected                      |
+| User Content            | Photos, videos, audio  | Not Collected                      |
+| Browsing/Search History | Web/app history        | Not Collected                      |
+| Sensitive Info          | Health, biometrics     | Not Collected                      |
 
-- **Email Addresses**: ✅ Collected
-  - **Purpose**: Account creation, authentication, support communications
-  - **Linked to User**: Yes
-  - **Used for Tracking**: No
+### Future Optional Toggles (OFF by default)
 
-#### Financial Info
+- Sentry (crash/error logs) — OFF
+- Analytics (GA/Mixpanel/etc.) — OFF
+- Native payments (Apple Pay/IAP) — DISABLED; web-based payments only
 
-- **Financial Info**: ✅ Collected
-  - **Purpose**: Trading account management, transaction history, portfolio tracking
-  - **Types**: Account balances, transaction records, trading positions
-  - **Linked to User**: Yes
-  - **Used for Tracking**: No
+## Third-Party Data Sharing (MVP)
 
-#### Identifiers
+- No third‑party analytics or ad tracking enabled
+- No native payments; web-based checkout only
 
-- **User ID**: ✅ Collected
-  - **Purpose**: Account identification, session management
-  - **Linked to User**: Yes
-  - **Used for Tracking**: No
+## Data Retention and Deletion (MVP)
 
-#### Usage Data
-
-- **Product Interaction**: ✅ Collected
-  - **Purpose**: App functionality, user experience improvement
-  - **Types**: Trading actions, page views, feature usage
-  - **Linked to User**: Yes
-  - **Used for Tracking**: No
-
-#### Diagnostics
-
-- **Crash Data**: ✅ Collected
-  - **Purpose**: App stability and performance improvement
-  - **Linked to User**: No
-  - **Used for Tracking**: No
-
-- **Performance Data**: ✅ Collected
-  - **Purpose**: App optimization and debugging
-  - **Linked to User**: No
-  - **Used for Tracking**: No
-
-- **Other Diagnostic Data**: ✅ Collected
-  - **Purpose**: Error logging and system diagnostics
-  - **Linked to User**: No
-  - **Used for Tracking**: No
-
-### Data NOT Linked to User Identity
-
-#### Location
-
-- **Precise Location**: ❌ Not Collected
-- **Coarse Location**: ❌ Not Collected
-
-#### Sensitive Info
-
-- **Sensitive Info**: ❌ Not Collected
-  - **Note**: Financial data is collected but handled under "Financial Info" category
-
-#### Health & Fitness
-
-- **Health**: ❌ Not Collected
-- **Fitness**: ❌ Not Collected
-
-#### Contacts
-
-- **Contacts**: ❌ Not Collected
-
-#### User Content
-
-- **Photos or Videos**: ❌ Not Collected
-- **Audio Data**: ❌ Not Collected
-- **Gameplay Content**: ❌ Not Collected
-- **Customer Support**: ✅ May be Collected
-  - **Purpose**: Customer service and support
-  - **Linked to User**: Yes (when user initiates support request)
-
-#### Search History
-
-- **Search History**: ❌ Not Collected
-
-#### Browsing History
-
-- **Browsing History**: ❌ Not Collected
-
-## Third-Party Data Sharing
-
-### Analytics and Performance
-
-- **No third-party analytics tracking**: Currently no Google Analytics, Mixpanel, or similar services actively collecting data
-- **TradingView widgets**: External chart widgets may collect usage data per their privacy policy
-- **Supabase**: Authentication and database services - data processed per service agreement
-
-### Advertising
-
-- **No advertising networks**: App does not display third-party advertisements
-- **No advertising tracking**: No advertising identifiers collected or shared
-
-### Payment Processing
-
-- **Stripe**: Payment processing handled through web interface
-- **No native payments**: iOS app does not implement Apple Pay or In-App Purchases
-
-## Data Retention and Deletion
-
-### User Account Data
-
-- **Retention Period**: Retained while account is active plus regulatory requirements (typically 7 years for financial records)
-- **Deletion Process**: Users can request account deletion through customer support
-
-### Diagnostic Data
-
-- **Retention Period**: 90 days for crash logs and performance data
-- **Automatic Deletion**: Diagnostic data automatically purged after retention period
-
-### Session Data
-
-- **Retention Period**: 30 days for active sessions
-- **Automatic Cleanup**: Session data cleared on logout or expiration
+- No diagnostic/analytics collection; nothing retained beyond standard web session data
 
 ## Data Security Measures
 
@@ -147,57 +55,24 @@ This document outlines the privacy labels required for the PBCEx iOS app submiss
 - **SOC 2 Type II**: Backend infrastructure compliance
 - **Financial Regulations**: Compliance with applicable financial data protection requirements
 
-## iOS-Specific Data Handling
+## iOS-Specific Data Handling (MVP)
 
-### Native iOS Features
-
-- **Keychain**: Secure storage for authentication tokens
-- **Background App Refresh**: Limited to essential data updates
-- **Push Notifications**: If implemented, will require user consent
-
-### Permissions
-
-- **Camera**: Not requested
-- **Microphone**: Not requested
-- **Location**: Not requested
-- **Contacts**: Not requested
-- **Photos**: Not requested
+- No native permissions requested
+- No push notifications
 
 ## Privacy Policy Links
 
-### App Store Submission
+- Privacy URL (placeholder): https://pbcex.com/disclosures
+- Terms of Service: https://pbcex.com/legal/tos
 
-- **Privacy Policy URL**: https://pbcex.com/legal/privacy
-- **Terms of Service URL**: https://pbcex.com/legal/tos
+## Tracking Disclosure (MVP)
 
-### In-App Links
+- No cross‑app tracking; ATT not applicable
 
-- Privacy policy accessible through app settings
-- Terms of service accessible during account creation and in app footer
+## Age Rating and Geographic Scope (MVP)
 
-## Tracking Disclosure
-
-### Cross-App Tracking
-
-- **Status**: Does NOT track users across apps and websites owned by other companies
-- **App Tracking Transparency**: Not applicable as no cross-app tracking occurs
-
-### First-Party Tracking
-
-- **Internal Analytics**: Limited to app functionality and user experience improvement
-- **No Behavioral Profiling**: Data not used for behavioral advertising or profiling
-
-## Age Rating and Restrictions
-
-### Age Rating
-
-- **Minimum Age**: 18+ (financial services restriction)
-- **Age Verification**: Required during account creation
-
-### Geographic Restrictions
-
-- **Supported Regions**: US, CA, GB (configurable via environment variables)
-- **Compliance**: Regional financial regulations compliance
+- Intended age rating: 4+ (App Store Connect target) — app content is informational; trading features gated by web account eligibility
+- Supported Regions (app wrapper scope): United States (initial)
 
 ## Updates and Changes
 
