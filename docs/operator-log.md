@@ -12,6 +12,16 @@
 - **Test Coverage**: 100% (20/20 frontend tests passing)
 - **Notes**: Backend test failures in PR were infrastructure-related (DB connectivity); admin merge used. iOS workflow visible in Actions tab.
 
+### Bundle B Close-Out — AASA + Disclosures
+
+- **PRs**: #38, #39
+- **Merge SHAs**: #38 → d05eadc; #39 → a6ac70e
+- **Required Checks**: Frontend (lint+build+test) ✅, Backend (lint+build+test) ✅, CI Summary ✅, CodeRabbit ✅
+- **FastChecks**: ❌ non-blocking; unrelated backend tests
+- **Endpoints**: `/.well-known/apple-app-site-association` (200 JSON), `/disclosures` (200; includes “Supported Regions”, “Export Compliance”)
+- **Staging Smoke**: Pending (no STAGING_WEB_BASE_URL configured); local sanity OK
+- **Follow-ups**: Replace AASA TeamID placeholder; finalize ASC contacts/URLs; store ASC\_\* secrets in GitHub Environments
+
 ## 2025-09-08
 
 ### PR #29 - Compliance Surface Merge
