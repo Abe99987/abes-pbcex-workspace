@@ -12,6 +12,24 @@
 
 # Operator Log
 
+## Step-36 operational notes
+
+- PR #40 merged: scaffold (Capacitor config, entitlements patch, wrapper bridge, deeplink page). Gates: Frontend/Backend CI green; CodeRabbit passed.
+- PR #41 merged: M3 placeholders (icon/splash) and wrapper plan doc. Auto-merge after CodeRabbit; no platform artifacts committed.
+- Branch hygiene: pruned `feat/ios-step36-capacitor-scaffold` and `feat/ios-step36-m3-icons` (local+remote).
+
+## Tooling hygiene
+
+- Added `.nvmrc` with Node 20 to eliminate EBADENGINE warnings; current local Node v24.6.0 (recommend `nvm use` for consistency).
+- Pre-push hook runs `npx gitleaks detect --verbose --no-git || exit 0`; if the gitleaks binary is not installed locally the hook logs a warning and exits non-blocking by design.
+- TypeScript and ESLint remain clean after Node version pin.
+
+## Step-36 complete
+
+- PR #42 merged: M4 UAT tests (deeplink fallback, external-links policy placeholder). CodeRabbit auto-merge successful.
+- PR #44 merged: Node 20 pin via .nvmrc and gitleaks documentation. CodeRabbit auto-merge successful.
+- Zero open PRs for Step-36.
+
 ## 2025-09-09
 
 ### PR #37 - iOS Wrapper Prework (Bundle A)
