@@ -1,0 +1,192 @@
+name: iOS Build (Manual)
+
+# Manual workflow for iOS app builds
+# Triggered only when Apple Developer credentials are available
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build Type'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      skip_tests:
+        description: 'Skip tests'
+        required: false
+        default: false
+        type: boolean
+
+# Restrict to iOS build environment (set per-job below)
+
+# Minimal permissions for security
+permissions:
+  contents: read
+  actions: read
+
+# Ensure only one iOS build runs at a time
+concurrency:
+  group: ios-build
+  cancel-in-progress: true
+
+jobs:
+  ios-build-stub:
+    name: iOS Build Placeholder
+    runs-on: macos-latest
+    environment: ios
+
+    # Skip if not ready for iOS builds
+    if: ${{ vars.IOS_WORKFLOW_ENABLED == 'true' }}
+
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup npm
+        run: |
+          npm --version
+          echo "Using npm $(npm --version) with Node $(node --version)"
+
+      - name: Environment Check
+        run: |
+          echo "🍎 iOS Build Environment Check"
+          echo "Build Type: ${{ inputs.build_type }}"
+          echo "Skip Tests: ${{ inputs.skip_tests }}"
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Xcode Version: $(xcode-select -p)"
+
+      - name: Install Dependencies (Stub)
+        run: |
+          echo "📦 Installing dependencies..."
+          echo "npm ci would run here when ready"
+          echo "Dependencies installation placeholder"
+
+      - name: Environment Configuration (Stub)
+        run: |
+          echo "⚙️ Configuring build environment..."
+          echo "Build type: ${{ inputs.build_type }}"
+          case "${{ inputs.build_type }}" in
+            "development")
+              echo "Development build configuration"
+              ;;
+            "staging")
+              echo "Staging build configuration"
+              ;;
+            "production")
+              echo "Production build configuration"
+              ;;
+          esac
+
+      - name: TypeScript Check (Stub)
+        if: ${{ !inputs.skip_tests }}
+        run: |
+          echo "🔍 TypeScript compilation check..."
+          echo "tsc --noEmit would run here"
+
+      - name: Lint Check (Stub)
+        if: ${{ !inputs.skip_tests }}
+        run: |
+          echo "🧹 ESLint check..."
+          echo "npm run lint would run here"
+
+      - name: Unit Tests (Stub)
+        if: ${{ !inputs.skip_tests }}
+        run: |
+          echo "🧪 Running unit tests..."
+          echo "npm run test would run here"
+
+      - name: Build Web App (Stub)
+        run: |
+          echo "🏗️ Building web application..."
+          echo "Next.js build for static export would run here"
+          echo "Build output would be in 'out' directory"
+
+      - name: Capacitor Setup (Stub)
+        run: |
+          echo "⚡ Setting up Capacitor..."
+          echo "npx cap init would run here when ready"
+          echo "App ID: com.pbcex.app (placeholder)"
+          echo "App Name: PBCEx"
+
+      - name: iOS Platform Setup (Stub)
+        run: |
+          echo "📱 Adding iOS platform..."
+          echo "npx cap add ios would run here"
+          echo "iOS project would be created in ios/ directory"
+
+      - name: Sync Web Assets (Stub)
+        run: |
+          echo "🔄 Syncing web assets to iOS..."
+          echo "npx cap sync ios would run here"
+          echo "Web assets copied to iOS project"
+
+      - name: iOS Build (Stub)
+        run: |
+          echo "🍎 Building iOS app..."
+          echo "xcodebuild would run here with proper certificates"
+          echo "Build for device/simulator based on configuration"
+          echo ""
+          echo "⚠️  iOS build pending Apple Developer credentials"
+          echo "📋 Required setup:"
+          echo "   - Apple Developer account enrollment"
+          echo "   - iOS development certificates"
+          echo "   - App ID and provisioning profiles"
+          echo "   - Xcode project configuration"
+
+      - name: Archive and Export (Stub)
+        if: ${{ inputs.build_type != 'development' }}
+        run: |
+          echo "📦 Creating iOS archive..."
+          echo "xcodebuild archive would run here"
+          echo "Export for App Store Connect or TestFlight"
+
+      - name: Build Summary
+        run: |
+          echo "✅ iOS Build Workflow Complete (Stub Mode)"
+          echo ""
+          echo "📊 Build Summary:"
+          echo "   Build Type: ${{ inputs.build_type }}"
+          echo "   Tests Skipped: ${{ inputs.skip_tests }}"
+          echo "   Status: Placeholder - Awaiting Apple Credentials"
+          echo ""
+          echo "🎯 Next Steps:"
+          echo "   1. Complete Apple Developer enrollment"
+          echo "   2. Set up development certificates"
+          echo "   3. Configure repository secrets for iOS signing"
+          echo "   4. Enable IOS_BUILD_ENABLED variable"
+          echo "   5. Run actual iOS build workflow"
+
+      # Upload build artifacts (stub)
+      - name: Upload Build Artifacts (Stub)
+        if: ${{ inputs.build_type != 'development' }}
+        run: |
+          echo "📤 Upload artifacts placeholder..."
+          echo "IPA file would be uploaded to artifacts"
+          echo "Build logs and reports would be preserved"
+
+  # Notification job (stub)
+  notify-completion:
+    name: Notify Build Completion
+    runs-on: ubuntu-latest
+    needs: ios-build-stub
+    if: always()
+
+    steps:
+      - name: Build Status Notification
+        run: |
+          echo "📢 iOS Build Notification (Stub)"
+          echo "Build Status: ${{ needs.ios-build-stub.result }}"
+          echo "Notification would be sent to team when ready"
