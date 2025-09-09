@@ -55,7 +55,7 @@ async function main() {
       if (!updated.includes(link)) {
         updated = updated.replace(
           /<key>com\.apple\.developer\.associated-domains<\/key>\s*<array>/,
-          match => `${match}\n\t\t<string>${link}<\/string>`
+          match => `${match}\n\t\t<string>${link}</string>`
         );
       }
     }
