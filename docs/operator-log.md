@@ -1,3 +1,9 @@
+### Step-36 operational notes
+
+- PR #40 merged: scaffold (Capacitor config, entitlements patch, wrapper bridge, deeplink page). Gates: Frontend/Backend CI green; CodeRabbit passed.
+- PR #41 merged: M3 placeholders (icon/splash) and wrapper plan doc. Auto-merge after CodeRabbit; no platform artifacts committed.
+- Branch hygiene: pruned `feat/ios-step36-capacitor-scaffold` and `feat/ios-step36-m3-icons` (local+remote). Next: M4 tests as a tiny draft PR (tests-only).
+
 # Operator Log
 
 ## 2025-09-09
