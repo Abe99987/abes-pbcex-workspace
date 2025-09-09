@@ -1,3 +1,9 @@
+## Step-36 (iOS wrapper scaffold)
+
+- Adopted minimal Capacitor scaffold without committing platform trees (PR #40). Server URL via `STAGING_WEB_BASE_URL` with localhost fallback. Added `scripts/ios/patch-entitlements.ts` to manage Associated Domains.
+- External link policy centralized: `ExternalLink` routes non-allowlisted hosts via wrapper bridge; allowlist defaults `pbcex.com,tradingview.com`. Added deeplink page `/deeplink/open` with fallback.
+- M3 placeholders added (PR #41): `assets/mobile/icon.png` (1024), `assets/mobile/splash.png` (2732) and `docs/ios-wrapper-plan.md`. Real assets to follow post-enrollment.
+
 # Decision Log
 
 ## Sprint 27 — Alerts and Error Budgets (PR #28)

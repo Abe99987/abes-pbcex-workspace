@@ -1,3 +1,15 @@
+### Step-36 operational notes
+
+- PR #40 merged: scaffold (Capacitor config, entitlements patch, wrapper bridge, deeplink page). Gates: Frontend/Backend CI green; CodeRabbit passed.
+- PR #41 merged: M3 placeholders (icon/splash) and wrapper plan doc. Auto-merge after CodeRabbit; no platform artifacts committed.
+- Branch hygiene: pruned `feat/ios-step36-capacitor-scaffold` and `feat/ios-step36-m3-icons` (local+remote). Next: M4 tests as a tiny draft PR (tests-only).
+
+### Tooling hygiene
+
+- Added `.nvmrc` with Node 20 to eliminate EBADENGINE warnings; current local Node v24.6.0 (recommend `nvm use` for consistency).
+- Pre-push script uses `npx gitleaks detect --verbose --no-git || exit 0`; gitleaks binary not available as npm package, so "could not determine executable" is expected and non-blocking.
+- TypeScript and ESLint remain clean after Node version pin.
+
 # Operator Log
 
 ## 2025-09-09
