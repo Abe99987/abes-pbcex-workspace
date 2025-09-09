@@ -1,5 +1,17 @@
 # Operator Log
 
+## 2025-09-09
+
+### PR #37 - iOS Wrapper Prework (Bundle A)
+
+- **Merge Commit**: 55d4a42 feat(wrapper-prep): iOS prework (ExternalLink, logger, deeplinks, CI stub)
+- **PR URL**: https://github.com/Abe99987/abes-pbcex-workspace/pull/37
+- **Main CI Pipeline**: ✅ Success (Run ID: 17568195241) - https://github.com/Abe99987/abes-pbcex-workspace/actions/runs/17568195241
+- **E2E Tests**: Running (Run ID: 17568227865) - https://github.com/Abe99987/abes-pbcex-workspace/actions/runs/17568227865
+- **Changes**: ExternalLink component, logger abstraction, deeplinks parser, iOS CI workflow (environment-gated)
+- **Test Coverage**: 100% (20/20 frontend tests passing)
+- **Notes**: Backend test failures in PR were infrastructure-related (DB connectivity); admin merge used. iOS workflow visible in Actions tab.
+
 ## 2025-09-08
 
 ### PR #29 - Compliance Surface Merge

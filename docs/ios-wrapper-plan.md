@@ -61,6 +61,19 @@ This document outlines the plan for wrapping the PBCEx web application in an iOS
 - Fallback to default routes when parameters are missing
 - Invalid routes are rejected gracefully
 
+### Universal Links and AASA
+
+- AASA hosting location: `frontend/public/.well-known/apple-app-site-association`
+- Minimal applinks config with path prefix `/app/*` and placeholder app ID `ABCDE12345.com.pbcex.app` (replace with real Team ID)
+- Served by Next.js static files; route is `/.well-known/apple-app-site-association`
+
+### Secrets and Environments (names only)
+
+- GitHub Environments should store:
+  - `ASC_ISSUER_ID`
+  - `ASC_KEY_ID`
+  - `ASC_API_KEY_P8_BASE64`
+
 ## External Links Policy
 
 ### Centralized Policy Enforcement

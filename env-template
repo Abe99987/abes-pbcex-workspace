@@ -120,6 +120,16 @@ API_BASE_URL=http://localhost:3000
 APP_BASE_URL=http://localhost:8080
 COINGECKO_BASE_URL=https://api.coingecko.com/api/v3
 
+# =======================
+# Apple App Store Connect (placeholders only — store real values in secrets)
+# =======================
+# ASC_ISSUER_ID: App Store Connect API issuer UUID (e.g., 69b5d7b0-xxxx-xxxx-xxxx-1a2b3c4d5e6f)
+ASC_ISSUER_ID=
+# ASC_KEY_ID: App Store Connect API key ID (e.g., 1A2BC3D4E5)
+ASC_KEY_ID=
+# ASC_API_KEY_P8_BASE64: Base64 of the .p8 private key contents (single line)
+ASC_API_KEY_P8_BASE64=
+
 # Price-Lock Configuration
 PRICELOCK_SPREAD_BPS=50
 
