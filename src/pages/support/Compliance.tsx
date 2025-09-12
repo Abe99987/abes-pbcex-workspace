@@ -104,7 +104,7 @@ const Compliance = () => {
             </Card>
 
             <div className='mt-12 text-center'>
-              <Card className='shadow-xl border-border/50 rounded-2xl bg-gradient-to-r from-gold/10 to-gold-light/10 border-gold/20'>
+              <Card className='shadow-xl border-gold/20 rounded-2xl bg-gradient-to-r from-gold/10 to-gold-light/10'>
                 <CardContent className='p-8'>
                   <h3 className='text-xl font-semibold mb-4'>
                     Regulatory Excellence
