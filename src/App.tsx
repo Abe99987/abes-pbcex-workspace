@@ -3,7 +3,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import Index from './pages/Index';
 import Trading from './pages/Trading';
@@ -153,7 +153,11 @@ const App = () => (
               path='/legal/terms-of-service'
               element={<TermsOfService />}
             />
-            <Route path='/legal/regulatory' element={<Regulatory />} />
+            {/* Redirect legacy regulatory path to disclosures */}
+            <Route
+              path='/legal/regulatory'
+              element={<Navigate to='/disclosures' replace />}
+            />
             <Route path='/legal/licenses' element={<Licenses />} />
             <Route path='/health' element={<Health />} />
             {/* Development-only routes */}

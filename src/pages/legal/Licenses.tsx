@@ -88,7 +88,7 @@ const Licenses = () => {
                   {currentLicenses.map(license => (
                     <Card
                       key={`${license.type}-${license.jurisdiction}`}
-                      className='shadow-xl border-border/50 rounded-2xl'
+                      className='shadow-xl border border-border/50 rounded-2xl'
                     >
                       <CardContent className='p-6'>
                         <div className='flex items-start justify-between'>
@@ -122,7 +122,7 @@ const Licenses = () => {
                   {inProgress.map(license => (
                     <Card
                       key={`${license.type}-${license.jurisdiction}`}
-                      className='shadow-xl border-border/50 rounded-2xl'
+                      className='shadow-xl border border-border/50 rounded-2xl'
                     >
                       <CardContent className='p-6'>
                         <div className='flex items-start justify-between'>
@@ -156,7 +156,7 @@ const Licenses = () => {
                   {certifications.map(cert => (
                     <Card
                       key={cert.name}
-                      className='shadow-xl border-border/50 rounded-2xl'
+                      className='shadow-xl border border-border/50 rounded-2xl'
                     >
                       <CardContent className='p-6'>
                         <div className='flex items-start justify-between'>
@@ -205,7 +205,7 @@ const Licenses = () => {
               </Card>
 
               <div className='text-center'>
-                <Card className='shadow-xl border-border/50 rounded-2xl bg-gradient-to-r from-gold/10 to-gold-light/10 border-gold/20'>
+                <Card className='shadow-xl border-gold/20 rounded-2xl bg-gradient-to-r from-gold/10 to-gold-light/10'>
                   <CardContent className='p-8'>
                     <h3 className='text-xl font-semibold mb-4'>
                       Licensing Updates
@@ -217,16 +217,15 @@ const Licenses = () => {
                     </p>
                     <div className='flex flex-col sm:flex-row gap-4 justify-center'>
                       <Button
-                        onClick={() =>
-                          (window.location.href = '/legal/regulatory')
-                        }
+                        onClick={() => (window.location.href = '/disclosures')}
                       >
                         View Regulatory Framework
                       </Button>
                       <Button
                         variant='outline'
                         onClick={() =>
-                          (window.location.href = 'mailto:legal@pbcex.com')
+                          // Switch back to legal@pbcex.com once alias is created
+                          (window.location.href = 'mailto:contact@pbcex.com')
                         }
                       >
                         Contact Legal Team
