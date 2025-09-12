@@ -20,6 +20,7 @@ import {
   TrendingUp,
   BarChart3,
   ExternalLink,
+  Settings,
 } from 'lucide-react';
 
 interface BotConfig {
