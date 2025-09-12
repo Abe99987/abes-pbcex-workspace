@@ -50,6 +50,8 @@ import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import TermsOfService from './pages/legal/TermsOfService';
 import Regulatory from './pages/legal/Regulatory';
 import Licenses from './pages/legal/Licenses';
+import LegalList from './pages/legal/LegalList';
+import LegalView from './pages/legal/LegalView';
 import Health from './pages/Health';
 import NotFound from './pages/NotFound';
 import AdminTrade from './pages/AdminTrade';
@@ -148,6 +150,8 @@ const App = () => (
             <Route path='/support/help-center' element={<HelpCenter />} />
             <Route path='/support/security' element={<Security />} />
             <Route path='/support/compliance' element={<Compliance />} />
+            <Route path='/legal' element={<LegalList />} />
+            <Route path='/legal/:slug' element={<LegalView />} />
             <Route path='/legal/privacy-policy' element={<PrivacyPolicy />} />
             <Route
               path='/legal/terms-of-service'

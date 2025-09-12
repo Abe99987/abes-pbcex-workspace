@@ -27,8 +27,9 @@ const Footer = () => {
   const legalLinks = [
     { label: 'Privacy Policy', href: '/legal/privacy-policy' },
     { label: 'Terms of Service', href: '/legal/terms-of-service' },
-    { label: 'Regulatory', href: '/legal/regulatory' },
-    { label: 'Licenses', href: '/legal/licenses' },
+    { label: 'Privacy Choices', href: '/legal/privacy-choices' },
+    { label: 'Accessibility', href: '/legal/accessibility' },
+    { label: 'Disclosures', href: '/legal/risk-disclosures' },
   ];
 
   return (
@@ -136,16 +137,17 @@ const Footer = () => {
         <div className='flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0'>
           <div className='flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-secondary-foreground/70'>
             <div className='flex items-center space-x-2'>
+              <span>PBCEx, Inc. — People's Bank & Commodities Exchange</span>
+            </div>
+            <div className='flex items-center space-x-2'>
               <Mail className='h-4 w-4' />
-              <span>contact@pbcex.com</span>
+              <span>
+                contact@pbcex.com • privacy@pbcex.com • support@pbcex.com
+              </span>
             </div>
             <div className='flex items-center space-x-2'>
               <Phone className='h-4 w-4' />
-              <span>+1 (555) 123-4567</span>
-            </div>
-            <div className='flex items-center space-x-2'>
-              <MapPin className='h-4 w-4' />
-              <span>Licensed in Multiple Jurisdictions</span>
+              <span>+1-833-43-PBCEX • https://www.pbcex.com</span>
             </div>
           </div>
           <div className='text-sm text-secondary-foreground/70'>

@@ -1,3 +1,18 @@
+## Step-36 wrap-up (iOS wrapper scaffold)
+
+- Scaffolded minimal Capacitor wrapper without committing platform trees; server URL via `STAGING_WEB_BASE_URL` with localhost fallback. PR #40.
+- Centralized external-link policy via `ExternalLink` and wrapper bridge; added `/deeplink/open` fallback route; env keys: `PUBLIC_IOS_DEEP_LINK_SCHEME`, `PUBLIC_EXTERNAL_LINK_HOST_ALLOWLIST`. PR #40.
+- Added placeholders for app assets (`assets/mobile/icon.png`, `assets/mobile/splash.png`) and `docs/ios-wrapper-plan.md`. PR #41.
+- Tests-only slice landed for deeplink fallback and external-links policy placeholder. PR #42.
+- Tooling hygiene: `.nvmrc` pinned to Node 20 and pre-push gitleaks behavior documented (non-blocking when binary missing). PR #44.
+- Docs wrap-up and operator log updates. PR #43.
+
+Remaining human to-dos:
+
+- Enroll Apple Developer org; create ASC app record; set `appIDs` Team ID in AASA.
+- Provide ASC secrets: `ASC_ISSUER_ID`, `ASC_KEY_ID`, `ASC_API_KEY_P8_BASE64` (in secrets, not VCS).
+- Replace placeholder icon/splash with final assets post-enrollment.
+
 ## Step-36 (iOS wrapper scaffold)
 
 - Adopted minimal Capacitor scaffold without committing platform trees (PR #40). Server URL via `STAGING_WEB_BASE_URL` with localhost fallback. Added `scripts/ios/patch-entitlements.ts` to manage Associated Domains.

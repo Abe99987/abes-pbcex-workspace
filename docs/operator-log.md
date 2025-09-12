@@ -28,7 +28,18 @@
 
 - PR #42 merged: M4 UAT tests (deeplink fallback, external-links policy placeholder). CodeRabbit auto-merge successful.
 - PR #44 merged: Node 20 pin via .nvmrc and gitleaks documentation. CodeRabbit auto-merge successful.
-- Zero open PRs for Step-36.
+- PR #43 merged: docs wrap-up (decision/operator updates).
+- Zero open PRs for Step-36; branches pruned locally and remote tracking cleared.
+
+### CI snapshot
+
+- Main: Frontend ✅, Backend ✅, CI Summary ✅ (FastChecks informational)
+
+### Next actions (human to-dos)
+
+- Apple Developer enrollment + ASC app record; add Team ID to AASA `appIDs`.
+- Secrets provisioning in CI: `ASC_ISSUER_ID`, `ASC_KEY_ID`, `ASC_API_KEY_P8_BASE64`.
+- Replace placeholder icon/splash after enrollment.
 
 ## 2025-09-09
 
