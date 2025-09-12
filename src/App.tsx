@@ -52,6 +52,10 @@ import Regulatory from './pages/legal/Regulatory';
 import Licenses from './pages/legal/Licenses';
 import LegalList from './pages/legal/LegalList';
 import LegalView from './pages/legal/LegalView';
+import PrivacyHub from './pages/legal/privacy';
+import ComplianceHub from './pages/legal/compliance';
+import TermsRiskHub from './pages/legal/terms-risk';
+import OperationsHub from './pages/legal/operations';
 import Health from './pages/Health';
 import NotFound from './pages/NotFound';
 import AdminTrade from './pages/AdminTrade';
@@ -151,6 +155,10 @@ const App = () => (
             <Route path='/support/security' element={<Security />} />
             <Route path='/support/compliance' element={<Compliance />} />
             <Route path='/legal' element={<LegalList />} />
+            <Route path='/legal/privacy' element={<PrivacyHub />} />
+            <Route path='/legal/compliance' element={<ComplianceHub />} />
+            <Route path='/legal/terms-risk' element={<TermsRiskHub />} />
+            <Route path='/legal/operations' element={<OperationsHub />} />
             <Route path='/legal/:slug' element={<LegalView />} />
             <Route path='/legal/privacy-policy' element={<PrivacyPolicy />} />
             <Route
