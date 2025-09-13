@@ -50,34 +50,50 @@ const LegalList = () => {
       'terms-of-service': 'Agreement governing your use of PBCEx.',
     };
 
-    async function loadManifest() {
+    async function tryFetchJSON<T>(url: string): Promise<T | null> {
       try {
-        // Primary: outside /legal route space
-        const r1 = await fetch('/data/legal-manifest.json', {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10_000);
+        const res = await fetch(url, {
           cache: 'no-cache',
+          signal: controller.signal,
         });
-        if (r1.ok) {
-          const data = (await r1.json()) as ManifestItem[];
-          if (!cancelled) setItems(data);
-          return;
+        clearTimeout(timeoutId);
+        if (!res.ok) return null;
+        const contentType = (
+          res.headers.get('content-type') || ''
+        ).toLowerCase();
+        if (!contentType.includes('application/json')) return null;
+        try {
+          return (await res.json()) as T;
+        } catch {
+          return null;
         }
-        // Fallback: original path
-        const r2 = await fetch('/legal/manifest.json', { cache: 'no-cache' });
-        if (r2.ok) {
-          const data = (await r2.json()) as ManifestItem[];
-          if (!cancelled) setItems(data);
-          return;
-        }
-        // Final fallback: baked-in
-        if (!cancelled) {
-          setError('Live manifest unavailable — using fallback list.');
-          setItems(bakedIn);
-        }
-      } catch (e: any) {
-        if (!cancelled) {
-          setError('Live manifest unavailable — using fallback list.');
-          setItems(bakedIn);
-        }
+      } catch {
+        return null;
+      }
+    }
+
+    async function loadManifest() {
+      const cacheBuster = Date.now();
+      const primaryUrl = `/data/legal-manifest.json?v=${cacheBuster}`;
+      const secondaryUrl = `/legal/manifest.json?v=${cacheBuster}`;
+
+      const fromPrimary = await tryFetchJSON<ManifestItem[]>(primaryUrl);
+      if (!cancelled && Array.isArray(fromPrimary) && fromPrimary.length) {
+        setItems(fromPrimary);
+        return;
+      }
+
+      const fromSecondary = await tryFetchJSON<ManifestItem[]>(secondaryUrl);
+      if (!cancelled && Array.isArray(fromSecondary) && fromSecondary.length) {
+        setItems(fromSecondary);
+        return;
+      }
+
+      if (!cancelled) {
+        setError('Live manifest unavailable — using fallback list.');
+        setItems(bakedIn);
       }
     }
 
