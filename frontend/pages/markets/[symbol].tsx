@@ -34,7 +34,7 @@ export default function SymbolDetail() {
 
   const symbolStr = Array.isArray(symbol) ? symbol[0] : symbol;
   const isValid = symbolStr ? isValidSymbol(symbolStr) : false;
-  
+
   // Get canonical symbol for TradingView widgets
   const canonicalSymbol = symbolStr ? getCanonicalSymbol(symbolStr) : undefined;
 
@@ -111,7 +111,6 @@ export default function SymbolDetail() {
 
   const relatedSymbols = getRelatedSymbols(symbolStr);
 
-
   const validateOrder = (): boolean => {
     setErrorMsg('');
     const qty = parseFloat(orderQty);
@@ -128,31 +127,42 @@ export default function SymbolDetail() {
 
   const handleSubmitOrder = async () => {
     if (!validateOrder()) return;
-    
+
     // Generate idempotency key
     const requestId = nanoid();
-    
+
     try {
       setSubmitting(true);
       setErrorMsg('');
-      
+
       // Use new idempotent trade API
-      const response = orderSide === 'buy' 
-        ? await api.trade.buy({ symbol: orderSymbol, qty: orderQty, request_id: requestId })
-        : await api.trade.sell({ symbol: orderSymbol, qty: orderQty, request_id: requestId });
-      
+      const response =
+        orderSide === 'buy'
+          ? await api.trade.buy({
+              symbol: orderSymbol,
+              qty: orderQty,
+              request_id: requestId,
+            })
+          : await api.trade.sell({
+              symbol: orderSymbol,
+              qty: orderQty,
+              request_id: requestId,
+            });
+
       if (response.data.code === 'SUCCESS' && response.data.data) {
         const receiptData = response.data.data;
         setReceipt(receiptData);
-        toast.success(`${orderSide.charAt(0).toUpperCase() + orderSide.slice(1)} order filled`);
-        
+        toast.success(
+          `${orderSide.charAt(0).toUpperCase() + orderSide.slice(1)} order filled`
+        );
+
         // Refetch balances using standard query
         try {
           await api.wallet.getBalances();
         } catch (e) {
           console.warn('Balance refetch failed (non-fatal):', e);
         }
-        
+
         // Clear form
         setOrderQty('');
       } else {
@@ -160,7 +170,8 @@ export default function SymbolDetail() {
       }
     } catch (err: any) {
       console.error('Trade submit failed:', err);
-      const errorMessage = err.response?.data?.message || err.message || 'Trade failed';
+      const errorMessage =
+        err.response?.data?.message || err.message || 'Trade failed';
       setErrorMsg(errorMessage);
       toast.error('Trade failed. Please try again');
     } finally {
@@ -170,7 +181,6 @@ export default function SymbolDetail() {
 
   return (
     <div className='min-h-screen bg-slate-50'>
-
       {/* Page Header */}
       <div className='bg-white shadow-sm border-b'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
@@ -229,7 +239,9 @@ export default function SymbolDetail() {
               </div>
               <div className='bg-white rounded-lg shadow-sm border p-6'>
                 <SymbolOverview
-                  symbols={[[canonicalSymbol || symbolStr, `${displayName}|1D`]]}
+                  symbols={[
+                    [canonicalSymbol || symbolStr, `${displayName}|1D`],
+                  ]}
                   height={350}
                   showVolume={true}
                   showMA={false}
@@ -270,7 +282,9 @@ export default function SymbolDetail() {
                 </h3>
                 <div className='space-y-3'>
                   <div>
-                    <label className='block text-sm text-gray-600 mb-1'>Side</label>
+                    <label className='block text-sm text-gray-600 mb-1'>
+                      Side
+                    </label>
                     <div className='flex space-x-2'>
                       <button
                         onClick={() => setOrderSide('buy')}
@@ -297,7 +311,9 @@ export default function SymbolDetail() {
                     </div>
                   </div>
                   <div>
-                    <label className='block text-sm text-gray-600 mb-1'>Symbol</label>
+                    <label className='block text-sm text-gray-600 mb-1'>
+                      Symbol
+                    </label>
                     <select
                       data-testid='order-symbol'
                       className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
@@ -310,7 +326,9 @@ export default function SymbolDetail() {
                     </select>
                   </div>
                   <div>
-                    <label className='block text-sm text-gray-600 mb-1'>Quantity</label>
+                    <label className='block text-sm text-gray-600 mb-1'>
+                      Quantity
+                    </label>
                     <input
                       data-testid='order-qty'
                       type='number'
@@ -328,12 +346,16 @@ export default function SymbolDetail() {
                   )}
                   {receipt && (
                     <div className='text-sm bg-green-50 border border-green-200 rounded-lg p-3'>
-                      <div className='font-semibold text-green-800'>Order Receipt</div>
+                      <div className='font-semibold text-green-800'>
+                        Order Receipt
+                      </div>
                       <div className='text-green-700 mt-1'>
-                        {receipt.side} {receipt.qty} {receipt.symbol} at ${receipt.price}
+                        {receipt.side} {receipt.qty} {receipt.symbol} at $
+                        {receipt.price}
                       </div>
                       <div className='text-xs text-green-600 mt-1'>
-                        Fee: ${receipt.fee} | ID: {receipt.journal_id.slice(0, 8)}
+                        Fee: ${receipt.fee} | ID:{' '}
+                        {receipt.journal_id.slice(0, 8)}
                       </div>
                     </div>
                   )}
@@ -344,7 +366,9 @@ export default function SymbolDetail() {
                     aria-disabled={submitting}
                     className={`w-full px-4 py-2 rounded-lg text-white transition-colors ${submitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
                   >
-                    {submitting ? 'Submitting…' : `${orderSide.charAt(0).toUpperCase() + orderSide.slice(1)} ${orderSymbol}`}
+                    {submitting
+                      ? 'Submitting…'
+                      : `${orderSide.charAt(0).toUpperCase() + orderSide.slice(1)} ${orderSymbol}`}
                   </button>
                 </div>
               </div>

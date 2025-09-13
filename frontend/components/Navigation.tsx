@@ -26,6 +26,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { TickerTape } from '@/components/tradingview';
+import { APP_BUILD_VERSION } from '@/lib/constants';
 
 interface NavItem {
   name: string;
@@ -284,9 +285,11 @@ export default function Navigation() {
     router.push('/login');
   };
 
-
   return (
-    <nav className='bg-white shadow-sm border-b border-gray-200'>
+    <nav
+      className='bg-white shadow-sm border-b border-gray-200'
+      data-build-version={APP_BUILD_VERSION}
+    >
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <div className='flex h-16 justify-between'>
           {/* Logo and main nav */}
@@ -306,7 +309,9 @@ export default function Navigation() {
                   onClick={() => setBuyDropdownOpen(!buyDropdownOpen)}
                   aria-expanded={buyDropdownOpen}
                   className={`inline-flex items-center px-1 pt-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                    buyDropdownOpen ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                    buyDropdownOpen
+                      ? 'text-gray-900'
+                      : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   Buy Crypto
@@ -324,9 +329,13 @@ export default function Navigation() {
                         <div className='flex items-start space-x-3'>
                           <item.icon className='h-5 w-5 text-gray-400 mt-0.5' />
                           <div>
-                            <div className='font-medium text-gray-900'>{item.name}</div>
+                            <div className='font-medium text-gray-900'>
+                              {item.name}
+                            </div>
                             {item.description && (
-                              <div className='text-gray-500 text-xs'>{item.description}</div>
+                              <div className='text-gray-500 text-xs'>
+                                {item.description}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -342,7 +351,9 @@ export default function Navigation() {
                   onClick={() => setTradeDropdownOpen(!tradeDropdownOpen)}
                   aria-expanded={tradeDropdownOpen}
                   className={`inline-flex items-center px-1 pt-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                    router.pathname.startsWith('/markets') ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                    router.pathname.startsWith('/markets')
+                      ? 'text-gray-900'
+                      : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   Trade
@@ -360,9 +371,13 @@ export default function Navigation() {
                         <div className='flex items-start space-x-3'>
                           <item.icon className='h-5 w-5 text-gray-400 mt-0.5' />
                           <div>
-                            <div className='font-medium text-gray-900'>{item.name}</div>
+                            <div className='font-medium text-gray-900'>
+                              {item.name}
+                            </div>
                             {item.description && (
-                              <div className='text-gray-500 text-xs'>{item.description}</div>
+                              <div className='text-gray-500 text-xs'>
+                                {item.description}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -378,7 +393,9 @@ export default function Navigation() {
                   onClick={() => setMarketsDropdownOpen(!marketsDropdownOpen)}
                   aria-expanded={marketsDropdownOpen}
                   className={`inline-flex items-center px-1 pt-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                    router.pathname.startsWith('/markets') ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                    router.pathname.startsWith('/markets')
+                      ? 'text-gray-900'
+                      : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   <LineChart className='mr-1 h-4 w-4' />
@@ -397,9 +414,13 @@ export default function Navigation() {
                         <div className='flex items-start space-x-3'>
                           <item.icon className='h-5 w-5 text-gray-400 mt-0.5' />
                           <div>
-                            <div className='font-medium text-gray-900'>{item.name}</div>
+                            <div className='font-medium text-gray-900'>
+                              {item.name}
+                            </div>
                             {item.description && (
-                              <div className='text-gray-500 text-xs'>{item.description}</div>
+                              <div className='text-gray-500 text-xs'>
+                                {item.description}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -415,7 +436,9 @@ export default function Navigation() {
                   onClick={() => setShopDropdownOpen(!shopDropdownOpen)}
                   aria-expanded={shopDropdownOpen}
                   className={`inline-flex items-center px-1 pt-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                    router.pathname.startsWith('/markets') ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                    router.pathname.startsWith('/markets')
+                      ? 'text-gray-900'
+                      : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   Shop
@@ -433,9 +456,13 @@ export default function Navigation() {
                         <div className='flex items-start space-x-3'>
                           <item.icon className='h-5 w-5 text-gray-400 mt-0.5' />
                           <div>
-                            <div className='font-medium text-gray-900'>{item.name}</div>
+                            <div className='font-medium text-gray-900'>
+                              {item.name}
+                            </div>
                             {item.description && (
-                              <div className='text-gray-500 text-xs'>{item.description}</div>
+                              <div className='text-gray-500 text-xs'>
+                                {item.description}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -451,7 +478,9 @@ export default function Navigation() {
                   onClick={() => setTransferDropdownOpen(!transferDropdownOpen)}
                   aria-expanded={transferDropdownOpen}
                   className={`inline-flex items-center px-1 pt-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                    router.pathname.startsWith('/wallet') ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                    router.pathname.startsWith('/wallet')
+                      ? 'text-gray-900'
+                      : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   Send / Receive
@@ -469,9 +498,13 @@ export default function Navigation() {
                         <div className='flex items-start space-x-3'>
                           <item.icon className='h-5 w-5 text-gray-400 mt-0.5' />
                           <div>
-                            <div className='font-medium text-gray-900'>{item.name}</div>
+                            <div className='font-medium text-gray-900'>
+                              {item.name}
+                            </div>
                             {item.description && (
-                              <div className='text-gray-500 text-xs'>{item.description}</div>
+                              <div className='text-gray-500 text-xs'>
+                                {item.description}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -569,7 +602,12 @@ export default function Navigation() {
               </div>
             ) : (
               <div className='flex items-center'>
-                <Link href='/login' className='px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-800'>Log in</Link>
+                <Link
+                  href='/login'
+                  className='px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-800'
+                >
+                  Log in
+                </Link>
               </div>
             )}
           </div>

@@ -6,7 +6,7 @@
 @media print {
   /* Header */
   body::before {
-    content: "PBCEx, Inc.";
+    content: 'PBCEx, Inc.';
     display: block;
     font-size: 12px;
     margin-bottom: 8mm;
@@ -14,7 +14,8 @@
 
   /* Footer with page numbers */
   body::after {
-    content: "pbcex.com • +1-833-43-PBCEX • contact@pbcex.com • Page " counter(page) " of " counter(pages);
+    content: 'pbcex.com • +1-833-43-PBCEX • contact@pbcex.com • Page '
+      counter(page) ' of ' counter(pages);
     display: block;
     font-size: 10px;
     position: fixed;
@@ -24,11 +25,12 @@
   }
 
   a[href]::after {
-    content: " (" attr(href) ")";
+    content: ' (' attr(href) ')';
     font-size: 10px;
   }
 
-  h1, h2 {
+  h1,
+  h2 {
     break-after: avoid-page;
   }
 
@@ -43,7 +45,10 @@
   }
 
   /* Hide navigation and other UI elements */
-  nav, header, footer, .print-hide {
+  nav,
+  header,
+  footer,
+  .print-hide {
     display: none !important;
   }
 }

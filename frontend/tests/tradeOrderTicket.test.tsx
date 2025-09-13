@@ -1,5 +1,5 @@
 /**
- * Component integration test for Trade Order Ticket - Sprint 26  
+ * Component integration test for Trade Order Ticket - Sprint 26
  * Tests the order ticket submit flow with mocked POST /api/trades/* endpoints
  */
 
@@ -14,7 +14,7 @@ const mockedApi = api as jest.Mocked<typeof api>;
 
 // Mock nanoid
 jest.mock('nanoid', () => ({
-  nanoid: () => 'test-request-id-12345'
+  nanoid: () => 'test-request-id-12345',
 }));
 
 // Mock Next.js router
@@ -33,7 +33,7 @@ jest.mock('@/hooks/useAuth', () => ({
   }),
 }));
 
-// Mock toast notifications  
+// Mock toast notifications
 jest.mock('react-hot-toast', () => ({
   success: jest.fn(),
   error: jest.fn(),
@@ -55,28 +55,38 @@ const OrderTicketTestComponent: React.FC = () => {
     }
 
     const requestId = 'test-request-id-12345';
-    
+
     try {
       setSubmitting(true);
       setErrorMsg('');
-      
-      const response = orderSide === 'buy' 
-        ? await api.trade.buy({ symbol: orderSymbol, qty: orderQty, request_id: requestId })
-        : await api.trade.sell({ symbol: orderSymbol, qty: orderQty, request_id: requestId });
-      
+
+      const response =
+        orderSide === 'buy'
+          ? await api.trade.buy({
+              symbol: orderSymbol,
+              qty: orderQty,
+              request_id: requestId,
+            })
+          : await api.trade.sell({
+              symbol: orderSymbol,
+              qty: orderQty,
+              request_id: requestId,
+            });
+
       if (response.data.code === 'SUCCESS' && response.data.data) {
         const receiptData = response.data.data;
         setReceipt(receiptData);
-        
+
         // Refetch balances
         await api.wallet.getBalances();
-        
+
         setOrderQty('');
       } else {
         setErrorMsg(response.data.message || 'Trade failed');
       }
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Trade failed';
+      const errorMessage =
+        err.response?.data?.message || err.message || 'Trade failed';
       setErrorMsg(errorMessage);
     } finally {
       setSubmitting(false);
@@ -84,62 +94,64 @@ const OrderTicketTestComponent: React.FC = () => {
   };
 
   return (
-    <div data-testid="order-ticket">
+    <div data-testid='order-ticket'>
       <div>
         <label>Side</label>
         <button
-          data-testid="buy-button"
+          data-testid='buy-button'
           onClick={() => setOrderSide('buy')}
           className={orderSide === 'buy' ? 'active' : ''}
         >
           Buy
         </button>
         <button
-          data-testid="sell-button"
+          data-testid='sell-button'
           onClick={() => setOrderSide('sell')}
           className={orderSide === 'sell' ? 'active' : ''}
         >
           Sell
         </button>
       </div>
-      
+
       <div>
         <label>Symbol</label>
         <select
-          data-testid="order-symbol"
+          data-testid='order-symbol'
           value={orderSymbol}
           onChange={e => setOrderSymbol(e.target.value)}
         >
-          <option value="XAU-s">XAU-s</option>
-          <option value="PAXG">PAXG</option>
+          <option value='XAU-s'>XAU-s</option>
+          <option value='PAXG'>PAXG</option>
         </select>
       </div>
-      
+
       <div>
         <label>Quantity</label>
         <input
-          data-testid="order-qty"
-          type="number"
+          data-testid='order-qty'
+          type='number'
           value={orderQty}
           onChange={e => setOrderQty(e.target.value)}
-          placeholder="0.00"
+          placeholder='0.00'
         />
       </div>
-      
-      {errorMsg && (
-        <div data-testid="error-message">{errorMsg}</div>
-      )}
-      
+
+      {errorMsg && <div data-testid='error-message'>{errorMsg}</div>}
+
       {receipt && (
-        <div data-testid="receipt">
+        <div data-testid='receipt'>
           <div>Order Receipt</div>
-          <div>{receipt.side} {receipt.qty} {receipt.symbol} at ${receipt.price}</div>
-          <div>Fee: ${receipt.fee} | ID: {receipt.journal_id.slice(0, 8)}</div>
+          <div>
+            {receipt.side} {receipt.qty} {receipt.symbol} at ${receipt.price}
+          </div>
+          <div>
+            Fee: ${receipt.fee} | ID: {receipt.journal_id.slice(0, 8)}
+          </div>
         </div>
       )}
-      
+
       <button
-        data-testid="submit-button"
+        data-testid='submit-button'
         onClick={handleSubmitOrder}
         disabled={submitting}
       >
@@ -162,27 +174,29 @@ describe('Trade Order Ticket', () => {
         request_id: 'test-request-id-12345',
         symbol: 'XAU-s',
         qty: '1.0',
-        price: 2650.50,
+        price: 2650.5,
         fee: '13.25',
         spread_bps: 0,
         ts: '2024-01-15T10:30:00Z',
         price_source: 'PricesService',
         side: 'BUY' as const,
-        receipt_v: 'v1'
+        receipt_v: 'v1',
       };
 
       mockedApi.trade.buy.mockResolvedValueOnce({
-        data: { code: 'SUCCESS', data: mockReceipt }
+        data: { code: 'SUCCESS', data: mockReceipt },
       } as any);
 
       mockedApi.wallet.getBalances.mockResolvedValueOnce({
-        data: { code: 'SUCCESS' }
+        data: { code: 'SUCCESS' },
       } as any);
 
       render(<OrderTicketTestComponent />);
 
       // Set up order
-      fireEvent.change(screen.getByTestId('order-qty'), { target: { value: '1.0' } });
+      fireEvent.change(screen.getByTestId('order-qty'), {
+        target: { value: '1.0' },
+      });
       fireEvent.click(screen.getByTestId('buy-button'));
 
       // Submit order
@@ -193,7 +207,7 @@ describe('Trade Order Ticket', () => {
         expect(mockedApi.trade.buy).toHaveBeenCalledWith({
           symbol: 'XAU-s',
           qty: '1.0',
-          request_id: 'test-request-id-12345'
+          request_id: 'test-request-id-12345',
         });
       });
 
@@ -203,8 +217,12 @@ describe('Trade Order Ticket', () => {
       // Check receipt is displayed
       await waitFor(() => {
         expect(screen.getByTestId('receipt')).toBeInTheDocument();
-        expect(screen.getByText('BUY 1.0 XAU-s at $2650.5')).toBeInTheDocument();
-        expect(screen.getByText('Fee: $13.25 | ID: journal-')).toBeInTheDocument();
+        expect(
+          screen.getByText('BUY 1.0 XAU-s at $2650.5')
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText('Fee: $13.25 | ID: journal-')
+        ).toBeInTheDocument();
       });
 
       // Verify form was cleared
@@ -215,8 +233,8 @@ describe('Trade Order Ticket', () => {
       // Mock API error
       const mockError = {
         response: {
-          data: { message: 'Insufficient balance' }
-        }
+          data: { message: 'Insufficient balance' },
+        },
       };
 
       mockedApi.trade.buy.mockRejectedValueOnce(mockError);
@@ -224,7 +242,9 @@ describe('Trade Order Ticket', () => {
       render(<OrderTicketTestComponent />);
 
       // Set up order
-      fireEvent.change(screen.getByTestId('order-qty'), { target: { value: '1.0' } });
+      fireEvent.change(screen.getByTestId('order-qty'), {
+        target: { value: '1.0' },
+      });
       fireEvent.click(screen.getByTestId('buy-button'));
 
       // Submit order
@@ -255,22 +275,24 @@ describe('Trade Order Ticket', () => {
         ts: '2024-01-15T10:35:00Z',
         price_source: 'PricesService',
         side: 'SELL' as const,
-        receipt_v: 'v1'
+        receipt_v: 'v1',
       };
 
       mockedApi.trade.sell.mockResolvedValueOnce({
-        data: { code: 'SUCCESS', data: mockReceipt }
+        data: { code: 'SUCCESS', data: mockReceipt },
       } as any);
 
       mockedApi.wallet.getBalances.mockResolvedValueOnce({
-        data: { code: 'SUCCESS' }
+        data: { code: 'SUCCESS' },
       } as any);
 
       render(<OrderTicketTestComponent />);
 
       // Set up sell order
       fireEvent.click(screen.getByTestId('sell-button'));
-      fireEvent.change(screen.getByTestId('order-qty'), { target: { value: '0.5' } });
+      fireEvent.change(screen.getByTestId('order-qty'), {
+        target: { value: '0.5' },
+      });
 
       // Submit order
       fireEvent.click(screen.getByTestId('submit-button'));
@@ -280,7 +302,7 @@ describe('Trade Order Ticket', () => {
         expect(mockedApi.trade.sell).toHaveBeenCalledWith({
           symbol: 'XAU-s',
           qty: '0.5',
-          request_id: 'test-request-id-12345'
+          request_id: 'test-request-id-12345',
         });
       });
 
@@ -290,7 +312,9 @@ describe('Trade Order Ticket', () => {
       // Check receipt is displayed
       await waitFor(() => {
         expect(screen.getByTestId('receipt')).toBeInTheDocument();
-        expect(screen.getByText('SELL 0.5 XAU-s at $2648.75')).toBeInTheDocument();
+        expect(
+          screen.getByText('SELL 0.5 XAU-s at $2648.75')
+        ).toBeInTheDocument();
       });
     });
   });
@@ -304,7 +328,9 @@ describe('Trade Order Ticket', () => {
 
       await waitFor(() => {
         expect(screen.getByTestId('error-message')).toBeInTheDocument();
-        expect(screen.getByText('Enter a valid quantity > 0')).toBeInTheDocument();
+        expect(
+          screen.getByText('Enter a valid quantity > 0')
+        ).toBeInTheDocument();
       });
 
       // Verify API was not called
@@ -316,12 +342,16 @@ describe('Trade Order Ticket', () => {
       render(<OrderTicketTestComponent />);
 
       // Enter negative quantity
-      fireEvent.change(screen.getByTestId('order-qty'), { target: { value: '-1' } });
+      fireEvent.change(screen.getByTestId('order-qty'), {
+        target: { value: '-1' },
+      });
       fireEvent.click(screen.getByTestId('submit-button'));
 
       await waitFor(() => {
         expect(screen.getByTestId('error-message')).toBeInTheDocument();
-        expect(screen.getByText('Enter a valid quantity > 0')).toBeInTheDocument();
+        expect(
+          screen.getByText('Enter a valid quantity > 0')
+        ).toBeInTheDocument();
       });
     });
   });
@@ -333,32 +363,34 @@ describe('Trade Order Ticket', () => {
         request_id: 'test-request-id-12345',
         symbol: 'XAU-s',
         qty: '1.0',
-        price: 2650.50,
+        price: 2650.5,
         fee: '13.25',
         spread_bps: 0,
         ts: '2024-01-15T10:30:00Z',
         price_source: 'PricesService',
         side: 'BUY' as const,
-        receipt_v: 'v1'
+        receipt_v: 'v1',
       };
 
       mockedApi.trade.buy.mockResolvedValueOnce({
-        data: { code: 'SUCCESS', data: mockReceipt }
+        data: { code: 'SUCCESS', data: mockReceipt },
       } as any);
 
       mockedApi.wallet.getBalances.mockResolvedValueOnce({
-        data: { code: 'SUCCESS' }
+        data: { code: 'SUCCESS' },
       } as any);
 
       render(<OrderTicketTestComponent />);
 
-      fireEvent.change(screen.getByTestId('order-qty'), { target: { value: '1.0' } });
+      fireEvent.change(screen.getByTestId('order-qty'), {
+        target: { value: '1.0' },
+      });
       fireEvent.click(screen.getByTestId('submit-button'));
 
       await waitFor(() => {
         expect(mockedApi.trade.buy).toHaveBeenCalledWith(
           expect.objectContaining({
-            request_id: 'test-request-id-12345'
+            request_id: 'test-request-id-12345',
           })
         );
       });

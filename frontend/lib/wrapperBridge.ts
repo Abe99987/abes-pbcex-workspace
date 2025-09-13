@@ -39,7 +39,9 @@ export async function openExternal(url: string): Promise<void> {
 export async function logToFile(message: string): Promise<void> {
   if (!(await isNative())) return;
   try {
-    const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
+    const { Filesystem, Directory, Encoding } = await import(
+      '@capacitor/filesystem'
+    );
     const filename = 'mobile-log.txt';
     try {
       await Filesystem.appendFile({
@@ -60,5 +62,3 @@ export async function logToFile(message: string): Promise<void> {
     // noop on web or if module unavailable
   }
 }
-
-

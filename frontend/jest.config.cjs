@@ -1,17 +1,23 @@
 module.exports = {
   testEnvironment: 'jsdom',
-  roots: ['<rootDir>/pages', '<rootDir>/components', '<rootDir>/src', '<rootDir>/tests'],
+  roots: [
+    '<rootDir>/pages',
+    '<rootDir>/components',
+    '<rootDir>/src',
+    '<rootDir>/tests',
+  ],
   testMatch: ['**/?(*.)+(spec|test).+(ts|tsx)'],
   transform: {
     '^.+\\.(ts|tsx)$': [
       'ts-jest',
-      { tsconfig: {
+      {
+        tsconfig: {
           jsx: 'react-jsx',
           module: 'commonjs',
           esModuleInterop: true,
           target: 'ES2020',
-        }
-      }
+        },
+      },
     ],
   },
   moduleNameMapper: {
@@ -29,5 +35,3 @@ module.exports = {
   },
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
 };
-
-
