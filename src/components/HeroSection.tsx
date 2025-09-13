@@ -13,7 +13,7 @@ const HeroSection = () => {
       <div className='container mx-auto px-4 relative z-10'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-6xl mx-auto'>
           {/* Left - Content - aligned with page grid */}
-          <div className='text-center lg:text-left space-y-5 lg:-ml-8'>
+          <div className='text-left lg:text-left space-y-5 lg:-ml-8 px-4 lg:px-0'>
             {/* Brand eyebrow - reduced size with color split */}
             <div className='text-[9rem] md:text-[10.5rem] font-bold tracking-wide leading-none'>
               <span className='text-foreground'>PBC</span><span className='text-gold'>Ex</span>
@@ -36,7 +36,7 @@ const HeroSection = () => {
               Trade real assets with bank-grade security and global reach.
             </p>
 
-            <div className='flex flex-col sm:flex-row gap-4 justify-center lg:justify-start'>
+            <div className='flex flex-col sm:flex-row gap-4 justify-start lg:justify-start'>
               <Button 
                 variant='gold' 
                 size='lg' 
@@ -62,7 +62,7 @@ const HeroSection = () => {
           </div>
 
           {/* Right - Treasure Chest */}
-          <div className='flex justify-center lg:justify-start lg:-mr-16 relative'>
+          <div className='flex justify-center lg:justify-start lg:-mr-12 xl:-mr-16 relative'>
             <div className='relative'>
               {/* Interior glow from chest lid gap only */}
               <div className='absolute top-[25%] left-1/2 transform -translate-x-1/2 w-[120px] h-[80px] bg-gradient-ellipse from-amber-400/25 via-gold/15 to-transparent blur-xl opacity-80' />
@@ -70,11 +70,11 @@ const HeroSection = () => {
               {/* Soft shadow beneath chest (not glow) */}
               <div className='absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[400px] h-[40px] bg-black/30 rounded-full blur-2xl opacity-60' />
               
-              {/* Treasure chest image */}
+              {/* Treasure chest image - responsive sizing */}
               <img
                 src={treasureChest}
                 alt='Treasure chest glowing from within'
-                className='w-[700px] h-[700px] md:w-[800px] md:h-[800px] object-contain object-right-center relative z-10'
+                className='w-[700px] h-[700px] md:w-[735px] md:h-[735px] lg:w-[770px] lg:h-[770px] xl:w-[840px] xl:h-[840px] object-contain object-right-center relative z-10'
                 style={{
                   filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4))',
                 }}
