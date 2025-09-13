@@ -155,7 +155,6 @@ const AssetPricing = () => {
                     </Badge>
                   </div>
                 </div>
-
                 <div className='space-y-2 mb-4'>
                   <h3 className='font-semibold text-foreground'>
                     {asset.name}
@@ -167,7 +166,6 @@ const AssetPricing = () => {
                     {asset.description}
                   </p>
                 </div>
-
                 /* Action Buttons - Show for all assets except generic ones */
                 {asset.isLive && (
                   <div className='space-y-2 mt-4 opacity-0 group-hover:opacity-100 md:opacity-100 transition-opacity duration-300'>
@@ -276,7 +274,6 @@ const AssetPricing = () => {
                     )}
                   </div>
                 )}
-
                 {/* Token Raise Button - For coming soon assets */}
                 {asset.comingSoon && (
                   <div className='space-y-2 mt-4'>

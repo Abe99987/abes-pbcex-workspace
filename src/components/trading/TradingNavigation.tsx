@@ -41,71 +41,207 @@ const TradingNavigation = () => {
       label: 'Buy Crypto',
       icon: Bitcoin,
       items: [
-        { title: 'Quick Buy', description: 'Fiat → asset in one step', href: '/trading' },
-        { title: 'Quick Convert', description: 'Swap between assets instantly', href: '/coin-trading' },
-        { title: 'Buy with Card', description: 'Visa/Mastercard checkout', href: '/trading' },
-        { title: 'Deposit Crypto', description: 'On-chain deposit addresses', href: '/wallet' },
+        {
+          title: 'Quick Buy',
+          description: 'Fiat → asset in one step',
+          href: '/trading',
+        },
+        {
+          title: 'Quick Convert',
+          description: 'Swap between assets instantly',
+          href: '/coin-trading',
+        },
+        {
+          title: 'Buy with Card',
+          description: 'Visa/Mastercard checkout',
+          href: '/trading',
+        },
+        {
+          title: 'Deposit Crypto',
+          description: 'On-chain deposit addresses',
+          href: '/wallet',
+        },
       ],
     },
     {
       label: 'Trade',
       icon: TrendingUp,
       items: [
-        { title: 'Spot (USD)', description: 'USD-quoted markets', href: '/trading' },
-        { title: 'Spot (USDC)', description: 'USDC-quoted markets', href: '/trading' },
-        { title: 'Coin-to-Coin', description: 'BTC/ETH quote pairs', href: '/coin-trading' },
-        { title: 'DCA', description: 'Automated recurring purchases', href: '/trade/dca' },
+        {
+          title: 'Spot (USD)',
+          description: 'USD-quoted markets',
+          href: '/trading',
+        },
+        {
+          title: 'Spot (USDC)',
+          description: 'USDC-quoted markets',
+          href: '/trading',
+        },
+        {
+          title: 'Coin-to-Coin',
+          description: 'BTC/ETH quote pairs',
+          href: '/coin-trading',
+        },
+        {
+          title: 'DCA',
+          description: 'Automated recurring purchases',
+          href: '/trade/dca',
+        },
       ],
     },
     {
       label: 'Markets',
       icon: BarChart3,
       items: [
-        { title: 'Analytics', description: 'Overview & key metrics dashboard', href: '/markets/analytics' },
-        { title: 'Tutorials', description: 'How-to guides for trading', href: '/education' },
-        { title: 'Education (Learn X)', description: 'Courses & long-form content', href: '/education' },
+        {
+          title: 'Analytics',
+          description: 'Overview & key metrics dashboard',
+          href: '/markets/analytics',
+        },
+        {
+          title: 'Tutorials',
+          description: 'How-to guides for trading',
+          href: '/education',
+        },
+        {
+          title: 'Education (Learn X)',
+          description: 'Courses & long-form content',
+          href: '/education',
+        },
       ],
     },
     {
       label: 'Shop',
       icon: ShoppingCart,
       items: [
-        { title: 'Shop All', description: 'View all commodities', href: '/shop' },
-        { title: 'Buy Physical Gold', description: 'Coins & bars with insured shipping', href: '/shop/GOLD' },
-        { title: 'Buy Physical Silver', description: 'Coins & bars with insured shipping', href: '/shop/SILVER' },
-        { title: 'Buy Physical Platinum', description: 'Coins & bars with insured shipping', href: '/shop/PLATINUM' },
-        { title: 'Buy Physical Palladium', description: 'Coins & bars with insured shipping', href: '/shop/PALLADIUM' },
-        { title: 'Buy Physical Copper', description: 'Rounds & bars', href: '/shop/COPPER' },
+        {
+          title: 'Shop All',
+          description: 'View all commodities',
+          href: '/shop',
+        },
+        {
+          title: 'Buy Physical Gold',
+          description: 'Coins & bars with insured shipping',
+          href: '/shop/GOLD',
+        },
+        {
+          title: 'Buy Physical Silver',
+          description: 'Coins & bars with insured shipping',
+          href: '/shop/SILVER',
+        },
+        {
+          title: 'Buy Physical Platinum',
+          description: 'Coins & bars with insured shipping',
+          href: '/shop/PLATINUM',
+        },
+        {
+          title: 'Buy Physical Palladium',
+          description: 'Coins & bars with insured shipping',
+          href: '/shop/PALLADIUM',
+        },
+        {
+          title: 'Buy Physical Copper',
+          description: 'Rounds & bars',
+          href: '/shop/COPPER',
+        },
       ],
     },
     {
       label: 'Send / Receive',
       icon: ArrowLeftRight,
       items: [
-        { title: 'Send to PBCEx User', description: 'Free & instant transfers', href: '/send/internal' },
-        { title: 'Crypto Withdrawal', description: 'Send on-chain to external wallet', href: '/send/crypto' },
-        { title: 'Bank Transfers (SWIFT/WISE-ready)', description: 'Domestic & international wires', href: '/send/bank' },
-        { title: 'Pay with QR Code', description: 'Merchant payments via QR', href: '/pay/qr' },
-        { title: 'Receive with QR Code', description: 'Your QR for incoming payments', href: '/receive/qr' },
-        { title: 'Spend with Visa Card', description: 'Use card at any merchant', href: '/card/spend' },
-        { title: 'Set up Bill Pay', description: 'Schedule utilities & vendors', href: '/pay/bills' },
-        { title: 'Request a Payment', description: 'Create an invoice/QR', href: '/pay/request' },
-        { title: 'Set up Recurring Transfers', description: 'Automate payouts & savings', href: '/send/recurring' },
+        {
+          title: 'Send to PBCEx User',
+          description: 'Free & instant transfers',
+          href: '/send/internal',
+        },
+        {
+          title: 'Crypto Withdrawal',
+          description: 'Send on-chain to external wallet',
+          href: '/send/crypto',
+        },
+        {
+          title: 'Bank Transfers (SWIFT/WISE-ready)',
+          description: 'Domestic & international wires',
+          href: '/send/bank',
+        },
+        {
+          title: 'Pay with QR Code',
+          description: 'Merchant payments via QR',
+          href: '/pay/qr',
+        },
+        {
+          title: 'Receive with QR Code',
+          description: 'Your QR for incoming payments',
+          href: '/receive/qr',
+        },
+        {
+          title: 'Spend with Visa Card',
+          description: 'Use card at any merchant',
+          href: '/card/spend',
+        },
+        {
+          title: 'Set up Bill Pay',
+          description: 'Schedule utilities & vendors',
+          href: '/pay/bills',
+        },
+        {
+          title: 'Request a Payment',
+          description: 'Create an invoice/QR',
+          href: '/pay/request',
+        },
+        {
+          title: 'Set up Recurring Transfers',
+          description: 'Automate payouts & savings',
+          href: '/send/recurring',
+        },
       ],
     },
     {
       label: 'My Account',
       icon: User,
       items: [
-        { title: 'Balances & Funding', description: 'Overview, deposit, withdraw', href: '/my-assets' },
-        { title: 'Cards', description: 'Manage virtual & physical cards', href: '/card/spend' },
-        { title: 'Transaction History', description: 'All account transfers', href: '/transaction-history' },
-        { title: 'Order History', description: 'Trades & executions', href: '/order-history' },
+        {
+          title: 'Balances & Funding',
+          description: 'Overview, deposit, withdraw',
+          href: '/my-assets',
+        },
+        {
+          title: 'Cards',
+          description: 'Manage virtual & physical cards',
+          href: '/card/spend',
+        },
+        {
+          title: 'Transaction History',
+          description: 'All account transfers',
+          href: '/transaction-history',
+        },
+        {
+          title: 'Order History',
+          description: 'Trades & executions',
+          href: '/order-history',
+        },
         { title: 'PnL', description: 'Profit and loss', href: '/pnl' },
-        { title: 'Connect Wallet', description: 'Link external wallets', href: '/wallet' },
-        { title: 'Security', description: '2FA, sessions, passkeys', href: '/account/security' },
-        { title: 'Settings & Profile', description: 'Preferences and KYC', href: '/account' },
-        { title: 'Support', description: 'Help center & contact', href: '/support/help-center' },
+        {
+          title: 'Connect Wallet',
+          description: 'Link external wallets',
+          href: '/wallet',
+        },
+        {
+          title: 'Security',
+          description: '2FA, sessions, passkeys',
+          href: '/account/security',
+        },
+        {
+          title: 'Settings & Profile',
+          description: 'Preferences and KYC',
+          href: '/account',
+        },
+        {
+          title: 'Support',
+          description: 'Help center & contact',
+          href: '/support/help-center',
+        },
       ],
     },
   ];
@@ -148,9 +284,13 @@ const TradingNavigation = () => {
               <div className='py-2'>
                 {menu.items.map((item, index) => (
                   <div key={typeof item === 'string' ? item : item.title}>
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       className='px-4 py-3 hover:bg-[#15171A] focus:bg-[#15171A] cursor-pointer'
-                      onClick={() => typeof item === 'object' && item.href ? navigate(item.href) : undefined}
+                      onClick={() =>
+                        typeof item === 'object' && item.href
+                          ? navigate(item.href)
+                          : undefined
+                      }
                     >
                       <div className='flex flex-col space-y-1'>
                         <div className='text-[#F2F3F5] font-medium text-sm'>
@@ -186,7 +326,7 @@ const TradingNavigation = () => {
               <User className='w-5 h-5' />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent 
+          <DropdownMenuContent
             className='w-64 bg-[#111214] border-[#23262A] text-[#F2F3F5] shadow-2xl'
             align='end'
             sideOffset={8}
@@ -198,7 +338,7 @@ const TradingNavigation = () => {
                     {menu.label}
                   </div>
                   {menu.items.map((item, itemIndex) => (
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       key={item.title}
                       className='px-4 py-2 hover:bg-[#15171A] focus:bg-[#15171A] cursor-pointer'
                       onClick={() => navigate(item.href)}
@@ -218,13 +358,15 @@ const TradingNavigation = () => {
                   )}
                 </div>
               ))}
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className='px-4 py-2 hover:bg-[#15171A] focus:bg-[#15171A] cursor-pointer'
                 onClick={() => navigate('/support/help-center')}
               >
                 <div className='flex items-center space-x-2'>
                   <HelpCircle className='w-4 h-4' />
-                  <span className='text-[#F2F3F5] font-medium text-sm'>Help</span>
+                  <span className='text-[#F2F3F5] font-medium text-sm'>
+                    Help
+                  </span>
                 </div>
               </DropdownMenuItem>
             </div>
@@ -243,7 +385,7 @@ const TradingNavigation = () => {
           <HelpCircle className='w-4 h-4 mr-2' />
           Help
         </Button>
-        
+
         <Button
           size='sm'
           className='bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-2'

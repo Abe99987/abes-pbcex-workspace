@@ -82,7 +82,13 @@ const SpendingTab = () => {
   ];
 
   const mockMerchantTrends = [
-    { merchant: 'Amazon', currentMonth: 450, previousMonth: 380, change: 18.4, transactionCount: 12 },
+    {
+      merchant: 'Amazon',
+      currentMonth: 450,
+      previousMonth: 380,
+      change: 18.4,
+      transactionCount: 12,
+    },
     {
       merchant: 'Starbucks',
       currentMonth: 120,

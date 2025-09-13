@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { AuthProvider } from '@/hooks/useAuth';
 import { Toaster } from 'react-hot-toast';
 import '@/styles/globals.css';
+import { useRouter } from 'next/router';
+import Navigation from '@/components/Navigation';
 
 function useRegionPreference() {
   const [selectedRegion, setSelectedRegion] = useState<string>('US');
@@ -104,6 +106,8 @@ function RegionGatingBanner() {
 }
 
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+  const hideGlobalNav = router.pathname.startsWith('/admin');
   return (
     <AuthProvider>
       {/* Public Beta informational badge */}
@@ -126,6 +130,7 @@ export default function App({ Component, pageProps }: AppProps) {
         return null;
       })()}
       <RegionGatingBanner />
+      {!hideGlobalNav && <Navigation />}
       <Component {...pageProps} />
       {/* Global footer navigation */}
       <footer className='mt-16 border-t border-gray-200 bg-white' role='contentinfo'>

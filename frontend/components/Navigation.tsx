@@ -284,9 +284,6 @@ export default function Navigation() {
     router.push('/login');
   };
 
-  if (!user) {
-    return null;
-  }
 
   return (
     <nav className='bg-white shadow-sm border-b border-gray-200'>
@@ -296,7 +293,7 @@ export default function Navigation() {
           <div className='flex'>
             <div className='flex flex-shrink-0 items-center'>
               <Link
-                href='/dashboard'
+                href={user ? '/dashboard' : '/'}
                 className='text-xl font-bold text-gray-900'
               >
                 PBCEx
@@ -530,45 +527,51 @@ export default function Navigation() {
 
           {/* User menu */}
           <div className='hidden sm:ml-6 sm:flex sm:items-center'>
-            <div className='relative'>
-              <button
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className='flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-              >
-                <div className='flex items-center space-x-2 px-3 py-2'>
-                  <User className='h-5 w-5 text-gray-400' />
-                  <span className='text-sm font-medium text-gray-700'>
-                    {getUserDisplayName(user)}
-                  </span>
-                  <ChevronDown className='h-4 w-4 text-gray-400' />
-                </div>
-              </button>
-              {userDropdownOpen && (
-                <div className='absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5'>
-                  <Link
-                    href='/account/profile'
-                    onClick={() => setUserDropdownOpen(false)}
-                    className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                  >
-                    Your Profile
-                  </Link>
-                  <Link
-                    href='/account/settings'
-                    onClick={() => setUserDropdownOpen(false)}
-                    className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                  >
-                    Settings
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className='flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                  >
-                    <LogOut className='mr-2 h-4 w-4' />
-                    Sign out
-                  </button>
-                </div>
-              )}
-            </div>
+            {user ? (
+              <div className='relative'>
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className='flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+                >
+                  <div className='flex items-center space-x-2 px-3 py-2'>
+                    <User className='h-5 w-5 text-gray-400' />
+                    <span className='text-sm font-medium text-gray-700'>
+                      {getUserDisplayName(user)}
+                    </span>
+                    <ChevronDown className='h-4 w-4 text-gray-400' />
+                  </div>
+                </button>
+                {userDropdownOpen && (
+                  <div className='absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5'>
+                    <Link
+                      href='/account/profile'
+                      onClick={() => setUserDropdownOpen(false)}
+                      className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                    >
+                      Your Profile
+                    </Link>
+                    <Link
+                      href='/account/settings'
+                      onClick={() => setUserDropdownOpen(false)}
+                      className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                    >
+                      Settings
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className='flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                    >
+                      <LogOut className='mr-2 h-4 w-4' />
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className='flex items-center'>
+                <Link href='/login' className='px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-800'>Log in</Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

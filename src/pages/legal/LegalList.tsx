@@ -129,9 +129,9 @@ const LegalList = () => {
                     ) : null}
                   </CardHeader>
                   <CardContent>
-                     <p className='text-sm text-muted-foreground mb-3'>
-                       {summaries[item.slug] || 'View the full policy.'}
-                     </p>
+                    <p className='text-sm text-muted-foreground mb-3'>
+                      {summaries[item.slug] || 'View the full policy.'}
+                    </p>
                     <a
                       className='text-primary hover:underline text-sm'
                       href={`/legal/${item.slug}`}
