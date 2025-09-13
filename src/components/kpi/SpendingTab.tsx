@@ -82,18 +82,20 @@ const SpendingTab = () => {
   ];
 
   const mockMerchantTrends = [
-    { merchant: 'Amazon', currentMonth: 450, previousMonth: 380, change: 18.4 },
+    { merchant: 'Amazon', currentMonth: 450, previousMonth: 380, change: 18.4, transactionCount: 12 },
     {
       merchant: 'Starbucks',
       currentMonth: 120,
       previousMonth: 95,
       change: 26.3,
+      transactionCount: 8,
     },
     {
       merchant: 'Office Depot',
       currentMonth: 85,
       previousMonth: 90,
       change: -5.6,
+      transactionCount: 3,
     },
   ];
 
@@ -330,6 +332,8 @@ const SpendingTab = () => {
             transactions={mockTransactions}
             onUpdateCategory={() => {}}
             onCreateRule={() => {}}
+            selectedCategory={selectedCategory}
+            accountType={accountType}
           />
         </CardContent>
       </Card>

@@ -49,6 +49,7 @@ const AssetPricing = () => {
       icon: '🥇',
       description: 'Per Troy Ounce',
       isLive: true,
+      comingSoon: false,
     },
     {
       name: 'Silver (XAG)',
@@ -59,6 +60,7 @@ const AssetPricing = () => {
       icon: '🥈',
       description: 'Per Troy Ounce',
       isLive: true,
+      comingSoon: false,
     },
     {
       name: 'Platinum (XPT)',
@@ -69,40 +71,43 @@ const AssetPricing = () => {
       icon: '⚪',
       description: 'Per Troy Ounce',
       isLive: true,
+      comingSoon: false,
       tooltip:
         'OSPT is a fully redeemable platinum-backed token issued by Orbiko. Tokens are 1:1 backed by platinum stored in insured vaults and are transparently audited.',
     },
     // Bottom Row Assets
     {
-      name: 'Libyan Crude Oil',
-      symbol: 'NOC',
-      price: '$76.45',
-      change: '+1.8%',
+      name: 'Bitcoin (BTC)',
+      symbol: 'BTC',
+      price: '$43,567.89',
+      change: '+2.8%',
       isPositive: true,
-      icon: '🇱🇾',
-      description: 'NOC Per Barrel',
+      icon: '₿',
+      description: 'Per Bitcoin',
       isLive: true,
+      comingSoon: false,
     },
     {
-      name: 'Brent Crude Oil',
-      symbol: 'BRENT',
-      price: '$79.15',
-      change: '+2.3%',
+      name: 'Ethereum (ETH)',
+      symbol: 'ETH',
+      price: '$2,687.45',
+      change: '+1.9%',
       isPositive: true,
-      icon: '⚡',
-      description: 'Per Barrel',
+      icon: '⧫',
+      description: 'Per Ethereum',
       isLive: true,
+      comingSoon: false,
     },
     {
-      name: 'Lithium',
-      symbol: 'LI',
-      price: '$28,500',
-      change: '+0.0%',
+      name: 'Solana (SOL)',
+      symbol: 'SOL',
+      price: '$142.33',
+      change: '+4.2%',
       isPositive: true,
-      icon: '🔋',
-      description: 'Per Metric Ton',
-      isLive: false,
-      comingSoon: true,
+      icon: '◎',
+      description: 'Per Solana',
+      isLive: true,
+      comingSoon: false,
     },
   ];
 
@@ -163,7 +168,7 @@ const AssetPricing = () => {
                   </p>
                 </div>
 
-                {/* Action Buttons - Show for all assets except generic ones */}
+                /* Action Buttons - Show for all assets except generic ones */
                 {asset.isLive && (
                   <div className='space-y-2 mt-4 opacity-0 group-hover:opacity-100 md:opacity-100 transition-opacity duration-300'>
                     <div className='flex gap-2'>
@@ -191,7 +196,13 @@ const AssetPricing = () => {
                                   ? 'Buy Libyan NOC crude oil contracts'
                                   : asset.symbol === 'BRENT'
                                     ? 'Buy Brent crude oil contracts'
-                                    : `Purchase tokenized ${asset.name.split(' ')[0].toLowerCase()} at real-time market price`}
+                                    : asset.symbol === 'BTC'
+                                      ? 'Purchase Bitcoin at real-time market price'
+                                      : asset.symbol === 'ETH'
+                                        ? 'Purchase Ethereum at real-time market price'
+                                        : asset.symbol === 'SOL'
+                                          ? 'Purchase Solana at real-time market price'
+                                          : `Purchase tokenized ${asset.name.split(' ')[0].toLowerCase()} at real-time market price`}
                             </p>
                           </TooltipContent>
                         </Tooltip>
@@ -221,7 +232,13 @@ const AssetPricing = () => {
                                   ? 'Sell NOC contracts or request delivery'
                                   : asset.symbol === 'BRENT'
                                     ? 'Sell Brent contracts or request delivery'
-                                    : `Physically redeem your digital ${asset.name.split(' ')[0].toLowerCase()} balance`}
+                                    : asset.symbol === 'BTC'
+                                      ? 'Sell your Bitcoin holdings'
+                                      : asset.symbol === 'ETH'
+                                        ? 'Sell your Ethereum holdings'
+                                        : asset.symbol === 'SOL'
+                                          ? 'Sell your Solana holdings'
+                                          : `Physically redeem your digital ${asset.name.split(' ')[0].toLowerCase()} balance`}
                             </p>
                           </TooltipContent>
                         </Tooltip>
