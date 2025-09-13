@@ -1,3 +1,11 @@
+## Step-37 (Nav+Print Finalization) - 2025-09-13
+
+- **Navigation unification**: Resolved PR #55 residue and ensured canonical Navigation component is used site-wide; removed conflicting page-local headers
+- **Print scope finalization**: Confirmed `print.module.css` is properly scoped to legal viewer only; no global print styles affecting main UI
+- **Build version hard-bump**: Incremented `APP_BUILD_VERSION` from 1.0.1 to 1.0.2 to force new bundle generation and preview refresh
+- **Bundle invalidation**: Added `data-app-build` attribute to root element in `_app.tsx` to ensure all pages pull the new bundle
+- **Preview reliability**: Ensured Lovable preview will show new header after merge and rebuild
+
 ## Step-36 wrap-up (iOS wrapper scaffold)
 
 - Scaffolded minimal Capacitor wrapper without committing platform trees; server URL via `STAGING_WEB_BASE_URL` with localhost fallback. PR #40.
