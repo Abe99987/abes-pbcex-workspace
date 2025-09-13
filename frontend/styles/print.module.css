@@ -1,0 +1,49 @@
+/* Print-only styles for legal documents */
+@page {
+  margin: 20mm;
+}
+
+@media print {
+  /* Header */
+  body::before {
+    content: "PBCEx, Inc.";
+    display: block;
+    font-size: 12px;
+    margin-bottom: 8mm;
+  }
+
+  /* Footer with page numbers */
+  body::after {
+    content: "pbcex.com • +1-833-43-PBCEX • contact@pbcex.com • Page " counter(page) " of " counter(pages);
+    display: block;
+    font-size: 10px;
+    position: fixed;
+    bottom: 10mm;
+    width: 100%;
+    text-align: center;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 10px;
+  }
+
+  h1, h2 {
+    break-after: avoid-page;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Ensure white background and black text for print */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Hide navigation and other UI elements */
+  nav, header, footer, .print-hide {
+    display: none !important;
+  }
+}

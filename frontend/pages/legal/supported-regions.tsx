@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import '../styles/print.module.css';
 import Link from 'next/link';
 
 const LAST_UPDATED = '2025-01-15';
