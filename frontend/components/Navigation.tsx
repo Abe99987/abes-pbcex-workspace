@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth, getUserDisplayName } from '@/hooks/useAuth';
@@ -13,6 +13,17 @@ import {
   DollarSign,
   LogOut,
   LineChart,
+  CreditCard,
+  ArrowLeftRight,
+  Download,
+  Upload,
+  Landmark,
+  QrCode,
+  Calendar,
+  Repeat,
+  ShoppingCart,
+  Shield,
+  Settings,
 } from 'lucide-react';
 import { TickerTape } from '@/components/tradingview';
 
@@ -23,18 +34,195 @@ interface NavItem {
   description?: string;
 }
 
-const walletItems: NavItem[] = [
+// Buy Crypto dropdown
+const buyCryptoItems: NavItem[] = [
   {
-    name: 'My Assets',
-    href: '/wallet/assets',
-    icon: Wallet,
-    description: 'View and manage your portfolio',
+    name: 'Quick Buy (Placeholder)',
+    href: '/markets/BINANCE:BTCUSDT',
+    icon: CreditCard,
+    description: 'Fiat → asset in one step',
   },
   {
-    name: 'My Spending',
+    name: 'Quick Convert (Placeholder)',
+    href: '/wallet/assets',
+    icon: ArrowLeftRight,
+    description: 'Swap between assets instantly',
+  },
+  {
+    name: 'Buy with Card (Placeholder)',
     href: '/wallet/spending',
+    icon: CreditCard,
+    description: 'Visa/Mastercard checkout',
+  },
+  {
+    name: 'Deposit Crypto (Placeholder)',
+    href: '/wallet/assets',
+    icon: Download,
+    description: 'On-chain deposit addresses',
+  },
+];
+
+// Trade dropdown
+const tradeItems: NavItem[] = [
+  {
+    name: 'Spot (USD) (Placeholder)',
+    href: '/markets',
+    icon: LineChart,
+    description: 'USD-quoted markets',
+  },
+  {
+    name: 'Spot (USDC) (Placeholder)',
+    href: '/markets',
+    icon: LineChart,
+    description: 'USDC-quoted markets',
+  },
+  {
+    name: 'Coin-to-Coin (Placeholder)',
+    href: '/markets/BINANCE:BTCUSDT',
+    icon: ArrowLeftRight,
+    description: 'BTC/ETH quote pairs',
+  },
+  {
+    name: 'DCA (Placeholder)',
+    href: '/wallet/assets',
+    icon: Repeat,
+    description: 'Automated recurring purchases',
+  },
+];
+
+// Markets dropdown
+const marketsItems: NavItem[] = [
+  {
+    name: 'Analytics',
+    href: '/markets/analytics',
+    icon: BarChart3,
+    description: 'Overview & key metrics dashboard',
+  },
+  {
+    name: 'Tutorials (Placeholder)',
+    href: '/disclosures',
+    icon: FileText,
+    description: 'How-to guides',
+  },
+  {
+    name: 'Education (Learn) (Placeholder)',
+    href: '/legal',
+    icon: FileText,
+    description: 'Courses & long-form',
+  },
+];
+
+// Shop dropdown (link metals to symbols)
+const shopItems: NavItem[] = [
+  {
+    name: 'Shop All (Placeholder)',
+    href: '/markets',
+    icon: ShoppingCart,
+    description: 'View all commodities',
+  },
+  {
+    name: 'Buy Physical Gold',
+    href: '/markets/OANDA:XAUUSD',
     icon: DollarSign,
-    description: 'Track spending and budgets',
+    description: 'Gold',
+  },
+  {
+    name: 'Buy Physical Silver',
+    href: '/markets/OANDA:XAGUSD',
+    icon: DollarSign,
+    description: 'Silver',
+  },
+  {
+    name: 'Buy Physical Platinum',
+    href: '/markets/OANDA:XPTUSD',
+    icon: DollarSign,
+    description: 'Platinum',
+  },
+  {
+    name: 'Buy Physical Palladium',
+    href: '/markets/OANDA:XPDUSD',
+    icon: DollarSign,
+    description: 'Palladium',
+  },
+  {
+    name: 'Buy Physical Copper',
+    href: '/markets/COMEX:HG1!',
+    icon: DollarSign,
+    description: 'Copper',
+  },
+];
+
+// Send / Receive dropdown
+const transferItems: NavItem[] = [
+  {
+    name: 'Send to PBCEx User (Placeholder)',
+    href: '/wallet/assets',
+    icon: Upload,
+    description: 'Free & instant transfers',
+  },
+  {
+    name: 'Crypto Withdrawal (Placeholder)',
+    href: '/wallet/transactions',
+    icon: ArrowLeftRight,
+    description: 'Send on-chain',
+  },
+  {
+    name: 'Bank Transfers (SWIFT/WISE-ready) (Placeholder)',
+    href: '/wallet/transactions',
+    icon: Landmark,
+    description: 'Domestic & international',
+  },
+  {
+    name: 'Pay with QR Code (Placeholder)',
+    href: '/wallet/spending',
+    icon: QrCode,
+    description: 'Merchant QR',
+  },
+  {
+    name: 'Receive with QR Code (Placeholder)',
+    href: '/wallet/spending',
+    icon: QrCode,
+    description: 'Your QR',
+  },
+  {
+    name: 'Spend with Visa Card (Placeholder)',
+    href: '/wallet/spending',
+    icon: CreditCard,
+    description: 'Use card',
+  },
+  {
+    name: 'Set up Bill Pay (Placeholder)',
+    href: '/wallet/spending',
+    icon: Calendar,
+    description: 'Schedule utilities & vendors',
+  },
+  {
+    name: 'Request a Payment (Placeholder)',
+    href: '/wallet/transactions',
+    icon: FileText,
+    description: 'Create invoice/QR',
+  },
+  {
+    name: 'Set up Recurring Transfers (Placeholder)',
+    href: '/wallet/transactions',
+    icon: Repeat,
+    description: 'Automate payouts & savings',
+  },
+];
+
+// My Account (Wallet) dropdown
+const walletItems: NavItem[] = [
+  {
+    name: 'Balances & Funding',
+    href: '/wallet/assets',
+    icon: Wallet,
+    description: 'Balances, deposit, and funding options',
+  },
+  {
+    name: 'Cards (Placeholder)',
+    href: '/wallet/spending',
+    icon: CreditCard,
+    description: 'Manage cards and spending',
   },
   {
     name: 'Transaction History',
@@ -54,11 +242,40 @@ const walletItems: NavItem[] = [
     icon: TrendingUp,
     description: 'Profit & loss analytics',
   },
+  {
+    name: 'Connect Wallet (Placeholder)',
+    href: '/wallet/assets',
+    icon: ArrowLeftRight,
+    description: 'Connect external wallet',
+  },
+  {
+    name: 'Security (Placeholder)',
+    href: '/legal/privacy',
+    icon: Shield,
+    description: '2FA and security settings',
+  },
+  {
+    name: 'Settings & Profile (Placeholder)',
+    href: '/dashboard',
+    icon: Settings,
+    description: 'Manage your profile and preferences',
+  },
+  {
+    name: 'Support (Placeholder)',
+    href: '/disclosures',
+    icon: FileText,
+    description: 'Help center and support',
+  },
 ];
 
 export default function Navigation() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const [buyDropdownOpen, setBuyDropdownOpen] = useState(false);
+  const [tradeDropdownOpen, setTradeDropdownOpen] = useState(false);
+  const [marketsDropdownOpen, setMarketsDropdownOpen] = useState(false);
+  const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
+  const [transferDropdownOpen, setTransferDropdownOpen] = useState(false);
   const [walletDropdownOpen, setWalletDropdownOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
@@ -86,63 +303,209 @@ export default function Navigation() {
               </Link>
             </div>
             <div className='hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8'>
-              <Link
-                href='/dashboard'
-                className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${
-                  router.pathname === '/dashboard'
-                    ? 'border-b-2 border-blue-500 text-gray-900'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                Dashboard
-              </Link>
+              {/* Buy Crypto */}
+              <div className='relative'>
+                <button
+                  onClick={() => setBuyDropdownOpen(!buyDropdownOpen)}
+                  aria-expanded={buyDropdownOpen}
+                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    buyDropdownOpen ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Buy Crypto
+                  <ChevronDown className='ml-1 h-4 w-4' />
+                </button>
+                {buyDropdownOpen && (
+                  <div className='absolute left-0 top-full z-10 mt-2 w-96 origin-top-left rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5'>
+                    {buyCryptoItems.map(item => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setBuyDropdownOpen(false)}
+                        className='block px-4 py-3 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none'
+                      >
+                        <div className='flex items-start space-x-3'>
+                          <item.icon className='h-5 w-5 text-gray-400 mt-0.5' />
+                          <div>
+                            <div className='font-medium text-gray-900'>{item.name}</div>
+                            {item.description && (
+                              <div className='text-gray-500 text-xs'>{item.description}</div>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-              {/* Markets Link */}
-              <Link
-                href='/markets'
-                className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${
-                  router.pathname.startsWith('/markets')
-                    ? 'border-b-2 border-blue-500 text-gray-900'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <LineChart className='mr-1 h-4 w-4' />
-                Markets
-              </Link>
+              {/* Trade */}
+              <div className='relative'>
+                <button
+                  onClick={() => setTradeDropdownOpen(!tradeDropdownOpen)}
+                  aria-expanded={tradeDropdownOpen}
+                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    router.pathname.startsWith('/markets') ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Trade
+                  <ChevronDown className='ml-1 h-4 w-4' />
+                </button>
+                {tradeDropdownOpen && (
+                  <div className='absolute left-0 top-full z-10 mt-2 w-96 origin-top-left rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5'>
+                    {tradeItems.map(item => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setTradeDropdownOpen(false)}
+                        className='block px-4 py-3 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none'
+                      >
+                        <div className='flex items-start space-x-3'>
+                          <item.icon className='h-5 w-5 text-gray-400 mt-0.5' />
+                          <div>
+                            <div className='font-medium text-gray-900'>{item.name}</div>
+                            {item.description && (
+                              <div className='text-gray-500 text-xs'>{item.description}</div>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-              {/* Disclosures Link */}
-              <Link
-                href='/disclosures'
-                className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${
-                  router.pathname === '/disclosures'
-                    ? 'border-b-2 border-blue-500 text-gray-900'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                Disclosures
-              </Link>
+              {/* Markets */}
+              <div className='relative'>
+                <button
+                  onClick={() => setMarketsDropdownOpen(!marketsDropdownOpen)}
+                  aria-expanded={marketsDropdownOpen}
+                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    router.pathname.startsWith('/markets') ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <LineChart className='mr-1 h-4 w-4' />
+                  Markets
+                  <ChevronDown className='ml-1 h-4 w-4' />
+                </button>
+                {marketsDropdownOpen && (
+                  <div className='absolute left-0 top-full z-10 mt-2 w-96 origin-top-left rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5'>
+                    {marketsItems.map(item => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setMarketsDropdownOpen(false)}
+                        className='block px-4 py-3 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none'
+                      >
+                        <div className='flex items-start space-x-3'>
+                          <item.icon className='h-5 w-5 text-gray-400 mt-0.5' />
+                          <div>
+                            <div className='font-medium text-gray-900'>{item.name}</div>
+                            {item.description && (
+                              <div className='text-gray-500 text-xs'>{item.description}</div>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-              {/* Wallet Dropdown */}
+              {/* Shop */}
+              <div className='relative'>
+                <button
+                  onClick={() => setShopDropdownOpen(!shopDropdownOpen)}
+                  aria-expanded={shopDropdownOpen}
+                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    router.pathname.startsWith('/markets') ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Shop
+                  <ChevronDown className='ml-1 h-4 w-4' />
+                </button>
+                {shopDropdownOpen && (
+                  <div className='absolute left-0 top-full z-10 mt-2 w-96 origin-top-left rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5'>
+                    {shopItems.map(item => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setShopDropdownOpen(false)}
+                        className='block px-4 py-3 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none'
+                      >
+                        <div className='flex items-start space-x-3'>
+                          <item.icon className='h-5 w-5 text-gray-400 mt-0.5' />
+                          <div>
+                            <div className='font-medium text-gray-900'>{item.name}</div>
+                            {item.description && (
+                              <div className='text-gray-500 text-xs'>{item.description}</div>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Send / Receive */}
+              <div className='relative'>
+                <button
+                  onClick={() => setTransferDropdownOpen(!transferDropdownOpen)}
+                  aria-expanded={transferDropdownOpen}
+                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    router.pathname.startsWith('/wallet') ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Send / Receive
+                  <ChevronDown className='ml-1 h-4 w-4' />
+                </button>
+                {transferDropdownOpen && (
+                  <div className='absolute left-0 top-full z-10 mt-2 w-[28rem] origin-top-left rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5'>
+                    {transferItems.map(item => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setTransferDropdownOpen(false)}
+                        className='block px-4 py-3 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none'
+                      >
+                        <div className='flex items-start space-x-3'>
+                          <item.icon className='h-5 w-5 text-gray-400 mt-0.5' />
+                          <div>
+                            <div className='font-medium text-gray-900'>{item.name}</div>
+                            {item.description && (
+                              <div className='text-gray-500 text-xs'>{item.description}</div>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* My Account (Wallet) */}
               <div className='relative'>
                 <button
                   onClick={() => setWalletDropdownOpen(!walletDropdownOpen)}
-                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${
+                  aria-expanded={walletDropdownOpen}
+                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                     router.pathname.startsWith('/wallet')
-                      ? 'border-b-2 border-blue-500 text-gray-900'
+                      ? 'text-gray-900'
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  Wallet
+                  My Account
                   <ChevronDown className='ml-1 h-4 w-4' />
                 </button>
                 {walletDropdownOpen && (
-                  <div className='absolute left-0 top-full z-10 mt-2 w-80 origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5'>
+                  <div className='absolute left-0 top-full z-10 mt-2 w-96 origin-top-left rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5'>
                     {walletItems.map(item => (
                       <Link
                         key={item.name}
                         href={item.href}
                         onClick={() => setWalletDropdownOpen(false)}
-                        className='block px-4 py-3 text-sm hover:bg-gray-50'
+                        className='block px-4 py-3 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none'
                       >
                         <div className='flex items-start space-x-3'>
                           <item.icon className='h-5 w-5 text-gray-400 mt-0.5' />
