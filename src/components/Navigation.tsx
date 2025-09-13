@@ -263,23 +263,28 @@ const Navigation = () => {
       items: [
         {
           label: 'Balances & Funding',
-          href: '/my-assets',
-          description: 'Balances, deposit, and funding options',
+          href: '/account',
+          description: 'Balances, deposit, funding options',
         },
         {
-          label: 'Cards (Placeholder)',
+          label: 'My Assets',
+          href: '/my-assets',
+          description: 'Buy, Sell, Realize; Send/Receive, Spend, Transfer',
+        },
+        {
+          label: 'My Spending',
           href: '/my-spending',
-          description: 'Manage cards and spending',
+          description: 'Track expenses, categories, and savings goals',
         },
         {
           label: 'Transaction History',
           href: '/transaction-history',
-          description: 'View all deposits and withdrawals',
+          description: 'All transactions',
         },
         {
           label: 'Order History',
           href: '/order-history',
-          description: 'Track your trading activity',
+          description: 'Trading activity',
         },
         {
           label: 'PnL',
@@ -287,24 +292,24 @@ const Navigation = () => {
           description: 'Profit & loss analytics',
         },
         {
-          label: 'Connect Wallet (Placeholder)',
-          href: '/my-assets',
-          description: 'Connect external wallet',
+          label: 'Connect Wallet',
+          href: '/wallet',
+          description: 'External wallets',
         },
         {
           label: 'Security (Placeholder)',
           href: '/support/security',
-          description: '2FA and security settings',
+          description: '2FA & sessions',
         },
         {
           label: 'Settings & Profile (Placeholder)',
           href: '/account',
-          description: 'Manage your profile and preferences',
+          description: 'Preferences & KYC',
         },
         {
           label: 'Support (Placeholder)',
           href: '/support/help-center',
-          description: 'Help center and support',
+          description: 'Help center',
         },
       ],
     },
