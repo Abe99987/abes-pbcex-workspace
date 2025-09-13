@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 interface ManifestItem {
   slug: string;
@@ -14,17 +21,67 @@ const LegalList = () => {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/legal/manifest.json', { cache: 'no-cache' })
-      .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then((data: ManifestItem[]) => {
-        if (!cancelled) setItems(data);
-      })
-      .catch(e => {
-        if (!cancelled) setError(`Failed to load legal manifest: ${e.message}`);
-      });
+
+    const bakedIn: ManifestItem[] = [
+      { slug: 'privacy-policy', title: 'Privacy Policy' },
+      { slug: 'privacy-choices', title: 'Privacy Choices' },
+      { slug: 'accessibility', title: 'Accessibility' },
+      { slug: 'esign-consent', title: 'E-SIGN Consent' },
+      { slug: 'aml-bsa-program', title: 'AML/BSA Program' },
+      { slug: 'ofac-policy', title: 'OFAC Sanctions Policy' },
+      { slug: 'dealers-aml-memo', title: 'Dealers AML Memo' },
+      { slug: 'record-retention', title: 'Record Retention' },
+      { slug: 'refunds-shipping', title: 'Refunds & Shipping' },
+      { slug: 'risk-disclosures', title: 'Risk Disclosures' },
+      { slug: 'terms-of-service', title: 'Terms of Service' },
+    ];
+
+    const summaries: Record<string, string> = {
+      'privacy-policy': 'How we collect, use, and protect your data.',
+      'privacy-choices': 'Exercise your privacy options and preferences.',
+      accessibility: 'Our commitment to accessible services.',
+      'esign-consent': 'Consent to electronic delivery and signatures.',
+      'aml-bsa-program': 'Anti-money laundering and BSA compliance program.',
+      'ofac-policy': 'Sanctions screening and compliance requirements.',
+      'dealers-aml-memo': 'AML memo for dealers and vendors.',
+      'record-retention': 'Documents and data retention schedules.',
+      'refunds-shipping': 'Refunds, returns, and physical shipping policy.',
+      'risk-disclosures': 'Important trading and investment risks.',
+      'terms-of-service': 'Agreement governing your use of PBCEx.',
+    };
+
+    async function loadManifest() {
+      try {
+        // Primary: outside /legal route space
+        const r1 = await fetch('/data/legal-manifest.json', {
+          cache: 'no-cache',
+        });
+        if (r1.ok) {
+          const data = (await r1.json()) as ManifestItem[];
+          if (!cancelled) setItems(data);
+          return;
+        }
+        // Fallback: original path
+        const r2 = await fetch('/legal/manifest.json', { cache: 'no-cache' });
+        if (r2.ok) {
+          const data = (await r2.json()) as ManifestItem[];
+          if (!cancelled) setItems(data);
+          return;
+        }
+        // Final fallback: baked-in
+        if (!cancelled) {
+          setError('Live manifest unavailable — using fallback list.');
+          setItems(bakedIn);
+        }
+      } catch (e: any) {
+        if (!cancelled) {
+          setError('Live manifest unavailable — using fallback list.');
+          setItems(bakedIn);
+        }
+      }
+    }
+
+    loadManifest();
     return () => {
       cancelled = true;
     };
@@ -41,23 +98,34 @@ const LegalList = () => {
               Policies, disclosures, and terms. Select a document to view.
             </p>
             {error && <div className='mb-6 text-destructive'>{error}</div>}
-            <ul className='space-y-3'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
               {items.map(item => (
-                <li key={item.slug}>
-                  <a
-                    className='text-gold hover:underline'
-                    href={`/legal/${item.slug}`}
-                  >
-                    {item.title}
+                <Card
+                  key={item.slug}
+                  className='hover:shadow-lg transition-shadow'
+                >
+                  <CardHeader>
+                    <CardTitle className='text-xl'>{item.title}</CardTitle>
                     {item.lastUpdated ? (
-                      <span className='text-muted-foreground text-sm ml-2'>
-                        (Updated {item.lastUpdated})
-                      </span>
+                      <CardDescription>
+                        Updated {item.lastUpdated}
+                      </CardDescription>
                     ) : null}
-                  </a>
-                </li>
+                  </CardHeader>
+                  <CardContent>
+                    <p className='text-sm text-muted-foreground mb-3'>
+                      {(summaries as any)[item.slug] || 'View the full policy.'}
+                    </p>
+                    <a
+                      className='text-primary hover:underline text-sm'
+                      href={`/legal/${item.slug}`}
+                    >
+                      View document →
+                    </a>
+                  </CardContent>
+                </Card>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
       </main>

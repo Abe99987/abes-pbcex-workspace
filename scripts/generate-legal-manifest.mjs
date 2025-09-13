@@ -5,6 +5,7 @@ import path from 'path';
 const rootDir = process.cwd();
 const contentDir = path.join(rootDir, 'content', 'legal');
 const publicDir = path.join(rootDir, 'public', 'legal');
+const publicDataDir = path.join(rootDir, 'public', 'data');
 
 /**
  * Convert slug like "terms-of-service" to "Terms Of Service".
@@ -49,6 +50,7 @@ function ensureDir(dir) {
 function main() {
   ensureDir(contentDir);
   ensureDir(publicDir);
+  ensureDir(publicDataDir);
 
   const entries = fs
     .readdirSync(contentDir)
@@ -74,10 +76,17 @@ function main() {
     manifest.push({ slug, title: inferredTitle, lastUpdated: lastUpdated || null });
   }
 
+  const manifestJson = JSON.stringify(manifest, null, 2) + '\n';
   const manifestPath = path.join(publicDir, 'manifest.json');
-  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
+  fs.writeFileSync(manifestPath, manifestJson, 'utf8');
 
-  console.log(`Wrote ${entries.length} legal files to public/legal and manifest.json`);
+  // Duplicate manifest to public/data for hosts that route /legal/* to index.html
+  const manifestDataPath = path.join(publicDataDir, 'legal-manifest.json');
+  fs.writeFileSync(manifestDataPath, manifestJson, 'utf8');
+
+  console.log(
+    `Wrote ${entries.length} legal files to public/legal and manifest.json; duplicated manifest to public/data/legal-manifest.json`
+  );
 }
 
 main();
