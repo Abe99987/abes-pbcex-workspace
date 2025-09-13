@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import Navigation from '@/components/Navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -38,6 +37,20 @@ export default function Analytics() {
   const cardClass = 'bg-slate-900 border border-slate-800 rounded-xl p-4';
   const tableClass = 'w-full text-sm text-slate-200';
 
+  const getHrefForPair = (pair: string): string => {
+    const p = pair.toUpperCase();
+    if (p.includes('XAU')) return '/markets/OANDA:XAUUSD';
+    if (p.includes('XAG')) return '/markets/OANDA:XAGUSD';
+    if (p.includes('XPT')) return '/markets/OANDA:XPTUSD';
+    if (p.includes('HG1')) return '/markets/COMEX:HG1!';
+    if (p.includes('ETH')) return '/markets/BINANCE:ETHUSDT';
+    if (p.includes('BTC')) return '/markets/BINANCE:BTCUSDT';
+    if (p.includes('SOL')) return '/markets/SOLUSD';
+    if (p.includes('ADA')) return '/markets/ADAUSD';
+    if (p.includes('PAXG')) return '/markets/OANDA:XAUUSD';
+    return '/markets/OANDA:XAUUSD';
+  };
+
   return (
     <div className='min-h-screen dark bg-slate-950'>
       <Navigation />
@@ -65,14 +78,8 @@ export default function Analytics() {
               <div className='text-slate-400 text-xs uppercase tracking-wide'>Fear & Greed</div>
               <Activity className='h-4 w-4 text-amber-400' />
             </div>
-            <div className='relative mt-2 h-28 rounded-lg overflow-hidden border border-slate-800'>
-              <Image
-                src='https://alternative.me/crypto/fear-and-greed-index.png'
-                alt='Crypto Fear & Greed Index'
-                fill
-                sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw'
-                className='object-contain bg-slate-950'
-              />
+            <div className='relative mt-2 h-28 rounded-lg overflow-hidden border border-slate-800 bg-slate-950'>
+              <img src='https://alternative.me/crypto/fear-and-greed-index.png' alt='Crypto Fear & Greed Index' className='w-full h-full object-contain' />
             </div>
             <div className='text-[10px] text-slate-500 mt-2'>Source: Alternative.me</div>
           </div>
@@ -127,21 +134,21 @@ export default function Analytics() {
 
         {/* Compact tables */}
         <section className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-          {[
-            { title: 'Most Traded', rows: [ ['BTC/USDT','—','Trade'], ['ETH/USDT','—','Trade'], ['XAU/USD','—','Trade'] ] },
-            { title: 'Trending', rows: [ ['SOL/USDT','—','Trade'], ['XAG/USD','—','Trade'], ['ADA/USDT','—','Trade'] ] },
-            { title: 'Newly Listed', rows: [ ['PAXG/USD','—','Trade'], ['COMEX:HG1!','—','Trade'], ['XPT/USD','—','Trade'] ] },
-          ].map(section => (
+          {([
+            { title: 'Most Traded', rows: ['BTC/USDT', 'ETH/USDT', 'XAU/USD'] },
+            { title: 'Trending', rows: ['SOL/USDT', 'XAG/USD', 'ADA/USDT'] },
+            { title: 'Newly Listed', rows: ['PAXG/USD', 'COMEX:HG1!', 'XPT/USD'] },
+          ] as Array<{ title: string; rows: string[] }>).map(section => (
             <div key={section.title} className={cardClass}>
               <h3 className='text-base font-semibold text-slate-50 mb-3'>{section.title}</h3>
               <table className={tableClass}>
                 <tbody>
-                  {section.rows.map(([pair, vol]) => (
+                  {section.rows.map((pair) => (
                     <tr key={pair} className='border-t border-slate-800'>
                       <td className='py-2 text-slate-300'>{pair}</td>
-                      <td className='py-2 text-slate-500'>{vol}</td>
+                      <td className='py-2 text-slate-500'>—</td>
                       <td className='py-2 text-right'>
-                        <Link href={`/markets/${pair.includes('XAU')?'OANDA:XAUUSD':pair.includes('XAG')?'OANDA:XAGUSD':pair.includes('ETH')?'BINANCE:ETHUSDT':pair.includes('BTC')?'BINANCE:BTCUSDT':pair.includes('SOL')?'SOLUSD':pair.includes('ADA')?'ADAUSD':pair.includes('XPT')?'OANDA:XPTUSD':pair.includes('HG1')?'COMEX:HG1!':'OANDA:XAUUSD'}`} className='px-3 py-1.5 text-xs rounded bg-amber-500 text-slate-900 hover:bg-amber-400'>Trade</Link>
+                        <Link href={getHrefForPair(pair)} className='px-3 py-1.5 text-xs rounded bg-amber-500 text-slate-900 hover:bg-amber-400'>Trade</Link>
                       </td>
                     </tr>
                   ))}
