@@ -74,3 +74,10 @@ Added: /legal hub, /legal/tos, /legal/privacy, /legal/risk-disclosures, /legal/s
 - 'Fast checks' E2E remains non-required; CodeRabbit required; PR #48 merged (short SHA: 737fb05).
 - Preview stability: public/legal assets committed.
 - Next: Cloudflare redirects (/legal/regulatory → /compliance), Sentry alert for legal pages.
+
+## 2025-09-13 — Legal list manifest hardening (PR #49)
+
+- Duplicated manifest to `/data/legal-manifest.json`; resilient fetch order `/data` → `/legal` → baked-in list.
+- `/legal` renders an 11-tile grid with short summaries and "View document →" links; header/footer confirmed.
+- Merged PR #49; `/data` manifest is canonical for list loading.
+- Consider cache-buster on `/data` manifest if preview hosts cache aggressively.
