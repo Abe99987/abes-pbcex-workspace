@@ -5,16 +5,16 @@ import treasureChest from '@/assets/treasure-chest-large.png';
 
 const HeroSection = () => {
   return (
-    <section className='relative min-h-[70vh] flex items-center justify-center overflow-hidden pt-6 pb-4 bg-background'>
+    <section className='relative min-h-[78vh] flex items-center justify-center overflow-hidden pt-6 pb-2 bg-background'>
       {/* Background elements */}
       <div className='absolute inset-0 bg-gradient-to-br from-background via-card/30 to-muted/20' />
 
       <div className='container mx-auto px-4 relative z-10'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-6xl mx-auto'>
           {/* Left - Content - nudged closer to chest */}
-          <div className='text-center lg:text-left space-y-5 lg:ml-24'>
-            {/* Brand eyebrow - massively enlarged with color split */}
-            <div className='text-[12rem] md:text-[14rem] font-bold tracking-wide leading-none'>
+          <div className='text-center lg:text-left space-y-5 lg:ml-8'>
+            {/* Brand eyebrow - reduced size with color split */}
+            <div className='text-[9rem] md:text-[10.5rem] font-bold tracking-wide leading-none'>
               <span className='text-foreground'>PBC</span><span className='text-gold'>Ex</span>
             </div>
             
