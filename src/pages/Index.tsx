@@ -29,8 +29,8 @@ const Index = () => {
         <link rel='canonical' href='https://pbcex.com/' />
       </Helmet>
       <HeroSection />
-      <FeatureStripe />
       <AssetPricing />
+      <FeatureStripe />
       <FeaturesSection />
       <EducationSection />
       <Footer />

@@ -3,18 +3,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import {
   TrendingUp,
   TrendingDown,
-  ShoppingCart,
+  BarChart3,
   Package,
   Coins,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import BuyAssetModal from './BuyAssetModal';
 import RealizeAssetModal from './RealizeAssetModal';
 import BorrowingModal from './BorrowingModal';
@@ -26,93 +21,124 @@ interface Asset {
   change: string;
   isPositive: boolean;
   icon: string;
-  description: string;
-  isLive: boolean;
-  comingSoon?: boolean;
-  tooltip?: string;
+  type: 'metal' | 'crypto';
+  sparklineData: number[];
 }
 
+const Sparkline = ({ data }: { data: number[] }) => {
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const normalize = (val: number) => ((val - min) / (max - min)) * 40;
+  
+  const pathD = data
+    .map((point, index) => {
+      const x = (index / (data.length - 1)) * 80;
+      const y = 40 - normalize(point);
+      return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+    })
+    .join(' ');
+
+  return (
+    <div className='w-20 h-10 flex items-center justify-end'>
+      <svg width="80" height="40" className='overflow-visible'>
+        <path
+          d={pathD}
+          fill="none"
+          stroke="hsl(var(--gold))"
+          strokeWidth="2"
+          className='drop-shadow-sm'
+        />
+      </svg>
+    </div>
+  );
+};
+
 const AssetPricing = () => {
+  const navigate = useNavigate();
   const [buyModalOpen, setBuyModalOpen] = useState(false);
   const [realizeModalOpen, setRealizeModalOpen] = useState(false);
   const [borrowingModalOpen, setBorrowingModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
 
-  const assets = [
-    // Top Row Assets (live and tradable)
+  const assets: Asset[] = [
     {
-      name: 'Gold (XAU)',
-      symbol: 'AU',
+      name: 'Gold',
+      symbol: 'XAU',
       price: '$2,048.50',
       change: '+1.2%',
       isPositive: true,
       icon: '🥇',
-      description: 'Per Troy Ounce',
-      isLive: true,
-      comingSoon: false,
+      type: 'metal',
+      sparklineData: [2040, 2045, 2038, 2042, 2048, 2050, 2049, 2048],
     },
     {
-      name: 'Silver (XAG)',
-      symbol: 'AG',
+      name: 'Silver',
+      symbol: 'XAG',
       price: '$24.85',
       change: '+0.8%',
       isPositive: true,
       icon: '🥈',
-      description: 'Per Troy Ounce',
-      isLive: true,
-      comingSoon: false,
+      type: 'metal',
+      sparklineData: [24.2, 24.5, 24.3, 24.7, 24.8, 24.9, 24.85, 24.85],
     },
     {
-      name: 'Platinum (XPT)',
+      name: 'Platinum',
       symbol: 'XPT',
       price: '$924.80',
       change: '+0.6%',
       isPositive: true,
       icon: '⚪',
-      description: 'Per Troy Ounce',
-      isLive: true,
-      comingSoon: false,
-      tooltip:
-        'OSPT is a fully redeemable platinum-backed token issued by Orbiko. Tokens are 1:1 backed by platinum stored in insured vaults and are transparently audited.',
+      type: 'metal',
+      sparklineData: [920, 922, 918, 925, 924, 926, 925, 924.8],
     },
-    // Bottom Row Assets
     {
-      name: 'Bitcoin (BTC)',
+      name: 'Bitcoin',
       symbol: 'BTC',
       price: '$43,567.89',
       change: '+2.8%',
       isPositive: true,
       icon: '₿',
-      description: 'Per Bitcoin',
-      isLive: true,
-      comingSoon: false,
+      type: 'crypto',
+      sparklineData: [42000, 42500, 41800, 43000, 43200, 43600, 43500, 43567],
     },
     {
-      name: 'Ethereum (ETH)',
+      name: 'Ethereum',
       symbol: 'ETH',
       price: '$2,687.45',
       change: '+1.9%',
       isPositive: true,
       icon: '⧫',
-      description: 'Per Ethereum',
-      isLive: true,
-      comingSoon: false,
+      type: 'crypto',
+      sparklineData: [2650, 2660, 2640, 2670, 2680, 2690, 2685, 2687],
     },
     {
-      name: 'Solana (SOL)',
+      name: 'Solana',
       symbol: 'SOL',
       price: '$142.33',
       change: '+4.2%',
       isPositive: true,
       icon: '◎',
-      description: 'Per Solana',
-      isLive: true,
-      comingSoon: false,
+      type: 'crypto',
+      sparklineData: [135, 138, 140, 142, 144, 143, 142.5, 142.33],
     },
   ];
 
+  const handleCardClick = (asset: Asset) => {
+    if (asset.type === 'metal') {
+      navigate('/markets?tab=commodities');
+    } else {
+      navigate('/markets?tab=crypto');
+    }
+  };
+
+  const handleTradeClick = (asset: Asset, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const tradePair = asset.type === 'crypto' ? `${asset.symbol}-USDC` : asset.symbol;
+    navigate(`/trade/${tradePair}`);
+  };
+
   return (
-    <section id='assets' className='py-12 bg-muted/30'>
+    <section id='assets' className='py-12 bg-background'>
       <div className='container mx-auto px-4'>
         <div className='text-center mb-8'>
           <h2 className='text-3xl md:text-4xl font-bold text-foreground mb-4'>
@@ -124,182 +150,104 @@ const AssetPricing = () => {
           </p>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto'>
+        <div className='grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto'>
           {assets.map(asset => (
             <Card
               key={asset.symbol}
-              className='group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30 relative overflow-hidden'
+              className='group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-gold/30 cursor-pointer bg-card/80 backdrop-blur'
+              onClick={() => handleCardClick(asset)}
             >
-              <CardContent className='p-6'>
-                <div className='flex items-center justify-between mb-4'>
-                  <div className='text-2xl'>{asset.icon}</div>
-                  <div className='flex items-center gap-2'>
-                    {asset.comingSoon && (
-                      <Badge
-                        variant='outline'
-                        className='text-xs bg-gold/10 text-gold border-gold/30'
-                      >
-                        Early Access
-                      </Badge>
-                    )}
-                    <Badge
-                      variant={asset.isPositive ? 'default' : 'destructive'}
-                      className='flex items-center space-x-1'
-                    >
-                      {asset.isPositive ? (
-                        <TrendingUp className='w-3 h-3' />
-                      ) : (
-                        <TrendingDown className='w-3 h-3' />
-                      )}
-                      <span>{asset.change}</span>
-                    </Badge>
+              <CardContent className='p-4 md:p-6'>
+                <div className='flex items-start justify-between mb-3'>
+                  <div className='flex items-center space-x-2'>
+                    <span className='text-xl md:text-2xl'>{asset.icon}</span>
+                    <div>
+                      <div className='font-semibold text-foreground text-sm md:text-base'>
+                        {asset.name}
+                      </div>
+                      <div className='text-xs text-muted-foreground'>
+                        {asset.symbol}
+                      </div>
+                    </div>
                   </div>
+                  <Sparkline data={asset.sparklineData} />
                 </div>
-                <div className='space-y-2 mb-4'>
-                  <h3 className='font-semibold text-foreground'>
-                    {asset.name}
-                  </h3>
-                  <div className='text-2xl font-bold text-primary'>
+
+                <div className='mb-3'>
+                  <div className='text-lg md:text-xl font-bold text-foreground mb-1'>
                     {asset.price}
                   </div>
-                  <p className='text-sm text-muted-foreground'>
-                    {asset.description}
-                  </p>
+                  <Badge
+                    variant={asset.isPositive ? 'default' : 'destructive'}
+                    className='text-xs bg-gold/10 text-gold border-gold/30 hover:bg-gold/20'
+                  >
+                    {asset.isPositive ? (
+                      <TrendingUp className='w-3 h-3 mr-1' />
+                    ) : (
+                      <TrendingDown className='w-3 h-3 mr-1' />
+                    )}
+                    {asset.change}
+                  </Badge>
                 </div>
-                /* Action Buttons - Show for all assets except generic ones */
-                {asset.isLive && (
-                  <div className='space-y-2 mt-4 opacity-0 group-hover:opacity-100 md:opacity-100 transition-opacity duration-300'>
-                    <div className='flex gap-2'>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              size='sm'
-                              variant='outline'
-                              className='flex-1'
-                              onClick={() => {
-                                setSelectedAsset(asset);
-                                setBuyModalOpen(true);
-                              }}
-                            >
-                              <ShoppingCart className='w-3 h-3 mr-1' />
-                              Buy
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>
-                              {asset.symbol === 'XPT'
-                                ? 'Purchase tokenized platinum backed by OSPT'
-                                : asset.symbol === 'NOC'
-                                  ? 'Buy Libyan NOC crude oil contracts'
-                                  : asset.symbol === 'BRENT'
-                                    ? 'Buy Brent crude oil contracts'
-                                    : asset.symbol === 'BTC'
-                                      ? 'Purchase Bitcoin at real-time market price'
-                                      : asset.symbol === 'ETH'
-                                        ? 'Purchase Ethereum at real-time market price'
-                                        : asset.symbol === 'SOL'
-                                          ? 'Purchase Solana at real-time market price'
-                                          : `Purchase tokenized ${asset.name.split(' ')[0].toLowerCase()} at real-time market price`}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
 
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              size='sm'
-                              variant='outline'
-                              className='flex-1'
-                              onClick={() => {
-                                setSelectedAsset(asset);
-                                setRealizeModalOpen(true);
-                              }}
-                            >
-                              <Package className='w-3 h-3 mr-1' />
-                              Realize
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>
-                              {asset.symbol === 'XPT'
-                                ? 'Redeem your digital platinum for physical delivery'
-                                : asset.symbol === 'NOC'
-                                  ? 'Sell NOC contracts or request delivery'
-                                  : asset.symbol === 'BRENT'
-                                    ? 'Sell Brent contracts or request delivery'
-                                    : asset.symbol === 'BTC'
-                                      ? 'Sell your Bitcoin holdings'
-                                      : asset.symbol === 'ETH'
-                                        ? 'Sell your Ethereum holdings'
-                                        : asset.symbol === 'SOL'
-                                          ? 'Sell your Solana holdings'
-                                          : `Physically redeem your digital ${asset.name.split(' ')[0].toLowerCase()} balance`}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-
-                    {/* Borrow Against Precious Metals - Gold and Platinum */}
-                    {(asset.symbol === 'AU' || asset.symbol === 'XPT') && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              size='sm'
-                              variant='premium'
-                              className='w-full'
-                              onClick={() => {
-                                setSelectedAsset(asset);
-                                setBorrowingModalOpen(true);
-                              }}
-                            >
-                              <Coins className='w-3 h-3 mr-1' />
-                              {asset.symbol === 'AU'
-                                ? 'Borrow Against Gold'
-                                : 'Borrow Against Platinum'}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>
-                              {asset.tooltip ||
-                                'Asset-Based Financing — No Credit Checks. Instant Cash. Always Backed.'}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                <div className='space-y-2'>
+                  <div className='hidden md:flex gap-2'>
+                    <Button
+                      size='sm'
+                      variant='gold'
+                      className='flex-1'
+                      onClick={(e) => handleTradeClick(asset, e)}
+                    >
+                      <BarChart3 className='w-3 h-3 mr-1' />
+                      Trade
+                    </Button>
+                    {asset.type === 'metal' && (
+                      <Button
+                        size='sm'
+                        variant='outline'
+                        className='flex-1'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedAsset(asset);
+                          setRealizeModalOpen(true);
+                        }}
+                      >
+                        <Package className='w-3 h-3 mr-1' />
+                        Realize
+                      </Button>
                     )}
                   </div>
-                )}
-                {/* Token Raise Button - For coming soon assets */}
-                {asset.comingSoon && (
-                  <div className='space-y-2 mt-4'>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            size='sm'
-                            variant='premium'
-                            className='w-full'
-                            disabled
-                          >
-                            <Coins className='w-3 h-3 mr-1' />
-                            Token Raise - Coming Soon
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>
-                            Early access token raise opportunity with 5% rebate
-                            - launching soon!
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                  
+                  {/* Mobile: Single Trade button */}
+                  <div className='md:hidden'>
+                    <Button
+                      size='sm'
+                      variant='gold'
+                      className='w-full'
+                      onClick={(e) => handleTradeClick(asset, e)}
+                    >
+                      Trade
+                    </Button>
                   </div>
-                )}
+
+                  {/* Borrow buttons for XAU and XPT */}
+                  {(asset.symbol === 'XAU' || asset.symbol === 'XPT') && (
+                    <Button
+                      size='sm'
+                      variant='outline'
+                      className='w-full hidden md:flex'
+                      disabled
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedAsset(asset);
+                        setBorrowingModalOpen(true);
+                      }}
+                    >
+                      <Coins className='w-3 h-3 mr-1' />
+                      Borrow Against {asset.name}
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -310,23 +258,6 @@ const AssetPricing = () => {
             Prices updated every 30 seconds • Last update:{' '}
             {new Date().toLocaleTimeString()}
           </p>
-          <div className='mt-2 text-xs text-muted-foreground'>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className='underline decoration-dotted cursor-help'>
-                    Delivery insured by Dillon Gage, fully tracked & verified
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    All physical deliveries are insured, tracked, and verified
-                    by our trusted partner Dillon Gage
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
         </div>
       </div>
 
