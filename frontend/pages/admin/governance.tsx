@@ -39,7 +39,9 @@ export default function Governance() {
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'roles' | 'permissions' | 'policies'>('roles');
+  const [activeTab, setActiveTab] = useState<
+    'roles' | 'permissions' | 'policies'
+  >('roles');
 
   useEffect(() => {
     fetchGovernanceData();
@@ -50,7 +52,7 @@ export default function Governance() {
       setLoading(true);
       // TODO: Replace with actual admin governance endpoints
       // For now, use mock data
-      
+
       const mockRoles: Role[] = [
         {
           id: '1',
@@ -64,7 +66,8 @@ export default function Governance() {
         {
           id: '2',
           name: 'ADMIN',
-          description: 'Administrative access to manage users and system settings',
+          description:
+            'Administrative access to manage users and system settings',
           permissions: [],
           userCount: 3,
           createdAt: '2025-01-01T00:00:00Z',
@@ -221,10 +224,27 @@ export default function Governance() {
   const getPermissionCount = (roleName: string) => {
     // Mock permission mapping - in real app this would come from the backend
     const permissionMap: Record<string, string[]> = {
-      'SUPER_ADMIN': ['USER_READ', 'USER_WRITE', 'SYSTEM_READ', 'SYSTEM_WRITE', 'AUDIT_READ', 'TRADE_READ', 'TRADE_WRITE', 'WALLET_READ', 'WALLET_WRITE'],
-      'ADMIN': ['USER_READ', 'USER_WRITE', 'SYSTEM_READ', 'AUDIT_READ', 'TRADE_READ', 'WALLET_READ'],
-      'MODERATOR': ['USER_READ', 'TRADE_READ', 'WALLET_READ'],
-      'USER': ['TRADE_READ', 'TRADE_WRITE', 'WALLET_READ', 'WALLET_WRITE'],
+      SUPER_ADMIN: [
+        'USER_READ',
+        'USER_WRITE',
+        'SYSTEM_READ',
+        'SYSTEM_WRITE',
+        'AUDIT_READ',
+        'TRADE_READ',
+        'TRADE_WRITE',
+        'WALLET_READ',
+        'WALLET_WRITE',
+      ],
+      ADMIN: [
+        'USER_READ',
+        'USER_WRITE',
+        'SYSTEM_READ',
+        'AUDIT_READ',
+        'TRADE_READ',
+        'WALLET_READ',
+      ],
+      MODERATOR: ['USER_READ', 'TRADE_READ', 'WALLET_READ'],
+      USER: ['TRADE_READ', 'TRADE_WRITE', 'WALLET_READ', 'WALLET_WRITE'],
     };
     return permissionMap[roleName]?.length || 0;
   };
@@ -249,8 +269,8 @@ export default function Governance() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className='flex items-center justify-center h-64'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600'></div>
         </div>
       </AdminLayout>
     );
@@ -258,14 +278,16 @@ export default function Governance() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className='space-y-6'>
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Governance & Access Control</h1>
-          <div className="flex space-x-3">
+        <div className='flex justify-between items-center'>
+          <h1 className='text-2xl font-bold text-gray-900'>
+            Governance & Access Control
+          </h1>
+          <div className='flex space-x-3'>
             <button
               onClick={fetchGovernanceData}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700'
             >
               Refresh
             </button>
@@ -273,13 +295,17 @@ export default function Governance() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
+        <div className='border-b border-gray-200'>
+          <nav className='-mb-px flex space-x-8'>
             {[
               { id: 'roles', label: 'Roles', count: roles.length },
-              { id: 'permissions', label: 'Permissions', count: permissions.length },
+              {
+                id: 'permissions',
+                label: 'Permissions',
+                count: permissions.length,
+              },
               { id: 'policies', label: 'Policies', count: policies.length },
-            ].map((tab) => (
+            ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
@@ -290,7 +316,7 @@ export default function Governance() {
                 }`}
               >
                 {tab.label}
-                <span className="ml-2 bg-gray-100 text-gray-900 py-0.5 px-2.5 rounded-full text-xs font-medium">
+                <span className='ml-2 bg-gray-100 text-gray-900 py-0.5 px-2.5 rounded-full text-xs font-medium'>
                   {tab.count}
                 </span>
               </button>
@@ -300,57 +326,67 @@ export default function Governance() {
 
         {/* Roles Tab */}
         {activeTab === 'roles' && (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">System Roles</h3>
-              <p className="text-sm text-gray-600 mt-1">
+          <div className='bg-white rounded-lg shadow overflow-hidden'>
+            <div className='px-6 py-4 border-b border-gray-200'>
+              <h3 className='text-lg font-medium text-gray-900'>
+                System Roles
+              </h3>
+              <p className='text-sm text-gray-600 mt-1'>
                 Roles define sets of permissions that can be assigned to users
               </p>
             </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className='overflow-x-auto'>
+              <table className='min-w-full divide-y divide-gray-200'>
+                <thead className='bg-gray-50'>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Role
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Description
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Permissions
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Users
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Type
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {roles.map((role) => (
-                    <tr key={role.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="text-sm font-medium text-gray-900">{role.name}</div>
+                <tbody className='bg-white divide-y divide-gray-200'>
+                  {roles.map(role => (
+                    <tr key={role.id} className='hover:bg-gray-50'>
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <div className='flex items-center'>
+                          <div className='text-sm font-medium text-gray-900'>
+                            {role.name}
+                          </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900 max-w-xs">{role.description}</div>
+                      <td className='px-6 py-4'>
+                        <div className='text-sm text-gray-900 max-w-xs'>
+                          {role.description}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800'>
                           {getPermissionCount(role.name)} permissions
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
                         {role.userCount}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          role.isSystem ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                        }`}>
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            role.isSystem
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}
+                        >
                           {role.isSystem ? 'System' : 'Custom'}
                         </span>
                       </td>
@@ -364,51 +400,60 @@ export default function Governance() {
 
         {/* Permissions Tab */}
         {activeTab === 'permissions' && (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">System Permissions</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Permissions define what actions can be performed on specific resources
+          <div className='bg-white rounded-lg shadow overflow-hidden'>
+            <div className='px-6 py-4 border-b border-gray-200'>
+              <h3 className='text-lg font-medium text-gray-900'>
+                System Permissions
+              </h3>
+              <p className='text-sm text-gray-600 mt-1'>
+                Permissions define what actions can be performed on specific
+                resources
               </p>
             </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className='overflow-x-auto'>
+              <table className='min-w-full divide-y divide-gray-200'>
+                <thead className='bg-gray-50'>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Permission
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Description
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Resource
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Action
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Category
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {permissions.map((permission) => (
-                    <tr key={permission.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{permission.name}</div>
+                <tbody className='bg-white divide-y divide-gray-200'>
+                  {permissions.map(permission => (
+                    <tr key={permission.id} className='hover:bg-gray-50'>
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <div className='text-sm font-medium text-gray-900'>
+                          {permission.name}
+                        </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900 max-w-xs">{permission.description}</div>
+                      <td className='px-6 py-4'>
+                        <div className='text-sm text-gray-900 max-w-xs'>
+                          {permission.description}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
                         {permission.resource}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
                         {permission.action}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(permission.category)}`}>
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(permission.category)}`}
+                        >
                           {permission.category}
                         </span>
                       </td>
@@ -422,68 +467,79 @@ export default function Governance() {
 
         {/* Policies Tab */}
         {activeTab === 'policies' && (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Access Policies</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Policies define access rules that combine roles, resources, and conditions
+          <div className='bg-white rounded-lg shadow overflow-hidden'>
+            <div className='px-6 py-4 border-b border-gray-200'>
+              <h3 className='text-lg font-medium text-gray-900'>
+                Access Policies
+              </h3>
+              <p className='text-sm text-gray-600 mt-1'>
+                Policies define access rules that combine roles, resources, and
+                conditions
               </p>
             </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className='overflow-x-auto'>
+              <table className='min-w-full divide-y divide-gray-200'>
+                <thead className='bg-gray-50'>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Policy
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Description
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Effect
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Resources
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Roles
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {policies.map((policy) => (
-                    <tr key={policy.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{policy.name}</div>
+                <tbody className='bg-white divide-y divide-gray-200'>
+                  {policies.map(policy => (
+                    <tr key={policy.id} className='hover:bg-gray-50'>
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <div className='text-sm font-medium text-gray-900'>
+                          {policy.name}
+                        </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900 max-w-xs">{policy.description}</div>
+                      <td className='px-6 py-4'>
+                        <div className='text-sm text-gray-900 max-w-xs'>
+                          {policy.description}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          policy.effect === 'ALLOW' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            policy.effect === 'ALLOW'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
+                        >
                           {policy.effect}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-wrap gap-1">
+                      <td className='px-6 py-4'>
+                        <div className='flex flex-wrap gap-1'>
                           {policy.resources.map((resource, index) => (
                             <span
                               key={index}
-                              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                              className='inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800'
                             >
                               {resource}
                             </span>
                           ))}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-wrap gap-1">
+                      <td className='px-6 py-4'>
+                        <div className='flex flex-wrap gap-1'>
                           {policy.roles.map((role, index) => (
                             <span
                               key={index}
-                              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                              className='inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800'
                             >
                               {role}
                             </span>
@@ -499,18 +555,21 @@ export default function Governance() {
         )}
 
         {/* Info Box */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <span className="text-blue-400">ℹ️</span>
+        <div className='bg-blue-50 border border-blue-200 rounded-lg p-4'>
+          <div className='flex'>
+            <div className='flex-shrink-0'>
+              <span className='text-blue-400'>ℹ️</span>
             </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">Read-Only View</h3>
-              <div className="mt-2 text-sm text-blue-700">
+            <div className='ml-3'>
+              <h3 className='text-sm font-medium text-blue-800'>
+                Read-Only View
+              </h3>
+              <div className='mt-2 text-sm text-blue-700'>
                 <p>
-                  This is a read-only view of the current governance configuration. 
-                  To modify roles, permissions, or policies, please use the admin API endpoints 
-                  or contact a system administrator.
+                  This is a read-only view of the current governance
+                  configuration. To modify roles, permissions, or policies,
+                  please use the admin API endpoints or contact a system
+                  administrator.
                 </p>
               </div>
             </div>

@@ -1,12 +1,17 @@
 import React from 'react';
 import TradingViewWidget from './TradingViewWidget';
-import { WIDGET_CONFIGS, getCanonicalSymbol, REQUIRED_TIMEFRAMES, type ExecutionMarkersProvider } from '@/utils/tradingview';
+import {
+  WIDGET_CONFIGS,
+  getCanonicalSymbol,
+  REQUIRED_TIMEFRAMES,
+  type ExecutionMarkersProvider,
+} from '@/utils/tradingview';
 
 interface AdvancedChartProps {
   /** Symbol to display (will be converted to canonical format) */
   symbol?: string;
   /** Chart interval (defaults to supported timeframes) */
-  interval?: typeof REQUIRED_TIMEFRAMES[number];
+  interval?: (typeof REQUIRED_TIMEFRAMES)[number];
   /** Chart style */
   style?: '1' | '2' | '3' | '4' | '9';
   /** Auto resize */
@@ -44,7 +49,9 @@ export const AdvancedChart: React.FC<AdvancedChartProps> = ({
   containerStyle = {},
 }) => {
   // Convert symbol to canonical format if provided
-  const canonicalSymbol = symbol ? getCanonicalSymbol(symbol) : WIDGET_CONFIGS.ADVANCED_CHART.symbol;
+  const canonicalSymbol = symbol
+    ? getCanonicalSymbol(symbol)
+    : WIDGET_CONFIGS.ADVANCED_CHART.symbol;
 
   const config = {
     ...WIDGET_CONFIGS.ADVANCED_CHART,
@@ -63,15 +70,17 @@ export const AdvancedChart: React.FC<AdvancedChartProps> = ({
     // Ensure required timeframes are available
     time_frames: REQUIRED_TIMEFRAMES,
     // Crosshair configuration
-    crosshair_options: enableCrosshair ? {
-      visible: true,
-      style: 0, // Dotted
-      width: 1,
-      color: 'rgba(32, 38, 46, 0.1)',
-    } : undefined,
+    crosshair_options: enableCrosshair
+      ? {
+          visible: true,
+          style: 0, // Dotted
+          width: 1,
+          color: 'rgba(32, 38, 46, 0.1)',
+        }
+      : undefined,
     ...(studies && { studies }),
     // Execution markers hook (placeholder for future implementation)
-    ...(executionMarkersProvider && { 
+    ...(executionMarkersProvider && {
       customMarkersProvider: executionMarkersProvider,
       enable_publishing: false, // Security: disable publishing
     }),

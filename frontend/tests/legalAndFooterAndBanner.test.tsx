@@ -32,7 +32,9 @@ describe('Legal pages render', () => {
     render(<LegalHub />);
     expect(document.querySelector('title')).not.toBeNull();
     expect(document.querySelector('meta[name="description"]')).not.toBeNull();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Legal Hub/i);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /Legal Hub/i
+    );
     expect(screen.getByText(/Last updated:/i)).toBeInTheDocument();
   });
 
@@ -40,7 +42,9 @@ describe('Legal pages render', () => {
     render(<TOS />);
     expect(document.querySelector('title')).not.toBeNull();
     expect(document.querySelector('meta[name="description"]')).not.toBeNull();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Terms of Service/i);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /Terms of Service/i
+    );
     expect(screen.getByText(/Last updated:/i)).toBeInTheDocument();
   });
 
@@ -48,7 +52,9 @@ describe('Legal pages render', () => {
     render(<Privacy />);
     expect(document.querySelector('title')).not.toBeNull();
     expect(document.querySelector('meta[name="description"]')).not.toBeNull();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Privacy Policy/i);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /Privacy Policy/i
+    );
     expect(screen.getByText(/Last updated:/i)).toBeInTheDocument();
   });
 
@@ -56,7 +62,9 @@ describe('Legal pages render', () => {
     render(<Risk />);
     expect(document.querySelector('title')).not.toBeNull();
     expect(document.querySelector('meta[name="description"]')).not.toBeNull();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Risk Disclosures/i);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /Risk Disclosures/i
+    );
     expect(screen.getByText(/Last updated:/i)).toBeInTheDocument();
   });
 
@@ -64,7 +72,9 @@ describe('Legal pages render', () => {
     render(<Regions />);
     expect(document.querySelector('title')).not.toBeNull();
     expect(document.querySelector('meta[name="description"]')).not.toBeNull();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Supported Regions/i);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /Supported Regions/i
+    );
     expect(screen.getByText(/Last updated:/i)).toBeInTheDocument();
   });
 });
@@ -72,10 +82,22 @@ describe('Legal pages render', () => {
 describe('Footer links present', () => {
   test('Footer renders all legal links with correct hrefs', () => {
     renderWithApp(() => <div>Test Page</div>);
-    expect(screen.getByTestId('footer-link-tos')).toHaveAttribute('href', '/legal/tos');
-    expect(screen.getByTestId('footer-link-privacy')).toHaveAttribute('href', '/legal/privacy');
-    expect(screen.getByTestId('footer-link-risk')).toHaveAttribute('href', '/legal/risk-disclosures');
-    expect(screen.getByTestId('footer-link-supported-regions')).toHaveAttribute('href', '/legal/supported-regions');
+    expect(screen.getByTestId('footer-link-tos')).toHaveAttribute(
+      'href',
+      '/legal/tos'
+    );
+    expect(screen.getByTestId('footer-link-privacy')).toHaveAttribute(
+      'href',
+      '/legal/privacy'
+    );
+    expect(screen.getByTestId('footer-link-risk')).toHaveAttribute(
+      'href',
+      '/legal/risk-disclosures'
+    );
+    expect(screen.getByTestId('footer-link-supported-regions')).toHaveAttribute(
+      'href',
+      '/legal/supported-regions'
+    );
   });
 });
 
@@ -125,7 +147,9 @@ describe('Region gating banner logic', () => {
     window.localStorage.setItem('userRegion', 'US');
 
     renderWithApp(() => <div>Test Page</div>);
-    expect(screen.queryByTestId('region-gating-banner')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('region-gating-banner')
+    ).not.toBeInTheDocument();
   });
 
   test('Banner hidden when gating off', () => {
@@ -133,8 +157,8 @@ describe('Region gating banner logic', () => {
     window.localStorage.setItem('userRegion', 'AU');
 
     renderWithApp(() => <div>Test Page</div>);
-    expect(screen.queryByTestId('region-gating-banner')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('region-gating-banner')
+    ).not.toBeInTheDocument();
   });
 });
-
-

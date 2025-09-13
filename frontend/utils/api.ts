@@ -140,10 +140,18 @@ export const api = {
     placeOrder: (data: TradeOrderData) =>
       apiClient.post<ApiResponse<{ trade: Trade }>>('/api/trade/order', data),
     // New idempotent trade endpoints
-    buy: (data: { symbol: string; qty: string; slippage?: number; request_id: string }) =>
-      apiClient.post<ApiResponse<TradeReceipt>>('/api/trades/buy', data),
-    sell: (data: { symbol: string; qty: string; slippage?: number; request_id: string }) =>
-      apiClient.post<ApiResponse<TradeReceipt>>('/api/trades/sell', data),
+    buy: (data: {
+      symbol: string;
+      qty: string;
+      slippage?: number;
+      request_id: string;
+    }) => apiClient.post<ApiResponse<TradeReceipt>>('/api/trades/buy', data),
+    sell: (data: {
+      symbol: string;
+      qty: string;
+      slippage?: number;
+      request_id: string;
+    }) => apiClient.post<ApiResponse<TradeReceipt>>('/api/trades/sell', data),
     getHistory: (limit?: number, offset?: number) =>
       apiClient.get<ApiResponse<TradeHistoryResponse>>('/api/trade/history', {
         params: { limit, offset },

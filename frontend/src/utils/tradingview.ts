@@ -7,8 +7,15 @@
 export type TradingViewTheme = 'light' | 'dark';
 
 // Required timeframes for TradingView parity
-export const REQUIRED_TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1D'] as const;
-export type Timeframe = typeof REQUIRED_TIMEFRAMES[number];
+export const REQUIRED_TIMEFRAMES = [
+  '1m',
+  '5m',
+  '15m',
+  '1h',
+  '4h',
+  '1D',
+] as const;
+export type Timeframe = (typeof REQUIRED_TIMEFRAMES)[number];
 
 // Execution markers interface for trade visualization
 export interface ExecutionMarker {
@@ -23,27 +30,33 @@ export interface ExecutionMarker {
 
 // Execution markers provider interface
 export interface ExecutionMarkersProvider {
-  getMarkers: (symbol: string, timeframe: Timeframe) => Promise<ExecutionMarker[]>;
-  subscribeToMarkers?: (symbol: string, callback: (markers: ExecutionMarker[]) => void) => () => void;
+  getMarkers: (
+    symbol: string,
+    timeframe: Timeframe
+  ) => Promise<ExecutionMarker[]>;
+  subscribeToMarkers?: (
+    symbol: string,
+    callback: (markers: ExecutionMarker[]) => void
+  ) => () => void;
 }
 
 // Canonical symbol mappings (aligned with backend PriceFeedService)
 export const CANONICAL_SYMBOL_MAP = {
   // PBCEx asset codes to TradingView symbols (matches backend)
-  'XAU': 'OANDA:XAUUSD',
-  'AU': 'OANDA:XAUUSD',  // Gold
-  'XAG': 'OANDA:XAGUSD', 
-  'AG': 'OANDA:XAGUSD',  // Silver
-  'XPT': 'OANDA:XPTUSD',
-  'PT': 'OANDA:XPTUSD',  // Platinum
-  'XPD': 'OANDA:XPDUSD',
-  'PD': 'OANDA:XPDUSD',  // Palladium
-  'XCU': 'COMEX:HG1!',
-  'CU': 'COMEX:HG1!',    // Copper
-  'BTC': 'BINANCE:BTCUSDT',
-  'ETH': 'BINANCE:ETHUSDT',
-  'USD': 'OANDA:EURUSD', // For USD index
-  'PAXG': 'OANDA:XAUUSD', // PAXG tracks gold
+  XAU: 'OANDA:XAUUSD',
+  AU: 'OANDA:XAUUSD', // Gold
+  XAG: 'OANDA:XAGUSD',
+  AG: 'OANDA:XAGUSD', // Silver
+  XPT: 'OANDA:XPTUSD',
+  PT: 'OANDA:XPTUSD', // Platinum
+  XPD: 'OANDA:XPDUSD',
+  PD: 'OANDA:XPDUSD', // Palladium
+  XCU: 'COMEX:HG1!',
+  CU: 'COMEX:HG1!', // Copper
+  BTC: 'BINANCE:BTCUSDT',
+  ETH: 'BINANCE:ETHUSDT',
+  USD: 'OANDA:EURUSD', // For USD index
+  PAXG: 'OANDA:XAUUSD', // PAXG tracks gold
 } as const;
 
 // Common trading symbols organized by category
@@ -305,7 +318,10 @@ export function getWidgetScriptUrl(widgetType: string): string {
  * Convert PBCEx asset code to canonical TradingView symbol
  */
 export function getCanonicalSymbol(assetCode: string): string {
-  return CANONICAL_SYMBOL_MAP[assetCode as keyof typeof CANONICAL_SYMBOL_MAP] || assetCode;
+  return (
+    CANONICAL_SYMBOL_MAP[assetCode as keyof typeof CANONICAL_SYMBOL_MAP] ||
+    assetCode
+  );
 }
 
 /**
@@ -343,7 +359,7 @@ export function getSymbolDisplayName(symbol: string): string {
       }
     }
   }
-  
+
   // Find the symbol in our constants and return a friendly name
   for (const category of Object.values(SYMBOLS)) {
     for (const [key, value] of Object.entries(category)) {

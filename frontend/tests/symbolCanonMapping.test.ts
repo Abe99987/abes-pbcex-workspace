@@ -3,11 +3,11 @@
  * Tests the canonical symbol mapping functionality for TradingView parity
  */
 
-import { 
-  getCanonicalSymbol, 
-  getSymbolDisplayName, 
-  isValidSymbol, 
-  CANONICAL_SYMBOL_MAP 
+import {
+  getCanonicalSymbol,
+  getSymbolDisplayName,
+  isValidSymbol,
+  CANONICAL_SYMBOL_MAP,
 } from '@/utils/tradingview';
 
 describe('Symbol Canonical Mapping', () => {
@@ -42,13 +42,13 @@ describe('Symbol Canonical Mapping', () => {
     it('should be consistent with backend PriceFeedService mappings', () => {
       // Ensure frontend mapping aligns with backend canonical symbols
       const expectedBackendMappings = {
-        'AU': 'OANDA:XAUUSD',
-        'AG': 'OANDA:XAGUSD', 
-        'PT': 'OANDA:XPTUSD',
-        'PD': 'OANDA:XPDUSD',
-        'CU': 'COMEX:HG1!',
-        'BTC': 'BINANCE:BTCUSDT',
-        'ETH': 'BINANCE:ETHUSDT',
+        AU: 'OANDA:XAUUSD',
+        AG: 'OANDA:XAGUSD',
+        PT: 'OANDA:XPTUSD',
+        PD: 'OANDA:XPDUSD',
+        CU: 'COMEX:HG1!',
+        BTC: 'BINANCE:BTCUSDT',
+        ETH: 'BINANCE:ETHUSDT',
       };
 
       Object.entries(expectedBackendMappings).forEach(([asset, expected]) => {
@@ -93,11 +93,30 @@ describe('Symbol Canonical Mapping', () => {
 
   describe('CANONICAL_SYMBOL_MAP', () => {
     it('should contain all required PBCEx asset mappings', () => {
-      const requiredAssets = ['AU', 'XAU', 'AG', 'XAG', 'PT', 'XPT', 'PD', 'XPD', 'CU', 'XCU', 'BTC', 'ETH', 'USD', 'PAXG'];
-      
+      const requiredAssets = [
+        'AU',
+        'XAU',
+        'AG',
+        'XAG',
+        'PT',
+        'XPT',
+        'PD',
+        'XPD',
+        'CU',
+        'XCU',
+        'BTC',
+        'ETH',
+        'USD',
+        'PAXG',
+      ];
+
       requiredAssets.forEach(asset => {
         expect(CANONICAL_SYMBOL_MAP).toHaveProperty(asset);
-        expect(typeof CANONICAL_SYMBOL_MAP[asset as keyof typeof CANONICAL_SYMBOL_MAP]).toBe('string');
+        expect(
+          typeof CANONICAL_SYMBOL_MAP[
+            asset as keyof typeof CANONICAL_SYMBOL_MAP
+          ]
+        ).toBe('string');
       });
     });
 

@@ -1,4 +1,9 @@
-import { getLogger, parseBoolean, webConsoleLogger, noopLogger } from '../utils/app-logger';
+import {
+  getLogger,
+  parseBoolean,
+  webConsoleLogger,
+  noopLogger,
+} from '../utils/app-logger';
 
 describe('app-logger', () => {
   describe('parseBoolean', () => {
@@ -69,7 +74,9 @@ describe('app-logger', () => {
       webConsoleLogger.warn('test warn');
       webConsoleLogger.error('test error');
 
-      expect(console.debug).toHaveBeenCalledWith('[DEBUG] test debug', { data: 'test' });
+      expect(console.debug).toHaveBeenCalledWith('[DEBUG] test debug', {
+        data: 'test',
+      });
       expect(console.info).toHaveBeenCalledWith('[INFO] test info');
       expect(console.warn).toHaveBeenCalledWith('[WARN] test warn');
       expect(console.error).toHaveBeenCalledWith('[ERROR] test error');
