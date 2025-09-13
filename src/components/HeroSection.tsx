@@ -1,18 +1,18 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Shield, Globe, Coins } from 'lucide-react';
-import treasureChest from '@/assets/treasure-chest-large.png';
+import treasureChest from '@/assets/treasure-chest-realistic.png';
 
 const HeroSection = () => {
   return (
     <section className='relative min-h-[78vh] flex items-center justify-center overflow-hidden pt-6 pb-2 bg-background'>
-      {/* Background elements */}
-      <div className='absolute inset-0 bg-gradient-to-br from-background via-card/30 to-muted/20' />
+      {/* Background elements - seamless blend to exact site black */}
+      <div className='absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background' />
 
       <div className='container mx-auto px-4 relative z-10'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-6xl mx-auto'>
-          {/* Left - Content - nudged closer to chest */}
-          <div className='text-center lg:text-left space-y-5 lg:ml-8'>
+          {/* Left - Content - aligned with page grid */}
+          <div className='text-center lg:text-left space-y-5 lg:-ml-8'>
             {/* Brand eyebrow - reduced size with color split */}
             <div className='text-[9rem] md:text-[10.5rem] font-bold tracking-wide leading-none'>
               <span className='text-foreground'>PBC</span><span className='text-gold'>Ex</span>
@@ -60,34 +60,27 @@ const HeroSection = () => {
             </p>
           </div>
 
-          {/* Right - Treasure Chest - 3x larger */}
-          <div className='flex justify-center lg:justify-start lg:-mr-16'>
+          {/* Right - Treasure Chest */}
+          <div className='flex justify-center lg:justify-start lg:-mr-16 relative'>
+            {/* Seamless black blend vignette */}
+            <div className='absolute inset-0 bg-gradient-radial from-transparent via-background/60 to-background w-full h-full' />
+            
             <div className='relative'>
-              {/* Large warm amber radial glow - much bigger for 3x chest */}
-              <div className='absolute -top-40 -right-40 w-[800px] h-[800px] bg-gradient-radial from-amber-400/25 via-gold/20 to-transparent rounded-full blur-3xl opacity-80' />
+              {/* Compact interior glow from chest opening */}
+              <div className='absolute top-1/3 left-1/2 transform -translate-x-1/2 w-[200px] h-[150px] bg-gradient-radial from-amber-400/20 via-gold/12 to-transparent rounded-full blur-2xl opacity-70' />
               
-              {/* Curved wave band sweeping under the chest - extended */}
-              <div className='absolute -bottom-32 -right-60 w-[600px] h-80 bg-gradient-to-l from-amber-500/15 via-gold/10 to-transparent rounded-full blur-3xl opacity-60 transform rotate-12' />
-              
-              {/* Secondary glow for extra warmth - scaled up */}
-              <div className='absolute -top-20 -right-20 w-[500px] h-[500px] bg-gradient-radial from-gold-light/18 to-transparent rounded-full blur-2xl opacity-70' />
-              
-              {/* Subtle angular highlights */}
-              <div className='absolute -top-10 -right-32 w-96 h-1 bg-gradient-to-r from-transparent via-gold/8 to-transparent blur-sm opacity-30 transform rotate-12' />
-              <div className='absolute -bottom-16 -left-20 w-80 h-1 bg-gradient-to-r from-transparent via-amber-400/6 to-transparent blur-sm opacity-25 transform -rotate-6' />
-              
-              {/* Treasure chest image - 3x larger */}
+              {/* Treasure chest image */}
               <img
                 src={treasureChest}
-                alt='Glowing treasure chest'
-                className='w-[960px] h-[960px] object-contain relative z-10 max-w-none'
+                alt='Treasure chest glowing from within'
+                className='w-[800px] h-[800px] object-contain relative z-10 max-w-none'
                 style={{
-                  filter: 'drop-shadow(0 0 50px hsl(var(--gold) / 0.3)) drop-shadow(0 0 100px hsl(var(--gold) / 0.15)) drop-shadow(0 30px 60px rgba(0, 0, 0, 0.4))',
+                  filter: 'drop-shadow(2px 2px 8px hsl(var(--gold) / 0.15)) drop-shadow(-1px -1px 4px hsl(var(--foreground) / 0.08)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3))',
                 }}
               />
               
-              {/* Enhanced rim lighting effect */}
-              <div className='absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-gold/12 rounded-full blur-xl opacity-50' />
+              {/* Subtle rim light on top/front edges */}
+              <div className='absolute top-[10%] left-[10%] w-[80%] h-[40%] bg-gradient-to-br from-foreground/8 via-transparent to-transparent rounded-full blur-lg opacity-40' />
             </div>
           </div>
         </div>
