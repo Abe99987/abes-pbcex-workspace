@@ -43,6 +43,13 @@
 
 ## 2025-09-09
 
+## 2025-09-13 — Legal hubs v1 (PR #48)
+
+- PR URL: https://github.com/Abe99987/abes-pbcex-workspace/pull/48
+- Merge Commit: 737fb05 feat(legal): populate four legal hubs with tiles and link all canonical documents
+- CI: Required checks green; Fast checks non-required; CodeRabbit completed
+- Verification: Local preview smoke 7/7 routes 200; footer links and Support→Compliance to /legal/compliance
+
 ### PR #37 - iOS Wrapper Prework (Bundle A)
 
 - **Merge Commit**: 55d4a42 feat(wrapper-prep): iOS prework (ExternalLink, logger, deeplinks, CI stub)

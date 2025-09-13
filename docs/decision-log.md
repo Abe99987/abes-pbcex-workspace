@@ -66,3 +66,11 @@ Added: /legal hub, /legal/tos, /legal/privacy, /legal/risk-disclosures, /legal/s
 - Public Beta gating (informational) added: `PUBLIC_BETA_MODE` (+ `NEXT_PUBLIC_BETA_MODE`) shows a "Public Beta" badge with link to disclosures; no blocking behavior
 - UAT e2e added: `e2e/tests/uat/beta-gating.spec.ts` with @smoke-tagged checks for badge off/on and disclosures route 200
 - iOS wrapper decision doc: `docs/ios-wrapper-decision.md` with Capacitor vs RN analysis; provisional decision: Capacitor wrapper for authenticated PWA; no native payments
+
+## 2025-09-13 — Legal hubs v1 (PR #48)
+
+- Added four legal hubs with tiles; linked 11 canonical docs.
+- Kept 'Compliance' under Support; Legal shows four hubs + All Legal Documents.
+- 'Fast checks' E2E remains non-required; CodeRabbit required; PR #48 merged (short SHA: 737fb05).
+- Preview stability: public/legal assets committed.
+- Next: Cloudflare redirects (/legal/regulatory → /compliance), Sentry alert for legal pages.
