@@ -1,20 +1,20 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Shield, Globe, Coins } from 'lucide-react';
-import treasureChest from '@/assets/treasure-chest-transparent.png';
+import treasureChest from '@/assets/treasure-chest-dark.png';
 
 const HeroSection = () => {
   return (
-    <section className='relative min-h-[70vh] flex items-center justify-center overflow-hidden pt-6 pb-4 bg-background'>
+    <section className='relative min-h-[75vh] flex items-center justify-center overflow-hidden pt-6 pb-4 bg-background'>
       {/* Background elements */}
       <div className='absolute inset-0 bg-gradient-to-br from-background via-card/30 to-muted/20' />
 
       <div className='container mx-auto px-4 relative z-10'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-6xl mx-auto'>
           {/* Left - Content - nudged closer to chest */}
-          <div className='text-center lg:text-left space-y-5 lg:ml-8'>
-            {/* Brand eyebrow - made much more prominent */}
-            <div className='text-5xl md:text-6xl font-bold text-gold tracking-wide'>
+          <div className='text-center lg:text-left space-y-5 lg:ml-16'>
+            {/* Brand eyebrow - enlarged and more prominent */}
+            <div className='text-6xl md:text-7xl font-bold text-gold tracking-wide'>
               PBCEx
             </div>
             
