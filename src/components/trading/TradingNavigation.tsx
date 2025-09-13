@@ -63,7 +63,7 @@ const TradingNavigation = () => {
       items: [
         { title: 'Analytics', description: 'Overview & key metrics dashboard', href: '/markets/analytics' },
         { title: 'Tutorials', description: 'How-to guides for trading', href: '/education' },
-        { title: 'Education (Learn)', description: 'Courses & long-form content', href: '/education' },
+        { title: 'Education (Learn X)', description: 'Courses & long-form content', href: '/education' },
       ],
     },
     {
