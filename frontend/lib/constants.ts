@@ -1,5 +1,5 @@
 // App build version - increment to force new bundle
-export const APP_BUILD_VERSION = '1.0.1';
+export const APP_BUILD_VERSION = '1.0.2';
 
 // App metadata
 export const APP_NAME = 'PBCEx';

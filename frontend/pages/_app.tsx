@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import '@/styles/globals.css';
 import { useRouter } from 'next/router';
 import Navigation from '@/components/Navigation';
+import { APP_BUILD_VERSION } from '@/lib/constants';
 
 function useRegionPreference() {
   const [selectedRegion, setSelectedRegion] = useState<string>('US');
@@ -136,99 +137,101 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const hideGlobalNav = router.pathname.startsWith('/admin');
   return (
-    <AuthProvider>
-      {/* Public Beta informational badge */}
-      {(() => {
-        const betaMode = (
-          process.env.PUBLIC_BETA_MODE ||
-          process.env.NEXT_PUBLIC_BETA_MODE ||
-          'off'
-        ).toLowerCase();
-        if (betaMode === 'on' || betaMode === 'true' || betaMode === '1') {
-          return (
-            <div
-              className='w-full bg-indigo-50 border-b border-indigo-200'
-              role='status'
-              aria-live='polite'
-            >
-              <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between'>
-                <div
-                  className='text-indigo-900 text-sm font-medium'
-                  data-testid='public-beta-badge'
-                >
-                  Public Beta
-                </div>
-                <div className='text-sm'>
-                  <Link
-                    className='underline text-indigo-900'
-                    href='/legal/risk-disclosures'
+    <div data-app-build={APP_BUILD_VERSION}>
+      <AuthProvider>
+        {/* Public Beta informational badge */}
+        {(() => {
+          const betaMode = (
+            process.env.PUBLIC_BETA_MODE ||
+            process.env.NEXT_PUBLIC_BETA_MODE ||
+            'off'
+          ).toLowerCase();
+          if (betaMode === 'on' || betaMode === 'true' || betaMode === '1') {
+            return (
+              <div
+                className='w-full bg-indigo-50 border-b border-indigo-200'
+                role='status'
+                aria-live='polite'
+              >
+                <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between'>
+                  <div
+                    className='text-indigo-900 text-sm font-medium'
+                    data-testid='public-beta-badge'
                   >
-                    Read disclosures
-                  </Link>
+                    Public Beta
+                  </div>
+                  <div className='text-sm'>
+                    <Link
+                      className='underline text-indigo-900'
+                      href='/legal/risk-disclosures'
+                    >
+                      Read disclosures
+                    </Link>
+                  </div>
                 </div>
               </div>
+            );
+          }
+          return null;
+        })()}
+        <RegionGatingBanner />
+        {!hideGlobalNav && <Navigation />}
+        <Component {...pageProps} />
+        {/* Global footer navigation */}
+        <footer
+          className='mt-16 border-t border-gray-200 bg-white'
+          role='contentinfo'
+        >
+          <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
+            <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+              <div className='text-sm text-gray-500'>
+                © {new Date().getFullYear()} PBCEx. All rights reserved.
+              </div>
+              <nav aria-label='Legal'>
+                <ul className='flex flex-wrap gap-x-6 gap-y-2 text-sm'>
+                  <li>
+                    <Link
+                      href='/legal/tos'
+                      data-testid='footer-link-tos'
+                      className='text-gray-600 hover:text-gray-900'
+                    >
+                      Terms of Service
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href='/legal/privacy'
+                      data-testid='footer-link-privacy'
+                      className='text-gray-600 hover:text-gray-900'
+                    >
+                      Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href='/legal/risk-disclosures'
+                      data-testid='footer-link-risk'
+                      className='text-gray-600 hover:text-gray-900'
+                    >
+                      Risk Disclosures
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href='/legal/supported-regions'
+                      data-testid='footer-link-supported-regions'
+                      className='text-gray-600 hover:text-gray-900'
+                    >
+                      Supported Regions
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
             </div>
-          );
-        }
-        return null;
-      })()}
-      <RegionGatingBanner />
-      {!hideGlobalNav && <Navigation />}
-      <Component {...pageProps} />
-      {/* Global footer navigation */}
-      <footer
-        className='mt-16 border-t border-gray-200 bg-white'
-        role='contentinfo'
-      >
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
-          <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
-            <div className='text-sm text-gray-500'>
-              © {new Date().getFullYear()} PBCEx. All rights reserved.
-            </div>
-            <nav aria-label='Legal'>
-              <ul className='flex flex-wrap gap-x-6 gap-y-2 text-sm'>
-                <li>
-                  <Link
-                    href='/legal/tos'
-                    data-testid='footer-link-tos'
-                    className='text-gray-600 hover:text-gray-900'
-                  >
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href='/legal/privacy'
-                    data-testid='footer-link-privacy'
-                    className='text-gray-600 hover:text-gray-900'
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href='/legal/risk-disclosures'
-                    data-testid='footer-link-risk'
-                    className='text-gray-600 hover:text-gray-900'
-                  >
-                    Risk Disclosures
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href='/legal/supported-regions'
-                    data-testid='footer-link-supported-regions'
-                    className='text-gray-600 hover:text-gray-900'
-                  >
-                    Supported Regions
-                  </Link>
-                </li>
-              </ul>
-            </nav>
           </div>
-        </div>
-      </footer>
-      <Toaster />
-    </AuthProvider>
+        </footer>
+        <Toaster />
+      </AuthProvider>
+    </div>
   );
 }
