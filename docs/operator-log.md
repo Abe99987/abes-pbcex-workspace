@@ -50,6 +50,11 @@
 - CI: Required checks green; Fast checks non-required; CodeRabbit completed
 - Verification: Local preview smoke 7/7 routes 200; footer links and Support→Compliance to /legal/compliance
 
+## 2025-09-13 — Merge verify (PR #49)
+
+- Merge SHA: 4d79095; Deploy: local fallback
+- Smoke: /legal 200; /data manifest length=11; docs 200 (privacy-policy, aml-bsa-program, terms-of-service)
+
 ### PR #37 - iOS Wrapper Prework (Bundle A)
 
 - **Merge Commit**: 55d4a42 feat(wrapper-prep): iOS prework (ExternalLink, logger, deeplinks, CI stub)
