@@ -176,17 +176,74 @@ const TradingNavigation = () => {
 
       {/* Mobile Menu Button */}
       <div className='lg:hidden'>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant='ghost'
+              size='sm'
+              className='text-[#C8CDD3] hover:text-[#F2F3F5] hover:bg-[#111214]'
+            >
+              <User className='w-5 h-5' />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            className='w-64 bg-[#111214] border-[#23262A] text-[#F2F3F5] shadow-2xl'
+            align='end'
+            sideOffset={8}
+          >
+            <div className='py-2'>
+              {menuItems.map((menu, menuIndex) => (
+                <div key={menu.label}>
+                  <div className='px-4 py-2 text-[#C8CDD3] text-xs font-semibold uppercase tracking-wider'>
+                    {menu.label}
+                  </div>
+                  {menu.items.map((item, itemIndex) => (
+                    <DropdownMenuItem 
+                      key={item.title}
+                      className='px-4 py-2 hover:bg-[#15171A] focus:bg-[#15171A] cursor-pointer'
+                      onClick={() => navigate(item.href)}
+                    >
+                      <div className='flex flex-col space-y-1'>
+                        <div className='text-[#F2F3F5] font-medium text-sm'>
+                          {item.title}
+                        </div>
+                        <div className='text-[#C8CDD3] text-xs leading-relaxed'>
+                          {item.description}
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                  {menuIndex < menuItems.length - 1 && (
+                    <div className='mx-4 my-2 border-b border-[#23262A]' />
+                  )}
+                </div>
+              ))}
+              <DropdownMenuItem 
+                className='px-4 py-2 hover:bg-[#15171A] focus:bg-[#15171A] cursor-pointer'
+                onClick={() => navigate('/support/help-center')}
+              >
+                <div className='flex items-center space-x-2'>
+                  <HelpCircle className='w-4 h-4' />
+                  <span className='text-[#F2F3F5] font-medium text-sm'>Help</span>
+                </div>
+              </DropdownMenuItem>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Right - Help, Deposit, Language */}
+      <div className='hidden lg:flex items-center space-x-4'>
         <Button
           variant='ghost'
           size='sm'
-          className='text-[#C8CDD3] hover:text-[#F2F3F5] hover:bg-[#111214]'
+          className='text-[#F2F3F5] hover:text-[#F2F3F5] hover:bg-[#111214]'
+          onClick={() => navigate('/support/help-center')}
         >
-          <User className='w-5 h-5' />
+          <HelpCircle className='w-4 h-4 mr-2' />
+          Help
         </Button>
-      </div>
-
-      {/* Right - Deposit, Language */}
-      <div className='hidden lg:flex items-center space-x-4'>
+        
         <Button
           size='sm'
           className='bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-2'
