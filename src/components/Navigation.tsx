@@ -142,10 +142,11 @@ const Navigation = () => {
     {
       label: 'Markets',
       icon: BarChart3,
+      href: '/markets',
       items: [
         {
           label: 'Analytics',
-          href: '/markets/analytics',
+          href: '/markets?tab=overview',
           description: 'Overview & key metrics dashboard',
         },
         {
