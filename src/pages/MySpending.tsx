@@ -11,7 +11,7 @@ import {
   Calendar,
   AlertCircle,
 } from 'lucide-react';
-import Navigation from '@/components/Navigation';
+import Layout from '@/components/Layout';
 import SpendingDonut from '@/components/spending/SpendingDonut';
 import CategorySummaryList from '@/components/spending/CategorySummaryList';
 import BurnTrendChart from '@/components/spending/BurnTrendChart';
@@ -110,8 +110,7 @@ const MySpending = () => {
   const savingsBadge = getSavingsRateBadge();
 
   return (
-    <div className='min-h-screen bg-background'>
-      <Navigation />
+    <Layout>
       <div className='container mx-auto px-4 py-8'>
         {/* Header */}
         <div className='mb-8 flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0'>
@@ -318,7 +317,7 @@ const MySpending = () => {
           onCreateRule={handleCreateRule}
         />
       </div>
-    </div>
+    </Layout>
   );
 };
 
