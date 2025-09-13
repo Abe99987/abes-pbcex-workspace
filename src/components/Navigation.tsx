@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import ThemeToggle from './ThemeToggle';
 
 interface MenuItem {
   label: string;
@@ -338,16 +339,13 @@ const Navigation = () => {
       }`}
     >
       <div className='container mx-auto flex h-16 items-center justify-between px-4'>
-        {/* Left - Logo */}
+        {/* Left - Logo with subtitle */}
         <button
           onClick={() => navigate('/')}
-          className='flex items-center space-x-2 hover:opacity-80 transition-opacity'
+          className='flex flex-col items-start hover:opacity-80 transition-opacity'
         >
-          <img
-            src='/brand/pbcex-logo.svg'
-            alt='PBCEx'
-            className='h-7 w-auto object-contain'
-          />
+          <div className='text-xl font-bold text-gold tracking-wider'>PBCEx</div>
+          <div className='text-xs text-gray-400 -mt-1'>People's Banking & Commodities Exchange</div>
         </button>
 
         {/* Desktop Navigation - Center Menu */}
@@ -610,6 +608,9 @@ const Navigation = () => {
               Sign Up
             </Button>
           )}
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
           {/* Language Dropdown */}
           <DropdownMenu>

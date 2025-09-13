@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import Layout from '@/components/Layout';
 import HeroSection from '@/components/HeroSection';
+import FeatureStripe from '@/components/FeatureStripe';
 import AssetPricing from '@/components/AssetPricing';
 import FeaturesSection from '@/components/FeaturesSection';
 import EducationSection from '@/components/EducationSection';
@@ -28,6 +29,7 @@ const Index = () => {
         <link rel='canonical' href='https://pbcex.com/' />
       </Helmet>
       <HeroSection />
+      <FeatureStripe />
       <AssetPricing />
       <FeaturesSection />
       <EducationSection />
