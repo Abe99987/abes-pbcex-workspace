@@ -1,21 +1,21 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Shield, Globe, Coins } from 'lucide-react';
-import treasureChest from '@/assets/treasure-chest-dark.png';
+import treasureChest from '@/assets/treasure-chest-large.png';
 
 const HeroSection = () => {
   return (
-    <section className='relative min-h-[75vh] flex items-center justify-center overflow-hidden pt-6 pb-4 bg-background'>
+    <section className='relative min-h-[70vh] flex items-center justify-center overflow-hidden pt-6 pb-4 bg-background'>
       {/* Background elements */}
       <div className='absolute inset-0 bg-gradient-to-br from-background via-card/30 to-muted/20' />
 
       <div className='container mx-auto px-4 relative z-10'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-6xl mx-auto'>
           {/* Left - Content - nudged closer to chest */}
-          <div className='text-center lg:text-left space-y-5 lg:ml-16'>
-            {/* Brand eyebrow - enlarged and more prominent */}
-            <div className='text-6xl md:text-7xl font-bold text-gold tracking-wide'>
-              PBCEx
+          <div className='text-center lg:text-left space-y-5 lg:ml-24'>
+            {/* Brand eyebrow - massively enlarged with color split */}
+            <div className='text-[12rem] md:text-[14rem] font-bold tracking-wide leading-none'>
+              <span className='text-foreground'>PBC</span><span className='text-gold'>Ex</span>
             </div>
             
             {/* Micro-copy */}
@@ -60,30 +60,34 @@ const HeroSection = () => {
             </p>
           </div>
 
-          {/* Right - Treasure Chest */}
-          <div className='flex justify-center lg:justify-end lg:-ml-8'>
+          {/* Right - Treasure Chest - 3x larger */}
+          <div className='flex justify-center lg:justify-start lg:-mr-16'>
             <div className='relative'>
-              {/* Large warm amber radial glow - top-right offset */}
-              <div className='absolute -top-24 -right-24 w-[400px] h-[400px] bg-gradient-radial from-amber-400/20 via-gold/15 to-transparent rounded-full blur-3xl opacity-70' />
+              {/* Large warm amber radial glow - much bigger for 3x chest */}
+              <div className='absolute -top-40 -right-40 w-[800px] h-[800px] bg-gradient-radial from-amber-400/25 via-gold/20 to-transparent rounded-full blur-3xl opacity-80' />
               
-              {/* Curved wave band sweeping under the chest */}
-              <div className='absolute -bottom-20 -right-40 w-96 h-48 bg-gradient-to-l from-amber-500/12 via-gold/8 to-transparent rounded-full blur-2xl opacity-50 transform rotate-12' />
+              {/* Curved wave band sweeping under the chest - extended */}
+              <div className='absolute -bottom-32 -right-60 w-[600px] h-80 bg-gradient-to-l from-amber-500/15 via-gold/10 to-transparent rounded-full blur-3xl opacity-60 transform rotate-12' />
               
-              {/* Secondary glow for extra warmth */}
-              <div className='absolute -top-12 -right-12 w-80 h-80 bg-gradient-radial from-gold-light/15 to-transparent rounded-full blur-2xl opacity-60' />
+              {/* Secondary glow for extra warmth - scaled up */}
+              <div className='absolute -top-20 -right-20 w-[500px] h-[500px] bg-gradient-radial from-gold-light/18 to-transparent rounded-full blur-2xl opacity-70' />
               
-              {/* Treasure chest image */}
+              {/* Subtle angular highlights */}
+              <div className='absolute -top-10 -right-32 w-96 h-1 bg-gradient-to-r from-transparent via-gold/8 to-transparent blur-sm opacity-30 transform rotate-12' />
+              <div className='absolute -bottom-16 -left-20 w-80 h-1 bg-gradient-to-r from-transparent via-amber-400/6 to-transparent blur-sm opacity-25 transform -rotate-6' />
+              
+              {/* Treasure chest image - 3x larger */}
               <img
                 src={treasureChest}
-                alt='Treasure chest representing digital asset storage and wealth building'
-                className='w-80 h-80 object-contain relative z-10'
+                alt='Glowing treasure chest'
+                className='w-[960px] h-[960px] object-contain relative z-10 max-w-none'
                 style={{
-                  filter: 'drop-shadow(0 0 30px hsl(var(--gold) / 0.2)) drop-shadow(0 0 60px hsl(var(--gold) / 0.1)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3))',
+                  filter: 'drop-shadow(0 0 50px hsl(var(--gold) / 0.3)) drop-shadow(0 0 100px hsl(var(--gold) / 0.15)) drop-shadow(0 30px 60px rgba(0, 0, 0, 0.4))',
                 }}
               />
               
-              {/* Subtle rim lighting effect */}
-              <div className='absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-gold/10 rounded-full blur-xl opacity-40' />
+              {/* Enhanced rim lighting effect */}
+              <div className='absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-gold/12 rounded-full blur-xl opacity-50' />
             </div>
           </div>
         </div>
