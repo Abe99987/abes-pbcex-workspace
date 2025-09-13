@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/hooks/useAuth';
-import Navigation from '@/components/Navigation';
 import {
   AdvancedChart,
   SymbolOverview,
@@ -50,7 +49,6 @@ export default function SymbolDetail() {
   if (authLoading) {
     return (
       <div className='min-h-screen bg-slate-50'>
-        <Navigation />
         <div className='flex items-center justify-center h-96'>
           <div className='animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500'></div>
         </div>
@@ -61,7 +59,6 @@ export default function SymbolDetail() {
   if (!user) {
     return (
       <div className='min-h-screen bg-slate-50'>
-        <Navigation />
         <div className='flex items-center justify-center h-96'>
           <div className='text-center'>
             <h1 className='text-2xl font-bold text-gray-800 mb-4'>
@@ -76,7 +73,6 @@ export default function SymbolDetail() {
   if (!symbolStr || !isValid) {
     return (
       <div className='min-h-screen bg-slate-50'>
-        <Navigation />
         <div className='flex items-center justify-center h-96'>
           <div className='text-center'>
             <h1 className='text-2xl font-bold text-gray-800 mb-4'>
@@ -174,7 +170,6 @@ export default function SymbolDetail() {
 
   return (
     <div className='min-h-screen bg-slate-50'>
-      <Navigation />
 
       {/* Page Header */}
       <div className='bg-white shadow-sm border-b'>

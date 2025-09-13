@@ -13,7 +13,6 @@ import {
   type BackendTransaction,
 } from '@/utils/api';
 import toast from 'react-hot-toast';
-import Navigation from '@/components/Navigation';
 
 /**
  * Dashboard page showing balances, portfolio value, and market overview
@@ -98,7 +97,6 @@ export default function Dashboard() {
 
   return (
     <div className='min-h-screen bg-slate-50'>
-      <Navigation />
 
       {/* Dashboard Header */}
       <div className='bg-white shadow-sm border-b'>

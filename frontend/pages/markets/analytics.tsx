@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import Navigation from '@/components/Navigation';
+// Navigation is rendered globally in _app
 import { useAuth } from '@/hooks/useAuth';
 import { TrendingUp, BarChart3, Activity, LineChart } from 'lucide-react';
 
@@ -10,7 +10,6 @@ export default function Analytics() {
   if (authLoading) {
     return (
       <div className='min-h-screen dark bg-slate-950'>
-        <Navigation />
         <div className='flex items-center justify-center h-96'>
           <div className='animate-spin rounded-full h-32 w-32 border-b-2 border-amber-500'></div>
         </div>
@@ -21,7 +20,6 @@ export default function Analytics() {
   if (!user) {
     return (
       <div className='min-h-screen dark bg-slate-950'>
-        <Navigation />
         <div className='flex items-center justify-center h-96'>
           <div className='text-center'>
             <h1 className='text-2xl font-bold text-slate-50 mb-4'>
@@ -53,7 +51,6 @@ export default function Analytics() {
 
   return (
     <div className='min-h-screen dark bg-slate-950'>
-      <Navigation />
 
       <header className='border-b border-slate-800 bg-slate-950/50 backdrop-blur supports-[backdrop-filter]:bg-slate-950/50'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
