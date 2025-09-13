@@ -41,6 +41,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from './ThemeToggle';
+import pbcexLogo from '@/assets/pbcex-logo.png';
 
 interface MenuItem {
   label: string;
@@ -339,13 +340,16 @@ const Navigation = () => {
       }`}
     >
       <div className='container mx-auto flex h-16 items-center justify-between px-4'>
-        {/* Left - Logo with subtitle */}
+        {/* Left - Logo */}
         <button
           onClick={() => navigate('/')}
-          className='flex flex-col items-start hover:opacity-80 transition-opacity'
+          className='hover:opacity-80 transition-opacity'
         >
-          <div className='text-xl font-bold text-gold tracking-wider'>PBCEx</div>
-          <div className='text-xs text-gray-400 -mt-1'>People's Banking & Commodities Exchange</div>
+          <img
+            src={pbcexLogo}
+            alt="PBCEx"
+            className="h-8 w-auto"
+          />
         </button>
 
         {/* Desktop Navigation - Center Menu */}
