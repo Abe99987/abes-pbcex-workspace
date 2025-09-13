@@ -20,16 +20,16 @@ const Footer = () => {
   const supportLinks = [
     { label: 'Help Center', href: '/support/help-center' },
     { label: 'Security', href: '/support/security' },
-    { label: 'Compliance', href: '/support/compliance' },
+    { label: 'Compliance', href: '/legal/compliance' },
     { label: 'Contact', href: '/contact' },
   ];
 
   const legalLinks = [
-    { label: 'Privacy Policy', href: '/legal/privacy-policy' },
-    { label: 'Terms of Service', href: '/legal/terms-of-service' },
-    { label: 'Privacy Choices', href: '/legal/privacy-choices' },
-    { label: 'Accessibility', href: '/legal/accessibility' },
-    { label: 'Disclosures', href: '/legal/risk-disclosures' },
+    { label: 'Privacy & Rights', href: '/legal/privacy' },
+    { label: 'Financial Crime & Sanctions', href: '/legal/compliance' },
+    { label: 'Terms, Consent & Risk', href: '/legal/terms-risk' },
+    { label: 'Operations & Records', href: '/legal/operations' },
+    { label: 'All Legal Documents', href: '/legal' },
   ];
 
   return (
