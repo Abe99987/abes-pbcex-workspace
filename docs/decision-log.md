@@ -81,3 +81,11 @@ Added: /legal hub, /legal/tos, /legal/privacy, /legal/risk-disclosures, /legal/s
 - `/legal` renders an 11-tile grid with short summaries and "View document →" links; header/footer confirmed.
 - Merged PR #49; `/data` manifest is canonical for list loading.
 - Consider cache-buster on `/data` manifest if preview hosts cache aggressively.
+
+## 2025-09-13 — Legal: cache-busted manifest + fail-safe list (PR #50)
+
+- Merged PR #50 (merge SHA: ff3e055) to harden `/legal` list loading.
+- Loader order: `/data/legal-manifest.json?v=Date.now()` → `/legal/manifest.json?v=Date.now()` → baked-in 11-item list.
+- Added 10s timeout + strict JSON Content-Type gate; non-JSON/parse errors safely fall back (no throws).
+- Verification (local preview): `/legal` 200 with 11 tiles; docs 200 (`privacy-policy`, `aml-bsa-program`, `terms-of-service`); `/data/legal-manifest.json` 200 application/json.
+- Next: Lovable UX-only polish; monitor preview cache behavior; no product code changes planned beyond UX.

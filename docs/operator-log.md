@@ -55,6 +55,14 @@
 - Merge SHA: 4d79095; Deploy: local fallback
 - Smoke: /legal 200; /data manifest length=11; docs 200 (privacy-policy, aml-bsa-program, terms-of-service)
 
+## 2025-09-13 — Merge verify (PR #50)
+
+- PR URL: https://github.com/Abe99987/abes-pbcex-workspace/pull/50
+- Merge Commit: ff3e055 fix(legal): cache-busted /data manifest and fail-safe /legal tile loader
+- CI: Required checks green (Frontend, Backend, Workflows, CI Summary). Fast checks informational. Auto-merge enabled; branch protection satisfied.
+- Verification (local): /legal 200 (11 tiles); docs 200 (privacy-policy, aml-bsa-program, terms-of-service); /data/legal-manifest.json 200 application/json
+- Deploy: local preview (no staging URL provided)
+
 ### PR #37 - iOS Wrapper Prework (Bundle A)
 
 - **Merge Commit**: 55d4a42 feat(wrapper-prep): iOS prework (ExternalLink, logger, deeplinks, CI stub)

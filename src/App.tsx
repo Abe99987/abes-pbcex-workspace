@@ -52,6 +52,7 @@ import Regulatory from './pages/legal/Regulatory';
 import Licenses from './pages/legal/Licenses';
 import LegalList from './pages/legal/LegalList';
 import LegalView from './pages/legal/LegalView';
+import MarketsAnalytics from './pages/MarketsAnalytics';
 import PrivacyHub from './pages/legal/privacy';
 import ComplianceHub from './pages/legal/compliance';
 import TermsRiskHub from './pages/legal/terms-risk';
@@ -130,7 +131,7 @@ const App = () => (
             <Route path='/contact' element={<Contact />} />
             <Route path='/thank-you' element={<ThankYou />} />
             <Route path='/shop' element={<Shop />} />
-            <Route path='/shop/:symbol' element={<CommodityDetail />} />
+            <Route path='/markets/analytics' element={<MarketsAnalytics />} />
             {/* Account Routes */}
             <Route path='/account' element={<Account />} />
             <Route path='/account/identity' element={<Account />} />

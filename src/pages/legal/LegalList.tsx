@@ -19,36 +19,36 @@ const LegalList = () => {
   const [items, setItems] = useState<ManifestItem[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const bakedIn: ManifestItem[] = [
+    { slug: 'privacy-policy', title: 'Privacy Policy' },
+    { slug: 'privacy-choices', title: 'Privacy Choices' },
+    { slug: 'accessibility', title: 'Accessibility' },
+    { slug: 'esign-consent', title: 'E-SIGN Consent' },
+    { slug: 'aml-bsa-program', title: 'AML/BSA Program' },
+    { slug: 'ofac-policy', title: 'OFAC Sanctions Policy' },
+    { slug: 'dealers-aml-memo', title: 'Dealers AML Memo' },
+    { slug: 'record-retention', title: 'Record Retention' },
+    { slug: 'refunds-shipping', title: 'Refunds & Shipping' },
+    { slug: 'risk-disclosures', title: 'Risk Disclosures' },
+    { slug: 'terms-of-service', title: 'Terms of Service' },
+  ];
+
+  const summaries: Record<string, string> = {
+    'privacy-policy': 'How we collect, use, and protect your data.',
+    'privacy-choices': 'Exercise your privacy options and preferences.',
+    accessibility: 'Our commitment to accessible services.',
+    'esign-consent': 'Consent to electronic delivery and signatures.',
+    'aml-bsa-program': 'Anti-money laundering and BSA compliance program.',
+    'ofac-policy': 'Sanctions screening and compliance requirements.',
+    'dealers-aml-memo': 'AML memo for dealers and vendors.',
+    'record-retention': 'Documents and data retention schedules.',
+    'refunds-shipping': 'Refunds, returns, and physical shipping policy.',
+    'risk-disclosures': 'Important trading and investment risks.',
+    'terms-of-service': 'Agreement governing your use of PBCEx.',
+  };
+
   useEffect(() => {
     let cancelled = false;
-
-    const bakedIn: ManifestItem[] = [
-      { slug: 'privacy-policy', title: 'Privacy Policy' },
-      { slug: 'privacy-choices', title: 'Privacy Choices' },
-      { slug: 'accessibility', title: 'Accessibility' },
-      { slug: 'esign-consent', title: 'E-SIGN Consent' },
-      { slug: 'aml-bsa-program', title: 'AML/BSA Program' },
-      { slug: 'ofac-policy', title: 'OFAC Sanctions Policy' },
-      { slug: 'dealers-aml-memo', title: 'Dealers AML Memo' },
-      { slug: 'record-retention', title: 'Record Retention' },
-      { slug: 'refunds-shipping', title: 'Refunds & Shipping' },
-      { slug: 'risk-disclosures', title: 'Risk Disclosures' },
-      { slug: 'terms-of-service', title: 'Terms of Service' },
-    ];
-
-    const summaries: Record<string, string> = {
-      'privacy-policy': 'How we collect, use, and protect your data.',
-      'privacy-choices': 'Exercise your privacy options and preferences.',
-      accessibility: 'Our commitment to accessible services.',
-      'esign-consent': 'Consent to electronic delivery and signatures.',
-      'aml-bsa-program': 'Anti-money laundering and BSA compliance program.',
-      'ofac-policy': 'Sanctions screening and compliance requirements.',
-      'dealers-aml-memo': 'AML memo for dealers and vendors.',
-      'record-retention': 'Documents and data retention schedules.',
-      'refunds-shipping': 'Refunds, returns, and physical shipping policy.',
-      'risk-disclosures': 'Important trading and investment risks.',
-      'terms-of-service': 'Agreement governing your use of PBCEx.',
-    };
 
     async function tryFetchJSON<T>(url: string): Promise<T | null> {
       try {
@@ -130,7 +130,7 @@ const LegalList = () => {
                   </CardHeader>
                   <CardContent>
                     <p className='text-sm text-muted-foreground mb-3'>
-                      {(summaries as any)[item.slug] || 'View the full policy.'}
+                      {summaries[item.slug] || 'View the full policy.'}
                     </p>
                     <a
                       className='text-primary hover:underline text-sm'
