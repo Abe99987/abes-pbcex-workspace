@@ -83,240 +83,235 @@ const Navigation = () => {
   const isTrading =
     location.pathname === '/trading' || location.pathname === '/coin-trading';
 
-  // Get filtered menu items based on auth state - hide My Account when logged out
-  const getMenuItems = (): MenuItem[] => {
-    const baseMenuItems: MenuItem[] = [
-      {
-        label: 'Buy Crypto',
-        icon: Coins,
-        items: [
-          {
-            label: 'Quick Buy (Placeholder)',
-            href: '/markets/BINANCE:BTCUSDT',
-            description: 'Fiat → asset in one step',
-          },
-          {
-            label: 'Quick Convert (Placeholder)',
-            href: '/my-assets',
-            description: 'Swap between assets instantly',
-          },
-          {
-            label: 'Buy with Card (Placeholder)',
-            href: '/my-spending',
-            description: 'Visa/Mastercard checkout',
-          },
-          {
-            label: 'Deposit Crypto (Placeholder)',
-            href: '/my-assets',
-            description: 'On-chain deposit addresses',
-          },
-        ],
-      },
-      {
-        label: 'Trade',
-        icon: CandlestickChart,
-        items: [
-          {
-            label: 'Spot (USD) (Placeholder)',
-            href: '/trading',
-            description: 'USD-quoted markets',
-          },
-          {
-            label: 'Spot (USDC) (Placeholder)',
-            href: '/coin-trading',
-            description: 'USDC-quoted markets',
-          },
-          {
-            label: 'Coin-to-Coin (Placeholder)',
-            href: '/markets/BINANCE:BTCUSDT',
-            description: 'BTC/ETH quote pairs',
-          },
-          {
-            label: 'DCA (Placeholder)',
-            href: '/trade/dca',
-            description: 'Automated recurring purchases',
-          },
-        ],
-      },
-      {
-        label: 'Markets',
-        icon: BarChart3,
-        items: [
-          {
-            label: 'Analytics',
-            href: '/markets/analytics',
-            description: 'Overview & key metrics dashboard',
-          },
-          {
-            label: 'Tutorials (Placeholder)',
-            href: '/disclosures',
-            description: 'How-to guides',
-          },
-          {
-            label: 'Education (Learn) (Placeholder)',
-            href: '/education',
-            description: 'Courses & long-form',
-          },
-        ],
-      },
-      {
-        label: 'Shop',
-        icon: Package,
-        items: [
-          {
-            label: 'Shop All (Placeholder)',
-            href: '/shop',
-            description: 'View all commodities',
-          },
-          {
-            label: 'Buy Physical Gold',
-            href: '/markets/OANDA:XAUUSD',
-            description: 'Gold',
-          },
-          {
-            label: 'Buy Physical Silver',
-            href: '/markets/OANDA:XAGUSD',
-            description: 'Silver',
-          },
-          {
-            label: 'Buy Physical Platinum',
-            href: '/markets/OANDA:XPTUSD',
-            description: 'Platinum',
-          },
-          {
-            label: 'Buy Physical Palladium',
-            href: '/markets/OANDA:XPDUSD',
-            description: 'Palladium',
-          },
-          {
-            label: 'Buy Physical Copper',
-            href: '/markets/COMEX:HG1!',
-            description: 'Copper',
-          },
-        ],
-      },
-      {
-        label: 'Send / Receive',
-        icon: Send,
-        items: [
-          {
-            label: 'Send to PBCEx User (Placeholder)',
-            href: '/send/internal',
-            description: 'Free & instant transfers',
-          },
-          {
-            label: 'Crypto Withdrawal (Placeholder)',
-            href: '/send/crypto',
-            description: 'Send on-chain',
-          },
-          {
-            label: 'Bank Transfers (SWIFT/WISE-ready) (Placeholder)',
-            href: '/send/bank',
-            description: 'Domestic & international',
-          },
-          {
-            label: 'Pay with QR Code (Placeholder)',
-            href: '/pay/qr',
-            description: 'Merchant QR',
-          },
-          {
-            label: 'Receive with QR Code (Placeholder)',
-            href: '/receive/qr',
-            description: 'Your QR',
-          },
-          {
-            label: 'Spend with Visa Card (Placeholder)',
-            href: '/card/spend',
-            description: 'Use card',
-          },
-          {
-            label: 'Set up Bill Pay (Placeholder)',
-            href: '/pay/bills',
-            description: 'Schedule utilities & vendors',
-          },
-          {
-            label: 'Request a Payment (Placeholder)',
-            href: '/pay/request',
-            description: 'Create invoice/QR',
-          },
-          {
-            label: 'Set up Recurring Transfers (Placeholder)',
-            href: '/send/recurring',
-            description: 'Automate payouts & savings',
-          },
-        ],
-      },
-    ];
-
-    // Add My Account to menu only when user is logged in
-    if (user) {
-      baseMenuItems.push({
-        label: 'My Account',
-        icon: User,
-        items: [
-          {
-            label: 'Balances & Funding',
-            href: '/account',
-            description: 'Balances, deposit, funding options',
-          },
-          {
-            label: 'My Assets',
-            href: '/my-assets',
-            description: 'Buy, Sell, Realize; Send/Receive, Spend, Transfer',
-          },
-          {
-            label: 'My Spending',
-            href: '/my-spending',
-            description: 'Track expenses, categories, and savings goals',
-          },
-          {
-            label: 'Transaction History',
-            href: '/transaction-history',
-            description: 'All transactions',
-          },
-          {
-            label: 'Order History',
-            href: '/order-history',
-            description: 'Trading activity',
-          },
-          {
-            label: 'PnL',
-            href: '/pnl',
-            description: 'Profit & loss analytics',
-          },
-          {
-            label: 'Connect Wallet',
-            href: '/wallet',
-            description: 'External wallets',
-          },
-          {
-            label: 'Security (Placeholder)',
-            href: '/support/security',
-            description: '2FA & sessions',
-          },
-          {
-            label: 'Settings & Profile (Placeholder)',
-            href: '/account',
-            description: 'Preferences & KYC',
-          },
-          {
-            label: 'Support (Placeholder)',
-            href: '/support/help-center',
-            description: 'Help center',
-          },
-        ],
-      });
-    }
-
-    return baseMenuItems;
-  };
-
-  const menuItems = getMenuItems();
+  // Get menu items - My Account is always visible
+  const menuItems: MenuItem[] = [
+    {
+      label: 'Buy Crypto',
+      icon: Coins,
+      items: [
+        {
+          label: 'Quick Buy (Placeholder)',
+          href: '/markets/BINANCE:BTCUSDT',
+          description: 'Fiat → asset in one step',
+        },
+        {
+          label: 'Quick Convert (Placeholder)',
+          href: '/my-assets',
+          description: 'Swap between assets instantly',
+        },
+        {
+          label: 'Buy with Card (Placeholder)',
+          href: '/my-spending',
+          description: 'Visa/Mastercard checkout',
+        },
+        {
+          label: 'Deposit Crypto (Placeholder)',
+          href: '/my-assets',
+          description: 'On-chain deposit addresses',
+        },
+      ],
+    },
+    {
+      label: 'Trade',
+      icon: CandlestickChart,
+      items: [
+        {
+          label: 'Spot (USD) (Placeholder)',
+          href: '/trading',
+          description: 'USD-quoted markets',
+        },
+        {
+          label: 'Spot (USDC) (Placeholder)',
+          href: '/coin-trading',
+          description: 'USDC-quoted markets',
+        },
+        {
+          label: 'Coin-to-Coin (Placeholder)',
+          href: '/markets/BINANCE:BTCUSDT',
+          description: 'BTC/ETH quote pairs',
+        },
+        {
+          label: 'DCA (Placeholder)',
+          href: '/trade/dca',
+          description: 'Automated recurring purchases',
+        },
+      ],
+    },
+    {
+      label: 'Markets',
+      icon: BarChart3,
+      items: [
+        {
+          label: 'Analytics',
+          href: '/markets/analytics',
+          description: 'Overview & key metrics dashboard',
+        },
+        {
+          label: 'Tutorials (Placeholder)',
+          href: '/disclosures',
+          description: 'How-to guides',
+        },
+        {
+          label: 'Education (Learn) (Placeholder)',
+          href: '/education',
+          description: 'Courses & long-form',
+        },
+      ],
+    },
+    {
+      label: 'Shop',
+      icon: Package,
+      items: [
+        {
+          label: 'Shop All (Placeholder)',
+          href: '/shop',
+          description: 'View all commodities',
+        },
+        {
+          label: 'Buy Physical Gold',
+          href: '/markets/OANDA:XAUUSD',
+          description: 'Gold',
+        },
+        {
+          label: 'Buy Physical Silver',
+          href: '/markets/OANDA:XAGUSD',
+          description: 'Silver',
+        },
+        {
+          label: 'Buy Physical Platinum',
+          href: '/markets/OANDA:XPTUSD',
+          description: 'Platinum',
+        },
+        {
+          label: 'Buy Physical Palladium',
+          href: '/markets/OANDA:XPDUSD',
+          description: 'Palladium',
+        },
+        {
+          label: 'Buy Physical Copper',
+          href: '/markets/COMEX:HG1!',
+          description: 'Copper',
+        },
+      ],
+    },
+    {
+      label: 'Send / Receive',
+      icon: Send,
+      items: [
+        {
+          label: 'Send to PBCEx User (Placeholder)',
+          href: '/send/internal',
+          description: 'Free & instant transfers',
+        },
+        {
+          label: 'Crypto Withdrawal (Placeholder)',
+          href: '/send/crypto',
+          description: 'Send on-chain',
+        },
+        {
+          label: 'Bank Transfers (SWIFT/WISE-ready) (Placeholder)',
+          href: '/send/bank',
+          description: 'Domestic & international',
+        },
+        {
+          label: 'Pay with QR Code (Placeholder)',
+          href: '/pay/qr',
+          description: 'Merchant QR',
+        },
+        {
+          label: 'Receive with QR Code (Placeholder)',
+          href: '/receive/qr',
+          description: 'Your QR',
+        },
+        {
+          label: 'Spend with Visa Card (Placeholder)',
+          href: '/card/spend',
+          description: 'Use card',
+        },
+        {
+          label: 'Set up Bill Pay (Placeholder)',
+          href: '/pay/bills',
+          description: 'Schedule utilities & vendors',
+        },
+        {
+          label: 'Request a Payment (Placeholder)',
+          href: '/pay/request',
+          description: 'Create invoice/QR',
+        },
+        {
+          label: 'Set up Recurring Transfers (Placeholder)',
+          href: '/send/recurring',
+          description: 'Automate payouts & savings',
+        },
+      ],
+    },
+    {
+      label: 'My Account',
+      icon: User,
+      items: [
+        {
+          label: 'Balances & Funding',
+          href: '/account',
+          description: 'Balances, deposit, funding options',
+        },
+        {
+          label: 'My Assets',
+          href: '/my-assets',
+          description: 'Buy, Sell, Realize; Send/Receive, Spend, Transfer',
+        },
+        {
+          label: 'My Spending',
+          href: '/my-spending',
+          description: 'Track expenses, categories, and savings goals',
+        },
+        {
+          label: 'Transaction History',
+          href: '/transaction-history',
+          description: 'All transactions',
+        },
+        {
+          label: 'Order History',
+          href: '/order-history',
+          description: 'Trading activity',
+        },
+        {
+          label: 'PnL',
+          href: '/pnl',
+          description: 'Profit & loss analytics',
+        },
+        {
+          label: 'Connect Wallet',
+          href: '/wallet',
+          description: 'External wallets',
+        },
+        {
+          label: 'Security (Placeholder)',
+          href: '/support/security',
+          description: '2FA & sessions',
+        },
+        {
+          label: 'Settings & Profile (Placeholder)',
+          href: '/account',
+          description: 'Preferences & KYC',
+        },
+        {
+          label: 'Support (Placeholder)',
+          href: '/support/help-center',
+          description: 'Help center',
+        },
+      ],
+    },
+  ];
 
   const handleMenuClick = (menu: MenuItem, item?: MenuItem | string) => {
     if (typeof item === 'object' && item?.onClick) {
       item.onClick();
     } else if (typeof item === 'object' && item?.href) {
+      // For logged-out users clicking My Account items, open auth modal if needed
+      if (!user && menu.label === 'My Account') {
+        setAuthModalOpen(true);
+        return;
+      }
       navigate(item.href);
     } else if (menu.href) {
       navigate(menu.href);
