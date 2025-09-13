@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import Index from './pages/Index';
+import Markets from './pages/Markets';
+import Trade from './pages/Trade';
 import Trading from './pages/Trading';
 import CoinTrading from './pages/CoinTrading';
 import FxTrading from './pages/FxTrading';
@@ -101,6 +103,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path='/' element={<Index />} />
+            <Route path='/markets' element={<Markets />} />
+            <Route path='/trade/:pair' element={<Trade />} />
             <Route path='/trading' element={<Trading />} />
             <Route path='/coin-trading' element={<CoinTrading />} />
             <Route path='/admin/trade' element={<AdminTrade />} />
