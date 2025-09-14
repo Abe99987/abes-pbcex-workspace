@@ -307,7 +307,9 @@ const MySpending = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const recurringExpenses = categoryData.filter(cat => cat.recurring);
+  const recurringExpenses = (
+    liveCategoryData.length ? liveCategoryData : categoryData
+  ).filter(cat => cat.recurring);
 
   const savingsOpportunities = [
     {
@@ -328,7 +330,7 @@ const MySpending = () => {
   ];
 
   // Category totals for spending breakdown
-  const categoryData = budgets.map(budget => ({
+  const liveCategoryData = budgets.map(budget => ({
     name: budget.category,
     amount: budget.spent,
     color: getColorForCategory(budget.category),
@@ -609,7 +611,11 @@ const MySpending = () => {
                   <ResponsiveContainer width={420} height='100%'>
                     <PieChart>
                       <Pie
-                        data={categoryData}
+                        data={
+                          liveCategoryData.length
+                            ? liveCategoryData
+                            : categoryData
+                        }
                         cx='50%'
                         cy='50%'
                         innerRadius={80}
@@ -617,7 +623,10 @@ const MySpending = () => {
                         paddingAngle={2}
                         dataKey='amount'
                       >
-                        {categoryData.map((entry, index) => (
+                        {(liveCategoryData.length
+                          ? liveCategoryData
+                          : categoryData
+                        ).map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                         <LabelList
@@ -682,7 +691,10 @@ const MySpending = () => {
                   </div>
 
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-                    {categoryData.map((category, index) => {
+                    {(liveCategoryData.length
+                      ? liveCategoryData
+                      : categoryData
+                    ).map((category, index) => {
                       const Icon = category.icon;
                       const percentOfBudget =
                         (category.amount / category.budget) * 100;
@@ -1232,7 +1244,10 @@ const MySpending = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value='all'>All Categories</SelectItem>
-                        {categoryData.map(cat => (
+                        {(liveCategoryData.length
+                          ? liveCategoryData
+                          : categoryData
+                        ).map(cat => (
                           <SelectItem key={cat.name} value={cat.name}>
                             {cat.name}
                           </SelectItem>
@@ -1280,7 +1295,10 @@ const MySpending = () => {
                           <SelectValue placeholder='Categorize as...' />
                         </SelectTrigger>
                         <SelectContent>
-                          {categoryData.map(cat => (
+                          {(liveCategoryData.length
+                            ? liveCategoryData
+                            : categoryData
+                          ).map(cat => (
                             <SelectItem key={cat.name} value={cat.name}>
                               {cat.name}
                             </SelectItem>
@@ -1378,7 +1396,10 @@ const MySpending = () => {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {categoryData.map(cat => (
+                                {(liveCategoryData.length
+                                  ? liveCategoryData
+                                  : categoryData
+                                ).map(cat => (
                                   <SelectItem key={cat.name} value={cat.name}>
                                     {cat.name}
                                   </SelectItem>
