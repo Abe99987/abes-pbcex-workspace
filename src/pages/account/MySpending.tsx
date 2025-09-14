@@ -273,169 +273,171 @@ const MySpending = () => {
             </Card>
           </div>
 
-          {/* Overview Cards */}
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-            <Card className='bg-card/50 border-border/50'>
-              <CardHeader className='pb-2'>
-                <CardTitle className='text-sm font-medium text-muted-foreground'>This Month</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold text-foreground mb-1'>
-                  ${totalSpent.toLocaleString()}
-                </div>
-                <div className='flex items-center gap-1 text-sm'>
-                  <TrendingUp className='w-4 h-4 text-red-500' />
-                  <span className='text-red-500'>+12.3%</span>
-                  <span className='text-muted-foreground'>vs last month</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className='bg-card/50 border-border/50'>
-              <CardHeader className='pb-2'>
-                <CardTitle className='text-sm font-medium text-muted-foreground'>Budget Used</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold text-foreground mb-2'>
-                  {budgetUsed.toFixed(1)}%
-                </div>
-                <Progress value={budgetUsed} className='h-2 mb-1' />
-                <div className='text-sm text-muted-foreground'>
-                  ${(monthlyBudget - totalSpent).toLocaleString()} remaining
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className='bg-card/50 border-border/50'>
-              <CardHeader className='pb-2'>
-                <CardTitle className='text-sm font-medium text-muted-foreground'>Avg. Daily</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold text-foreground mb-1'>
-                  ${(totalSpent / 30).toFixed(0)}
-                </div>
-                <div className='flex items-center gap-1 text-sm'>
-                  <TrendingDown className='w-4 h-4 text-green-500' />
-                  <span className='text-green-500'>-5.2%</span>
-                  <span className='text-muted-foreground'>vs last month</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Charts Row */}
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-            
-            {/* Spending by Category */}
-            <Card className='bg-card/50 border-border/50 lg:col-span-2'>
-              <CardHeader>
-                <CardTitle className='text-foreground'>Spending by Category</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-                  <div className='h-64'>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={categoryData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={50}
-                          outerRadius={100}
-                          paddingAngle={2}
-                          dataKey="amount"
-                        >
-                          {categoryData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                          <LabelList
-                            dataKey={(entry: any) => `${entry.name} (${((entry.amount / totalSpent) * 100).toFixed(0)}%)`}
-                            position="outside"
-                            fontSize={10}
-                            fill="hsl(var(--foreground))"
-                          />
-                        </Pie>
-                        <Tooltip
-                          formatter={(value: number) => [`$${value.toLocaleString()}`, 'Amount']}
+          {/* Row 1: Donut Chart - Full Width */}
+          <Card className='bg-card/50 border-border/50'>
+            <CardHeader>
+              <CardTitle className='text-foreground'>Spending by Category</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className='flex flex-col items-center space-y-6'>
+                {/* Large Centered Donut */}
+                <div className='h-96 w-full flex justify-center'>
+                  <ResponsiveContainer width={420} height="100%">
+                    <PieChart>
+                      <Pie
+                        data={categoryData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={80}
+                        outerRadius={160}
+                        paddingAngle={2}
+                        dataKey="amount"
+                      >
+                        {categoryData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                        <LabelList
+                          dataKey={(entry: any) => `${entry.name} (${((entry.amount / totalSpent) * 100).toFixed(0)}%)`}
+                          position="outside"
+                          fontSize={11}
+                          fill="hsl(var(--foreground))"
                         />
-                      </PieChart>
-                    </ResponsiveContainer>
+                      </Pie>
+                      <Tooltip
+                        formatter={(value: number) => [`$${value.toLocaleString()}`, 'Amount']}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                
+                {/* Category Legend Below - Two Columns */}
+                <div className='w-full max-w-4xl'>
+                  <div className='flex items-center justify-between mb-4'>
+                    <h4 className='text-sm font-medium text-foreground'>Categories</h4>
+                    <Dialog open={showAddCategoryModal} onOpenChange={setShowAddCategoryModal}>
+                      <DialogTrigger asChild>
+                        <Button variant='outline' size='sm' className='text-xs'>
+                          Add Category
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Add New Category</DialogTitle>
+                        </DialogHeader>
+                        <div className='space-y-4'>
+                          <div>
+                            <label className='text-sm font-medium'>Category Name</label>
+                            <Input placeholder='e.g. Health & Fitness' />
+                          </div>
+                          <div>
+                            <label className='text-sm font-medium'>Color</label>
+                            <Input type='color' defaultValue='#8B5CF6' />
+                          </div>
+                          <div>
+                            <label className='text-sm font-medium'>Monthly Budget</label>
+                            <Input type='number' placeholder='500' />
+                          </div>
+                          <Button>Add Category</Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                   
-                  {/* Budgets & Categories moved here */}
-                  <div className='space-y-3'>
-                    <div className='flex items-center justify-between mb-4'>
-                      <h4 className='text-sm font-medium text-foreground'>Categories</h4>
-                      <Dialog open={showAddCategoryModal} onOpenChange={setShowAddCategoryModal}>
-                        <DialogTrigger asChild>
-                          <Button variant='outline' size='sm' className='text-xs'>
-                            Add Category
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Add New Category</DialogTitle>
-                          </DialogHeader>
-                          <div className='space-y-4'>
-                            <div>
-                              <label className='text-sm font-medium'>Category Name</label>
-                              <Input placeholder='e.g. Health & Fitness' />
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                    {categoryData.map((category, index) => {
+                      const Icon = category.icon;
+                      const percentOfBudget = (category.amount / category.budget) * 100;
+                      return (
+                        <div key={index} className='flex items-center justify-between p-3 bg-muted/20 rounded-lg'>
+                          <div className='flex items-center space-x-3'>
+                            <div className='p-1 rounded' style={{ backgroundColor: `${category.color}20` }}>
+                              <Icon className='w-4 h-4' style={{ color: category.color }} />
                             </div>
-                            <div>
-                              <label className='text-sm font-medium'>Color</label>
-                              <Input type='color' defaultValue='#8B5CF6' />
-                            </div>
-                            <div>
-                              <label className='text-sm font-medium'>Monthly Budget</label>
-                              <Input type='number' placeholder='500' />
-                            </div>
-                            <Button>Add Category</Button>
+                            <span className='text-sm font-medium text-foreground'>{category.name}</span>
                           </div>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                    
-                    <div className='space-y-2 max-h-48 overflow-y-auto'>
-                      {categoryData.map((category, index) => {
-                        const Icon = category.icon;
-                        const percentOfBudget = (category.amount / category.budget) * 100;
-                        
-                        return (
-                          <div key={index} className='space-y-1'>
-                            <div className='flex items-center justify-between'>
-                              <div className='flex items-center gap-2'>
-                                <div className='p-1 rounded' style={{ backgroundColor: `${category.color}20` }}>
-                                  <Icon className='w-3 h-3' style={{ color: category.color }} />
-                                </div>
-                                <span className='text-xs font-medium text-foreground'>{category.name}</span>
-                              </div>
-                              <span className='text-xs text-muted-foreground'>
-                                {percentOfBudget.toFixed(0)}%
-                              </span>
+                          <div className='text-right'>
+                            <div className='text-sm font-semibold text-foreground'>
+                              ${category.amount.toLocaleString()}
                             </div>
-                            <Progress value={percentOfBudget} className='h-1' />
+                            <div className='text-xs text-muted-foreground'>
+                              {percentOfBudget.toFixed(0)}% of budget
+                            </div>
                           </div>
-                        );
-                      })}
-                    </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Monthly Trend */}
-            <Card className='bg-card/50 border-border/50'>
+          {/* Row 2: KPI Tiles (Left) + Monthly Trend (Right) */}
+          <div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
+            
+            {/* Left Column: KPI Tiles Stacked */}
+            <div className='lg:col-span-4 space-y-4'>
+              <Card className='bg-card/50 border-border/50'>
+                <CardHeader className='pb-2'>
+                  <CardTitle className='text-sm font-medium text-muted-foreground'>This Month</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className='text-2xl font-bold text-foreground mb-1'>
+                    ${totalSpent.toLocaleString()}
+                  </div>
+                  <div className='flex items-center gap-1 text-sm'>
+                    <TrendingUp className='w-4 h-4 text-red-500' />
+                    <span className='text-red-500'>+12.3%</span>
+                    <span className='text-muted-foreground'>vs last month</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className='bg-card/50 border-border/50'>
+                <CardHeader className='pb-2'>
+                  <CardTitle className='text-sm font-medium text-muted-foreground'>Budget Used</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className='text-2xl font-bold text-foreground mb-2'>
+                    {budgetUsed.toFixed(1)}%
+                  </div>
+                  <Progress value={budgetUsed} className='h-2 mb-1' />
+                  <div className='text-sm text-muted-foreground'>
+                    ${(monthlyBudget - totalSpent).toLocaleString()} remaining
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className='bg-card/50 border-border/50'>
+                <CardHeader className='pb-2'>
+                  <CardTitle className='text-sm font-medium text-muted-foreground'>Avg. Daily</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className='text-2xl font-bold text-foreground mb-1'>
+                    ${(totalSpent / 30).toFixed(0)}
+                  </div>
+                  <div className='flex items-center gap-1 text-sm'>
+                    <TrendingDown className='w-4 h-4 text-green-500' />
+                    <span className='text-green-500'>-5.2%</span>
+                    <span className='text-muted-foreground'>vs last month</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Right Column: Monthly Trend - Expanded */}
+            <Card className='bg-card/50 border-border/50 lg:col-span-8'>
               <CardHeader>
                 <div className='flex items-center justify-between'>
                   <CardTitle className='text-foreground'>Monthly Trend</CardTitle>
                 </div>
-                <div className='flex gap-1 mt-2'>
+                <div className='flex gap-1 mt-2 overflow-x-auto'>
                   {['Day', 'Month', 'Year'].map((period) => (
                     <Button
                       key={period}
                       variant={trendTimeframe === period ? 'default' : 'ghost'}
                       size='sm'
-                      className='text-xs h-6 px-2'
+                      className='text-xs h-6 px-3 flex-shrink-0'
                       onClick={() => setTrendTimeframe(period)}
                     >
                       {period}
@@ -444,7 +446,7 @@ const MySpending = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className='h-64 mb-4'>
+                <div className='h-96 mb-4'>
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={monthlyTrend}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
