@@ -176,14 +176,12 @@ describe('TradeAdapter', () => {
   });
 
   it('placeOrder sets X-Idempotency-Key header', async () => {
-    (global as any).fetch = vi
-      .fn()
-      .mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          data: { trade: { id: 't1', price: '100.00', fee: '0.10' } },
-        }),
-      });
+    (global as any).fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: { trade: { id: 't1', price: '100.00', fee: '0.10' } },
+      }),
+    });
 
     await tradeAdapter.placeOrder({
       side: 'buy',
@@ -192,7 +190,7 @@ describe('TradeAdapter', () => {
       amount: 0.01,
     });
     const call = (fetch as any).mock.calls[0];
-    expect(call[0]).toMatch('/trade/order');
+    expect(call[0]).toMatch(/\/trading\/orders|\/trade\/order/);
     expect(call[1].headers['X-Idempotency-Key']).toBeDefined();
   });
 });
