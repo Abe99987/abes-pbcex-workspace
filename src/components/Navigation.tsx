@@ -92,23 +92,23 @@ const Navigation = () => {
       icon: Coins,
       items: [
         {
-          label: 'Quick Buy (Placeholder)',
-          href: '/markets/BINANCE:BTCUSDT',
+          label: 'Quick Buy',
+          href: '/buy',
           description: 'Fiat → asset in one step',
         },
         {
-          label: 'Quick Convert (Placeholder)',
-          href: '/my-assets',
+          label: 'Quick Convert',
+          href: '/convert',
           description: 'Swap between assets instantly',
         },
         {
-          label: 'Buy with Card (Placeholder)',
-          href: '/my-spending',
+          label: 'Buy with Card',
+          href: '/buy/card',
           description: 'Visa/Mastercard checkout',
         },
         {
-          label: 'Deposit Crypto (Placeholder)',
-          href: '/my-assets',
+          label: 'Deposit Crypto',
+          href: '/deposit',
           description: 'On-chain deposit addresses',
         },
       ],
