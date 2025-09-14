@@ -20,6 +20,26 @@
 
 _Merge note: unified via PR #59 (Markets) and PR #60 (Spending)._
 
+- Linked PRs: Markets wiring v1 merged in PR #59; Spending wiring v1 merged in PR #60 (squash-merge).
+- Frontend stability: Added jest aliases and jsdom window.open shim to stabilize tests; fixed MySpending duplicate variable for production build.
+- Adapters unified: Single `src/lib/api.ts` provides Markets and Spending adapters with `fetchWithTimeout` and mock fallbacks guarded by feature flags.
+
+## Trading Wiring v1 - 2025-09-14
+
+- TradeAdapter added in `src/lib/api.ts` with:
+  - `getBalances()` reading `/api/wallet/balances` (trading account) with mock fallback
+  - `streamPrices(pair)` via single SSE multiplexor to `/markets/stream` (one EventSource)
+  - `placeOrder()` idempotent stub to `/api/trade/order` with `X-Idempotency-Key`
+- UI wiring:
+  - `OrderPanel` reads balances, enforces settle-in rules per page (USD, USDC/USDT toggle, coin dropdown)
+  - Client validations: min notional ($5), available-balance check, disabled states while pending
+  - Price preview: last price from SSE, fee preview (20 bps)
+- Feature flag: `trading.v1` (default true)
+- Tests:
+  - Adapter unit: idempotency header present; balances returns rows
+  - Markets RTL updated: single SSE connection mocked and cleaned up
+- SSE discipline: one connection per page; manager auto-closes when no subscribers remain
+
 ## Step-37 (Nav+Print Finalization) - 2025-09-13
 
 - **Navigation unification**: Resolved PR #55 residue and ensured canonical Navigation component is used site-wide; removed conflicting page-local headers

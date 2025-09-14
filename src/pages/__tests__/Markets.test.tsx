@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import Markets from '../Markets';
 import { FEATURE_FLAGS } from '@/config/features';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 // Mock the API adapter
 jest.mock('../../lib/api', () => ({
@@ -48,6 +49,9 @@ jest.mock('../../lib/api', () => ({
     startPriceStream: jest.fn().mockReturnValue({
       close: jest.fn(),
     }),
+  },
+  tradeAdapter: {
+    streamPrices: jest.fn(() => ({ close: jest.fn() })),
   },
 }));
 
@@ -141,6 +145,51 @@ describe('Markets Page', () => {
 
     // Should clean up on unmount
     unmount();
+    expect(mockClose).toHaveBeenCalled();
+  });
+
+  it('cleans up SSE connection on route change', () => {
+    const mockClose = jest.fn();
+    const mockStream = { close: mockClose } as any;
+    const marketsAdapter = require('../../lib/api').marketsAdapter;
+    marketsAdapter.startPriceStream.mockReturnValue(mockStream);
+
+    const TestRoutes = () => (
+      <Routes>
+        <Route path='/' element={<Markets />} />
+        <Route path='/other' element={<div>Other</div>} />
+      </Routes>
+    );
+
+    const { rerender } = render(
+      <HelmetProvider>
+        <QueryClientProvider
+          client={
+            new QueryClient({ defaultOptions: { queries: { retry: false } } })
+          }
+        >
+          <MemoryRouter initialEntries={['/']}>
+            <TestRoutes />
+          </MemoryRouter>
+        </QueryClientProvider>
+      </HelmetProvider>
+    );
+
+    // Navigate to other route
+    rerender(
+      <HelmetProvider>
+        <QueryClientProvider
+          client={
+            new QueryClient({ defaultOptions: { queries: { retry: false } } })
+          }
+        >
+          <MemoryRouter initialEntries={['/other']}>
+            <TestRoutes />
+          </MemoryRouter>
+        </QueryClientProvider>
+      </HelmetProvider>
+    );
+
     expect(mockClose).toHaveBeenCalled();
   });
 });

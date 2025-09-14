@@ -3,15 +3,24 @@
  * Basic tests for both adapters (flags, normalization, CSV BOM)
  */
 
-import { spendingAdapter, marketsAdapter } from '../api';
+import { spendingAdapter, marketsAdapter, tradeAdapter } from '../api';
 import { FEATURE_FLAGS } from '@/config/features';
 
+// Declare test globals to satisfy TypeScript in this repo without jest types
+declare const describe: any;
+declare const it: any;
+declare const expect: any;
+declare const beforeEach: any;
+
+// Vitest global (available under Vite env); fallback to any
+declare const vi: { fn: () => any } | undefined;
+
 // Mock fetch globally
-(global as any).fetch = jest.fn();
+(global as any).fetch = vi ? vi.fn() : ((() => {}) as any);
 
 describe('MarketsAdapter', () => {
   beforeEach(() => {
-    (fetch as jest.Mock).mockReset();
+    (fetch as any).mockReset?.();
   });
 
   it('returns mock symbols when markets.v1 is disabled', async () => {
@@ -42,7 +51,7 @@ describe('MarketsAdapter', () => {
       timestamp: new Date().toISOString(),
     };
 
-    (fetch as jest.Mock).mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => mockApiResponse,
     });
@@ -59,7 +68,7 @@ describe('MarketsAdapter', () => {
 
 describe('SpendingAdapter', () => {
   beforeEach(() => {
-    (fetch as jest.Mock).mockReset();
+    (fetch as any).mockReset?.();
   });
 
   it('returns mock transactions when spending.v1 is disabled', async () => {
@@ -89,7 +98,7 @@ describe('SpendingAdapter', () => {
       timestamp: new Date().toISOString(),
     };
 
-    (fetch as jest.Mock).mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => mockApiResponse,
     });
@@ -137,7 +146,7 @@ describe('SpendingAdapter', () => {
       timestamp: new Date().toISOString(),
     };
 
-    (fetch as jest.Mock).mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => mockApiResponse,
     });
@@ -153,6 +162,38 @@ describe('SpendingAdapter', () => {
         }),
       })
     );
+  });
+});
+
+describe('TradeAdapter', () => {
+  beforeEach(() => {
+    (fetch as any).mockReset?.();
+  });
+
+  it('getBalances returns array (mock fallback ok)', async () => {
+    const rows = await tradeAdapter.getBalances();
+    expect(Array.isArray(rows)).toBe(true);
+  });
+
+  it('placeOrder sets X-Idempotency-Key header', async () => {
+    (global as any).fetch = vi
+      .fn()
+      .mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: { trade: { id: 't1', price: '100.00', fee: '0.10' } },
+        }),
+      });
+
+    await tradeAdapter.placeOrder({
+      side: 'buy',
+      base: 'BTC',
+      quote: 'USDC',
+      amount: 0.01,
+    });
+    const call = (fetch as any).mock.calls[0];
+    expect(call[0]).toMatch('/trade/order');
+    expect(call[1].headers['X-Idempotency-Key']).toBeDefined();
   });
 });
 
