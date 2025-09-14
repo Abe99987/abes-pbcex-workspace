@@ -3,4 +3,5 @@ export const FEATURE_FLAGS = {
   providerMarketplaceMock: true,
   'markets.v1': true,
   'spending.v1': true,
+  'trading.v1': true,
 } as const;

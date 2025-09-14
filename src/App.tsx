@@ -78,6 +78,7 @@ import Regulatory from './pages/legal/Regulatory';
 import Licenses from './pages/legal/Licenses';
 import LegalList from './pages/legal/LegalList';
 import LegalView from './pages/legal/LegalView';
+import { FEATURE_FLAGS } from '@/config/features';
 
 import PrivacyHub from './pages/legal/privacy';
 import ComplianceHub from './pages/legal/compliance';
@@ -139,8 +140,14 @@ const App = () => (
             <Route path='/education' element={<Education />} />
             <Route path='/my-assets' element={<MyAssets />} />
             {/* Legacy routes - redirects to canonical paths */}
-            <Route path='/transaction-history' element={<Navigate to='/transactions' replace />} />
-            <Route path='/order-history' element={<Navigate to='/orders' replace />} />
+            <Route
+              path='/transaction-history'
+              element={<Navigate to='/transactions' replace />}
+            />
+            <Route
+              path='/order-history'
+              element={<Navigate to='/orders' replace />}
+            />
             <Route path='/titled-asset/:address' element={<TitledAsset />} />
             <Route path='/realize' element={<Realize />} />
             <Route path='/pnl' element={<PnL />} />
@@ -163,7 +170,7 @@ const App = () => (
             <Route path='/shop/palladium' element={<Palladium />} />
             <Route path='/shop/copper' element={<Copper />} />
             <Route path='/shop/:symbol' element={<CommodityDetail />} />
-            
+
             {/* Buy/Convert/Deposit Routes */}
             <Route path='/buy' element={<QuickBuy />} />
             <Route path='/buy/card' element={<BuyWithCard />} />
@@ -181,13 +188,40 @@ const App = () => (
             <Route path='/settings' element={<AccountSettings />} />
             <Route path='/security' element={<AccountSecurity />} />
             <Route path='/support' element={<AccountSupport />} />
-            
+
             {/* Trading Routes */}
-            <Route path='/trading/spot-usd' element={<SpotUSD />} />
-            <Route path='/trading/spot-usdc' element={<SpotUSDC />} />
-            <Route path='/trading/coin' element={<CoinToCoin />} />
+            <Route
+              path='/trading/spot-usd'
+              element={
+                FEATURE_FLAGS['trading.v1'] ? (
+                  <SpotUSD />
+                ) : (
+                  <Navigate to='/' replace />
+                )
+              }
+            />
+            <Route
+              path='/trading/spot-usdc'
+              element={
+                FEATURE_FLAGS['trading.v1'] ? (
+                  <SpotUSDC />
+                ) : (
+                  <Navigate to='/' replace />
+                )
+              }
+            />
+            <Route
+              path='/trading/coin'
+              element={
+                FEATURE_FLAGS['trading.v1'] ? (
+                  <CoinToCoin />
+                ) : (
+                  <Navigate to='/' replace />
+                )
+              }
+            />
             <Route path='/trading/dca' element={<TradingDCA />} />
-            
+
             {/* Account Routes */}
             <Route path='/account' element={<Account />} />
             <Route path='/account/identity' element={<Account />} />

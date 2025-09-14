@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -12,9 +12,15 @@ import OrderPanel from './OrderPanel';
 import MarketData from './MarketData';
 import OrderHistory from './OrderHistory';
 import TradingFooter from './TradingFooter';
+import { tradeAdapter } from '@/lib/api';
 
 const SpotUSDInterface = () => {
   const [selectedPair, setSelectedPair] = useState('GOLD/USD');
+
+  useEffect(() => {
+    const sub = tradeAdapter.streamPrices(selectedPair);
+    return () => sub.close();
+  }, [selectedPair]);
 
   return (
     <div className='min-h-screen bg-black text-white flex flex-col'>
@@ -63,7 +69,7 @@ const SpotUSDInterface = () => {
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value='orders' className='flex-1 mt-0'>
-                    <OrderHistory type="active" />
+                    <OrderHistory type='active' />
                   </TabsContent>
                   <TabsContent value='trades' className='p-4'>
                     <div className='text-gray-400 text-sm'>
@@ -100,7 +106,7 @@ const SpotUSDInterface = () => {
 
               {/* Order Panel - USD settlement mode */}
               <ResizablePanel defaultSize={40} minSize={30}>
-                <OrderPanel pair={selectedPair} settlementMode="usd" />
+                <OrderPanel pair={selectedPair} settlementMode='usd' />
               </ResizablePanel>
             </ResizablePanelGroup>
           </ResizablePanel>
@@ -108,7 +114,7 @@ const SpotUSDInterface = () => {
 
         {/* Mobile Order Panel */}
         <div className='lg:hidden border-t border-gray-800'>
-          <OrderPanel pair={selectedPair} settlementMode="usd" />
+          <OrderPanel pair={selectedPair} settlementMode='usd' />
         </div>
       </div>
 

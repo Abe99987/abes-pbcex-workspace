@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -13,10 +13,18 @@ import OrderPanel from './OrderPanel';
 import MarketData from './MarketData';
 import OrderHistory from './OrderHistory';
 import TradingFooter from './TradingFooter';
+import { tradeAdapter } from '@/lib/api';
 
 const SpotUSDCInterface = () => {
   const [selectedPair, setSelectedPair] = useState('GOLD/USDC');
   const [selectedStablecoin, setSelectedStablecoin] = useState('USDC');
+  const [settlingBanner, setSettlingBanner] = useState('');
+
+  useEffect(() => {
+    setSettlingBanner(`Settling in ${selectedStablecoin}`);
+    const sub = tradeAdapter.streamPrices(selectedPair);
+    return () => sub.close();
+  }, [selectedPair, selectedStablecoin]);
 
   return (
     <div className='min-h-screen bg-black text-white flex flex-col'>
@@ -65,7 +73,7 @@ const SpotUSDCInterface = () => {
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value='orders' className='flex-1 mt-0'>
-                    <OrderHistory type="active" />
+                    <OrderHistory type='active' />
                   </TabsContent>
                   <TabsContent value='trades' className='p-4'>
                     <div className='text-gray-400 text-sm'>
@@ -107,7 +115,9 @@ const SpotUSDCInterface = () => {
                   <div className='p-3 border-b border-gray-800'>
                     <div className='flex gap-2 mb-3'>
                       <Button
-                        variant={selectedStablecoin === 'USDC' ? 'default' : 'outline'}
+                        variant={
+                          selectedStablecoin === 'USDC' ? 'default' : 'outline'
+                        }
                         size='sm'
                         onClick={() => setSelectedStablecoin('USDC')}
                         className={`flex-1 text-xs h-10 ${selectedStablecoin === 'USDC' ? 'bg-yellow-500 text-black hover:bg-yellow-600' : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'}`}
@@ -115,7 +125,9 @@ const SpotUSDCInterface = () => {
                         USDC • $12,450
                       </Button>
                       <Button
-                        variant={selectedStablecoin === 'USDT' ? 'default' : 'outline'}
+                        variant={
+                          selectedStablecoin === 'USDT' ? 'default' : 'outline'
+                        }
                         size='sm'
                         onClick={() => setSelectedStablecoin('USDT')}
                         className={`flex-1 text-xs h-10 ${selectedStablecoin === 'USDT' ? 'bg-yellow-500 text-black hover:bg-yellow-600' : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'}`}
@@ -123,25 +135,31 @@ const SpotUSDCInterface = () => {
                         USDT • $8,250
                       </Button>
                     </div>
-                    
+
                     {/* Locked Settlement Line */}
                     <div className='text-xs text-gray-400 mb-2'>
-                      Settling in {selectedStablecoin}
+                      {settlingBanner}
                     </div>
-                    
+
                     {/* Trading Balance */}
                     <div className='p-2 bg-gray-900/50 rounded border border-gray-700'>
                       <div className='text-xs text-gray-400 mb-1'>
                         Trading balance — {selectedStablecoin}:
                       </div>
                       <div className='text-sm font-mono text-white'>
-                        {selectedStablecoin === 'USDC' ? '12,450.00 USDC' : '8,250.00 USDT'}
+                        {selectedStablecoin === 'USDC'
+                          ? '12,450.00 USDC'
+                          : '8,250.00 USDT'}
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Rest of Order Panel */}
-                  <OrderPanel pair={selectedPair} settlementAsset={selectedStablecoin} settlementMode="usdc" />
+                  <OrderPanel
+                    pair={selectedPair}
+                    settlementAsset={selectedStablecoin}
+                    settlementMode='usdc'
+                  />
                 </div>
               </ResizablePanel>
             </ResizablePanelGroup>
@@ -155,7 +173,9 @@ const SpotUSDCInterface = () => {
             <div className='p-3 border-b border-gray-800'>
               <div className='flex gap-2 mb-3'>
                 <Button
-                  variant={selectedStablecoin === 'USDC' ? 'default' : 'outline'}
+                  variant={
+                    selectedStablecoin === 'USDC' ? 'default' : 'outline'
+                  }
                   size='sm'
                   onClick={() => setSelectedStablecoin('USDC')}
                   className={`flex-1 text-xs h-10 ${selectedStablecoin === 'USDC' ? 'bg-yellow-500 text-black hover:bg-yellow-600' : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'}`}
@@ -163,7 +183,9 @@ const SpotUSDCInterface = () => {
                   USDC • $12,450
                 </Button>
                 <Button
-                  variant={selectedStablecoin === 'USDT' ? 'default' : 'outline'}
+                  variant={
+                    selectedStablecoin === 'USDT' ? 'default' : 'outline'
+                  }
                   size='sm'
                   onClick={() => setSelectedStablecoin('USDT')}
                   className={`flex-1 text-xs h-10 ${selectedStablecoin === 'USDT' ? 'bg-yellow-500 text-black hover:bg-yellow-600' : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'}`}
@@ -171,22 +193,26 @@ const SpotUSDCInterface = () => {
                   USDT • $8,250
                 </Button>
               </div>
-              
-              <div className='text-xs text-gray-400 mb-2'>
-                Settling in {selectedStablecoin}
-              </div>
-              
+
+              <div className='text-xs text-gray-400 mb-2'>{settlingBanner}</div>
+
               <div className='p-2 bg-gray-900/50 rounded border border-gray-700'>
                 <div className='text-xs text-gray-400 mb-1'>
                   Trading balance — {selectedStablecoin}:
                 </div>
                 <div className='text-sm font-mono text-white'>
-                  {selectedStablecoin === 'USDC' ? '12,450.00 USDC' : '8,250.00 USDT'}
+                  {selectedStablecoin === 'USDC'
+                    ? '12,450.00 USDC'
+                    : '8,250.00 USDT'}
                 </div>
               </div>
             </div>
-            
-            <OrderPanel pair={selectedPair} settlementAsset={selectedStablecoin} settlementMode="usdc" />
+
+            <OrderPanel
+              pair={selectedPair}
+              settlementAsset={selectedStablecoin}
+              settlementMode='usdc'
+            />
           </div>
         </div>
       </div>
