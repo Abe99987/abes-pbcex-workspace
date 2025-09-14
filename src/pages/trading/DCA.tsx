@@ -46,8 +46,15 @@ const DCA = () => {
   const [calcCadence, setCalcCadence] = useState<'Day' | 'Month'>('Month');
   const [calcAmount, setCalcAmount] = useState('');
   const [calcAsset, setCalcAsset] = useState('Gold');
-  const [horizon, setHorizon] = useState('1y');
-  const [customMonths, setCustomMonths] = useState('');
+  const [calcStartDate, setCalcStartDate] = useState(() => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 1);
+    return date.toISOString().split('T')[0];
+  });
+  const [calcEndDate, setCalcEndDate] = useState(() => {
+    return new Date().toISOString().split('T')[0];
+  });
+  const [calcExecutionTime, setCalcExecutionTime] = useState('9:00 AM');
 
   // Rules state
   const [rules, setRules] = useState<DCARule[]>([]);
@@ -62,11 +69,10 @@ const DCA = () => {
     { value: 'Palladium', label: 'Palladium', price: '$1,150/oz' },
   ];
 
-  const horizonOptions = [
-    { value: '6m', label: '6 months', months: 6 },
-    { value: '1y', label: '1 year', months: 12 },
-    { value: '3y', label: '3 years', months: 36 },
-    { value: 'custom', label: 'Custom' },
+  const executionTimeOptions = [
+    { value: '9:00 AM', label: '9:00 AM' },
+    { value: '10:00 AM', label: '10:00 AM' },
+    { value: '12:00 PM', label: '12:00 PM' },
   ];
 
   // Load rules on mount
@@ -134,29 +140,57 @@ const DCA = () => {
     setActiveTab('setup');
   };
 
-  const handleCalculateReturns = () => {
-    if (!calcAmount || parseFloat(calcAmount) <= 0) return;
-
-    const months = horizon === 'custom' 
-      ? parseInt(customMonths) || 12 
-      : horizonOptions.find(h => h.value === horizon)?.months || 12;
-
-    const totalInvested = parseFloat(calcAmount) * (calcCadence === 'Day' ? months * 30 : months);
+  const validateDateRange = () => {
+    const start = new Date(calcStartDate);
+    const end = new Date(calcEndDate);
+    const fiveYearsAgo = new Date();
+    fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
     
-    // Mock projection calculation
-    const mockResults = {
-      totalInvested,
-      estimatedUnits: totalInvested / 2000, // Mock price calc
-      avgPrice: `$2,000`,
-      projectedValue: totalInvested * 1.15, // Mock 15% gain
-      horizon: `${months} months`,
-    };
+    return end >= start && start >= fiveYearsAgo;
+  };
 
-    setProjectionResults(mockResults);
+  const calculateContributions = () => {
+    const start = new Date(calcStartDate);
+    const end = new Date(calcEndDate);
+    
+    if (calcCadence === 'Day') {
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays + 1; // inclusive
+    } else {
+      const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+      return Math.max(1, months + 1); // inclusive
+    }
+  };
+
+  const handleCalculateReturns = () => {
+    if (!calcAmount || parseFloat(calcAmount) <= 0 || !validateDateRange()) return;
+
+    try {
+      const contributions = calculateContributions();
+      const totalInvested = parseFloat(calcAmount) * contributions;
+      
+      // Mock projection calculation
+      const mockResults = {
+        totalInvested,
+        estimatedUnits: totalInvested / 2000, // Mock price calc
+        avgPrice: `$2,000`,
+        projectedValue: totalInvested, // No market model, just invested amount
+        contributions,
+        horizon: `${contributions} ${calcCadence === 'Day' ? 'days' : 'months'}`,
+        startDate: calcStartDate,
+        endDate: calcEndDate,
+      };
+
+      setProjectionResults(mockResults);
+    } catch (error) {
+      console.error('Calculation error:', error);
+      setProjectionResults(null);
+    }
   };
 
   const isSetupValid = amount && parseFloat(amount) > 0;
-  const isCalcValid = calcAmount && parseFloat(calcAmount) > 0;
+  const isCalcValid = calcAmount && parseFloat(calcAmount) > 0 && validateDateRange();
 
   return (
     <Layout>
@@ -411,48 +445,60 @@ const DCA = () => {
                       </div>
                     </div>
 
-                    {/* Asset */}
+                    {/* Date Range */}
                     <div className='space-y-2'>
-                      <Label>Asset</Label>
-                      <Select value={calcAsset} onValueChange={setCalcAsset}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {assets.map((a) => (
-                            <SelectItem key={a.value} value={a.value}>
-                              {a.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Label>Date Range</Label>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                        <div>
+                          <Label htmlFor='start-date' className='text-xs text-muted-foreground'>Start date</Label>
+                          <Input
+                            id='start-date'
+                            type='date'
+                            value={calcStartDate}
+                            onChange={(e) => setCalcStartDate(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor='end-date' className='text-xs text-muted-foreground'>End date</Label>
+                          <Input
+                            id='end-date'
+                            type='date'
+                            value={calcEndDate}
+                            onChange={(e) => setCalcEndDate(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      {!validateDateRange() && (
+                        <p className='text-xs text-destructive'>
+                          End date must be after start date. Maximum lookback: 5 years.
+                        </p>
+                      )}
                     </div>
 
-                    {/* Horizon */}
+                    {/* Execution Time */}
                     <div className='space-y-2'>
-                      <Label>Projection horizon</Label>
-                      <div className='flex gap-2 flex-wrap'>
-                        {horizonOptions.map((h) => (
-                          <Button
-                            key={h.value}
-                            variant={horizon === h.value ? 'default' : 'outline'}
-                            size='sm'
-                            onClick={() => setHorizon(h.value)}
-                          >
-                            {h.label}
-                          </Button>
-                        ))}
+                      <Label htmlFor='execution-time'>Execution time</Label>
+                      <div className='space-y-1'>
+                        <Select value={calcExecutionTime} onValueChange={setCalcExecutionTime}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value='9:00 AM'>9:00 AM</SelectItem>
+                            <SelectItem value='10:00 AM'>10:00 AM</SelectItem>
+                            <SelectItem value='12:00 PM'>12:00 PM</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className='text-xs text-muted-foreground'>
+                          {calcCadence === 'Day' 
+                            ? 'Buys execute at the start of the selected period.' 
+                            : 'Executes at beginning of month.'
+                          }
+                        </p>
+                        <p className='text-xs text-muted-foreground'>
+                          All times local to your device.
+                        </p>
                       </div>
-                      {horizon === 'custom' && (
-                        <Input
-                          type='number'
-                          min='1'
-                          placeholder='12'
-                          value={customMonths}
-                          onChange={(e) => setCustomMonths(e.target.value)}
-                          className='w-32'
-                        />
-                      )}
                     </div>
 
                     <div className='flex gap-3'>
@@ -489,28 +535,42 @@ const DCA = () => {
                           <div className='text-center p-3 bg-muted/50 rounded-lg'>
                             <div className='text-sm text-muted-foreground'>Invested</div>
                             <div className='text-lg font-semibold'>
-                              ${projectionResults.totalInvested.toLocaleString()}
+                              ${projectionResults.totalInvested?.toLocaleString() || '0'}
                             </div>
                           </div>
                           <div className='text-center p-3 bg-muted/50 rounded-lg'>
                             <div className='text-sm text-muted-foreground'>Est. units</div>
                             <div className='text-lg font-semibold'>
-                              {projectionResults.estimatedUnits.toFixed(3)}
+                              {projectionResults.estimatedUnits?.toFixed(3) || '0'}
+                            </div>
+                          </div>
+                        </div>
+                        <div className='grid grid-cols-2 gap-4'>
+                          <div className='text-center p-3 bg-muted/50 rounded-lg'>
+                            <div className='text-sm text-muted-foreground'>Contributions</div>
+                            <div className='text-lg font-semibold'>
+                              {projectionResults.contributions || '0'}
+                            </div>
+                          </div>
+                          <div className='text-center p-3 bg-muted/50 rounded-lg'>
+                            <div className='text-sm text-muted-foreground'>Avg. price</div>
+                            <div className='text-lg font-semibold'>
+                              {projectionResults.avgPrice || '$0'}
                             </div>
                           </div>
                         </div>
                         <div className='text-center p-4 bg-primary/10 rounded-lg'>
                           <div className='text-sm text-muted-foreground mb-1'>Projected Value</div>
                           <div className='text-2xl font-bold text-primary'>
-                            ${projectionResults.projectedValue.toLocaleString()}
+                            ${projectionResults.projectedValue?.toLocaleString() || '0'}
                           </div>
                           <div className='text-xs text-muted-foreground'>
-                            Over {projectionResults.horizon}
+                            Over {projectionResults.horizon || 'selected period'}
                           </div>
                         </div>
                         <div className='h-20 bg-muted/30 rounded-lg flex items-center justify-center'>
                           <div className='text-xs text-muted-foreground'>
-                            [Projection chart placeholder]
+                            [{projectionResults.contributions || '0'} contributions visualization]
                           </div>
                         </div>
                       </div>
