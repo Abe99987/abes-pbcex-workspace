@@ -50,6 +50,7 @@ import AccountMySpending from './pages/account/MySpending';
 import AccountTransactions from './pages/account/Transactions';
 import AccountOrders from './pages/account/Orders';
 import ConnectWallet from './pages/account/ConnectWallet';
+import MyCards from './pages/account/MyCards';
 import AccountSettings from './pages/account/Settings';
 import AccountSecurity from './pages/account/Security';
 import AccountSupport from './pages/account/Support';
@@ -175,6 +176,7 @@ const App = () => (
             <Route path='/orders' element={<AccountOrders />} />
             <Route path='/pnl' element={<PnL />} />
             <Route path='/connect-wallet' element={<ConnectWallet />} />
+            <Route path='/my-cards' element={<MyCards />} />
             <Route path='/settings' element={<AccountSettings />} />
             <Route path='/security' element={<AccountSecurity />} />
             <Route path='/support' element={<AccountSupport />} />

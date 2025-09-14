@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import {
   PieChart,
@@ -43,6 +44,12 @@ import {
   Tag,
   Repeat,
   X,
+  Gauge,
+  Coins,
+  Settings,
+  CreditCard,
+  RotateCcw,
+  PiggyBank,
 } from 'lucide-react';
 
 const MySpending = () => {
@@ -54,12 +61,19 @@ const MySpending = () => {
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [showCreateRuleModal, setShowCreateRuleModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedMetal, setSelectedMetal] = useState('Gold');
+  const [smartSpendEnabled, setSmartSpendEnabled] = useState(true);
+  const [defaultSpendAsset, setDefaultSpendAsset] = useState('USDC');
   const itemsPerPage = 20;
 
   // Mock spending data
   const totalSpent = 4267.83;
   const monthlyBudget = 5000;
   const budgetUsed = (totalSpent / monthlyBudget) * 100;
+  const totalIncome = 6500;
+  const savingsRate = Math.round(((totalIncome - totalSpent) / totalIncome) * 100);
+  const potentialDCAAmount = Math.round((totalIncome - totalSpent) * 0.8);
 
   const categoryData = [
     { name: 'Shopping', amount: 1234.56, color: '#8B5CF6', icon: ShoppingCart, budget: 1500, recurring: false },
@@ -137,6 +151,37 @@ const MySpending = () => {
     console.log(`Updating transaction ${transactionId} to category ${newCategory}`);
   };
 
+  // Helper functions
+  const formatMonthYear = (date: Date) => {
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  };
+
+  const getSavingsRateColor = (rate: number) => {
+    if (rate < 15) return 'text-red-500';
+    if (rate < 25) return 'text-yellow-500';
+    if (rate < 30) return 'text-blue-500';
+    return 'text-green-500';
+  };
+
+  const getSavingsRateLabel = (rate: number) => {
+    if (rate < 15) return 'Needs work';
+    if (rate < 25) return 'Good';
+    if (rate < 30) return 'Strong';
+    return 'Wealthy';
+  };
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    setCurrentMonth(prev => {
+      const newMonth = new Date(prev);
+      if (direction === 'prev') {
+        newMonth.setMonth(newMonth.getMonth() - 1);
+      } else {
+        newMonth.setMonth(newMonth.getMonth() + 1);
+      }
+      return newMonth;
+    });
+  };
+
   return (
     <div className='min-h-screen bg-background'>
       <Navigation />
@@ -154,8 +199,62 @@ const MySpending = () => {
           
           {/* Header */}
           <div>
-            <h1 className='text-3xl font-bold text-foreground mb-2'>My Spending</h1>
-            <p className='text-muted-foreground'>Track your expenses and manage your budget</p>
+            <div className='flex items-center justify-between mb-4'>
+              <div>
+                <h1 className='text-3xl font-bold text-foreground mb-2'>My Spending</h1>
+                <div className='flex items-center gap-4'>
+                  <p className='text-muted-foreground'>Track your expenses and manage your budget</p>
+                  <a 
+                    href='/my-cards' 
+                    className='text-sm text-primary hover:text-primary/80 underline'
+                  >
+                    My Cards
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            {/* Smart Spend Settings */}
+            <Card className='bg-card/50 border-border/50 mb-6'>
+              <CardContent className='p-4'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-3'>
+                    <Settings className='w-5 h-5 text-muted-foreground' />
+                    <div>
+                      <div className='flex items-center gap-2'>
+                        <span className='text-sm font-medium text-foreground'>Smart Spend</span>
+                        <Switch 
+                          checked={smartSpendEnabled}
+                          onCheckedChange={setSmartSpendEnabled}
+                        />
+                      </div>
+                      <p className='text-xs text-muted-foreground'>
+                        Automatically spend from the optimal asset (fees/liquidity rules)
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className='flex items-center gap-3'>
+                    <div>
+                      <label className='text-xs text-muted-foreground block mb-1'>
+                        Default spend asset when Smart Spend is off
+                      </label>
+                      <Select value={defaultSpendAsset} onValueChange={setDefaultSpendAsset}>
+                        <SelectTrigger className='w-32 h-8'>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value='USDC'>USDC</SelectItem>
+                          <SelectItem value='BTC'>BTC</SelectItem>
+                          <SelectItem value='ETH'>ETH</SelectItem>
+                          <SelectItem value='GOLD'>GOLD</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Overview Cards */}
@@ -311,33 +410,108 @@ const MySpending = () => {
             </Card>
           </div>
 
+          {/* Savings Gauge and DCA Nudge Section */}
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8'>
+            
+            {/* Savings Rate Gauge */}
+            <Card className='bg-card/50 border-border/50'>
+              <CardContent className='p-6 text-center'>
+                <div className='flex items-center justify-center mb-4'>
+                  <div className='relative'>
+                    <Gauge className={`w-16 h-16 ${getSavingsRateColor(savingsRate)}`} />
+                    <div className='absolute inset-0 flex items-center justify-center'>
+                      <span className={`text-lg font-bold ${getSavingsRateColor(savingsRate)}`}>
+                        {savingsRate}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <h3 className='text-sm font-medium text-foreground mb-1'>
+                  Savings Rate this month
+                </h3>
+                <p className={`text-xs ${getSavingsRateColor(savingsRate)}`}>
+                  {getSavingsRateLabel(savingsRate)}
+                </p>
+                <p className='text-xs text-muted-foreground mt-2'>Target: 25%+</p>
+              </CardContent>
+            </Card>
+
+            {/* Gold DCA Nudge */}
+            <Card className='lg:col-span-2 bg-primary/10 border-primary/20'>
+              <CardContent className='p-4'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-3'>
+                    <Coins className='w-5 h-5 text-primary' />
+                    <div>
+                      <p className='text-sm font-medium text-foreground'>Auto-invest your savings</p>
+                      <p className='text-xs text-muted-foreground'>
+                        Based on your current savings pace, you could auto-invest ~${potentialDCAAmount}/month
+                      </p>
+                    </div>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <Select value={selectedMetal} onValueChange={setSelectedMetal}>
+                      <SelectTrigger className='w-20 h-8'>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='Gold'>Gold</SelectItem>
+                        <SelectItem value='Silver'>Silver</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button size='sm'>Set up DCA</Button>
+                    <Button variant='outline' size='sm'>Adjust amount</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Transaction Ledger Section */}
           <div className='grid grid-cols-1 xl:grid-cols-4 gap-6'>
             
             {/* Main Ledger */}
             <div className='xl:col-span-3 space-y-4'>
               
-              {/* Nudge Banner */}
-              <Card className='bg-primary/10 border-primary/20'>
-                <CardContent className='p-4'>
-                  <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-3'>
-                      <Target className='w-5 h-5 text-primary' />
-                      <div>
-                        <p className='text-sm font-medium text-foreground'>
-                          Potential monthly savings: ${savingsOpportunities.reduce((acc, opp) => acc + opp.potential, 0).toFixed(0)}
-                        </p>
-                        <p className='text-xs text-muted-foreground'>
-                          Review uncategorized transactions to find more savings opportunities
-                        </p>
-                      </div>
+              {/* Month Header for Transactions */}
+              <div className='flex items-center justify-between'>
+                <div>
+                  <h2 className='text-xl font-semibold text-foreground flex items-center gap-3'>
+                    Recent Transactions — {formatMonthYear(currentMonth)}
+                    <div className='flex items-center gap-1'>
+                      <Button 
+                        variant='ghost' 
+                        size='sm'
+                        onClick={() => navigateMonth('prev')}
+                        className='h-8 w-8 p-0'
+                      >
+                        <ChevronLeft className='w-4 h-4' />
+                      </Button>
+                      <Select>
+                        <SelectTrigger className='w-32 h-8 text-xs'>
+                          <SelectValue placeholder={formatMonthYear(currentMonth)} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value='2024-09'>September 2024</SelectItem>
+                          <SelectItem value='2024-08'>August 2024</SelectItem>
+                          <SelectItem value='2024-07'>July 2024</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        variant='ghost' 
+                        size='sm'
+                        onClick={() => navigateMonth('next')}
+                        className='h-8 w-8 p-0'
+                      >
+                        <ChevronRight className='w-4 h-4' />
+                      </Button>
                     </div>
-                    <Button variant='ghost' size='sm'>
-                      <X className='w-4 h-4' />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                  </h2>
+                  <p className='text-xs text-muted-foreground'>
+                    Showing transactions for {formatMonthYear(currentMonth).replace(' ', ' 1–30, ')}
+                  </p>
+                </div>
+              </div>
 
               {/* Filters & Search */}
               <Card className='bg-card/50 border-border/50'>
@@ -375,6 +549,10 @@ const MySpending = () => {
                       <Button variant='outline' size='sm'>
                         <Download className='w-4 h-4 mr-2' />
                         Export
+                      </Button>
+                      <Button variant='outline' size='sm'>
+                        <Download className='w-4 h-4 mr-2' />
+                        Export month CSV
                       </Button>
                     </div>
                   </div>
@@ -677,6 +855,12 @@ const MySpending = () => {
                 </CardContent>
               </Card>
             </div>
+          </div>
+          {/* Footer Disclosure */}
+          <div className='text-xs text-muted-foreground text-center pt-8 border-t border-border'>
+            <p>
+              DCA and round-ups are optional; not investment advice. Settlement in selected metal.
+            </p>
           </div>
         </div>
       </div>
