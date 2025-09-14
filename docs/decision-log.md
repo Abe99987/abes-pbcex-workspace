@@ -40,6 +40,15 @@ _Merge note: unified via PR #59 (Markets) and PR #60 (Spending)._
   - Markets RTL updated: single SSE connection mocked and cleaned up
 - SSE discipline: one connection per page; manager auto-closes when no subscribers remain
 
+## Trading Wiring v1 — merged + staging smoke (PR #61) — 2025-09-14
+
+- PR #61 merged (squash) into `main` at SHA `ff2e2a3`.
+- Endpoints verified: SSE `GET /api/markets/stream`; Orders `POST /api/trading/orders` with fallback to `/api/trade/order` (adapter).
+- Feature flag: `trading.v1` gates `/trading/*` at page-level; redirect when off.
+- SSE hygiene: exactly one `EventSource` per page; cleans up on route change (covered in RTL).
+- Idempotency: `X-Idempotency-Key` present on order stub (unit asserts; network evidence to be attached in operator log).
+- Staging smoke: initiated; awaiting staging preview link to attach screenshots/logs.
+
 ## Step-37 (Nav+Print Finalization) - 2025-09-13
 
 - **Navigation unification**: Resolved PR #55 residue and ensured canonical Navigation component is used site-wide; removed conflicting page-local headers

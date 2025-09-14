@@ -1,3 +1,27 @@
+## 2025-09-14 — Trading wiring v1 post-merge (PR #61)
+
+- Merge: `main@ff2e2a3` (PR #61: feat(frontend): trade wiring v1)
+- Scope: src/\*, docs
+
+Staging smoke checklist (pending staging URL):
+
+- [ ] /trading/spot-usd — USD settle-in locked, min notional $5 blocks submit, balances line visible
+- [ ] /trading/spot-usdc — USDC/USDT toggle + “Settling in …” banner
+- [ ] /trading/coin — settle-in dropdown; invalid combos disabled
+- [ ] SSE — exactly one EventSource per page; closes on route change
+- [ ] Order stub — POST /api/trading/orders; `X-Idempotency-Key` present (attach one network log)
+
+Evidence placeholders:
+
+- [ ] Screenshot 1: balances line + settle-in banner
+- [ ] Screenshot 2: Network log showing `X-Idempotency-Key`
+- [ ] Note: RTL confirms SSE cleanup on route change
+
+Notes:
+
+- Feature flag `trading.v1` default ON; page-level gating in `src/App.tsx`.
+- Adapter prefers `/api/trading/orders` with fallback to `/api/trade/order`.
+
 ### Step-36 operational notes
 
 - PR #40 merged: scaffold (Capacitor config, entitlements patch, wrapper bridge, deeplink page). Gates: Frontend/Backend CI green; CodeRabbit passed.
