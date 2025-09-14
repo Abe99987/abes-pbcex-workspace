@@ -16,12 +16,13 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
+  LabelList,
 } from 'recharts';
 import {
   DollarSign,
@@ -65,6 +66,12 @@ const MySpending = () => {
   const [selectedMetal, setSelectedMetal] = useState('Gold');
   const [smartSpendEnabled, setSmartSpendEnabled] = useState(true);
   const [defaultSpendAsset, setDefaultSpendAsset] = useState('USDC');
+  const [trendTimeframe, setTrendTimeframe] = useState('Month');
+  const [savingsGoal, setSavingsGoal] = useState(25);
+  const [dcaTimeframe, setDcaTimeframe] = useState('Month');
+  const [dcaAsset, setDcaAsset] = useState('Gold');
+  const [dcaSourceAccount, setDcaSourceAccount] = useState('Funding');
+  const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const itemsPerPage = 20;
 
   // Mock spending data
@@ -168,6 +175,15 @@ const MySpending = () => {
     if (rate < 25) return 'Good';
     if (rate < 30) return 'Strong';
     return 'Wealthy';
+  };
+
+  const getSavingsGoalDelta = (currentRate: number, goalRate: number) => {
+    const delta = (currentRate - goalRate) / 100 * totalIncome;
+    if (currentRate >= goalRate) {
+      return `You're above goal by $${Math.abs(delta).toFixed(0)}/mo.`;
+    } else {
+      return `You're under goal by $${Math.abs(delta).toFixed(0)}/mo.`;
+    }
   };
 
   const navigateMonth = (direction: 'prev' | 'next') => {
@@ -308,71 +324,101 @@ const MySpending = () => {
           </div>
 
           {/* Charts Row */}
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
             
             {/* Spending by Category */}
-            <Card className='bg-card/50 border-border/50'>
+            <Card className='bg-card/50 border-border/50 lg:col-span-2'>
               <CardHeader>
                 <CardTitle className='text-foreground'>Spending by Category</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className='h-64 mb-4'>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={categoryData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={40}
-                        outerRadius={80}
-                        paddingAngle={2}
-                        dataKey="amount"
-                      >
-                        {categoryData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        formatter={(value: number) => [`$${value.toLocaleString()}`, 'Amount']}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                
-                <div className='space-y-2'>
-                  {categoryData.map((category, index) => {
-                    const Icon = category.icon;
-                    const percentOfBudget = (category.amount / category.budget) * 100;
+                <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+                  <div className='h-64'>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={categoryData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={50}
+                          outerRadius={100}
+                          paddingAngle={2}
+                          dataKey="amount"
+                        >
+                          {categoryData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                          <LabelList
+                            dataKey={(entry: any) => `${entry.name} (${((entry.amount / totalSpent) * 100).toFixed(0)}%)`}
+                            position="outside"
+                            fontSize={10}
+                            fill="hsl(var(--foreground))"
+                          />
+                        </Pie>
+                        <Tooltip
+                          formatter={(value: number) => [`$${value.toLocaleString()}`, 'Amount']}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  {/* Budgets & Categories moved here */}
+                  <div className='space-y-3'>
+                    <div className='flex items-center justify-between mb-4'>
+                      <h4 className='text-sm font-medium text-foreground'>Categories</h4>
+                      <Dialog open={showAddCategoryModal} onOpenChange={setShowAddCategoryModal}>
+                        <DialogTrigger asChild>
+                          <Button variant='outline' size='sm' className='text-xs'>
+                            Add Category
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Add New Category</DialogTitle>
+                          </DialogHeader>
+                          <div className='space-y-4'>
+                            <div>
+                              <label className='text-sm font-medium'>Category Name</label>
+                              <Input placeholder='e.g. Health & Fitness' />
+                            </div>
+                            <div>
+                              <label className='text-sm font-medium'>Color</label>
+                              <Input type='color' defaultValue='#8B5CF6' />
+                            </div>
+                            <div>
+                              <label className='text-sm font-medium'>Monthly Budget</label>
+                              <Input type='number' placeholder='500' />
+                            </div>
+                            <Button>Add Category</Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                     
-                    return (
-                      <div key={index} className='flex items-center justify-between p-2 hover:bg-muted/50 rounded'>
-                        <div className='flex items-center gap-3'>
-                          <div className='p-1.5 rounded' style={{ backgroundColor: `${category.color}20` }}>
-                            <Icon className='w-4 h-4' style={{ color: category.color }} />
-                          </div>
-                          <div>
-                            <div className='text-sm font-medium text-foreground flex items-center gap-2'>
-                              {category.name}
-                              {category.recurring && (
-                                <Badge variant='secondary' className='text-xs'>Recurring</Badge>
-                              )}
+                    <div className='space-y-2 max-h-48 overflow-y-auto'>
+                      {categoryData.map((category, index) => {
+                        const Icon = category.icon;
+                        const percentOfBudget = (category.amount / category.budget) * 100;
+                        
+                        return (
+                          <div key={index} className='space-y-1'>
+                            <div className='flex items-center justify-between'>
+                              <div className='flex items-center gap-2'>
+                                <div className='p-1 rounded' style={{ backgroundColor: `${category.color}20` }}>
+                                  <Icon className='w-3 h-3' style={{ color: category.color }} />
+                                </div>
+                                <span className='text-xs font-medium text-foreground'>{category.name}</span>
+                              </div>
+                              <span className='text-xs text-muted-foreground'>
+                                {percentOfBudget.toFixed(0)}%
+                              </span>
                             </div>
-                            <div className='text-xs text-muted-foreground'>
-                              ${category.amount.toLocaleString()} / ${category.budget.toLocaleString()}
-                            </div>
+                            <Progress value={percentOfBudget} className='h-1' />
                           </div>
-                        </div>
-                        <div className='text-right'>
-                          <div className='text-sm font-medium text-foreground'>
-                            {percentOfBudget.toFixed(0)}%
-                          </div>
-                          <div className={`text-xs ${percentOfBudget > 90 ? 'text-red-500' : percentOfBudget > 75 ? 'text-yellow-500' : 'text-green-500'}`}>
-                            {percentOfBudget > 100 ? 'Over budget' : 'On track'}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -380,13 +426,28 @@ const MySpending = () => {
             {/* Monthly Trend */}
             <Card className='bg-card/50 border-border/50'>
               <CardHeader>
-                <CardTitle className='text-foreground'>Monthly Trend</CardTitle>
+                <div className='flex items-center justify-between'>
+                  <CardTitle className='text-foreground'>Monthly Trend</CardTitle>
+                </div>
+                <div className='flex gap-1 mt-2'>
+                  {['Day', 'Month', 'Year'].map((period) => (
+                    <Button
+                      key={period}
+                      variant={trendTimeframe === period ? 'default' : 'ghost'}
+                      size='sm'
+                      className='text-xs h-6 px-2'
+                      onClick={() => setTrendTimeframe(period)}
+                    >
+                      {period}
+                    </Button>
+                  ))}
+                </div>
               </CardHeader>
               <CardContent>
                 <div className='h-64 mb-4'>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={monthlyTrend}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <LineChart data={monthlyTrend}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                       <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
                       <YAxis stroke="hsl(var(--muted-foreground))" />
                       <Tooltip
@@ -398,13 +459,21 @@ const MySpending = () => {
                           borderRadius: '6px'
                         }}
                       />
-                      <Bar dataKey="amount" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                    </BarChart>
+                      <Line 
+                        type="monotone" 
+                        dataKey="amount" 
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth={3}
+                        dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
+                        animationDuration={1000}
+                      />
+                    </LineChart>
                   </ResponsiveContainer>
                 </div>
                 
                 <div className='text-sm text-muted-foreground text-center'>
-                  Average monthly spending: ${monthlyTrend.reduce((acc, month) => acc + month.amount, 0) / monthlyTrend.length}
+                  Average: ${(monthlyTrend.reduce((acc, month) => acc + month.amount, 0) / monthlyTrend.length).toLocaleString()}
                 </div>
               </CardContent>
             </Card>
@@ -467,12 +536,8 @@ const MySpending = () => {
             </Card>
           </div>
 
-          {/* Transaction Ledger Section */}
-          <div className='grid grid-cols-1 xl:grid-cols-4 gap-6'>
-            
-            {/* Main Ledger */}
-            <div className='xl:col-span-3 space-y-4'>
-              
+          {/* Transaction Ledger Section - Full Width */}
+          <div className='space-y-4'>
               {/* Month Header for Transactions */}
               <div className='flex items-center justify-between'>
                 <div>
@@ -713,149 +778,6 @@ const MySpending = () => {
                 </CardContent>
               </Card>
             </div>
-
-            {/* Right Rail */}
-            <div className='space-y-6'>
-              
-              {/* Budgets & Categories */}
-              <Card className='bg-card/50 border-border/50'>
-                <CardHeader>
-                  <CardTitle className='text-foreground text-sm'>Budgets & Categories</CardTitle>
-                </CardHeader>
-                <CardContent className='space-y-3'>
-                  {categoryData.map((category, index) => {
-                    const Icon = category.icon;
-                    const percentOfBudget = (category.amount / category.budget) * 100;
-                    
-                    return (
-                      <div key={index} className='space-y-2'>
-                        <div className='flex items-center justify-between'>
-                          <div className='flex items-center gap-2'>
-                            <div className='p-1 rounded' style={{ backgroundColor: `${category.color}20` }}>
-                              <Icon className='w-3 h-3' style={{ color: category.color }} />
-                            </div>
-                            <span className='text-xs font-medium text-foreground'>{category.name}</span>
-                          </div>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant='ghost' size='sm' className='text-xs h-6'>
-                                Edit
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Edit Budget - {category.name}</DialogTitle>
-                              </DialogHeader>
-                              <div className='space-y-4'>
-                                <div>
-                                  <label className='text-sm font-medium'>Monthly Budget</label>
-                                  <Input defaultValue={category.budget} type='number' />
-                                </div>
-                                <Button>Save Changes</Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                        <Progress value={percentOfBudget} className='h-1' />
-                        <div className='flex justify-between text-xs text-muted-foreground'>
-                          <span>${category.amount.toLocaleString()}</span>
-                          <span>${category.budget.toLocaleString()}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-
-              {/* Recurring Expenses */}
-              <Card className='bg-card/50 border-border/50'>
-                <CardHeader>
-                  <CardTitle className='text-foreground text-sm'>Recurring Expenses</CardTitle>
-                </CardHeader>
-                <CardContent className='space-y-3'>
-                  {recurringExpenses.map((expense, index) => {
-                    const Icon = expense.icon;
-                    return (
-                      <div key={index} className='flex items-center justify-between'>
-                        <div className='flex items-center gap-2'>
-                          <div className='p-1 rounded' style={{ backgroundColor: `${expense.color}20` }}>
-                            <Icon className='w-3 h-3' style={{ color: expense.color }} />
-                          </div>
-                          <div>
-                            <div className='text-xs font-medium text-foreground'>{expense.name}</div>
-                            <div className='text-xs text-muted-foreground'>${expense.amount}</div>
-                          </div>
-                        </div>
-                        <Button variant='ghost' size='sm' className='text-xs h-6'>
-                          Manage
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-
-              {/* Savings Opportunities */}
-              <Card className='bg-card/50 border-border/50'>
-                <CardHeader>
-                  <CardTitle className='text-foreground text-sm'>Savings Tips</CardTitle>
-                </CardHeader>
-                <CardContent className='space-y-3'>
-                  {savingsOpportunities.map((opportunity, index) => (
-                    <div key={index} className='p-3 bg-muted/30 rounded-lg'>
-                      <div className='flex items-start justify-between mb-2'>
-                        <div>
-                          <div className='text-xs font-medium text-foreground'>{opportunity.category}</div>
-                          <div className='text-xs text-green-500 font-medium'>Save ~${opportunity.potential}</div>
-                        </div>
-                      </div>
-                      <p className='text-xs text-muted-foreground leading-relaxed mb-2'>
-                        {opportunity.tip}
-                      </p>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant='outline' size='sm' className='text-xs h-6'>
-                            Create Rule
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Create Categorization Rule</DialogTitle>
-                          </DialogHeader>
-                          <div className='space-y-4'>
-                            <div>
-                              <label className='text-sm font-medium'>When merchant name contains:</label>
-                              <Input placeholder='e.g. Starbucks' />
-                            </div>
-                            <div>
-                              <label className='text-sm font-medium'>Automatically categorize as:</label>
-                              <Select>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Select category' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {categoryData.map((cat) => (
-                                    <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div className='flex items-center space-x-2'>
-                              <Checkbox id='auto-categorize' />
-                              <label htmlFor='auto-categorize' className='text-sm'>
-                                Auto-categorize future transactions
-                              </label>
-                            </div>
-                            <Button>Create Rule</Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
           {/* Footer Disclosure */}
           <div className='text-xs text-muted-foreground text-center pt-8 border-t border-border'>
             <p>
