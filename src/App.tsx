@@ -45,6 +45,14 @@ import QuickBuy from './pages/buy/QuickBuy';
 import BuyWithCard from './pages/buy/BuyWithCard';
 import Convert from './pages/Convert';
 import Deposit from './pages/Deposit';
+import Overview from './pages/account/Overview';
+import MySpending from './pages/account/MySpending';
+import Transactions from './pages/account/Transactions';
+import Orders from './pages/account/Orders';
+import ConnectWallet from './pages/account/ConnectWallet';
+import Settings from './pages/account/Settings';
+import Security from './pages/account/Security';
+import Support from './pages/account/Support';
 import Balances from './pages/Balances';
 import SpotUSD from './pages/trading/SpotUSD';
 import SpotUSDC from './pages/trading/SpotUSDC';
@@ -162,7 +170,15 @@ const App = () => (
             <Route path='/buy/card' element={<BuyWithCard />} />
             <Route path='/convert' element={<Convert />} />
             <Route path='/deposit' element={<Deposit />} />
-            <Route path='/balances' element={<Balances />} />
+            <Route path='/balances' element={<Overview />} />
+            <Route path='/my-assets' element={<MyAssets />} />
+            <Route path='/my-spending' element={<MySpending />} />
+            <Route path='/transactions' element={<Transactions />} />
+            <Route path='/orders' element={<Orders />} />
+            <Route path='/connect-wallet' element={<ConnectWallet />} />
+            <Route path='/settings' element={<Settings />} />
+            <Route path='/security' element={<Security />} />
+            <Route path='/support' element={<Support />} />
             
             {/* Trading Routes */}
             <Route path='/trading/spot-usd' element={<SpotUSD />} />

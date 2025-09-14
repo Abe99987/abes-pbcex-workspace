@@ -204,43 +204,52 @@ const TradingNavigation = () => {
         {
           title: 'Balances & Funding',
           description: 'Overview, deposit, withdraw',
+          href: '/balances',
+        },
+        {
+          title: 'My Assets',
+          description: 'Portfolio overview & holdings',
           href: '/my-assets',
         },
         {
-          title: 'Cards',
-          description: 'Manage virtual & physical cards',
-          href: '/card/spend',
+          title: 'My Spending',
+          description: 'Spending analysis & budgets',
+          href: '/my-spending',
         },
         {
           title: 'Transaction History',
           description: 'All account transfers',
-          href: '/transaction-history',
+          href: '/transactions',
         },
         {
           title: 'Order History',
           description: 'Trades & executions',
-          href: '/order-history',
+          href: '/orders',
         },
-        { title: 'PnL', description: 'Profit and loss', href: '/pnl' },
+        { 
+          title: 'PnL', 
+          description: 'Profit and loss', 
+          href: '/pnl' 
+        },
         {
           title: 'Connect Wallet',
           description: 'Link external wallets',
-          href: '/wallet',
-        },
-        {
-          title: 'Security',
-          description: '2FA, sessions, passkeys',
-          href: '/account/security',
+          href: '/connect-wallet',
         },
         {
           title: 'Settings & Profile',
           description: 'Preferences and KYC',
-          href: '/account',
+          href: '/settings',
+        },
+        {
+          title: 'Security',
+          description: '2FA, sessions, passkeys',
+          href: '/security',
         },
         {
           title: 'Support',
           description: 'Help center & contact',
-          href: '/support/help-center',
+          href: '/support',
         },
       ],
     },
