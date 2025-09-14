@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
+import { useDCAStore } from '@/hooks/useDCAStore';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -75,6 +76,9 @@ const MySpending = () => {
   const [dcaSourceAccount, setDcaSourceAccount] = useState('Funding');
   const [dcaAmount, setDcaAmount] = useState(100);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
+  
+  // DCA Store
+  const { rules: dcaRules, deleteRule: deleteDCARule } = useDCAStore();
   const [showTagInput, setShowTagInput] = useState<{[key: string]: boolean}>({});
   const [newTag, setNewTag] = useState('');
   const itemsPerPage = 20;
@@ -647,20 +651,20 @@ const MySpending = () => {
                     </div>
                   </div>
                   <div className='flex gap-2'>
-                    <Button 
-                      variant='outline'
-                      size='sm'
-                      onClick={() => window.location.href = '/trading/dca?tab=calculator'}
-                    >
-                      DCA Calculator
-                    </Button>
-                    <Button 
-                      variant='default'
-                      size='sm'
-                      onClick={() => window.location.href = '/trading/dca'}
-                    >
-                      Set up DCA
-                    </Button>
+                     <Button 
+                       variant='outline'
+                       size='sm'
+                       onClick={() => window.location.href = '/trading/dca#calculator'}
+                     >
+                       DCA Calculator
+                     </Button>
+                     <Button 
+                       variant='default'
+                       size='sm'
+                       onClick={() => window.location.href = '/trading/dca#setup'}
+                     >
+                       Set up DCA
+                     </Button>
                   </div>
                 </div>
                 
@@ -732,9 +736,26 @@ const MySpending = () => {
                       </Select>
                     </div>
                     
-                    <Button className='w-full sm:w-auto'>
-                      Save monthly rule
-                    </Button>
+                     <Button 
+                       className='w-full sm:w-auto'
+                       onClick={() => {
+                         if (dcaAmount > 0) {
+                           const rule = {
+                             amount: dcaAmount,
+                             cadence: dcaTimeframe as 'Day' | 'Month',
+                             asset: dcaAsset,
+                             sourceAccount: dcaSourceAccount as 'Funding' | 'Trading',
+                             createdAt: new Date(),
+                           };
+                           // Add to shared store
+                           import('@/lib/dcaStore').then(({ dcaStore }) => {
+                             dcaStore.addRule(rule);
+                           });
+                         }
+                       }}
+                     >
+                       Save monthly rule
+                     </Button>
                   </div>
                 </div>
                 
@@ -742,24 +763,28 @@ const MySpending = () => {
                 <div className='space-y-2'>
                   <h4 className='text-sm font-medium text-foreground'>Active Rules</h4>
                   <div className='space-y-2 max-h-32 overflow-y-auto'>
-                    <div className='flex items-center justify-between p-3 bg-card/50 rounded-lg border'>
-                      <div className='flex items-center gap-3'>
-                        <span className='text-sm font-medium'>$100 / Month → Gold</span>
-                        <Badge variant='secondary' className='text-xs'>From: Funding</Badge>
+                    {dcaRules.length === 0 ? (
+                      <div className='text-center py-4 text-sm text-muted-foreground'>
+                        No active DCA rules yet
                       </div>
-                      <Button variant='ghost' size='sm' className='h-6 w-6 p-0'>
-                        <X className='w-3 h-3' />
-                      </Button>
-                    </div>
-                    <div className='flex items-center justify-between p-3 bg-card/50 rounded-lg border'>
-                      <div className='flex items-center gap-3'>
-                        <span className='text-sm font-medium'>$50 / Month → Silver</span>
-                        <Badge variant='secondary' className='text-xs'>From: Trading</Badge>
-                      </div>
-                      <Button variant='ghost' size='sm' className='h-6 w-6 p-0'>
-                        <X className='w-3 h-3' />
-                      </Button>
-                    </div>
+                    ) : (
+                      dcaRules.map((rule) => (
+                        <div key={rule.id} className='flex items-center justify-between p-3 bg-card/50 rounded-lg border'>
+                          <div className='flex items-center gap-3'>
+                            <span className='text-sm font-medium'>${rule.amount} / {rule.cadence} → {rule.asset}</span>
+                            <Badge variant='secondary' className='text-xs'>From: {rule.sourceAccount}</Badge>
+                          </div>
+                          <Button 
+                            variant='ghost' 
+                            size='sm' 
+                            className='h-6 w-6 p-0'
+                            onClick={() => deleteDCARule(rule.id)}
+                          >
+                            <X className='w-3 h-3' />
+                          </Button>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </CardContent>

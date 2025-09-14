@@ -58,6 +58,7 @@ import Balances from './pages/Balances';
 import SpotUSD from './pages/trading/SpotUSD';
 import SpotUSDC from './pages/trading/SpotUSDC';
 import CoinToCoin from './pages/trading/CoinToCoin';
+import TradingDCA from './pages/trading/DCA';
 import InternalTransfer from './pages/send/InternalTransfer';
 import CryptoWithdrawal from './pages/send/CryptoWithdrawal';
 import BankTransfer from './pages/send/BankTransfer';
@@ -185,6 +186,7 @@ const App = () => (
             <Route path='/trading/spot-usd' element={<SpotUSD />} />
             <Route path='/trading/spot-usdc' element={<SpotUSDC />} />
             <Route path='/trading/coin' element={<CoinToCoin />} />
+            <Route path='/trading/dca' element={<TradingDCA />} />
             
             {/* Account Routes */}
             <Route path='/account' element={<Account />} />
