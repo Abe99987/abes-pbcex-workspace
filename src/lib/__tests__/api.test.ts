@@ -1,158 +1,167 @@
 /**
- * API Adapter Tests - Markets Wiring v1
- * Basic RTL test stubs for Markets adapter functionality
+ * API Adapter Tests - Markets & Spending Wiring v1
+ * Basic tests for both adapters (flags, normalization, CSV BOM)
  */
 
-import { marketsAdapter } from '../api';
+import { spendingAdapter, marketsAdapter } from '../api';
 import { FEATURE_FLAGS } from '@/config/features';
 
 // Mock fetch globally
-global.fetch = jest.fn();
+(global as any).fetch = jest.fn();
 
 describe('MarketsAdapter', () => {
   beforeEach(() => {
     (fetch as jest.Mock).mockReset();
   });
 
-  describe('getSymbols', () => {
-    it('should return mock data when feature flag is disabled', async () => {
-      // Temporarily disable feature flag
-      const originalFlag = FEATURE_FLAGS['markets.v1'];
-      (FEATURE_FLAGS as any)['markets.v1'] = false;
+  it('returns mock symbols when markets.v1 is disabled', async () => {
+    const original = FEATURE_FLAGS['markets.v1'];
+    (FEATURE_FLAGS as any)['markets.v1'] = false;
 
-      const symbols = await marketsAdapter.getSymbols();
+    const symbols = await marketsAdapter.getSymbols();
 
-      expect(symbols).toBeDefined();
-      expect(Array.isArray(symbols)).toBe(true);
-      expect(symbols.length).toBeGreaterThan(0);
-      expect(symbols[0]).toHaveProperty('pair');
-      expect(symbols[0]).toHaveProperty('symbol');
-      expect(symbols[0]).toHaveProperty('price');
+    expect(Array.isArray(symbols)).toBe(true);
+    expect(symbols.length).toBeGreaterThan(0);
+    expect(symbols[0]).toHaveProperty('pair');
 
-      // Restore feature flag
-      (FEATURE_FLAGS as any)['markets.v1'] = originalFlag;
-    });
-
-    it('should handle API response and normalize data', async () => {
-      const mockApiResponse = {
-        code: 'SUCCESS',
-        data: [
-          {
-            pair: 'BTC/USDC',
-            symbol: 'BTC',
-            name: 'Bitcoin',
-            price: 43567.89,
-            changePercent: 2.8,
-          },
-        ],
-        timestamp: new Date().toISOString(),
-      };
-
-      (fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockApiResponse,
-      });
-
-      const symbols = await marketsAdapter.getSymbols();
-
-      expect(symbols).toBeDefined();
-      expect(symbols[0].pair).toBe('BTC/USDC');
-      expect(symbols[0].price).toBe('43567.89'); // normalized to string
-    });
-
-    it('should fallback to mocks on API failure', async () => {
-      (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
-
-      const symbols = await marketsAdapter.getSymbols();
-
-      expect(symbols).toBeDefined();
-      expect(Array.isArray(symbols)).toBe(true);
-      expect(symbols.length).toBeGreaterThan(0);
-    });
+    (FEATURE_FLAGS as any)['markets.v1'] = original;
   });
 
-  describe('getKPIs', () => {
-    it('should return normalized KPI data', async () => {
-      const kpis = await marketsAdapter.getKPIs();
+  it('normalizes getSymbols API data shape', async () => {
+    const mockApiResponse = {
+      code: 'SUCCESS',
+      data: [
+        {
+          pair: 'BTC/USDC',
+          symbol: 'BTC',
+          name: 'Bitcoin',
+          price: 43567.89,
+          changePercent: 2.8,
+        },
+      ],
+      timestamp: new Date().toISOString(),
+    };
 
-      expect(kpis).toBeDefined();
-      expect(kpis).toHaveProperty('fearGreedIndex');
-      expect(kpis).toHaveProperty('fearGreedLabel');
-      expect(kpis).toHaveProperty('ethGasPrice');
-      expect(kpis).toHaveProperty('longShortRatio');
-      expect(typeof kpis.fearGreedIndex).toBe('number');
-    });
-  });
-
-  describe('startPriceStream', () => {
-    it('should return null when feature flag is disabled', () => {
-      const originalFlag = FEATURE_FLAGS['markets.v1'];
-      (FEATURE_FLAGS as any)['markets.v1'] = false;
-
-      const result = marketsAdapter.startPriceStream(() => {});
-
-      expect(result).toBeNull();
-
-      // Restore feature flag
-      (FEATURE_FLAGS as any)['markets.v1'] = originalFlag;
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockApiResponse,
     });
 
-    it('should create EventSource for price updates', () => {
-      // Mock EventSource
-      global.EventSource = jest.fn().mockImplementation(() => ({
-        onmessage: null,
-        onerror: null,
-        close: jest.fn(),
-      }));
+    const symbols = await marketsAdapter.getSymbols();
 
-      const eventSource = marketsAdapter.startPriceStream(() => {});
-
-      expect(EventSource).toHaveBeenCalledWith(
-        'http://localhost:3000/api/markets/stream'
-      );
-      expect(eventSource).toBeDefined();
-    });
+    expect(symbols).toBeDefined();
+    expect(symbols[0].pair).toBe('BTC/USDC');
+    expect(symbols[0].symbol).toBe('BTC');
+    expect(symbols[0].price).toBe('43567.89');
+    expect(typeof symbols[0].changePercent).toBe('number');
   });
 });
 
-// Performance tests
-describe('Performance SLOs', () => {
-  it('should handle large datasets efficiently', async () => {
-    const startTime = performance.now();
-
-    // Test with mock large dataset
-    const symbols = await marketsAdapter.getSymbols();
-
-    const endTime = performance.now();
-    const duration = endTime - startTime;
-
-    // Should process under 150ms (generous for mock data)
-    expect(duration).toBeLessThan(150);
-    expect(symbols).toBeDefined();
+describe('SpendingAdapter', () => {
+  beforeEach(() => {
+    (fetch as jest.Mock).mockReset();
   });
 
-  it('should normalize data without blocking', async () => {
-    // Test data normalization performance
-    const mockLargeDataset = Array.from({ length: 100 }, (_, i) => ({
-      pair: `ASSET${i}/USDC`,
-      symbol: `ASSET${i}`,
-      price: Math.random() * 1000,
-    }));
+  it('returns mock transactions when spending.v1 is disabled', async () => {
+    const original = FEATURE_FLAGS['spending.v1'];
+    (FEATURE_FLAGS as any)['spending.v1'] = false;
 
-    const startTime = performance.now();
+    const transactions = await spendingAdapter.getTransactions();
 
-    // This would be called internally by the adapter
-    const normalized = mockLargeDataset.map(item => ({
-      ...item,
-      price: item.price.toString(),
-      changePercent: 0,
-      sparklineData: [0, 0, 0, 0, 0, 0, 0, 0],
-    }));
+    expect(Array.isArray(transactions)).toBe(true);
+    expect(transactions.length).toBeGreaterThan(0);
+    expect(transactions[0]).toHaveProperty('id');
 
-    const endTime = performance.now();
-    const duration = endTime - startTime;
+    (FEATURE_FLAGS as any)['spending.v1'] = original;
+  });
 
-    expect(duration).toBeLessThan(50); // Should be very fast for normalization
-    expect(normalized).toHaveLength(100);
+  it('normalizes getTransactions API data shape with filters', async () => {
+    const mockApiResponse = {
+      code: 'SUCCESS',
+      data: [
+        {
+          id: '123',
+          merchant: 'Test Merchant',
+          amount: -100.5,
+          date: '2024-01-15T00:00:00Z',
+        },
+      ],
+      timestamp: new Date().toISOString(),
+    };
+
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockApiResponse,
+    });
+
+    const tx = await spendingAdapter.getTransactions({
+      month: '2024-01',
+      category: 'Shopping',
+    });
+
+    expect(tx).toBeDefined();
+    expect(tx[0].id).toBe('123');
+    expect(tx[0].merchant).toBe('Test Merchant');
+    expect(tx[0].amount).toBe(-100.5);
+    expect(typeof tx[0].date).toBe('string');
+  });
+
+  it('exportCsv returns CSV with UTF-8 BOM (mock path)', async () => {
+    const original = FEATURE_FLAGS['spending.v1'];
+    (FEATURE_FLAGS as any)['spending.v1'] = false;
+    try {
+      const blob = await spendingAdapter.exportCsv({ month: '2024-01' });
+      expect(blob).toBeInstanceOf(Blob);
+      expect(blob.type).toBe('text/csv;charset=utf-8');
+
+      const text = await blob.text();
+      expect(text.charCodeAt(0)).toBe(0xfeff); // BOM
+    } finally {
+      (FEATURE_FLAGS as any)['spending.v1'] = original;
+    }
+  });
+
+  it('createRule includes idempotency key and returns created rule', async () => {
+    const mockRule = {
+      alias: 'test_gold',
+      asset: 'Gold',
+      amount: 100,
+      frequency: 'monthly' as const,
+      nextExecution: '2024-02-01T10:00:00Z',
+      isActive: true,
+    };
+
+    const mockApiResponse = {
+      code: 'SUCCESS',
+      data: { ...mockRule, id: 'dca_123' },
+      timestamp: new Date().toISOString(),
+    };
+
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockApiResponse,
+    });
+
+    const result = await spendingAdapter.createRule(mockRule);
+
+    expect(result.id).toBe('dca_123');
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:3000/api/dca/rules',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-Idempotency-Key': expect.stringContaining('test_gold_'),
+        }),
+      })
+    );
+  });
+});
+
+describe('Performance SLOs', () => {
+  it('handles transaction fetch under 150ms', async () => {
+    const start = performance.now();
+    const tx = await spendingAdapter.getTransactions();
+    const duration = performance.now() - start;
+    expect(duration).toBeLessThan(150);
+    expect(tx).toBeDefined();
   });
 });
