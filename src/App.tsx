@@ -35,6 +35,10 @@ import ThankYou from './pages/ThankYou';
 import Shop from './pages/Shop';
 import CommodityDetail from './pages/CommodityDetail';
 import Account from './pages/Account';
+import QuickBuy from './pages/buy/QuickBuy';
+import BuyWithCard from './pages/buy/BuyWithCard';
+import Convert from './pages/Convert';
+import Deposit from './pages/Deposit';
 import InternalTransfer from './pages/send/InternalTransfer';
 import CryptoWithdrawal from './pages/send/CryptoWithdrawal';
 import BankTransfer from './pages/send/BankTransfer';
@@ -135,6 +139,12 @@ const App = () => (
             <Route path='/contact' element={<Contact />} />
             <Route path='/thank-you' element={<ThankYou />} />
             <Route path='/shop' element={<Shop />} />
+            
+            {/* Buy/Convert/Deposit Routes */}
+            <Route path='/buy' element={<QuickBuy />} />
+            <Route path='/buy/card' element={<BuyWithCard />} />
+            <Route path='/convert' element={<Convert />} />
+            <Route path='/deposit' element={<Deposit />} />
             
             {/* Account Routes */}
             <Route path='/account' element={<Account />} />

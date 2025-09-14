@@ -44,22 +44,22 @@ const TradingNavigation = () => {
         {
           title: 'Quick Buy',
           description: 'Fiat → asset in one step',
-          href: '/trading',
+          href: '/buy',
         },
         {
           title: 'Quick Convert',
           description: 'Swap between assets instantly',
-          href: '/coin-trading',
+          href: '/convert',
         },
         {
           title: 'Buy with Card',
           description: 'Visa/Mastercard checkout',
-          href: '/trading',
+          href: '/buy/card',
         },
         {
           title: 'Deposit Crypto',
           description: 'On-chain deposit addresses',
-          href: '/wallet',
+          href: '/deposit',
         },
       ],
     },
