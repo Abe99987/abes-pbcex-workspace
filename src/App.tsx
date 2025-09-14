@@ -34,6 +34,11 @@ import MobileApp from './pages/MobileApp';
 import Contact from './pages/Contact';
 import ThankYou from './pages/ThankYou';
 import Shop from './pages/Shop';
+import Gold from './pages/shop/Gold';
+import Silver from './pages/shop/Silver';
+import Platinum from './pages/shop/Platinum';
+import Palladium from './pages/shop/Palladium';
+import Copper from './pages/shop/Copper';
 import CommodityDetail from './pages/CommodityDetail';
 import Account from './pages/Account';
 import QuickBuy from './pages/buy/QuickBuy';
@@ -145,6 +150,12 @@ const App = () => (
             <Route path='/contact' element={<Contact />} />
             <Route path='/thank-you' element={<ThankYou />} />
             <Route path='/shop' element={<Shop />} />
+            <Route path='/shop/gold' element={<Gold />} />
+            <Route path='/shop/silver' element={<Silver />} />
+            <Route path='/shop/platinum' element={<Platinum />} />
+            <Route path='/shop/palladium' element={<Palladium />} />
+            <Route path='/shop/copper' element={<Copper />} />
+            <Route path='/shop/:symbol' element={<CommodityDetail />} />
             
             {/* Buy/Convert/Deposit Routes */}
             <Route path='/buy' element={<QuickBuy />} />

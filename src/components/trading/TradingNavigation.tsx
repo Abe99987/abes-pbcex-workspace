@@ -122,27 +122,27 @@ const TradingNavigation = () => {
         {
           title: 'Buy Physical Gold',
           description: 'Coins & bars with insured shipping',
-          href: '/shop/GOLD',
+          href: '/shop/gold',
         },
         {
           title: 'Buy Physical Silver',
           description: 'Coins & bars with insured shipping',
-          href: '/shop/SILVER',
+          href: '/shop/silver',
         },
         {
           title: 'Buy Physical Platinum',
           description: 'Coins & bars with insured shipping',
-          href: '/shop/PLATINUM',
+          href: '/shop/platinum',
         },
         {
           title: 'Buy Physical Palladium',
           description: 'Coins & bars with insured shipping',
-          href: '/shop/PALLADIUM',
+          href: '/shop/palladium',
         },
         {
           title: 'Buy Physical Copper',
           description: 'Rounds & bars',
-          href: '/shop/COPPER',
+          href: '/shop/copper',
         },
       ],
     },
