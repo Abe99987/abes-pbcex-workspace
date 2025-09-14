@@ -39,6 +39,7 @@ import redemptionRoutes from '@/routes/redemptionRoutes';
 import vaultRoutes from '@/routes/vaultRoutes';
 import supportRoutes from '@/routes/supportRoutes';
 import analyticsRoutes from '@/routes/analyticsRoutes';
+import dcaRoutes from '@/modules/dca/dca.module';
 import emailRoutes from '@/routes/emailRoutes';
 import fedexRoutes from '@/routes/fedexRoutes';
 import pricesRoutes from '@/routes/pricesRoutes';
@@ -331,6 +332,24 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/trade', tradeRoutes);
 app.use('/api/shop', shopRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/dca', dcaRoutes);
+
+// Alias route for spending compatibility
+import { DCAController } from '@/modules/dca/dca.controller';
+import { requireAuth, requireFeature } from '@/middlewares/auth';
+import { createRateLimit } from '@/middlewares/rateLimit';
+
+const spendingRateLimit = createRateLimit({
+  windowMs: 60 * 1000,
+  maxRequests: 30,
+});
+
+app.get('/api/spending/rules', 
+  requireAuth as any,
+  requireFeature('dca.enabled') as any,
+  spendingRateLimit as any,
+  DCAController.getRules as any
+);
 
 // Test-only utilities (disabled in production, gated by flag)
 if (env.NODE_ENV !== 'production' && process.env.E2E_TEST_ENABLED === 'true') {
