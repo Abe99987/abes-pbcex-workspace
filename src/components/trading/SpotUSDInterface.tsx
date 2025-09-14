@@ -98,9 +98,9 @@ const SpotUSDInterface = () => {
 
               <ResizableHandle withHandle />
 
-              {/* Order Panel - No settlement dropdown for USD spot */}
+              {/* Order Panel - USD settlement mode */}
               <ResizablePanel defaultSize={40} minSize={30}>
-                <OrderPanel pair={selectedPair} />
+                <OrderPanel pair={selectedPair} settlementMode="usd" />
               </ResizablePanel>
             </ResizablePanelGroup>
           </ResizablePanel>
@@ -108,7 +108,7 @@ const SpotUSDInterface = () => {
 
         {/* Mobile Order Panel */}
         <div className='lg:hidden border-t border-gray-800'>
-          <OrderPanel pair={selectedPair} />
+          <OrderPanel pair={selectedPair} settlementMode="usd" />
         </div>
       </div>
 

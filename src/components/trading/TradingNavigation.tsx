@@ -78,7 +78,7 @@ const TradingNavigation = () => {
           href: '/trading/spot-usdc',
         },
         {
-          title: 'Coin-to-Coin',
+          title: 'Coin-to-Coin — settle in any coin',
           description: 'BTC/ETH quote pairs',
           href: '/trading/coin',
         },

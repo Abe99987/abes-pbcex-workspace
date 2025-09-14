@@ -96,19 +96,8 @@ const SpotUSDCInterface = () => {
             className='hidden lg:block'
           >
             <ResizablePanelGroup direction='vertical'>
-              {/* Settlement Dropdown */}
-              <ResizablePanel defaultSize={10} minSize={8} maxSize={15}>
-                <div className='h-full bg-black p-3 border-b border-gray-800'>
-                  <SettlementDropdown
-                    onSettlementChange={handleSettlementChange}
-                  />
-                </div>
-              </ResizablePanel>
-
-              <ResizableHandle withHandle />
-
               {/* Order Book */}
-              <ResizablePanel defaultSize={50} minSize={35}>
+              <ResizablePanel defaultSize={60} minSize={40}>
                 <div className='h-full border-b border-gray-800 bg-black'>
                   <OrderBook pair={selectedPair} />
                 </div>
@@ -116,9 +105,9 @@ const SpotUSDCInterface = () => {
 
               <ResizableHandle withHandle />
 
-              {/* Order Panel - With settlement asset prop */}
+              {/* Order Panel - USDC settlement mode */}
               <ResizablePanel defaultSize={40} minSize={30}>
-                <OrderPanel pair={selectedPair} settlementAsset={settlementAsset} />
+                <OrderPanel pair={selectedPair} settlementAsset={settlementAsset} settlementMode="usdc" />
               </ResizablePanel>
             </ResizablePanelGroup>
           </ResizablePanel>
@@ -126,12 +115,7 @@ const SpotUSDCInterface = () => {
 
         {/* Mobile Order Panel */}
         <div className='lg:hidden border-t border-gray-800'>
-          <div className='p-3 border-b border-gray-800'>
-            <SettlementDropdown
-              onSettlementChange={handleSettlementChange}
-            />
-          </div>
-          <OrderPanel pair={selectedPair} settlementAsset={settlementAsset} />
+          <OrderPanel pair={selectedPair} settlementAsset={settlementAsset} settlementMode="usdc" />
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import {
   ResizableHandle,
 } from '@/components/ui/resizable';
 import MarketData from './MarketData';
+import OrderPanel from './OrderPanel';
 import TradingFooter from './TradingFooter';
 
 interface Asset {
@@ -228,12 +229,10 @@ const CoinToCoinInterface = () => {
                       </div>
                     </div>
 
-                    <Button
-                      className='w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold'
-                      disabled={!conversion}
-                    >
-                      Trade
-                    </Button>
+                    <div className='p-4 bg-gray-900 border border-gray-800 rounded-lg mb-4'>
+                      <div className='text-sm font-medium text-white mb-3'>Order Panel</div>
+                      <OrderPanel pair={`${fromAsset}/${toAsset}`} settlementMode="coin" />
+                    </div>
                   </CardContent>
                 </Card>
               </div>

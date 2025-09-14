@@ -12,20 +12,24 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import ScaleOrderModal from './ScaleOrderModal';
 import { FEATURE_FLAGS } from '@/config/features';
 
 interface OrderPanelProps {
   pair: string;
   settlementAsset?: string;
+  settlementMode?: 'usd' | 'usdc' | 'coin';
 }
 
-const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
+const OrderPanel = ({ pair, settlementAsset, settlementMode = 'usd' }: OrderPanelProps) => {
   const [orderType, setOrderType] = useState('limit');
   const [price, setPrice] = useState('');
   const [amount, setAmount] = useState('');
   const [scaleModalOpen, setScaleModalOpen] = useState(false);
+  const [selectedSettlement, setSelectedSettlement] = useState(settlementAsset || 'PAXG');
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Mock provider accepted assets
   const mockProviderAssets = ['PAXG', 'XAU-s', 'USD', 'USDC'];
@@ -59,6 +63,44 @@ const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
       {/* Header */}
       <div className='p-3 border-b border-gray-800'>
         <h3 className='text-sm font-semibold text-white mb-3'>Place Order</h3>
+
+        {/* Settlement Display */}
+        <div className='mb-4'>
+          {settlementMode === 'coin' ? (
+            <div>
+              <Label className='text-gray-300 text-xs mb-2 block'>Settle in:</Label>
+              <Select value={selectedSettlement} onValueChange={setSelectedSettlement}>
+                <SelectTrigger className='bg-gray-900 border-gray-700 text-white text-sm h-9'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className='bg-gray-900 border-gray-700'>
+                  <SelectItem value='PAXG' className='text-white hover:bg-gray-800'>PAXG (Gold)</SelectItem>
+                  <SelectItem value='XAG' className='text-white hover:bg-gray-800'>XAG (Silver)</SelectItem>
+                  <SelectItem value='BTC' className='text-white hover:bg-gray-800'>BTC</SelectItem>
+                  <SelectItem value='ETH' className='text-white hover:bg-gray-800'>ETH</SelectItem>
+                  <SelectItem value='SOL' className='text-white hover:bg-gray-800'>SOL</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <div className='text-xs text-gray-400'>
+              Settling in {settlementMode === 'usd' ? 'USD' : 'USDC'}
+            </div>
+          )}
+        </div>
+
+        {/* Trading Balance Display */}
+        <div className='mb-4 p-2 bg-gray-900/50 rounded border border-gray-700'>
+          <div className='text-xs text-gray-400 mb-1'>
+            Trading balance — {settlementMode === 'coin' ? selectedSettlement : settlementMode === 'usd' ? 'USD' : 'USDC'}:
+          </div>
+          <div className='text-sm font-mono text-white'>
+            {settlementMode === 'usd' ? '$12,450.00' : 
+             settlementMode === 'usdc' ? '12,450.00 USDC' : 
+             selectedSettlement === 'PAXG' ? '24.5 PAXG' : 
+             selectedSettlement === 'BTC' ? '0.185 BTC' : '5.2 ETH'}
+          </div>
+        </div>
 
         {/* Order Type Selection */}
         <div className='grid grid-cols-3 gap-1 bg-gray-900 rounded-md p-1 mb-4'>
@@ -123,21 +165,33 @@ const OrderPanel = ({ pair, settlementAsset }: OrderPanelProps) => {
         {/* Source of funds selector */}
         {orderType !== 'scale' && (
           <div>
-            <Label htmlFor='funding-source' className='text-gray-300 text-xs'>
+            <Label className='text-gray-300 text-xs mb-2 block'>
               Source of funds
             </Label>
-            <div className='grid grid-cols-2 gap-1 bg-gray-900 rounded-md p-1 mt-1'>
-              <Button variant='default' size='sm' className='text-xs h-8'>
-                Trading Balance
-              </Button>
-              <Button
-                variant='ghost'
-                size='sm'
-                className='text-xs h-8 text-gray-400'
-              >
-                Transfer from Funding...
-              </Button>
+            
+            {/* Trading Balances Summary */}
+            <div className='p-2 bg-gray-900/50 rounded border border-gray-700 mb-2 text-xs'>
+              <div className='text-gray-400 mb-1'>Trading balances:</div>
+              <div className='flex flex-wrap gap-2'>
+                <span className={`${settlementMode === 'usd' || (settlementMode === 'coin' && selectedSettlement === 'USD') ? 'text-yellow-400' : 'text-gray-300'}`}>
+                  USD $12,450
+                </span>
+                <span className='text-gray-500'>•</span>
+                <span className={`${settlementMode === 'usdc' || (settlementMode === 'coin' && selectedSettlement === 'USDC') ? 'text-yellow-400' : 'text-gray-300'}`}>
+                  USDC 12,450
+                </span>
+              </div>
             </div>
+            
+            {/* Transfer Button */}
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => navigate('/balances')}
+              className='w-full text-xs h-8 border-gray-600 hover:bg-gray-800'
+            >
+              Transfer from Funding
+            </Button>
           </div>
         )}
 
