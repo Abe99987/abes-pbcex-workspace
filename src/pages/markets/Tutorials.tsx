@@ -1,60 +1,211 @@
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   BookOpen,
-  Target,
-  Shield,
-  DollarSign,
+  User,
+  Wallet,
   TrendingUp,
-  Calculator,
-  AlertTriangle,
-  Clock,
+  PieChart,
+  Package,
+  Shield,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from 'lucide-react';
 
-interface TutorialCard {
+interface TutorialStep {
+  title: string;
+  content: string;
+}
+
+interface Tutorial {
   title: string;
   description: string;
   icon: React.ElementType;
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   estimatedTime: string;
-  topics: string[];
+  steps: TutorialStep[];
 }
 
-const tutorials: TutorialCard[] = [
+const tutorials: Tutorial[] = [
   {
-    title: 'Paper Trading',
-    description: 'Learn to trade with virtual money. Practice strategies without risk and build confidence before using real funds.',
-    icon: TrendingUp,
+    title: 'Sign Up & Account Access',
+    description: 'Get started with PBCEx by creating your account and completing KYC verification.',
+    icon: User,
+    difficulty: 'Beginner',
+    estimatedTime: '10 min',
+    steps: [
+      {
+        title: 'Create Your Account',
+        content: 'Visit PBCEx and click "Sign Up". Enter your email address and create a secure password with at least 8 characters, including uppercase, lowercase, and numbers.'
+      },
+      {
+        title: 'Verify Your Email',
+        content: 'Check your email inbox for a verification link from PBCEx. Click the link to verify your email address and activate your account.'
+      },
+      {
+        title: 'Complete KYC Verification',
+        content: 'Upload a government-issued ID and proof of address. Take a clear selfie for identity verification. This process typically takes 24-48 hours for approval.'
+      },
+      {
+        title: 'Set Up Security',
+        content: 'Enable two-factor authentication (2FA) using Google Authenticator or SMS. Create security questions and set up account recovery options.'
+      },
+      {
+        title: 'Access Your Dashboard',
+        content: 'Once verified, log in to access your PBCEx dashboard. Explore your account overview, balances, and available features.'
+      }
+    ]
+  },
+  {
+    title: 'Deposit & Withdraw',
+    description: 'Learn how to fund your account and withdraw assets securely.',
+    icon: Wallet,
     difficulty: 'Beginner',
     estimatedTime: '15 min',
-    topics: ['Virtual portfolio', 'Risk-free practice', 'Strategy testing', 'Performance tracking']
+    steps: [
+      {
+        title: 'Choose Deposit Method',
+        content: 'Navigate to "Deposit" in your dashboard. Select from bank transfer, credit/debit card, or cryptocurrency deposit options.'
+      },
+      {
+        title: 'Bank Transfer Setup',
+        content: 'For bank transfers, add your bank account details securely. Note the provided reference number for your transfer to ensure proper crediting.'
+      },
+      {
+        title: 'Cryptocurrency Deposits',
+        content: 'For crypto deposits, select your desired cryptocurrency and copy the provided deposit address. Always verify the address before sending.'
+      },
+      {
+        title: 'Withdrawal Process',
+        content: 'To withdraw, go to "Withdraw" and select your preferred method. Enter the amount and destination details. Confirm with 2FA.'
+      },
+      {
+        title: 'Transaction Monitoring',
+        content: 'Track all deposits and withdrawals in your transaction history. Deposits typically process within 1-3 business days, withdrawals within 24 hours.'
+      }
+    ]
   },
   {
-    title: 'Order Types',
-    description: 'Master different order types including market, limit, stop-loss, and scale orders to execute your trading strategy effectively.',
-    icon: Target,
-    difficulty: 'Beginner',
-    estimatedTime: '20 min',
-    topics: ['Market orders', 'Limit orders', 'Stop-loss', 'Scale orders', 'Order execution']
-  },
-  {
-    title: 'Risk Controls',
-    description: 'Understand position sizing, diversification, and risk management tools to protect your capital and maximize returns.',
-    icon: Shield,
+    title: 'Place a Trade (Spot, Coin-to-Coin, Scale)',
+    description: 'Master different trading methods including spot trading, coin-to-coin swaps, and scale orders.',
+    icon: TrendingUp,
     difficulty: 'Intermediate',
-    estimatedTime: '25 min',
-    topics: ['Position sizing', 'Stop-loss strategy', 'Portfolio diversification', 'Risk-reward ratios']
+    estimatedTime: '20 min',
+    steps: [
+      {
+        title: 'Navigate to Trading',
+        content: 'Access the "Trade" menu and choose between Spot (USDC), Coin-to-Coin, or set up DCA. Each method serves different trading strategies.'
+      },
+      {
+        title: 'Spot Trading Basics',
+        content: 'In Spot trading, select your trading pair (e.g., BTC/USDC). Choose between Market orders (instant execution) or Limit orders (specific price).'
+      },
+      {
+        title: 'Coin-to-Coin Trading',
+        content: 'For direct crypto swaps, select your source and target cryptocurrencies. Choose what asset to settle in using the "Settle in" dropdown.'
+      },
+      {
+        title: 'Scale Orders',
+        content: 'Scale orders let you buy/sell at multiple price levels. Set your price range, number of orders, and total amount to spread across the range.'
+      },
+      {
+        title: 'Order Management',
+        content: 'Monitor your open orders in the "Orders" tab. Cancel or modify orders as needed. Check your trading history and performance metrics.'
+      }
+    ]
   },
   {
-    title: 'Fees & Settlement',
-    description: 'Learn about trading fees, settlement processes, and how to optimize your costs across different asset classes.',
-    icon: Calculator,
+    title: 'My Spending (categorize, budgets, auto-invest)',
+    description: 'Set up spending analysis, create budgets, and automate your investments.',
+    icon: PieChart,
     difficulty: 'Intermediate',
     estimatedTime: '18 min',
-    topics: ['Trading fees', 'Settlement timing', 'Cross-asset costs', 'Fee optimization']
+    steps: [
+      {
+        title: 'Access Spending Dashboard',
+        content: 'Navigate to "My Account" → "My Spending" to view your spending analysis dashboard with charts and categorization.'
+      },
+      {
+        title: 'Categorize Transactions',
+        content: 'Review your transactions and add tags for better categorization. Click the "+" button in the Tags column to add custom tags.'
+      },
+      {
+        title: 'Set Savings Goals',
+        content: 'Use the Savings Rate gauge to set monthly savings targets. Choose from 15%, 25%, 30%, or set a custom percentage goal.'
+      },
+      {
+        title: 'Auto-Invest Setup',
+        content: 'In the "Auto-invest your savings" section, set up recurring investments. Choose amount, frequency (daily/monthly), and target asset.'
+      },
+      {
+        title: 'Monitor Performance',
+        content: 'Track your spending trends and savings rate over time. Adjust your auto-invest rules and budgets based on your financial goals.'
+      }
+    ]
+  },
+  {
+    title: 'Buy Physical Metals (Shop & order flow)',
+    description: 'Purchase physical gold, silver, platinum, palladium, and copper with secure delivery.',
+    icon: Package,
+    difficulty: 'Beginner',
+    estimatedTime: '12 min',
+    steps: [
+      {
+        title: 'Browse Metal Options',
+        content: 'Visit the "Shop" section to explore physical metals. Compare prices for gold, silver, platinum, palladium, and copper products.'
+      },
+      {
+        title: 'Select Your Metal',
+        content: 'Choose your preferred metal and product type (coins, bars, rounds). Review live pricing, minimum order quantities, and product specifications.'
+      },
+      {
+        title: 'Place Your Order',
+        content: 'Enter your desired quantity and review the total cost including shipping and insurance. Confirm your shipping address and contact details.'
+      },
+      {
+        title: 'Payment & Confirmation',
+        content: 'Complete payment using your PBCEx balance or linked payment method. Receive order confirmation with tracking information.'
+      },
+      {
+        title: 'Delivery & Storage',
+        content: 'Track your shipment through insured delivery services. Upon delivery, verify your products and consider secure storage options.'
+      }
+    ]
+  },
+  {
+    title: 'Security & 2FA',
+    description: 'Secure your account with two-factor authentication and advanced security features.',
+    icon: Shield,
+    difficulty: 'Beginner',
+    estimatedTime: '8 min',
+    steps: [
+      {
+        title: 'Enable 2FA',
+        content: 'Go to "Security" settings and enable two-factor authentication. Download Google Authenticator or Authy app on your mobile device.'
+      },
+      {
+        title: 'Set Up Authenticator',
+        content: 'Scan the QR code with your authenticator app or enter the provided secret key manually. Save your backup codes in a secure location.'
+      },
+      {
+        title: 'Test 2FA Setup',
+        content: 'Verify your 2FA setup by entering a code from your authenticator app. This ensures everything is working correctly before you need it.'
+      },
+      {
+        title: 'Additional Security',
+        content: 'Set up security questions, enable login notifications, and review your active sessions regularly. Consider using a hardware security key for additional protection.'
+      },
+      {
+        title: 'Security Best Practices',
+        content: 'Use a unique, strong password, keep your recovery codes safe, never share your 2FA codes, and log out of public devices after use.'
+      }
+    ]
   }
 ];
 
@@ -71,14 +222,34 @@ const getDifficultyColor = (difficulty: string) => {
   }
 };
 
-const Tutorials = () => {
+const MarketsTutorials = () => {
+  const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const nextStep = () => {
+    if (selectedTutorial && currentStep < selectedTutorial.steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const closeTutorial = () => {
+    setSelectedTutorial(null);
+    setCurrentStep(0);
+  };
+
   return (
     <Layout>
       <Helmet>
-        <title>Trading Tutorials - PBCEx | Learn Trading Essentials</title>
+        <title>Tutorials - PBCEx | Step-by-Step Trading Guides</title>
         <meta
           name='description'
-          content='Master trading with our comprehensive tutorials. Learn paper trading, order types, risk controls, and fee optimization for successful trading.'
+          content='Learn trading essentials with our interactive tutorials. Master account setup, deposits, trading, spending analysis, physical metals, and security.'
         />
       </Helmet>
 
@@ -91,14 +262,14 @@ const Tutorials = () => {
                 <BookOpen className='w-6 h-6 text-primary' />
               </div>
               <div>
-                <h1 className='text-3xl font-bold text-foreground'>Trading Tutorials</h1>
-                <p className='text-muted-foreground'>Master the essentials of trading with our step-by-step guides</p>
+                <h1 className='text-3xl font-bold text-foreground'>Tutorials</h1>
+                <p className='text-muted-foreground'>Click-through guides to get started</p>
               </div>
             </div>
           </div>
 
           {/* Tutorial Grid */}
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
             {tutorials.map((tutorial, index) => {
               const Icon = tutorial.icon;
               
@@ -109,15 +280,13 @@ const Tutorials = () => {
                       <div className='p-3 rounded-lg bg-primary/10 border border-primary/20'>
                         <Icon className='w-6 h-6 text-primary' />
                       </div>
-                      <div className='flex items-center gap-2'>
-                        <Badge className={getDifficultyColor(tutorial.difficulty)}>
-                          {tutorial.difficulty}
-                        </Badge>
-                      </div>
+                      <Badge className={getDifficultyColor(tutorial.difficulty)}>
+                        {tutorial.difficulty}
+                      </Badge>
                     </div>
                     
                     <div className='space-y-2'>
-                      <CardTitle className='text-xl text-foreground'>{tutorial.title}</CardTitle>
+                      <CardTitle className='text-lg text-foreground'>{tutorial.title}</CardTitle>
                       <p className='text-muted-foreground text-sm leading-relaxed'>
                         {tutorial.description}
                       </p>
@@ -125,72 +294,110 @@ const Tutorials = () => {
                   </CardHeader>
                   
                   <CardContent className='pt-0'>
-                    {/* Time Estimate */}
-                    <div className='flex items-center gap-2 mb-4 text-sm text-muted-foreground'>
-                      <Clock className='w-4 h-4' />
-                      <span>Estimated time: {tutorial.estimatedTime}</span>
-                    </div>
-
-                    {/* Topics */}
-                    <div className='mb-6'>
-                      <div className='text-sm font-medium text-foreground mb-2'>What you'll learn:</div>
-                      <div className='flex flex-wrap gap-1'>
-                        {tutorial.topics.map((topic, topicIndex) => (
-                          <Badge key={topicIndex} variant='secondary' className='text-xs bg-muted/50 text-muted-foreground'>
-                            {topic}
-                          </Badge>
-                        ))}
+                    <div className='flex items-center justify-between mb-4'>
+                      <div className='text-sm text-muted-foreground'>
+                        {tutorial.estimatedTime} • {tutorial.steps.length} steps
                       </div>
                     </div>
 
-                    {/* Action Button */}
                     <Button 
                       className='w-full bg-primary hover:bg-primary/90 text-primary-foreground'
-                      disabled
+                      onClick={() => setSelectedTutorial(tutorial)}
                     >
-                      Read Tutorial
+                      Start Tutorial
                     </Button>
                   </CardContent>
                 </Card>
               );
             })}
           </div>
-
-          {/* Additional Resources */}
-          <Card className='mt-8 bg-card/50 border-border/50'>
-            <CardHeader>
-              <CardTitle className='flex items-center gap-2 text-foreground'>
-                <AlertTriangle className='w-5 h-5 text-yellow-500' />
-                Need More Help?
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <h4 className='font-medium text-foreground mb-2'>Video Lessons</h4>
-                  <p className='text-sm text-muted-foreground mb-2'>
-                    Watch comprehensive video courses covering advanced trading strategies and market analysis.
-                  </p>
-                  <Button variant='outline' size='sm'>
-                    Browse Video Library
-                  </Button>
-                </div>
-                <div>
-                  <h4 className='font-medium text-foreground mb-2'>Live Support</h4>
-                  <p className='text-sm text-muted-foreground mb-2'>
-                    Get personalized help from our trading experts through live chat or scheduled consultations.
-                  </p>
-                  <Button variant='outline' size='sm'>
-                    Contact Support
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
+
+      {/* Tutorial Dialog */}
+      <Dialog open={!!selectedTutorial} onOpenChange={() => closeTutorial()}>
+        <DialogContent className='max-w-2xl bg-card border-border'>
+          {selectedTutorial && (
+            <>
+              <DialogHeader className='flex flex-row items-center justify-between space-y-0 pb-4'>
+                <div className='flex items-center gap-3'>
+                  <div className='p-2 rounded-lg bg-primary/10 border border-primary/20'>
+                    <selectedTutorial.icon className='w-5 h-5 text-primary' />
+                  </div>
+                  <div>
+                    <DialogTitle className='text-xl font-semibold text-foreground'>
+                      {selectedTutorial.title}
+                    </DialogTitle>
+                    <div className='text-sm text-muted-foreground'>
+                      Step {currentStep + 1} of {selectedTutorial.steps.length}
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={closeTutorial}
+                  className='h-8 w-8 p-0'
+                >
+                  <X className='h-4 w-4' />
+                </Button>
+              </DialogHeader>
+
+              <div className='space-y-6'>
+                {/* Progress Bar */}
+                <div className='w-full bg-muted rounded-full h-2'>
+                  <div 
+                    className='bg-primary h-2 rounded-full transition-all duration-300'
+                    style={{ width: `${((currentStep + 1) / selectedTutorial.steps.length) * 100}%` }}
+                  />
+                </div>
+
+                {/* Step Content */}
+                <div className='space-y-4'>
+                  <h3 className='text-lg font-semibold text-foreground'>
+                    {selectedTutorial.steps[currentStep].title}
+                  </h3>
+                  <p className='text-muted-foreground leading-relaxed'>
+                    {selectedTutorial.steps[currentStep].content}
+                  </p>
+                </div>
+
+                {/* Navigation */}
+                <div className='flex items-center justify-between pt-4'>
+                  <Button
+                    variant='outline'
+                    onClick={prevStep}
+                    disabled={currentStep === 0}
+                    className='flex items-center gap-2'
+                  >
+                    <ChevronLeft className='w-4 h-4' />
+                    Previous
+                  </Button>
+
+                  {currentStep < selectedTutorial.steps.length - 1 ? (
+                    <Button
+                      onClick={nextStep}
+                      className='flex items-center gap-2 bg-primary hover:bg-primary/90'
+                    >
+                      Next
+                      <ChevronRight className='w-4 h-4' />
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={closeTutorial}
+                      className='bg-green-600 hover:bg-green-700 text-white'
+                    >
+                      Complete Tutorial
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
 
-export default Tutorials;
+export default MarketsTutorials;

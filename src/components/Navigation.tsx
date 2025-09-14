@@ -150,8 +150,8 @@ const Navigation = () => {
           description: 'Overview & key metrics dashboard',
         },
         {
-          label: 'Tutorials (Placeholder)',
-          href: '/disclosures',
+          label: 'Tutorials',
+          href: '/markets/tutorials',
           description: 'How-to guides',
         },
         {
@@ -172,27 +172,27 @@ const Navigation = () => {
         },
         {
           label: 'Buy Physical Gold',
-          href: '/markets/OANDA:XAUUSD',
+          href: '/shop/gold',
           description: 'Gold',
         },
         {
           label: 'Buy Physical Silver',
-          href: '/markets/OANDA:XAGUSD',
+          href: '/shop/silver',
           description: 'Silver',
         },
         {
           label: 'Buy Physical Platinum',
-          href: '/markets/OANDA:XPTUSD',
+          href: '/shop/platinum',
           description: 'Platinum',
         },
         {
           label: 'Buy Physical Palladium',
-          href: '/markets/OANDA:XPDUSD',
+          href: '/shop/palladium',
           description: 'Palladium',
         },
         {
           label: 'Buy Physical Copper',
-          href: '/markets/COMEX:HG1!',
+          href: '/shop/copper',
           description: 'Copper',
         },
       ],

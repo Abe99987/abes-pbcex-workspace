@@ -3,9 +3,11 @@ import SpotUSDCInterface from '@/components/trading/SpotUSDCInterface';
 
 const SpotUSDC = () => {
   return (
-    <div className='min-h-screen bg-background overflow-y-auto'>
+    <div className='min-h-screen bg-background'>
       <Navigation />
-      <SpotUSDCInterface />
+      <div className='overflow-y-auto' style={{ height: 'calc(100vh - 64px)' }}>
+        <SpotUSDCInterface />
+      </div>
     </div>
   );
 };

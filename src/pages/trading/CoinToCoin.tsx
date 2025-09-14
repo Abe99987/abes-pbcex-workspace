@@ -3,9 +3,11 @@ import CoinToCoinInterface from '@/components/trading/CoinToCoinInterface';
 
 const CoinToCoin = () => {
   return (
-    <div className='min-h-screen bg-background overflow-y-auto'>
+    <div className='min-h-screen bg-background'>
       <Navigation />
-      <CoinToCoinInterface />
+      <div className='overflow-y-auto' style={{ height: 'calc(100vh - 64px)' }}>
+        <CoinToCoinInterface />
+      </div>
     </div>
   );
 };
