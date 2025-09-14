@@ -39,6 +39,9 @@ import QuickBuy from './pages/buy/QuickBuy';
 import BuyWithCard from './pages/buy/BuyWithCard';
 import Convert from './pages/Convert';
 import Deposit from './pages/Deposit';
+import SpotUSD from './pages/trading/SpotUSD';
+import SpotUSDC from './pages/trading/SpotUSDC';
+import CoinToCoin from './pages/trading/CoinToCoin';
 import InternalTransfer from './pages/send/InternalTransfer';
 import CryptoWithdrawal from './pages/send/CryptoWithdrawal';
 import BankTransfer from './pages/send/BankTransfer';
@@ -145,6 +148,11 @@ const App = () => (
             <Route path='/buy/card' element={<BuyWithCard />} />
             <Route path='/convert' element={<Convert />} />
             <Route path='/deposit' element={<Deposit />} />
+            
+            {/* Trading Routes */}
+            <Route path='/trading/spot-usd' element={<SpotUSD />} />
+            <Route path='/trading/spot-usdc' element={<SpotUSDC />} />
+            <Route path='/trading/coin' element={<CoinToCoin />} />
             
             {/* Account Routes */}
             <Route path='/account' element={<Account />} />

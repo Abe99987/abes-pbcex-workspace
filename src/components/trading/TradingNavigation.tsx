@@ -70,17 +70,17 @@ const TradingNavigation = () => {
         {
           title: 'Spot (USD)',
           description: 'USD-quoted markets',
-          href: '/trading',
+          href: '/trading/spot-usd',
         },
         {
           title: 'Spot (USDC)',
           description: 'USDC-quoted markets',
-          href: '/trading',
+          href: '/trading/spot-usdc',
         },
         {
           title: 'Coin-to-Coin',
           description: 'BTC/ETH quote pairs',
-          href: '/coin-trading',
+          href: '/trading/coin',
         },
         {
           title: 'DCA',
