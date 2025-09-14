@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import Index from './pages/Index';
 import Markets from './pages/Markets';
+import MarketsTutorials from './pages/markets/Tutorials';
 import Trade from './pages/Trade';
 import Trading from './pages/Trading';
 import CoinTrading from './pages/CoinTrading';
@@ -112,6 +113,7 @@ const App = () => (
           <Routes>
             <Route path='/' element={<Index />} />
             <Route path='/markets' element={<Markets />} />
+            <Route path='/markets/tutorials' element={<MarketsTutorials />} />
             <Route path='/trade/:pair' element={<Trade />} />
             <Route path='/trading' element={<Trading />} />
             <Route path='/coin-trading' element={<CoinTrading />} />
