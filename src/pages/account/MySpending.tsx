@@ -484,52 +484,194 @@ const MySpending = () => {
             
             {/* Savings Rate Gauge */}
             <Card className='bg-card/50 border-border/50'>
-              <CardContent className='p-6 text-center'>
-                <div className='flex items-center justify-center mb-4'>
-                  <div className='relative'>
-                    <Gauge className={`w-16 h-16 ${getSavingsRateColor(savingsRate)}`} />
+              <CardHeader className='pb-4'>
+                <div className='flex items-center justify-between'>
+                  <CardTitle className='text-lg flex items-center space-x-2'>
+                    <Gauge className='w-5 h-5' />
+                    <span>Savings Rate</span>
+                  </CardTitle>
+                  <div className='flex items-center gap-2'>
+                    <Button 
+                      variant={trendTimeframe === 'Month' ? 'default' : 'outline'} 
+                      size='sm'
+                      onClick={() => setTrendTimeframe('Month')}
+                      className='text-xs'
+                    >
+                      Month
+                    </Button>
+                    <Button 
+                      variant={trendTimeframe === 'Year' ? 'default' : 'outline'} 
+                      size='sm'
+                      onClick={() => setTrendTimeframe('Year')}
+                      className='text-xs'
+                    >
+                      Year
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className='space-y-4'>
+                <div className='flex justify-center'>
+                  <div className='relative w-40 h-40'>
+                    <div className='absolute inset-0 rounded-full border-8 border-muted'></div>
+                    <div 
+                      className={`absolute inset-0 rounded-full border-8 border-t-transparent border-r-transparent ${getSavingsRateColor(savingsRate)} transition-all duration-500`}
+                      style={{
+                        transform: `rotate(${(savingsRate / 100) * 360}deg)`,
+                        clipPath: 'polygon(50% 0, 100% 0, 100% 50%, 50% 50%)'
+                      }}
+                    ></div>
                     <div className='absolute inset-0 flex items-center justify-center'>
-                      <span className={`text-lg font-bold ${getSavingsRateColor(savingsRate)}`}>
-                        {savingsRate}%
-                      </span>
+                      <div className='text-center'>
+                        <div className='text-3xl font-bold text-foreground'>{savingsRate}%</div>
+                        <div className='text-sm text-muted-foreground'>{getSavingsRateLabel(savingsRate)}</div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <h3 className='text-sm font-medium text-foreground mb-1'>
-                  Savings Rate this month
-                </h3>
-                <p className={`text-xs ${getSavingsRateColor(savingsRate)}`}>
-                  {getSavingsRateLabel(savingsRate)}
-                </p>
-                <p className='text-xs text-muted-foreground mt-2'>Target: 25%+</p>
+                
+                {/* Goal Pills */}
+                <div className='flex justify-center gap-2 mb-3'>
+                  {[15, 25, 30].map((goal) => (
+                    <Button
+                      key={goal}
+                      variant={savingsGoal === goal ? 'default' : 'outline'}
+                      size='sm'
+                      onClick={() => setSavingsGoal(goal)}
+                      className='text-xs px-3'
+                    >
+                      {goal}%
+                    </Button>
+                  ))}
+                  <Button
+                    variant={savingsGoal !== 15 && savingsGoal !== 25 && savingsGoal !== 30 ? 'default' : 'outline'}
+                    size='sm'
+                    onClick={() => setSavingsGoal(35)}
+                    className='text-xs px-3'
+                  >
+                    Custom
+                  </Button>
+                </div>
+                
+                {/* Custom Input */}
+                {savingsGoal !== 15 && savingsGoal !== 25 && savingsGoal !== 30 && (
+                  <div className='flex justify-center'>
+                    <Input
+                      type='number'
+                      placeholder='%'
+                      className='w-20 text-center'
+                      value={savingsGoal}
+                      onChange={(e) => setSavingsGoal(Number(e.target.value))}
+                    />
+                  </div>
+                )}
+                
+                <div className='text-center'>
+                  <div className='text-sm text-muted-foreground mb-2'>Target: {savingsGoal}%</div>
+                  <div className='text-xs text-muted-foreground'>{getSavingsGoalDelta(savingsRate, savingsGoal)}</div>
+                </div>
               </CardContent>
             </Card>
 
             {/* Gold DCA Nudge */}
             <Card className='lg:col-span-2 bg-primary/10 border-primary/20'>
-              <CardContent className='p-4'>
+              <CardContent className='p-4 space-y-4'>
                 <div className='flex items-center justify-between'>
                   <div className='flex items-center gap-3'>
                     <Coins className='w-5 h-5 text-primary' />
                     <div>
                       <p className='text-sm font-medium text-foreground'>Auto-invest your savings</p>
                       <p className='text-xs text-muted-foreground'>
-                        Based on your current savings pace, you could auto-invest ~${potentialDCAAmount}/month
+                        Based on your current savings pace, you could auto-invest ~${potentialDCAAmount}/month.
                       </p>
                     </div>
                   </div>
-                  <div className='flex items-center gap-2'>
-                    <Select value={selectedMetal} onValueChange={setSelectedMetal}>
-                      <SelectTrigger className='w-20 h-8'>
-                        <SelectValue />
+                  <div className='flex gap-2'>
+                    <Button 
+                      variant='outline'
+                      size='sm'
+                      onClick={() => window.location.href = '/trading/dca?tab=calculator'}
+                    >
+                      DCA Calculator
+                    </Button>
+                    <Button 
+                      variant='default'
+                      size='sm'
+                      onClick={() => window.location.href = '/trading/dca'}
+                    >
+                      Set up DCA
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* DCA Configuration */}
+                <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
+                  <div className='flex items-center space-x-2'>
+                    <span className='text-sm text-foreground'>Amount per</span>
+                    <div className='flex space-x-1'>
+                      {['Day', 'Month', 'Year'].map((timeframe) => (
+                        <Button
+                          key={timeframe}
+                          variant={dcaTimeframe === timeframe ? 'default' : 'outline'}
+                          size='sm'
+                          onClick={() => setDcaTimeframe(timeframe)}
+                          className='text-xs px-2'
+                        >
+                          {timeframe}
+                        </Button>
+                      ))}
+                    </div>
+                    <Input
+                      type='number'
+                      placeholder='100'
+                      className='w-20'
+                      defaultValue='100'
+                    />
+                  </div>
+                  
+                  <div>
+                    <Select value={dcaAsset} onValueChange={setDcaAsset}>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select asset' />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value='Gold'>Gold</SelectItem>
                         <SelectItem value='Silver'>Silver</SelectItem>
+                        <SelectItem value='BTC'>BTC</SelectItem>
+                        <SelectItem value='ETH'>ETH</SelectItem>
+                        <SelectItem value='Platinum'>Platinum</SelectItem>
+                        <SelectItem value='Palladium'>Palladium</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Button size='sm'>Set up DCA</Button>
-                    <Button variant='outline' size='sm'>Adjust amount</Button>
+                  </div>
+                  
+                  <Button className='w-full'>
+                    Save monthly rule
+                  </Button>
+                </div>
+                
+                {/* Rules List */}
+                <div className='space-y-2'>
+                  <h4 className='text-sm font-medium text-foreground'>Active Rules</h4>
+                  <div className='space-y-2 max-h-32 overflow-y-auto'>
+                    <div className='flex items-center justify-between p-3 bg-card/50 rounded-lg border'>
+                      <div className='flex items-center gap-3'>
+                        <span className='text-sm font-medium'>$100 / Month → Gold</span>
+                        <Badge variant='secondary' className='text-xs'>From: Funding</Badge>
+                      </div>
+                      <Button variant='ghost' size='sm' className='h-6 w-6 p-0'>
+                        <X className='w-3 h-3' />
+                      </Button>
+                    </div>
+                    <div className='flex items-center justify-between p-3 bg-card/50 rounded-lg border'>
+                      <div className='flex items-center gap-3'>
+                        <span className='text-sm font-medium'>$50 / Month → Silver</span>
+                        <Badge variant='secondary' className='text-xs'>From: Trading</Badge>
+                      </div>
+                      <Button variant='ghost' size='sm' className='h-6 w-6 p-0'>
+                        <X className='w-3 h-3' />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>
