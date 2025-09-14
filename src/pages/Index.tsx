@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
-import Navigation from '@/components/Navigation';
+import Layout from '@/components/Layout';
 import HeroSection from '@/components/HeroSection';
+import FeatureStripe from '@/components/FeatureStripe';
 import AssetPricing from '@/components/AssetPricing';
 import FeaturesSection from '@/components/FeaturesSection';
 import EducationSection from '@/components/EducationSection';
@@ -8,7 +9,7 @@ import Footer from '@/components/Footer';
 
 const Index = () => {
   return (
-    <div className='min-h-screen bg-background'>
+    <Layout>
       <Helmet>
         <title>
           PBCex - Asset-Backed Digital Banking | Precious Metals Trading
@@ -27,13 +28,13 @@ const Index = () => {
         />
         <link rel='canonical' href='https://pbcex.com/' />
       </Helmet>
-      <Navigation />
       <HeroSection />
       <AssetPricing />
+      <FeatureStripe />
       <FeaturesSection />
       <EducationSection />
       <Footer />
-    </div>
+    </Layout>
   );
 };
 

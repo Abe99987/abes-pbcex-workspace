@@ -8,8 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import DepositModal from '@/components/modals/DepositModal';
 import WalletConnectModal from '@/components/modals/WalletConnectModal';
 import AuthModal from '@/components/modals/AuthModal';
@@ -22,7 +20,6 @@ import {
   TrendingUp,
   Shield,
   HelpCircle,
-  Home,
   Send,
   Building2,
   BookOpen,
@@ -30,22 +27,12 @@ import {
   Coins,
   CandlestickChart,
   History,
-  PieChart,
   TrendingDown,
-  ArrowUpDown,
   Receipt,
   Package,
-  Truck,
-  MapPin,
   Settings,
   LogOut,
   CreditCard,
-  Users,
-  Gift,
-  Target,
-  Code,
-  Badge as BadgeIcon,
-  Crown,
   Key,
   FileText,
   Bell,
@@ -53,6 +40,8 @@ import {
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import ThemeToggle from './ThemeToggle';
+import pbcexLogo from '@/assets/pbcex-logo.png';
 
 interface MenuItem {
   label: string;
@@ -96,66 +85,79 @@ const Navigation = () => {
   const isTrading =
     location.pathname === '/trading' || location.pathname === '/coin-trading';
 
+  // Get menu items - My Account is always visible
   const menuItems: MenuItem[] = [
+    {
+      label: 'Buy Crypto',
+      icon: Coins,
+      items: [
+        {
+          label: 'Quick Buy',
+          href: '/buy',
+          description: 'Fiat → asset in one step',
+        },
+        {
+          label: 'Quick Convert',
+          href: '/convert',
+          description: 'Swap between assets instantly',
+        },
+        {
+          label: 'Buy with Card',
+          href: '/buy/card',
+          description: 'Visa/Mastercard checkout',
+        },
+        {
+          label: 'Deposit Crypto',
+          href: '/deposit',
+          description: 'On-chain deposit addresses',
+        },
+      ],
+    },
     {
       label: 'Trade',
       icon: CandlestickChart,
       items: [
         {
-          label: 'USDC Trading',
-          description: 'Settle in USDC',
+          label: 'Spot (USD) (Placeholder)',
           href: '/trading',
+          description: 'USD-quoted markets',
         },
         {
-          label: 'COIN Trading',
-          description: 'Settle in PAXG, XAG, OSP, BTC, ETH, SOL, XRP, SUI',
-          href: '/coin-trading',
+          label: 'Spot (USDC) — stablecoin trading (USDC/USDT)',
+          href: '/trading/spot-usdc',
+          description: 'USDC/USDT markets',
         },
-        { label: 'FX Trading', description: 'USD, EUR, GBP, AED, LYD, JPY' },
-        { label: 'Margin Trading', description: 'Coming Soon' },
         {
-          label: 'Dollar-Cost Average Strategies',
-          href: '/trade/dca',
-          description: 'Automate asset purchases',
+          label: 'Coin-to-Coin — settle in any coin',
+          href: '/trading/coin',
+          description: 'Direct crypto & metals trading',
         },
-        { label: 'Trade Analytics' },
-        { label: 'Market Reports' },
-        { label: 'News' },
+        {
+          label: 'DCA — set up auto-buy',
+          href: '/trading/dca',
+          description: 'Automated recurring purchases',
+        },
       ],
     },
     {
-      label: 'Wallet',
-      icon: Wallet,
+      label: 'Markets',
+      icon: BarChart3,
+      href: '/markets',
       items: [
         {
-          label: 'My Assets',
-          description: 'Buy, Sell, Realize, Send/Receive, Spend, Transfer',
-          onClick: () => navigate('/my-assets'),
+          label: 'Analytics',
+          href: '/markets?tab=overview',
+          description: 'Overview & key metrics dashboard',
         },
         {
-          label: 'My Spending',
-          description: 'Track expenses, categories, and savings goals',
-          onClick: () => navigate('/my-spending'),
+          label: 'Tutorials',
+          href: '/markets/tutorials',
+          description: 'How-to guides',
         },
         {
-          label: 'Transaction History',
-          description: 'View all account transactions and transfers',
-          onClick: () => navigate('/transaction-history'),
-        },
-        {
-          label: 'Order History',
-          description: 'Track all trading orders and execution',
-          onClick: () => navigate('/order-history'),
-        },
-        {
-          label: 'PnL',
-          description: 'Profit and Loss',
-          onClick: () => navigate('/pnl'),
-        },
-        {
-          label: 'Connect Wallet',
-          description: 'Connect external wallets',
-          onClick: () => setWalletConnectModalOpen(true),
+          label: 'Education (Learn) (Placeholder)',
+          href: '/education',
+          description: 'Courses & long-form',
         },
       ],
     },
@@ -164,58 +166,142 @@ const Navigation = () => {
       icon: Package,
       items: [
         {
-          label: 'Shop All',
+          label: 'Shop All (Placeholder)',
           href: '/shop',
           description: 'View all commodities',
         },
-        { label: 'Buy Physical Gold', href: '/shop/XAU' },
-        { label: 'Buy Physical Silver', href: '/shop/XAG' },
-        { label: 'Buy Physical Platinum', href: '/shop/XPT' },
-        { label: 'Buy Physical Palladium', href: '/shop/XPD' },
-        { label: 'Buy Physical Copper', href: '/shop/XCU' },
-        { label: 'Oil — Coming Soon', href: '/realize' },
-        { label: 'Natural Gas — Coming Soon', href: '/realize' },
-        { label: 'Lithium — Coming Soon', href: '/realize' },
+        {
+          label: 'Buy Physical Gold',
+          href: '/shop/gold',
+          description: 'Gold',
+        },
+        {
+          label: 'Buy Physical Silver',
+          href: '/shop/silver',
+          description: 'Silver',
+        },
+        {
+          label: 'Buy Physical Platinum',
+          href: '/shop/platinum',
+          description: 'Platinum',
+        },
+        {
+          label: 'Buy Physical Palladium',
+          href: '/shop/palladium',
+          description: 'Palladium',
+        },
+        {
+          label: 'Buy Physical Copper',
+          href: '/shop/copper',
+          description: 'Copper',
+        },
       ],
     },
     {
-      label: 'Send/Pay',
+      label: 'Send / Receive',
       icon: Send,
       items: [
-        { label: 'Send to PBCEx User', href: '/send/internal' },
-        { label: 'Crypto Withdrawal', href: '/send/crypto' },
-        { label: 'Bank Transfers (SWIFT/WISE-ready)', href: '/send/bank' },
-        { label: 'Pay with QR Code', href: '/pay/qr' },
-        { label: 'Receive with QR Code', href: '/receive/qr' },
-        { label: 'Spend with Visa Card', href: '/card/spend' },
-        { label: 'Set up Bill Pay', href: '/pay/bills' },
-        { label: 'Request a Payment', href: '/pay/request' },
-        { label: 'Set up Recurring Transfers', href: '/send/recurring' },
+        {
+          label: 'Send to PBCEx User (Placeholder)',
+          href: '/send/internal',
+          description: 'Free & instant transfers',
+        },
+        {
+          label: 'Crypto Withdrawal (Placeholder)',
+          href: '/send/crypto',
+          description: 'Send on-chain',
+        },
+        {
+          label: 'Bank Transfers (SWIFT/WISE-ready) (Placeholder)',
+          href: '/send/bank',
+          description: 'Domestic & international',
+        },
+        {
+          label: 'Pay with QR Code (Placeholder)',
+          href: '/pay/qr',
+          description: 'Merchant QR',
+        },
+        {
+          label: 'Receive with QR Code (Placeholder)',
+          href: '/receive/qr',
+          description: 'Your QR',
+        },
+        {
+          label: 'Spend with Visa Card (Placeholder)',
+          href: '/card/spend',
+          description: 'Use card',
+        },
+        {
+          label: 'Set up Bill Pay (Placeholder)',
+          href: '/pay/bills',
+          description: 'Schedule utilities & vendors',
+        },
+        {
+          label: 'Request a Payment (Placeholder)',
+          href: '/pay/request',
+          description: 'Create invoice/QR',
+        },
+        {
+          label: 'Set up Recurring Transfers (Placeholder)',
+          href: '/send/recurring',
+          description: 'Automate payouts & savings',
+        },
       ],
     },
     {
-      label: 'Franchise',
-      href: '/franchise',
-      icon: Building2,
-    },
-    {
-      label: 'Learn',
-      href: '/education',
-      icon: BookOpen,
-    },
-    {
-      label: 'Security',
-      href: '/support/security',
-      icon: Shield,
-    },
-    {
-      label: 'Help',
-      icon: HelpCircle,
+      label: 'My Account',
+      icon: User,
       items: [
-        { label: 'Help Center', href: '/support/help-center' },
-        { label: 'Security', href: '/support/security' },
-        { label: 'Compliance', href: '/support/compliance' },
-        { label: 'Contact', href: '/contact' },
+        {
+          label: 'Balances & Funding',
+          href: '/balances',
+          description: 'Overview, deposit, withdraw',
+        },
+        {
+          label: 'My Assets',
+          href: '/my-assets',
+          description: 'Portfolio overview & holdings',
+        },
+        {
+          label: 'My Spending',
+          href: '/my-spending',
+          description: 'Spending analysis & budgets',
+        },
+        {
+          label: 'Transaction History',
+          href: '/transactions',
+          description: 'All account transfers',
+        },
+        {
+          label: 'Order History',
+          href: '/orders',
+          description: 'Trades & executions',
+        },
+        {
+          label: 'PnL',
+          href: '/pnl',
+          description: 'Profit and loss',
+        },
+        {
+          label: 'Connect Wallet',
+          href: '/connect-wallet',
+          description: 'Link external wallets',
+        },
+        {
+          label: 'Settings & Profile',
+          href: '/settings',
+          description: 'Preferences and KYC',
+        },
+        {
+          label: 'Security',
+          href: '/security',
+          description: '2FA, sessions, passkeys',
+        },
+        {
+          label: 'Support',
+          href: '/support',
+          description: 'Help center',
+        },
       ],
     },
   ];
@@ -224,6 +310,8 @@ const Navigation = () => {
     if (typeof item === 'object' && item?.onClick) {
       item.onClick();
     } else if (typeof item === 'object' && item?.href) {
+      // Navigate to the intended page - auth modal will overlay if needed
+      // Remove signup redirect behavior
       navigate(item.href);
     } else if (menu.href) {
       navigate(menu.href);
@@ -246,19 +334,19 @@ const Navigation = () => {
       className={`sticky top-0 z-50 w-full border-b ${
         isTrading
           ? 'bg-black border-gray-800'
-          : 'border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'
+          : 'bg-[#0A0A0A] border-gray-800'
       }`}
     >
       <div className='container mx-auto flex h-16 items-center justify-between px-4'>
         {/* Left - Logo */}
         <button
           onClick={() => navigate('/')}
-          className='flex items-center space-x-2 hover:opacity-80 transition-opacity'
+          className='hover:opacity-80 transition-opacity'
         >
           <img
-            src='/brand/pbcex-logo.svg'
-            alt='PBCEx'
-            className='h-7 w-auto object-contain'
+            src={pbcexLogo}
+            alt="PBCEx"
+            className="h-8 w-auto"
           />
         </button>
 
@@ -274,7 +362,7 @@ const Navigation = () => {
                     className={`h-9 px-3 transition-colors ${
                       isTrading
                         ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                        : 'text-gray-300 hover:text-white hover:bg-gray-800'
                     }`}
                     onClick={() => handleMenuClick(menu)}
                   >
@@ -287,7 +375,7 @@ const Navigation = () => {
                   className={`w-48 z-50 ${
                     isTrading
                       ? 'bg-gray-900 border-gray-700 text-gray-100'
-                      : 'bg-background border-border text-foreground'
+                      : 'bg-gray-900 border-gray-700 text-gray-100'
                   }`}
                   align='center'
                 >
@@ -297,7 +385,7 @@ const Navigation = () => {
                         className={`cursor-pointer flex items-center justify-between ${
                           isTrading
                             ? 'hover:bg-gray-800 focus:bg-gray-800'
-                            : 'hover:bg-accent focus:bg-accent'
+                            : 'hover:bg-gray-800 focus:bg-gray-800'
                         } ${(typeof item === 'object' && item.label && item.label.includes('Coming Soon')) || (typeof item === 'string' && item.includes('Coming Soon')) ? 'opacity-50 text-muted-foreground cursor-not-allowed' : ''}`}
                         onClick={e => {
                           const isComingSoon =
@@ -326,7 +414,7 @@ const Navigation = () => {
                                 className={`text-xs ${
                                   isTrading
                                     ? 'text-gray-400'
-                                    : 'text-muted-foreground'
+                                    : 'text-gray-400'
                                 }`}
                               >
                                 {item.description}
@@ -340,7 +428,7 @@ const Navigation = () => {
                           (menu.label === 'Trade' && index === 2) ||
                           (menu.label === 'Realize' && index === 5)) && (
                           <DropdownMenuSeparator
-                            className={isTrading ? 'bg-gray-700' : 'bg-border'}
+                            className={isTrading ? 'bg-gray-700' : 'bg-gray-700'}
                           />
                         )}
                     </div>
@@ -355,7 +443,7 @@ const Navigation = () => {
                 className={`h-9 px-3 transition-colors ${
                   isTrading
                     ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    : 'text-gray-300 hover:text-white hover:bg-gray-800'
                 }`}
                 onClick={() => handleMenuClick(menu)}
               >
@@ -368,169 +456,144 @@ const Navigation = () => {
 
         {/* Right - Actions */}
         <div className='hidden md:flex items-center space-x-3'>
+          {/* Deposit Button */}
           <Button
             size='sm'
             className={`${
               isTrading
                 ? 'bg-green-600 hover:bg-green-700 text-white'
-                : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                : 'bg-amber-500 hover:bg-amber-600 text-black font-medium'
             }`}
             onClick={() => setDepositModalOpen(true)}
           >
             Deposit
           </Button>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant='ghost'
-                size='sm'
-                className={`${
-                  isTrading
-                    ? 'text-gray-300 hover:text-white'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Globe className='w-4 h-4 mr-1' />
-                {selectedLanguage}
-                <ChevronDown className='w-3 h-3 ml-1' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className={`z-50 ${
-                isTrading
-                  ? 'bg-gray-900 border-gray-700 text-gray-100'
-                  : 'bg-background border-border text-foreground'
-              }`}
-            >
-              <DropdownMenuItem
-                onClick={() => setSelectedLanguage('EN')}
-                className={`cursor-pointer ${
-                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-                }`}
-              >
-                English
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setSelectedLanguage('AR')}
-                className={`cursor-pointer ${
-                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-                }`}
-              >
-                العربية
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setSelectedLanguage('ZH')}
-                className={`cursor-pointer ${
-                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-                }`}
-              >
-                中文
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setSelectedLanguage('ES')}
-                className={`cursor-pointer ${
-                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-                }`}
-              >
-                Español
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setSelectedLanguage('FR')}
-                className={`cursor-pointer ${
-                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-                }`}
-              >
-                Français
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setSelectedLanguage('HI')}
-                className={`cursor-pointer ${
-                  isTrading ? 'hover:bg-gray-800' : 'hover:bg-accent'
-                }`}
-              >
-                हिन्दी
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Account/Auth Button */}
+          {/* Auth Button */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant='ghost'
+                  variant='outline'
                   size='sm'
-                  className={`p-2 ${
-                    isTrading
-                      ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                  }`}
+                  className='bg-gray-800 border-gray-600 text-white hover:bg-gray-700 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-gray-900'
                   aria-label='Account menu'
                 >
-                  <User className='w-4 h-4' />
+                  Account
+                  <ChevronDown className='w-3 h-3 ml-1' />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align='end'
-                className='w-56 bg-popover border shadow-md'
+                className='w-56 bg-gray-900 border-gray-700 text-gray-100 shadow-lg'
               >
                 <DropdownMenuItem
-                  onClick={() => navigate('/account')}
-                  className='cursor-pointer hover:bg-accent'
+                  onClick={() => navigate('/my-assets')}
+                  className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
                 >
                   <User className='mr-2 h-4 w-4' />
-                  Account
+                  <div>
+                    <div className='font-medium'>My Assets</div>
+                    <div className='text-xs text-gray-400'>Buy, Sell, Realize; Send/Receive, Spend, Transfer</div>
+                  </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => navigate('/account/identity')}
-                  className='cursor-pointer hover:bg-accent'
-                >
-                  <UserCheck className='mr-2 h-4 w-4' />
-                  Identity / KYC
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => navigate('/account/security')}
-                  className='cursor-pointer hover:bg-accent'
-                >
-                  <Shield className='mr-2 h-4 w-4' />
-                  Security
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => navigate('/account/payments')}
-                  className='cursor-pointer hover:bg-accent'
+                  onClick={() => navigate('/my-spending')}
+                  className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
                 >
                   <CreditCard className='mr-2 h-4 w-4' />
-                  Payment Methods
+                  <div>
+                    <div className='font-medium'>My Spending</div>
+                    <div className='text-xs text-gray-400'>Track expenses, categories, and savings goals</div>
+                  </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => navigate('/account/notifications')}
-                  className='cursor-pointer hover:bg-accent'
+                  onClick={() => navigate('/balances')}
+                  className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
                 >
-                  <Bell className='mr-2 h-4 w-4' />
-                  Notifications
+                  <UserCheck className='mr-2 h-4 w-4' />
+                  <div>
+                    <div className='font-medium'>Balances & Funding</div>
+                    <div className='text-xs text-gray-400'>Overview, deposit, withdraw</div>
+                  </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => navigate('/account/api-keys')}
-                  className='cursor-pointer hover:bg-accent'
+                  onClick={() => navigate('/transactions')}
+                  className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
                 >
-                  <Key className='mr-2 h-4 w-4' />
-                  API Keys
+                  <History className='mr-2 h-4 w-4' />
+                  <div>
+                    <div className='font-medium'>Transaction History</div>
+                    <div className='text-xs text-gray-400'>All account transfers</div>
+                  </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => navigate('/account/tax')}
-                  className='cursor-pointer hover:bg-accent'
+                  onClick={() => navigate('/orders')}
+                  className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
                 >
-                  <FileText className='mr-2 h-4 w-4' />
-                  Tax Documents
+                  <Receipt className='mr-2 h-4 w-4' />
+                  <div>
+                    <div className='font-medium'>Order History</div>
+                    <div className='text-xs text-gray-400'>Trades & executions</div>
+                  </div>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => navigate('/pnl')}
+                  className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
+                >
+                  <TrendingUp className='mr-2 h-4 w-4' />
+                  <div>
+                    <div className='font-medium'>PnL</div>
+                    <div className='text-xs text-gray-400'>Profit & loss analytics</div>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/wallet')}
+                  className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
+                >
+                  <Wallet className='mr-2 h-4 w-4' />
+                  <div>
+                    <div className='font-medium'>Connect Wallet</div>
+                    <div className='text-xs text-gray-400'>External wallets</div>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/support/security')}
+                  className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
+                >
+                  <Shield className='mr-2 h-4 w-4' />
+                  <div>
+                    <div className='font-medium'>Security (Placeholder)</div>
+                    <div className='text-xs text-gray-400'>2FA & sessions</div>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/account')}
+                  className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
+                >
+                  <Settings className='mr-2 h-4 w-4' />
+                  <div>
+                    <div className='font-medium'>Settings & Profile (Placeholder)</div>
+                    <div className='text-xs text-gray-400'>Preferences & KYC</div>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/support/help-center')}
+                  className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
+                >
+                  <HelpCircle className='mr-2 h-4 w-4' />
+                  <div>
+                    <div className='font-medium'>Support (Placeholder)</div>
+                    <div className='text-xs text-gray-400'>Help center</div>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className='bg-gray-700' />
                 <DropdownMenuItem
                   onClick={async () => {
                     await supabase.auth.signOut();
                     navigate('/');
                   }}
-                  className='cursor-pointer hover:bg-accent text-red-600'
+                  className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800 text-red-400'
                 >
                   <LogOut className='mr-2 h-4 w-4' />
                   Sign out
@@ -539,19 +602,72 @@ const Navigation = () => {
             </DropdownMenu>
           ) : (
             <Button
-              variant='ghost'
               size='sm'
-              className={`p-2 ${
-                isTrading
-                  ? 'text-gray-300 hover:text-white hover:bg-gray-800'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-              }`}
+              className='bg-amber-500 hover:bg-amber-600 text-black font-medium focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-gray-900'
               onClick={() => setAuthModalOpen(true)}
-              aria-label='Account access'
+              aria-label='Sign up or log in'
             >
-              <User className='w-4 h-4' />
+              Sign Up
             </Button>
           )}
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
+          {/* Language Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='text-gray-300 hover:text-white hover:bg-gray-800 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-gray-900'
+              >
+                <Globe className='w-4 h-4 mr-1' />
+                {selectedLanguage}
+                <ChevronDown className='w-3 h-3 ml-1' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className='z-50 bg-gray-900 border-gray-700 text-gray-100'
+            >
+              <DropdownMenuItem
+                onClick={() => setSelectedLanguage('EN')}
+                className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
+              >
+                English
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setSelectedLanguage('AR')}
+                className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
+              >
+                العربية
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setSelectedLanguage('ZH')}
+                className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
+              >
+                中文
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setSelectedLanguage('ES')}
+                className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
+              >
+                Español
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setSelectedLanguage('FR')}
+                className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
+              >
+                Français
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setSelectedLanguage('HI')}
+                className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
+              >
+                हिन्दी
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Mobile Navigation */}
@@ -559,23 +675,19 @@ const Navigation = () => {
           <SheetTrigger asChild className='md:hidden'>
             <Button variant='ghost' size='icon'>
               <Menu
-                className={`h-5 w-5 ${isTrading ? 'text-white' : 'text-foreground'}`}
+                className={`h-5 w-5 ${isTrading ? 'text-white' : 'text-white'}`}
               />
             </Button>
           </SheetTrigger>
           <SheetContent
-            className={isTrading ? 'bg-gray-900 border-gray-700' : ''}
+            className='bg-gray-900 border-gray-700'
           >
             <div className='flex flex-col space-y-4 mt-8'>
               {menuItems.map(menu => (
                 <div key={menu.label} className='space-y-2'>
                   <button
                     onClick={() => handleMenuClick(menu)}
-                    className={`w-full text-left transition-colors duration-200 flex items-center space-x-3 p-2 ${
-                      isTrading
-                        ? 'text-gray-300 hover:text-white'
-                        : 'text-foreground hover:text-primary'
-                    }`}
+                    className='w-full text-left transition-colors duration-200 flex items-center space-x-3 p-2 text-gray-300 hover:text-white'
                   >
                     <menu.icon className='h-5 w-5' />
                     <span>{menu.label}</span>
@@ -597,11 +709,7 @@ const Navigation = () => {
                           }
                           handleMenuClick(menu, item);
                         }}
-                        className={`w-full text-left text-sm pl-10 py-2 transition-colors flex items-center ${
-                          isTrading
-                            ? 'text-gray-400 hover:text-gray-200'
-                            : 'text-muted-foreground hover:text-foreground'
-                        } ${(typeof item === 'object' && item.label && item.label.includes('Coming Soon')) || (typeof item === 'string' && item.includes('Coming Soon')) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`w-full text-left text-sm pl-10 py-2 transition-colors flex items-center text-gray-400 hover:text-gray-200 ${(typeof item === 'object' && item.label && item.label.includes('Coming Soon')) || (typeof item === 'string' && item.includes('Coming Soon')) ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         {typeof item === 'object' && item.icon && (
                           <item.icon className='w-4 h-4 mr-2' />
@@ -612,11 +720,7 @@ const Navigation = () => {
                           </div>
                           {typeof item === 'object' && item.description && (
                             <div
-                              className={`text-xs ${
-                                isTrading
-                                  ? 'text-gray-500'
-                                  : 'text-muted-foreground/60'
-                              }`}
+                              className='text-xs text-gray-500'
                             >
                               {item.description}
                             </div>
@@ -626,16 +730,30 @@ const Navigation = () => {
                     ))}
                 </div>
               ))}
-              <Button
-                className={`mt-4 ${
-                  isTrading
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-primary hover:bg-primary/90'
-                }`}
-                onClick={() => setDepositModalOpen(true)}
-              >
-                Deposit
-              </Button>
+              <div className='flex flex-col space-y-3 mt-4'>
+                <Button
+                  className='bg-amber-500 hover:bg-amber-600 text-black font-medium'
+                  onClick={() => setDepositModalOpen(true)}
+                >
+                  Deposit
+                </Button>
+                {user ? (
+                  <Button
+                    variant='outline'
+                    className='bg-gray-800 border-gray-600 text-white hover:bg-gray-700'
+                    onClick={() => navigate('/my-assets')}
+                  >
+                    Account ▾
+                  </Button>
+                ) : (
+                  <Button
+                    className='bg-amber-500 hover:bg-amber-600 text-black font-medium'
+                    onClick={() => setAuthModalOpen(true)}
+                  >
+                    Sign Up
+                  </Button>
+                )}
+              </div>
             </div>
           </SheetContent>
         </Sheet>

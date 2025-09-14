@@ -1,68 +1,92 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Shield, Globe, Coins } from 'lucide-react';
+import treasureChest from '@/assets/treasure-chest-realistic.png';
 
 const HeroSection = () => {
   return (
-    <section className='relative min-h-[80vh] flex items-center justify-center overflow-hidden pt-8 pb-12'>
-      {/* Background gradient */}
-      <div className='absolute inset-0 bg-gradient-to-br from-background via-muted/30 to-accent/20' />
+    <section className='relative min-h-[65vh] md:min-h-[75vh] flex items-center justify-center overflow-hidden pt-6 pb-2 bg-background'>
+      {/* Seamless deep-black blend - no seams */}
+      <div className='absolute inset-0 bg-background' />
+      <div className='absolute inset-0 bg-gradient-radial from-background via-background to-background opacity-100' />
 
-      {/* Content */}
       <div className='container mx-auto px-4 relative z-10'>
-        <div className='text-center max-w-4xl mx-auto'>
-          <Badge
-            variant='outline'
-            className='mb-6 border-gold/30 text-gold bg-gold/5'
-          >
-            <Coins className='w-4 h-4 mr-2' />
-            Next-Generation Asset-Backed Banking
-          </Badge>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-6xl mx-auto'>
+          {/* Left - Content - aligned with page grid */}
+          <div className='text-left lg:text-left space-y-5 lg:-ml-8 px-4 lg:px-0'>
+            {/* Brand eyebrow - reduced size with color split */}
+            <div className='text-[9rem] md:text-[10.5rem] font-bold tracking-wide leading-none'>
+              <span className='text-foreground'>PBC</span><span className='text-gold'>Ex</span>
+            </div>
+            
+            {/* Micro-copy */}
+            <div className='text-xs text-muted-foreground/60 -mt-2'>
+              People's Banking & Commodities Exchange
+            </div>
 
-          <h1 className='text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight'>
-            People's Bank{' '}
-            <span className='bg-gradient-to-r from-gold to-gold-light bg-clip-text text-transparent'>
-              Commodities Exchange
-            </span>
-          </h1>
+            <h1 className='text-4xl md:text-5xl font-bold text-foreground leading-tight max-w-lg'>
+              Start your{' '}
+              <span className='bg-gradient-to-r from-gold to-gold-light bg-clip-text text-transparent'>
+                treasure
+              </span>{' '}
+              now.
+            </h1>
 
-          <p className='text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed'>
-            The Home of Hard Commodities. Real Assets, Real Settlement, Real
-            Utility. Buy when the moment is right, Realize when you're ready.
-            Back to the roots of trading
-          </p>
+            <p className='text-xl text-muted-foreground leading-relaxed'>
+              Trade real assets with bank-grade security and global reach.
+            </p>
 
-          <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
-            <Button variant='gold' size='lg' className='group'>
-              Start Banking Today
-              <ArrowRight className='ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform' />
-            </Button>
-            <Button variant='premium' size='lg'>
-              Learn More
-            </Button>
+            <div className='flex flex-col sm:flex-row gap-4 justify-start lg:justify-start'>
+              <Button 
+                variant='gold' 
+                size='lg' 
+                className='group bg-gold text-black hover:bg-gold-light focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-background'
+                onClick={() => window.location.href = '/markets'}
+              >
+                Trade now
+                <ArrowRight className='ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform' />
+              </Button>
+              <Button 
+                variant='outline' 
+                size='lg'
+                className='border-muted text-foreground hover:bg-muted/20 focus:ring-2 focus:ring-muted focus:ring-offset-2 focus:ring-offset-background'
+                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Explore products
+              </Button>
+            </div>
+
+            <p className='text-xs text-muted-foreground/60'>
+              Regulated financial services. Assets held in secure custody. Individual results may vary.
+            </p>
           </div>
 
-          {/* Trust indicators */}
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto'>
-            <div className='flex items-center justify-center space-x-2 text-muted-foreground'>
-              <Shield className='h-5 w-5 text-gold' />
-              <span className='text-sm font-medium'>Central Bank Licensed</span>
-            </div>
-            <div className='flex items-center justify-center space-x-2 text-muted-foreground'>
-              <Globe className='h-5 w-5 text-silver' />
-              <span className='text-sm font-medium'>Global Reach</span>
-            </div>
-            <div className='flex items-center justify-center space-x-2 text-muted-foreground'>
-              <Coins className='h-5 w-5 text-gold' />
-              <span className='text-sm font-medium'>100% Asset Backed</span>
+          {/* Right - Treasure Chest */}
+          <div className='flex justify-center lg:justify-start lg:-mr-12 xl:-mr-16 relative'>
+            <div className='relative'>
+              {/* Interior glow from chest lid gap only */}
+              <div className='absolute top-[25%] left-1/2 transform -translate-x-1/2 w-[120px] h-[80px] bg-gradient-ellipse from-amber-400/25 via-gold/15 to-transparent blur-xl opacity-80' />
+              
+              {/* Soft shadow beneath chest (not glow) */}
+              <div className='absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[400px] h-[40px] bg-black/30 rounded-full blur-2xl opacity-60' />
+              
+              {/* Treasure chest image - responsive sizing */}
+              <img
+                src={treasureChest}
+                alt='Treasure chest glowing from within'
+                className='w-[700px] h-[700px] md:w-[735px] md:h-[735px] lg:w-[770px] lg:h-[770px] xl:w-[840px] xl:h-[840px] object-contain object-right-center relative z-10'
+                style={{
+                  filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4))',
+                }}
+              />
+              
+              {/* Very faint rim light for legibility - 6% strength */}
+              <div className='absolute top-[8%] left-[15%] w-[70%] h-[35%] bg-gradient-to-br from-foreground/6 via-transparent to-transparent rounded-lg blur-md opacity-50' />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Subtle decorative elements */}
-      <div className='absolute top-20 left-10 w-20 h-20 rounded-full bg-gold/10 blur-xl' />
-      <div className='absolute bottom-20 right-10 w-32 h-32 rounded-full bg-silver/10 blur-xl' />
     </section>
   );
 };

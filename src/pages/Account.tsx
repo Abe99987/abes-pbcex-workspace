@@ -14,7 +14,7 @@ import {
   Settings,
   Edit3,
 } from 'lucide-react';
-import Navigation from '@/components/Navigation';
+import Layout from '@/components/Layout';
 import Footer from '@/components/Footer';
 
 const Account = () => {
@@ -244,9 +244,7 @@ const Account = () => {
   };
 
   return (
-    <div className='min-h-screen bg-background'>
-      <Navigation />
-
+    <Layout>
       {/* Breadcrumbs */}
       <div className='container mx-auto px-4 py-4'>
         <nav className='text-sm text-muted-foreground'>
@@ -259,7 +257,7 @@ const Account = () => {
       <div className='container mx-auto px-4 pb-16'>{renderContent()}</div>
 
       <Footer />
-    </div>
+    </Layout>
   );
 };
 
