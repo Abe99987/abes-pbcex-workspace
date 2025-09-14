@@ -42,7 +42,10 @@ describe('MarketsAdapter', () => {
       timestamp: new Date().toISOString(),
     };
 
-    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockApiResponse,
+    });
 
     const symbols = await marketsAdapter.getSymbols();
 
@@ -86,9 +89,15 @@ describe('SpendingAdapter', () => {
       timestamp: new Date().toISOString(),
     };
 
-    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockApiResponse,
+    });
 
-    const tx = await spendingAdapter.getTransactions({ month: '2024-01', category: 'Shopping' });
+    const tx = await spendingAdapter.getTransactions({
+      month: '2024-01',
+      category: 'Shopping',
+    });
 
     expect(tx).toBeDefined();
     expect(tx[0].id).toBe('123');
@@ -122,7 +131,10 @@ describe('SpendingAdapter', () => {
       timestamp: new Date().toISOString(),
     };
 
-    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockApiResponse,
+    });
 
     const result = await spendingAdapter.createRule(mockRule);
 
@@ -130,7 +142,9 @@ describe('SpendingAdapter', () => {
     expect(fetch).toHaveBeenCalledWith(
       'http://localhost:3000/api/dca/rules',
       expect.objectContaining({
-        headers: expect.objectContaining({ 'X-Idempotency-Key': expect.stringContaining('test_gold_') }),
+        headers: expect.objectContaining({
+          'X-Idempotency-Key': expect.stringContaining('test_gold_'),
+        }),
       })
     );
   });

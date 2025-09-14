@@ -18,7 +18,7 @@
 - **Performance SLOs**: Optimistic UI updates, efficient transaction filtering, CSV export with proper MIME types
 - **Test Coverage**: RTL test stubs for Spending adapter, transaction ledger, tags CRUD, budget operations, CSV export, and DCA rule management
 
-_Merge note: unified via PR #59 (Markets) and PR #60 (Spending)._ 
+_Merge note: unified via PR #59 (Markets) and PR #60 (Spending)._
 
 ## Step-37 (Nav+Print Finalization) - 2025-09-13
 
