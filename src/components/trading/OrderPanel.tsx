@@ -79,8 +79,29 @@ const OrderPanel = ({ pair, settlementAsset, settlementMode = 'usd' }: OrderPane
                   <SelectItem value='BTC' className='text-white hover:bg-gray-800'>BTC</SelectItem>
                   <SelectItem value='ETH' className='text-white hover:bg-gray-800'>ETH</SelectItem>
                   <SelectItem value='SOL' className='text-white hover:bg-gray-800'>SOL</SelectItem>
+                  <SelectItem value='USDC' className='text-white hover:bg-gray-800'>USDC</SelectItem>
+                  <SelectItem value='USDT' className='text-white hover:bg-gray-800'>USDT</SelectItem>
                 </SelectContent>
               </Select>
+              
+              {/* Trading Balance for Coin Mode */}
+              <div className='mt-3 p-2 bg-gray-900/50 rounded border border-gray-700'>
+                <div className='text-xs text-gray-400 mb-1'>
+                  Trading balance — {selectedSettlement}:
+                </div>
+                <div className='text-sm font-mono text-white'>
+                  {selectedSettlement === 'PAXG' ? '24.5 PAXG' : 
+                   selectedSettlement === 'XAG' ? '1,240.8 XAG' :
+                   selectedSettlement === 'BTC' ? '0.185 BTC' : 
+                   selectedSettlement === 'ETH' ? '5.2 ETH' :
+                   selectedSettlement === 'SOL' ? '120.5 SOL' :
+                   selectedSettlement === 'USDC' ? '12,450.00 USDC' : '8,250.00 USDT'}
+                </div>
+              </div>
+            </div>
+          ) : settlementMode === 'usdc' ? (
+            <div className='text-xs text-gray-400'>
+              {/* USDC mode handled by parent component toggle */}
             </div>
           ) : (
             <div className='text-xs text-gray-400'>
@@ -89,18 +110,20 @@ const OrderPanel = ({ pair, settlementAsset, settlementMode = 'usd' }: OrderPane
           )}
         </div>
 
-        {/* Trading Balance Display */}
-        <div className='mb-4 p-2 bg-gray-900/50 rounded border border-gray-700'>
-          <div className='text-xs text-gray-400 mb-1'>
-            Trading balance — {settlementMode === 'coin' ? selectedSettlement : settlementMode === 'usd' ? 'USD' : 'USDC'}:
+        {/* Trading Balance Display - Only for non-coin modes since coin mode handles it above */}
+        {settlementMode !== 'coin' && (
+          <div className='mb-4 p-2 bg-gray-900/50 rounded border border-gray-700'>
+            <div className='text-xs text-gray-400 mb-1'>
+              Trading balance — {settlementMode === 'usd' ? 'USD' : settlementAsset}:
+            </div>
+            <div className='text-sm font-mono text-white'>
+              {settlementMode === 'usd' ? '$12,450.00' : 
+               settlementMode === 'usdc' && settlementAsset === 'USDC' ? '12,450.00 USDC' :
+               settlementMode === 'usdc' && settlementAsset === 'USDT' ? '8,250.00 USDT' : 
+               '12,450.00 USDC'}
+            </div>
           </div>
-          <div className='text-sm font-mono text-white'>
-            {settlementMode === 'usd' ? '$12,450.00' : 
-             settlementMode === 'usdc' ? '12,450.00 USDC' : 
-             selectedSettlement === 'PAXG' ? '24.5 PAXG' : 
-             selectedSettlement === 'BTC' ? '0.185 BTC' : '5.2 ETH'}
-          </div>
-        </div>
+        )}
 
         {/* Order Type Selection */}
         <div className='grid grid-cols-3 gap-1 bg-gray-900 rounded-md p-1 mb-4'>
