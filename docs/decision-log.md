@@ -8,6 +8,18 @@
 - **Performance SLOs**: Table render optimizations, response normalization under 150ms p95, no blocking reflows on tab switches
 - **Test Coverage**: RTL test stubs for Markets adapter, feature flag behavior, SSE connection management, and performance characteristics
 
+## Spending Wiring v1 - 2025-09-14
+
+- **Spending API Adapter**: Created `SpendingAdapter` class with transactions, budgets, tags CRUD, CSV export, and DCA rules management via alias endpoints
+- **Feature Flag Integration**: Added `spending.v1` flag (default: true) with fallback UI when disabled
+- **MySpending Page Wiring**: Connected to live transaction API with month filtering, real-time tag management, budget read/write operations, CSV export with UTF-8 BOM for Excel compatibility, and DCA rule synchronization
+- **DCA Integration**: Rule creation/management via `/api/dca/rules` with X-Idempotency-Key headers; schedule summary display (monthly execution at 10:00 ET)
+- **OpenAPI Contract Compliance**: Response shape normalization, type guards for API responses, graceful handling of both standard and legacy response formats
+- **Performance SLOs**: Optimistic UI updates, efficient transaction filtering, CSV export with proper MIME types
+- **Test Coverage**: RTL test stubs for Spending adapter, transaction ledger, tags CRUD, budget operations, CSV export, and DCA rule management
+
+_Merge note: unified via PR #59 (Markets) and PR #60 (Spending)._ 
+
 ## Step-37 (Nav+Print Finalization) - 2025-09-13
 
 - **Navigation unification**: Resolved PR #55 residue and ensured canonical Navigation component is used site-wide; removed conflicting page-local headers
