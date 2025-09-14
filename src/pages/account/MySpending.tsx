@@ -18,6 +18,8 @@ import {
   ResponsiveContainer,
   LineChart,
   Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -71,7 +73,10 @@ const MySpending = () => {
   const [dcaTimeframe, setDcaTimeframe] = useState('Month');
   const [dcaAsset, setDcaAsset] = useState('Gold');
   const [dcaSourceAccount, setDcaSourceAccount] = useState('Funding');
+  const [dcaAmount, setDcaAmount] = useState(100);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
+  const [showTagInput, setShowTagInput] = useState<{[key: string]: boolean}>({});
+  const [newTag, setNewTag] = useState('');
   const itemsPerPage = 20;
 
   // Mock spending data
@@ -92,13 +97,51 @@ const MySpending = () => {
     { name: 'Other', amount: 360.08, color: '#6B7280', icon: DollarSign, budget: 500, recurring: false },
   ];
 
+  // Data for different trend views
+  const dailyTrend = Array.from({ length: 30 }, (_, i) => ({
+    day: i + 1,
+    amount: Math.floor(Math.random() * 200) + 100 // Random daily amounts
+  }));
+
   const monthlyTrend = [
-    { month: 'Jan', amount: 3890 },
-    { month: 'Feb', amount: 4120 },
-    { month: 'Mar', amount: 3950 },
-    { month: 'Apr', amount: 4340 },
-    { month: 'May', amount: 4267 },
+    { month: 'Jul', amount: 3654 },
+    { month: 'Aug', amount: 3890 },
+    { month: 'Sep', amount: 4120 },
+    { month: 'Oct', amount: 3950 },
+    { month: 'Nov', amount: 4340 },
+    { month: 'Dec', amount: 4267 },
+    { month: 'Jan', amount: 4156 },
+    { month: 'Feb', amount: 3987 },
+    { month: 'Mar', amount: 4298 },
+    { month: 'Apr', amount: 4089 },
+    { month: 'May', amount: 4178 },
+    { month: 'Jun', amount: 4267 },
   ];
+
+  const yearlyTrend = [
+    { year: '2020', amount: 42680 },
+    { year: '2021', amount: 45230 },
+    { year: '2022', amount: 48950 },
+    { year: '2023', amount: 51240 },
+    { year: '2024', amount: 49870 },
+  ];
+
+  // Get current trend data based on timeframe
+  const getCurrentTrendData = () => {
+    switch (trendTimeframe) {
+      case 'Day': return dailyTrend;
+      case 'Year': return yearlyTrend;
+      default: return monthlyTrend;
+    }
+  };
+
+  const getCurrentDataKey = () => {
+    switch (trendTimeframe) {
+      case 'Day': return 'day';
+      case 'Year': return 'year';
+      default: return 'month';
+    }
+  };
 
   // Mock transaction data
   const mockTransactions = [
@@ -431,14 +474,20 @@ const MySpending = () => {
                 <div className='flex items-center justify-between'>
                   <CardTitle className='text-foreground'>Monthly Trend</CardTitle>
                 </div>
-                <div className='flex gap-1 mt-2 overflow-x-auto'>
+                  <div className='flex gap-1 mt-2 overflow-x-auto'>
                   {['Day', 'Month', 'Year'].map((period) => (
                     <Button
                       key={period}
                       variant={trendTimeframe === period ? 'default' : 'ghost'}
                       size='sm'
                       className='text-xs h-6 px-3 flex-shrink-0'
-                      onClick={() => setTrendTimeframe(period)}
+                      onClick={() => {
+                        setTrendTimeframe(period);
+                        // Sync the savings gauge timeframe (only Month/Year for gauge)
+                        if (period === 'Month' || period === 'Year') {
+                          // No additional action needed as the gauge already syncs
+                        }
+                      }}
                     >
                       {period}
                     </Button>
@@ -448,10 +497,21 @@ const MySpending = () => {
               <CardContent>
                 <div className='h-96 mb-4'>
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={monthlyTrend}>
+                    <BarChart data={getCurrentTrendData()}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
-                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <XAxis 
+                        dataKey={getCurrentDataKey()} 
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        tickLine={false}
+                        interval={trendTimeframe === 'Day' ? 4 : 0}
+                      />
+                      <YAxis 
+                        stroke="hsl(var(--muted-foreground))" 
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                      />
                       <Tooltip
                         formatter={(value: number) => [`$${value.toLocaleString()}`, 'Spent']}
                         labelStyle={{ color: 'hsl(var(--foreground))' }}
@@ -461,21 +521,19 @@ const MySpending = () => {
                           borderRadius: '6px'
                         }}
                       />
-                      <Line 
-                        type="monotone" 
+                      <Bar 
                         dataKey="amount" 
-                        stroke="hsl(var(--primary))" 
-                        strokeWidth={3}
-                        dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
-                        activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
-                        animationDuration={1000}
+                        fill="hsl(var(--primary))" 
+                        radius={[4, 4, 0, 0]}
+                        animationDuration={800}
                       />
-                    </LineChart>
+                    </BarChart>
                   </ResponsiveContainer>
                 </div>
                 
                 <div className='text-sm text-muted-foreground text-center'>
-                  Average: ${(monthlyTrend.reduce((acc, month) => acc + month.amount, 0) / monthlyTrend.length).toLocaleString()}
+                  Average: ${(getCurrentTrendData().reduce((acc: number, item: any) => acc + item.amount, 0) / getCurrentTrendData().length).toLocaleString()}
+                  {trendTimeframe === 'Day' && <span className='block text-xs mt-1'>January 2024</span>}
                 </div>
               </CardContent>
             </Card>
@@ -494,7 +552,7 @@ const MySpending = () => {
                   </CardTitle>
                   <div className='flex items-center gap-2'>
                     <Button 
-                      variant={trendTimeframe === 'Month' ? 'default' : 'outline'} 
+                      variant={trendTimeframe === 'Month' || trendTimeframe === 'Day' ? 'default' : 'outline'} 
                       size='sm'
                       onClick={() => setTrendTimeframe('Month')}
                       className='text-xs'
@@ -606,50 +664,78 @@ const MySpending = () => {
                   </div>
                 </div>
                 
-                {/* DCA Configuration */}
-                <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
-                  <div className='flex items-center space-x-2'>
-                    <span className='text-sm text-foreground'>Amount per</span>
-                    <div className='flex space-x-1'>
-                      {['Day', 'Month', 'Year'].map((timeframe) => (
-                        <Button
-                          key={timeframe}
-                          variant={dcaTimeframe === timeframe ? 'default' : 'outline'}
-                          size='sm'
-                          onClick={() => setDcaTimeframe(timeframe)}
-                          className='text-xs px-2'
-                        >
-                          {timeframe}
-                        </Button>
-                      ))}
-                    </div>
-                    <Input
-                      type='number'
-                      placeholder='100'
-                      className='w-20'
-                      defaultValue='100'
-                    />
-                  </div>
-                  
+                {/* DCA Configuration Form */}
+                <div className='space-y-4'>
+                  {/* Amount per section with label above */}
                   <div>
-                    <Select value={dcaAsset} onValueChange={setDcaAsset}>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select asset' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value='Gold'>Gold</SelectItem>
-                        <SelectItem value='Silver'>Silver</SelectItem>
-                        <SelectItem value='BTC'>BTC</SelectItem>
-                        <SelectItem value='ETH'>ETH</SelectItem>
-                        <SelectItem value='Platinum'>Platinum</SelectItem>
-                        <SelectItem value='Palladium'>Palladium</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <label className='text-sm font-medium text-foreground block mb-2'>Amount per</label>
+                    <div className='flex items-center gap-3 flex-wrap'>
+                      <div className='flex gap-1'>
+                        {['Day', 'Month'].map((timeframe) => (
+                          <Button
+                            key={timeframe}
+                            variant={dcaTimeframe === timeframe ? 'default' : 'outline'}
+                            size='sm'
+                            onClick={() => setDcaTimeframe(timeframe)}
+                            className='text-xs px-3'
+                          >
+                            {timeframe}
+                          </Button>
+                        ))}
+                      </div>
+                      <p className='text-xs text-muted-foreground'>
+                        Executes at beginning of selected period.
+                      </p>
+                    </div>
                   </div>
-                  
-                  <Button className='w-full'>
-                    Save monthly rule
-                  </Button>
+
+                  {/* Form fields row */}
+                  <div className='grid grid-cols-1 sm:grid-cols-4 gap-3 items-end'>
+                    <div>
+                      <label className='text-sm font-medium text-foreground block mb-2'>Amount</label>
+                      <Input
+                        type='number'
+                        placeholder='100'
+                        value={dcaAmount}
+                        onChange={(e) => setDcaAmount(Number(e.target.value))}
+                        className='min-w-20'
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className='text-sm font-medium text-foreground block mb-2'>Choose asset</label>
+                      <Select value={dcaAsset} onValueChange={setDcaAsset}>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select asset' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value='Gold'>Gold</SelectItem>
+                          <SelectItem value='Silver'>Silver</SelectItem>
+                          <SelectItem value='BTC'>BTC</SelectItem>
+                          <SelectItem value='ETH'>ETH</SelectItem>
+                          <SelectItem value='Platinum'>Platinum</SelectItem>
+                          <SelectItem value='Palladium'>Palladium</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className='text-sm font-medium text-foreground block mb-2'>From account</label>
+                      <Select value={dcaSourceAccount} onValueChange={setDcaSourceAccount}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value='Funding'>Funding</SelectItem>
+                          <SelectItem value='Trading'>Trading</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <Button className='w-full sm:w-auto'>
+                      Save monthly rule
+                    </Button>
+                  </div>
                 </div>
                 
                 {/* Rules List */}
@@ -862,7 +948,7 @@ const MySpending = () => {
                               </Select>
                             </TableCell>
                             <TableCell>
-                              <div className='flex gap-1 flex-wrap'>
+                              <div className='flex gap-1 flex-wrap items-center'>
                                 {transaction.tags.map((tag) => (
                                   <Badge key={tag} variant='secondary' className='text-xs'>
                                     {tag}
@@ -873,6 +959,77 @@ const MySpending = () => {
                                     <Repeat className='w-3 h-3 mr-1' />
                                     Recurring
                                   </Badge>
+                                )}
+                                
+                                {/* Add Tag functionality */}
+                                {transaction.tags.length === 0 ? (
+                                  <Button
+                                    variant='ghost'
+                                    size='sm'
+                                    className='text-xs h-6 px-2 text-muted-foreground'
+                                    onClick={() => setShowTagInput({
+                                      ...showTagInput,
+                                      [transaction.id]: true
+                                    })}
+                                  >
+                                    + Add tag
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    variant='outline'
+                                    size='sm'
+                                    className='text-xs h-6 w-6 p-0'
+                                    onClick={() => setShowTagInput({
+                                      ...showTagInput,
+                                      [transaction.id]: true
+                                    })}
+                                  >
+                                    +
+                                  </Button>
+                                )}
+
+                                {/* Inline tag input */}
+                                {showTagInput[transaction.id] && (
+                                  <div className='flex items-center gap-1 ml-2'>
+                                    <Input
+                                      placeholder='Tag name'
+                                      className='h-6 w-20 text-xs'
+                                      value={newTag}
+                                      onChange={(e) => setNewTag(e.target.value)}
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && newTag.trim()) {
+                                          // In real app, this would add the tag
+                                          console.log(`Adding tag "${newTag}" to transaction ${transaction.id}`);
+                                          setNewTag('');
+                                          setShowTagInput({
+                                            ...showTagInput,
+                                            [transaction.id]: false
+                                          });
+                                        } else if (e.key === 'Escape') {
+                                          setShowTagInput({
+                                            ...showTagInput,
+                                            [transaction.id]: false
+                                          });
+                                          setNewTag('');
+                                        }
+                                      }}
+                                      autoFocus
+                                    />
+                                    <Button
+                                      variant='ghost'
+                                      size='sm'
+                                      className='h-6 w-6 p-0'
+                                      onClick={() => {
+                                        setShowTagInput({
+                                          ...showTagInput,
+                                          [transaction.id]: false
+                                        });
+                                        setNewTag('');
+                                      }}
+                                    >
+                                      <X className='w-3 h-3' />
+                                    </Button>
+                                  </div>
                                 )}
                               </div>
                             </TableCell>
