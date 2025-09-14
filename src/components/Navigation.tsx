@@ -254,52 +254,52 @@ const Navigation = () => {
       items: [
         {
           label: 'Balances & Funding',
-          href: '/account',
-          description: 'Balances, deposit, funding options',
+          href: '/balances',
+          description: 'Overview, deposit, withdraw',
         },
         {
           label: 'My Assets',
           href: '/my-assets',
-          description: 'Buy, Sell, Realize; Send/Receive, Spend, Transfer',
+          description: 'Portfolio overview & holdings',
         },
         {
           label: 'My Spending',
           href: '/my-spending',
-          description: 'Track expenses, categories, and savings goals',
+          description: 'Spending analysis & budgets',
         },
         {
           label: 'Transaction History',
-          href: '/transaction-history',
-          description: 'All transactions',
+          href: '/transactions',
+          description: 'All account transfers',
         },
         {
           label: 'Order History',
-          href: '/order-history',
-          description: 'Trading activity',
+          href: '/orders',
+          description: 'Trades & executions',
         },
         {
           label: 'PnL',
           href: '/pnl',
-          description: 'Profit & loss analytics',
+          description: 'Profit and loss',
         },
         {
           label: 'Connect Wallet',
-          href: '/wallet',
-          description: 'External wallets',
+          href: '/connect-wallet',
+          description: 'Link external wallets',
         },
         {
-          label: 'Security (Placeholder)',
-          href: '/support/security',
-          description: '2FA & sessions',
+          label: 'Settings & Profile',
+          href: '/settings',
+          description: 'Preferences and KYC',
         },
         {
-          label: 'Settings & Profile (Placeholder)',
-          href: '/account',
-          description: 'Preferences & KYC',
+          label: 'Security',
+          href: '/security',
+          description: '2FA, sessions, passkeys',
         },
         {
-          label: 'Support (Placeholder)',
-          href: '/support/help-center',
+          label: 'Support',
+          href: '/support',
           description: 'Help center',
         },
       ],
@@ -310,11 +310,8 @@ const Navigation = () => {
     if (typeof item === 'object' && item?.onClick) {
       item.onClick();
     } else if (typeof item === 'object' && item?.href) {
-      // For logged-out users clicking My Account items, open auth modal if needed
-      if (!user && menu.label === 'My Account') {
-        setAuthModalOpen(true);
-        return;
-      }
+      // Navigate to the intended page - auth modal will overlay if needed
+      // Remove signup redirect behavior
       navigate(item.href);
     } else if (menu.href) {
       navigate(menu.href);
@@ -511,33 +508,33 @@ const Navigation = () => {
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => navigate('/account')}
+                  onClick={() => navigate('/balances')}
                   className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
                 >
                   <UserCheck className='mr-2 h-4 w-4' />
                   <div>
                     <div className='font-medium'>Balances & Funding</div>
-                    <div className='text-xs text-gray-400'>Balances, deposit, funding options</div>
+                    <div className='text-xs text-gray-400'>Overview, deposit, withdraw</div>
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => navigate('/transaction-history')}
+                  onClick={() => navigate('/transactions')}
                   className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
                 >
                   <History className='mr-2 h-4 w-4' />
                   <div>
                     <div className='font-medium'>Transaction History</div>
-                    <div className='text-xs text-gray-400'>All transactions</div>
+                    <div className='text-xs text-gray-400'>All account transfers</div>
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => navigate('/order-history')}
+                  onClick={() => navigate('/orders')}
                   className='cursor-pointer hover:bg-gray-800 focus:bg-gray-800'
                 >
                   <Receipt className='mr-2 h-4 w-4' />
                   <div>
                     <div className='font-medium'>Order History</div>
-                    <div className='text-xs text-gray-400'>Trading activity</div>
+                    <div className='text-xs text-gray-400'>Trades & executions</div>
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem

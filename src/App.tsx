@@ -15,7 +15,6 @@ import FxTrading from './pages/FxTrading';
 import Franchise from './pages/Franchise';
 import Education from './pages/Education';
 import MyAssets from './pages/MyAssets';
-import MySpending from './pages/MySpending';
 import TransactionHistory from './pages/TransactionHistory';
 import OrderHistory from './pages/OrderHistory';
 import TitledAsset from './pages/TitledAsset';
@@ -45,14 +44,15 @@ import QuickBuy from './pages/buy/QuickBuy';
 import BuyWithCard from './pages/buy/BuyWithCard';
 import Convert from './pages/Convert';
 import Deposit from './pages/Deposit';
-import Overview from './pages/account/Overview';
-import MySpending from './pages/account/MySpending';
-import Transactions from './pages/account/Transactions';
-import Orders from './pages/account/Orders';
+// Account pages - using canonical imports
+import BalancesOverview from './pages/account/Overview';
+import AccountMySpending from './pages/account/MySpending';
+import AccountTransactions from './pages/account/Transactions';
+import AccountOrders from './pages/account/Orders';
 import ConnectWallet from './pages/account/ConnectWallet';
-import Settings from './pages/account/Settings';
-import Security from './pages/account/Security';
-import Support from './pages/account/Support';
+import AccountSettings from './pages/account/Settings';
+import AccountSecurity from './pages/account/Security';
+import AccountSupport from './pages/account/Support';
 import Balances from './pages/Balances';
 import SpotUSD from './pages/trading/SpotUSD';
 import SpotUSDC from './pages/trading/SpotUSDC';
@@ -68,7 +68,7 @@ import RequestPayment from './pages/pay/RequestPayment';
 import RecurringTransfers from './pages/send/Recurring';
 import DCA from './pages/trade/DCA';
 import HelpCenter from './pages/support/HelpCenter';
-import Security from './pages/support/Security';
+import SupportSecurity from './pages/support/Security';
 import Compliance from './pages/support/Compliance';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import TermsOfService from './pages/legal/TermsOfService';
@@ -136,12 +136,9 @@ const App = () => (
             <Route path='/franchise' element={<Franchise />} />
             <Route path='/education' element={<Education />} />
             <Route path='/my-assets' element={<MyAssets />} />
-            <Route path='/my-spending' element={<MySpending />} />
-            <Route
-              path='/transaction-history'
-              element={<TransactionHistory />}
-            />
-            <Route path='/order-history' element={<OrderHistory />} />
+            {/* Legacy routes - redirects to canonical paths */}
+            <Route path='/transaction-history' element={<Navigate to='/transactions' replace />} />
+            <Route path='/order-history' element={<Navigate to='/orders' replace />} />
             <Route path='/titled-asset/:address' element={<TitledAsset />} />
             <Route path='/realize' element={<Realize />} />
             <Route path='/pnl' element={<PnL />} />
@@ -170,15 +167,17 @@ const App = () => (
             <Route path='/buy/card' element={<BuyWithCard />} />
             <Route path='/convert' element={<Convert />} />
             <Route path='/deposit' element={<Deposit />} />
-            <Route path='/balances' element={<Overview />} />
+            {/* My Account Routes - Canonical */}
+            <Route path='/balances' element={<BalancesOverview />} />
             <Route path='/my-assets' element={<MyAssets />} />
-            <Route path='/my-spending' element={<MySpending />} />
-            <Route path='/transactions' element={<Transactions />} />
-            <Route path='/orders' element={<Orders />} />
+            <Route path='/my-spending' element={<AccountMySpending />} />
+            <Route path='/transactions' element={<AccountTransactions />} />
+            <Route path='/orders' element={<AccountOrders />} />
+            <Route path='/pnl' element={<PnL />} />
             <Route path='/connect-wallet' element={<ConnectWallet />} />
-            <Route path='/settings' element={<Settings />} />
-            <Route path='/security' element={<Security />} />
-            <Route path='/support' element={<Support />} />
+            <Route path='/settings' element={<AccountSettings />} />
+            <Route path='/security' element={<AccountSecurity />} />
+            <Route path='/support' element={<AccountSupport />} />
             
             {/* Trading Routes */}
             <Route path='/trading/spot-usd' element={<SpotUSD />} />
@@ -206,7 +205,7 @@ const App = () => (
             <Route path='/send/recurring' element={<RecurringTransfers />} />
             <Route path='/trade/dca' element={<DCA />} />
             <Route path='/support/help-center' element={<HelpCenter />} />
-            <Route path='/support/security' element={<Security />} />
+            <Route path='/support/security' element={<SupportSecurity />} />
             <Route path='/support/compliance' element={<Compliance />} />
             <Route path='/legal' element={<LegalList />} />
             <Route path='/legal/privacy' element={<PrivacyHub />} />
