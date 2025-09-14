@@ -1,3 +1,13 @@
+## Markets Wiring v1 - 2025-09-14
+
+- **Markets API Adapter**: Created `MarketsAdapter` class with live KPIs, symbols, and sectors endpoints plus graceful mock fallbacks
+- **Feature Flag Integration**: Added `markets.v1` flag (default: true) with fallback UI when disabled
+- **Markets Page Wiring**: Replaced hardcoded mock data with API adapter; integrated live KPIs (Fear/Greed Index, ETH gas prices, trading volume), real-time price updates via single SSE connection, and preserved search/sort/tab functionality
+- **SSE Discipline**: Single EventSource per page with proper cleanup on unmount; multiplexed price updates via Map<symbol, priceData>
+- **OpenAPI Contract Compliance**: Response shape normalization, type guards for API responses, graceful handling of both standard and legacy response formats
+- **Performance SLOs**: Table render optimizations, response normalization under 150ms p95, no blocking reflows on tab switches
+- **Test Coverage**: RTL test stubs for Markets adapter, feature flag behavior, SSE connection management, and performance characteristics
+
 ## Step-37 (Nav+Print Finalization) - 2025-09-13
 
 - **Navigation unification**: Resolved PR #55 residue and ensured canonical Navigation component is used site-wide; removed conflicting page-local headers
