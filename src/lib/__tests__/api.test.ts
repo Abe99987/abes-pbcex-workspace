@@ -106,13 +106,19 @@ describe('SpendingAdapter', () => {
     expect(typeof tx[0].date).toBe('string');
   });
 
-  it('exportCsv returns CSV with UTF-8 BOM', async () => {
-    const blob = await spendingAdapter.exportCsv({ month: '2024-01' });
-    expect(blob).toBeInstanceOf(Blob);
-    expect(blob.type).toBe('text/csv;charset=utf-8');
+  it('exportCsv returns CSV with UTF-8 BOM (mock path)', async () => {
+    const original = FEATURE_FLAGS['spending.v1'];
+    (FEATURE_FLAGS as any)['spending.v1'] = false;
+    try {
+      const blob = await spendingAdapter.exportCsv({ month: '2024-01' });
+      expect(blob).toBeInstanceOf(Blob);
+      expect(blob.type).toBe('text/csv;charset=utf-8');
 
-    const text = await blob.text();
-    expect(text.charCodeAt(0)).toBe(0xfeff); // BOM
+      const text = await blob.text();
+      expect(text.charCodeAt(0)).toBe(0xfeff); // BOM
+    } finally {
+      (FEATURE_FLAGS as any)['spending.v1'] = original;
+    }
   });
 
   it('createRule includes idempotency key and returns created rule', async () => {

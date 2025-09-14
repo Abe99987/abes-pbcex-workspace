@@ -9,6 +9,25 @@ import { FEATURE_FLAGS } from '@/config/features';
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
+// Fetch helper with timeout to avoid hanging requests
+async function fetchWithTimeout(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+  ms = 10000
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), ms);
+  try {
+    const response = await fetch(input, {
+      ...(init || {}),
+      signal: controller.signal,
+    });
+    return response;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // Common types - aligned with OpenAPI spec
 export interface ApiResponse<T> {
   code: 'SUCCESS' | 'ERROR' | 'VALIDATION_ERROR' | 'NOT_FOUND';
@@ -420,7 +439,7 @@ export class SpendingAdapter {
       if (filters.month) params.append('month', filters.month);
       if (filters.category) params.append('category', filters.category);
       if (filters.merchant) params.append('merchant', filters.merchant);
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `${this.baseUrl}/spending/transactions?${params}`,
         {
           headers: {
@@ -448,7 +467,7 @@ export class SpendingAdapter {
     if (!FEATURE_FLAGS['spending.v1'])
       return ['electronics', 'coffee', 'groceries', 'gas', 'subscription'];
     try {
-      const response = await fetch(`${this.baseUrl}/spending/tags`);
+      const response = await fetchWithTimeout(`${this.baseUrl}/spending/tags`);
       const result = await response.json();
       return result.data;
     } catch (e) {
@@ -460,7 +479,7 @@ export class SpendingAdapter {
   async addTag(transactionId: string, tag: string): Promise<void> {
     if (!FEATURE_FLAGS['spending.v1']) return;
     try {
-      await fetch(
+      await fetchWithTimeout(
         `${this.baseUrl}/spending/transactions/${transactionId}/tags`,
         {
           method: 'POST',
@@ -476,12 +495,15 @@ export class SpendingAdapter {
   async getBudgets(): Promise<Budget[]> {
     if (!FEATURE_FLAGS['spending.v1']) return this.getMockBudgets();
     try {
-      const response = await fetch(`${this.baseUrl}/spending/budgets`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      });
+      const response = await fetchWithTimeout(
+        `${this.baseUrl}/spending/budgets`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        }
+      );
       if (!response.ok)
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       const result = await response.json();
@@ -500,7 +522,7 @@ export class SpendingAdapter {
   async saveBudget(categoryId: string, monthlyLimit: number): Promise<void> {
     if (!FEATURE_FLAGS['spending.v1']) return;
     try {
-      await fetch(`${this.baseUrl}/spending/budgets`, {
+      await fetchWithTimeout(`${this.baseUrl}/spending/budgets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ categoryId, monthlyLimit }),
@@ -519,7 +541,7 @@ export class SpendingAdapter {
     try {
       const params = new URLSearchParams();
       if (filters.month) params.append('month', filters.month);
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `${this.baseUrl}/spending/export/csv?${params}`
       );
       return await response.blob();
@@ -532,12 +554,15 @@ export class SpendingAdapter {
   async getRules(): Promise<DCARule[]> {
     if (!FEATURE_FLAGS['spending.v1']) return this.getMockDCARules();
     try {
-      const response = await fetch(`${this.baseUrl}/spending/rules`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      });
+      const response = await fetchWithTimeout(
+        `${this.baseUrl}/spending/rules`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        }
+      );
       if (!response.ok)
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       const result = await response.json();
@@ -557,7 +582,7 @@ export class SpendingAdapter {
     if (!FEATURE_FLAGS['spending.v1'])
       return { ...rule, id: `mock_${Date.now()}` } as DCARule;
     try {
-      const response = await fetch(`${this.baseUrl}/dca/rules`, {
+      const response = await fetchWithTimeout(`${this.baseUrl}/dca/rules`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
