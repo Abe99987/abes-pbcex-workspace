@@ -34,6 +34,7 @@ _Merge note: unified via PR #59 (Markets) and PR #60 (Spending)._
 - Node 20.x enforcement added: .nvmrc files, engine-strict, preinstall guard to prevent lockfile drift
 - Node 20 enforced; stash triage closed; repo clean at b6a0eba
 - Trade v1 staging smoke: blocked (no resolvable frontend URL, see operator log)
+- Session closeout: handoffs created (HANDSHAKE-DELTA + ENGINEERING HANDOFF) at SHA 8018f98
 - TradeAdapter added in `src/lib/api.ts` with:
   - `getBalances()` reading `/api/wallet/balances` (trading account) with mock fallback
   - `streamPrices(pair)` via single SSE multiplexor to `/markets/stream` (one EventSource)

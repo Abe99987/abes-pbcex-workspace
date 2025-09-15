@@ -1,0 +1,33 @@
+HANDSHAKE-DELTA — Next-Chat Starter
+
+📍 ANCHOR
+Repo: github.com/Abe99987/abes-pbcex-workspace  
+Branch: main@8018f98 "Merge origin/main - sync staging smoke PR #65"
+Environment: Local dev operational, Staging frontend blocked (DNS)
+Models: claude-4-sonnet (implement), claude-4.1-opus (recovery)
+
+📋 SESSION DELTA  
+Files: src/*, e2e/*, docs/*, .nvmrc, .npmrc, scripts/
+PRs: #62 (smoke tests), #63 (docs recovery), #64 (Node enforcement), #65 (staging block)
+Flags: trading.v1=ON, dca.enabled=ON, markets.v1=ON, spending.v1=ON
+
+🎯 OUTCOMES
+✅ Trade v1 smoke tests stabilized (SSE + idempotency verified)
+✅ Node 20.x enforcement active (prevents lockfile drift)  
+✅ Safety stash triage complete (737 files cleaned)
+❌ Staging smoke blocked (no frontend URL)
+
+⚠️ TOP RISKS
+1. Staging deployment missing: No STAGING_WEB_BASE_URL configured
+2. Node version drift: Local Node 24.x vs repo Node 20.x
+3. SSE performance: Single connection per page needs monitoring
+
+🔄 DO-FIRST NEXT SESSION
+1. Configure STAGING_WEB_BASE_URL + run Trade v1 staging smoke
+2. PaxG integration kickoff (legal compliance + price feeds)  
+3. TradingView parity checks (chart data + SSE alignment)
+
+📎 LINKS
+- Trade smoke: e2e/tests/trading-smoke.e2e.spec.ts
+- Evidence: docs/evidence/local/, docs/evidence/staging/
+- Configs: .nvmrc, .npmrc, scripts/check-node-20.js
