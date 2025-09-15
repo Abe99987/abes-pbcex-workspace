@@ -44,6 +44,24 @@ Fixes Applied:
 - Targeted specific button text ("Buy GOLD") to avoid navigation conflicts
 - Simplified min notional validation to focus on key functionality
 
+### Post-Merge Verification (2025-09-15 01:20)
+
+- **PR #62 Merged**: SHA 5b511c4 "test(e2e): stabilize Trade v1 smoke; verify single SSE + idempotency (#62)"
+- **Environment**: Local testing (staging blocked - no STAGING_WEB_BASE_URL)
+- **Base URL**: http://localhost:8080
+- **Command**: `CI=1 BASE_URL=http://localhost:8080 npx playwright test --project=chromium tests/trading-smoke.e2e.spec.ts --reporter=line`
+- **Result**: ✅ **SUCCESS** - All 3 tests passed in 4.2s
+
+Post-Merge Test Results:
+
+- ✅ /trading/spot-usd: USD settle-in, balances visible, SSE single connection, X-Idempotency-Key verified
+- ✅ /trading/spot-usdc: USDC/USDT toggles visible, "Settling in" banner present
+- ✅ /trading/coin: Settle-in dropdown present and functional
+- ✅ SSE: Exactly 1 EventSource connection per page, closes on route change
+- ✅ Orders: X-Idempotency-Key header present on order submission
+
+Evidence: docs/evidence/post-merge/smoke-success.log
+
 Staging smoke checklist (pending staging URL):
 
 - [ ] /trading/spot-usd — USD settle-in locked, min notional $5 blocks submit, balances line visible
