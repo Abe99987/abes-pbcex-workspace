@@ -3,6 +3,7 @@
 ## 🚀 Quick Start Commands
 
 ### **🆕 First Time Setup**
+
 ```bash
 # Complete one-shot setup (recommended for new developers)
 npm run first-run
@@ -15,6 +16,7 @@ npm run first-run
 ```
 
 ### **🔄 Daily Development**
+
 ```bash
 # Quick start for existing setup
 npm run dev:all
@@ -25,11 +27,24 @@ npm run dev:all
 # 3. Concurrent dev servers
 ```
 
+### 🧭 Quick Verify & Recovery
+
+```bash
+# Where am I and what is running?
+pwd
+git branch --show-current
+docker compose ps
+
+# If the shell looks stuck (e.g., shows `quote>` or pastes acted weird)
+printf '\n'; stty sane
+```
+
 ---
 
 ## 🔧 Environment Management
 
 ### **🚀 Environment Bootstrap**
+
 ```bash
 # Set up environment files from templates
 npm run setup:env
@@ -41,6 +56,7 @@ npm run setup:env
 ```
 
 ### **🔐 Secrets Generation**
+
 ```bash
 # Generate secure secrets for development
 npm run secrets:set
@@ -52,6 +68,7 @@ npm run secrets:set
 ```
 
 ### **🩺 Environment Validation**
+
 ```bash
 # Standard environment validation
 npm run env:doctor
@@ -70,6 +87,7 @@ npm run env:doctor:strict
 ## 🐳 Infrastructure Management
 
 ### **🚀 Docker Services**
+
 ```bash
 # Start all services
 docker compose up -d
@@ -88,6 +106,7 @@ docker compose restart [service-name]
 ```
 
 ### **🔍 Preflight Checks**
+
 ```bash
 # Validate system connectivity
 npm run preflight
@@ -103,6 +122,7 @@ npm run preflight
 ## 🌱 Development Data
 
 ### **🌱 Data Seeding**
+
 ```bash
 # Seed development database
 npm run dev:seed
@@ -115,6 +135,7 @@ npm run dev:seed
 ```
 
 ### **🗄️ Database Management**
+
 ```bash
 # Run migrations (when implemented)
 npm run migrate
@@ -131,6 +152,7 @@ npm run seed
 ## 🧪 Testing Commands
 
 ### **🔬 Unit Tests**
+
 ```bash
 # Run all unit tests
 npm run test
@@ -148,6 +170,7 @@ npm run test:api           # API tests only
 ```
 
 ### **🔌 Integration Tests**
+
 ```bash
 # Run API integration tests
 npm run test:api
@@ -160,6 +183,7 @@ npm run test -- tests/integration/auth.api.test.ts
 ```
 
 ### **🌐 End-to-End Tests**
+
 ```bash
 # Run all E2E tests
 npm run e2e
@@ -172,6 +196,7 @@ npm run e2e -- auth.e2e.spec.ts
 ```
 
 ### **📊 Contract Tests**
+
 ```bash
 # Run contract tests (disabled by default)
 npm run test:contract
@@ -184,6 +209,7 @@ npm run validate:openapi
 ```
 
 ### **⚡ Load Tests**
+
 ```bash
 # Run k6 load tests
 npm run loadtest
@@ -198,6 +224,7 @@ k6 run loadtests/k6/scenarios/price_polling.js
 ## 🚀 Development Servers
 
 ### **🔧 Backend Development**
+
 ```bash
 # Start backend dev server
 cd backend && npm run dev
@@ -209,6 +236,7 @@ cd backend && npm run dev
 ```
 
 ### **🌐 Frontend Development**
+
 ```bash
 # Start frontend dev server
 cd frontend && npm run dev
@@ -220,6 +248,7 @@ cd frontend && npm run dev
 ```
 
 ### **🔄 Concurrent Development**
+
 ```bash
 # Start both servers concurrently
 npm run dev:all
@@ -230,11 +259,17 @@ npm run dev:all
 # - Graceful shutdown on Ctrl+C
 ```
 
+#### ℹ️ Notes
+
+- If you try `npm --workspace backend run dev` or `npm --workspace frontend run dev` and see **“No workspaces found”**, this repo expects the **`cd <app> && npm run dev`** form shown above.
+- Frontend dev port is typically **http://localhost:3000** (Next.js). If you start a root-level Vite template, you may see **http://localhost:8080** instead—follow the URL printed in your terminal.
+
 ---
 
 ## 🧹 Code Quality
 
 ### **🔍 Linting**
+
 ```bash
 # Lint all code
 npm run lint
@@ -248,6 +283,7 @@ npm run lint -- frontend/src
 ```
 
 ### **🔒 Security Audit**
+
 ```bash
 # Run security audit
 npm run audit
@@ -264,6 +300,7 @@ npm audit fix --force
 ## 📦 Build & Deployment
 
 ### **🏗️ Building**
+
 ```bash
 # Build backend
 cd backend && npm run build
@@ -276,6 +313,7 @@ npm run build:dev
 ```
 
 ### **🚀 Starting Production**
+
 ```bash
 # Start production backend
 cd backend && npm start
@@ -289,6 +327,7 @@ cd frontend && npm start
 ## 🛠️ Tooling & Utilities
 
 ### **📮 API Testing**
+
 ```bash
 # Show Postman collection paths
 npm run postman:open
@@ -303,6 +342,7 @@ npm run thunder:open
 ```
 
 ### **📄 Documentation**
+
 ```bash
 # Convert PDF to Markdown
 npm run pdf2md
@@ -318,6 +358,7 @@ npm run pdf2md
 ## 🔄 Phase-3 Feature Testing
 
 ### **🚩 Feature Flag Testing**
+
 ```bash
 # Test Phase-3 features (when enabled)
 npm run test:phase3
@@ -329,6 +370,7 @@ npm run test:phase3
 ```
 
 ### **🔧 Environment-Specific Testing**
+
 ```bash
 # Test with specific feature flags
 ENABLE_VAULT_REDEMPTION=true npm run test:phase3
@@ -341,6 +383,7 @@ PHASE=3 npm run test:phase3
 ## 🐛 Troubleshooting Commands
 
 ### **🔍 Debug Environment**
+
 ```bash
 # Check environment configuration
 npm run env:doctor:strict
@@ -353,6 +396,7 @@ docker compose ps
 ```
 
 ### **🔄 Reset Development Environment**
+
 ```bash
 # Stop all services
 docker compose down
@@ -365,6 +409,7 @@ npm run first-run
 ```
 
 ### **🧹 Clean Dependencies**
+
 ```bash
 # Clean node_modules
 rm -rf node_modules package-lock.json
@@ -380,6 +425,7 @@ cd frontend && rm -rf node_modules package-lock.json && npm install
 ## 📊 Monitoring & Logs
 
 ### **📝 View Logs**
+
 ```bash
 # View all service logs
 docker compose logs -f
@@ -397,6 +443,7 @@ cd frontend && npm run dev
 ```
 
 ### **📈 Performance Monitoring**
+
 ```bash
 # Run performance tests
 npm run loadtest
@@ -413,6 +460,7 @@ docker compose ps
 ## 🚀 Advanced Usage
 
 ### **🔧 Custom Environment Variables**
+
 ```bash
 # Override environment for specific commands
 NODE_ENV=staging npm run env:doctor
@@ -421,6 +469,7 @@ RUN_CONTRACT_TESTS=true npm run test:contract
 ```
 
 ### **🐳 Docker Compose Overrides**
+
 ```bash
 # Use custom compose file
 docker compose -f docker-compose.override.yml up -d
@@ -433,6 +482,7 @@ docker compose --profile development up -d
 ```
 
 ### **🧪 Test Environment Setup**
+
 ```bash
 # Set up test database
 npm run migrate:test
@@ -449,27 +499,32 @@ npm run test:cleanup
 ## 📚 Command Categories Summary
 
 ### **🚀 Setup & Onboarding**
+
 - `npm run first-run` - Complete first-time setup
 - `npm run setup:env` - Environment bootstrap
 - `npm run secrets:set` - Secret generation
 
 ### **🔄 Daily Development**
+
 - `npm run dev:all` - Quick development start
 - `npm run dev:seed` - Seed test data
 - `npm run preflight` - System validation
 
 ### **🧪 Testing & Quality**
+
 - `npm run test` - Unit tests
 - `npm run test:integration` - Integration tests
 - `npm run e2e` - End-to-end tests
 - `npm run lint` - Code quality checks
 
 ### **🐳 Infrastructure**
+
 - `docker compose up -d` - Start services
 - `docker compose down` - Stop services
 - `npm run preflight` - Connectivity checks
 
 ### **📦 Build & Deploy**
+
 - `npm run build` - Build applications
 - `npm start` - Start production servers
 - `npm run audit` - Security checks
@@ -479,12 +534,14 @@ npm run test:cleanup
 ## 🎯 Best Practices
 
 ### **🆕 New Developer Workflow**
+
 1. **Clone & Setup**: `git clone && npm run first-run`
 2. **Daily Start**: `npm run dev:all`
 3. **Testing**: `npm run test` before committing
 4. **Validation**: `npm run env:doctor:strict` before PRs
 
 ### **🔄 Daily Development Workflow**
+
 1. **Start Services**: `npm run dev:all`
 2. **Make Changes**: Edit code with hot reload
 3. **Run Tests**: `npm run test` for changes
@@ -492,6 +549,7 @@ npm run test:cleanup
 5. **Stop Services**: Ctrl+C to stop dev servers
 
 ### **🚀 Production Deployment**
+
 1. **Environment**: Set production environment variables
 2. **Validation**: `npm run env:doctor:strict`
 3. **Build**: `npm run build` for all packages
@@ -509,10 +567,15 @@ npm run dev:all            # Daily development
 npm run env:doctor:strict  # Validate environment
 npm run test               # Run all tests
 
+# 🧭 Verify / Where am I?
+pwd                        # Current directory
+git branch --show-current  # Current git branch
+docker compose ps          # Infra status (containers)
+
 # 🐳 Infrastructure
-docker compose up -d        # Start services
-docker compose down         # Stop services
-npm run preflight          # Check connectivity
+docker compose up -d       # Start services
+docker compose down        # Stop services
+npm run preflight          # Connectivity checks
 
 # 🧪 Testing
 npm run test:unit          # Unit tests
@@ -524,10 +587,36 @@ npm run lint               # Code quality
 npm run secrets:set        # Generate secrets
 npm run dev:seed           # Seed test data
 npm run postman:open       # Show API tools
+
+# 🧯 If the shell gets stuck (e.g., shows `quote>`)…
+printf '\n'; stty sane
 ```
 
 ---
 
-**PBCEx Team** - Building the future of commodity trading 🚀
+## 🧰 Handy Next Commands (single‑paste choices)
 
-*This command reference is maintained alongside the codebase and updated with each new script or command.*
+### A) Keep infra running & start both app servers (in two tabs)
+
+```bash
+# Tab 1 – backend
+cd "/Users/ebraheimsalem/Library/Mobile Documents/com~apple~CloudDocs/Documents/GitHub/abes-pbcex-workspace/backend" && npm run dev
+```
+
+```bash
+# Tab 2 – frontend
+cd "/Users/ebraheimsalem/Library/Mobile Documents/com~apple~CloudDocs/Documents/GitHub/abes-pbcex-workspace/frontend" && npm run dev
+```
+
+### B) Quick verify anytime
+
+```bash
+cd "/Users/ebraheimsalem/Library/Mobile Documents/com~apple~CloudDocs/Documents/GitHub/abes-pbcex-workspace"
+pwd && git branch --show-current && docker compose ps
+```
+
+### C) Stop infra when you’re done
+
+```bash
+cd "/Users/ebraheimsalem/Library/Mobile Documents/com~apple~CloudDocs/Documents/GitHub/abes-pbcex-workspace" && docker compose down
+```
