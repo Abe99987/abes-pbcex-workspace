@@ -223,3 +223,11 @@ Notes:
 - **Branch**: main
 - **Run URL**: https://github.com/Abe99987/abes-pbcex-workspace/actions/runs/17562567586
 - **Notes**: No-op plan as designed; workflow_dispatch with release_tag=v0.0.0-post-merge-test
+
+### Safety Stash Triage Closure (2025-09-15)
+
+- **PR #63 Merged**: Successfully recovered docs changes via selective restore
+- **Lockfile Decision**: backend/package-lock.json NOT updated due to Node 24.x vs repo Node 20.x mismatch
+- **Rationale**: Avoiding non-deterministic churn; enforce Node 20.x locally per repo engines
+- **stash@{11} Status**: Will be dropped (129 duplicate " 2" artifacts + problematic lockfile)
+- **Evidence**: 4,083 line diff in lockfile caused by version mismatch, exceeds ≤10 line safety threshold
