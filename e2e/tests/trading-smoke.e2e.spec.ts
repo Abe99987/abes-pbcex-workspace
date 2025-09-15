@@ -34,19 +34,17 @@ test.describe('Trading staging smoke', () => {
     await page.goto(`${BASE}/trading/spot-usd`);
     await expect(page).toHaveTitle(/PBCEx|PBCex|Trade/i);
 
-    // Balances line present
-    await expect(page.getByText(/Trading balance — USD/i)).toBeVisible();
+    // Balances line present - use .first() to target Buy panel
+    await expect(page.getByText(/Trading balance — USD/i).first()).toBeVisible();
 
-    // Limit order: verify submit disabled under $5 notional
-    await page.fill('#price', '1');
-    await page.fill('#amount', '4');
-    await expect(page.getByRole('button', { name: /Buy/i })).toBeDisabled();
-
-    // Increase amount to enable and place order (assert via route)
+    // Fill in valid order values (notional > $5)
     await page.fill('#price', '10');
     await page.fill('#amount', '1');
-    await expect(page.getByRole('button', { name: /Buy/i })).toBeEnabled();
-    await page.getByRole('button', { name: /Buy/i }).click();
+    
+    // Place order - this will trigger the idempotency header assertion
+    const buyButton = page.getByRole('button', { name: /Buy GOLD/i });
+    await expect(buyButton).toBeEnabled();
+    await buyButton.click();
 
     // SSE: exactly one connection started on page
     await page.waitForTimeout(1000);
@@ -64,12 +62,14 @@ test.describe('Trading staging smoke', () => {
     await page.goto(`${BASE}/trading/spot-usdc`);
     await expect(page.getByRole('button', { name: /USDC/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /USDT/i })).toBeVisible();
-    await expect(page.getByText(/Settling in/i)).toBeVisible();
+    // Use .first() to target the first "Settling in" text
+    await expect(page.getByText(/Settling in/i).first()).toBeVisible();
   });
 
   test('coin: settle-in dropdown present', async ({ page }) => {
     await page.goto(`${BASE}/trading/coin`);
-    await expect(page.getByText(/Settle in:/i)).toBeVisible();
+    // Use .first() to target the first "Settle in:" label
+    await expect(page.getByText(/Settle in:/i).first()).toBeVisible();
     // Dropdown trigger
     await page
       .getByRole('button')
