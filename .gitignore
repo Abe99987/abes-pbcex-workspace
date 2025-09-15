@@ -81,6 +81,8 @@ public
 # Playwright/E2E outputs
 e2e/test-results/
 e2e/playwright-report/
+test-results/
+playwright-report/
 
 # Storybook build outputs
 .out
