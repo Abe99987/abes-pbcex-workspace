@@ -1,0 +1,18 @@
+Trade v1 Staging Smoke Test - BLOCKED
+======================================
+Date: 2025-09-15 02:33 UTC
+Status: BLOCKED - No resolvable staging frontend URL
+
+Block Details:
+- API endpoint found: https://api.staging.pbcex.com
+- Frontend URL search failed:
+  - staging.pbcex.com (DNS resolution failed)
+  - app.staging.pbcex.com (DNS resolution failed)  
+  - web.staging.pbcex.com (DNS resolution failed)
+- Environment: STAGING_WEB_BASE_URL not set
+- Test command: Would have been 'CI=1 BASE_URL=<staging-url> npx playwright test --project=chromium e2e/tests/trading-smoke.e2e.spec.ts --reporter=line'
+
+Recommendation: 
+- Configure staging frontend deployment
+- Set STAGING_WEB_BASE_URL environment variable  
+- Rerun staging smoke after staging is accessible

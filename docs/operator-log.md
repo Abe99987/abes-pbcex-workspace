@@ -238,3 +238,24 @@ Notes:
 - **Purpose**: Prevent lockfile drift from Node version mismatches (avoid repeat of 4K+ line diff from Node 24.x)
 - **Implementation**: Preinstall script fails fast with clear message if Node major version ≠ 20
 - **Developer workflow**: Use `nvm use 20` or `nvm install 20` before `npm install`
+
+### Node 20.x Enforcement Complete (2025-09-15)
+
+- **PR #64 Result**: MERGED at 2025-09-15T02:24:51Z - Node 20.x enforcement successful
+- **Main/Origin Sync**: Local main b6a0eba == origin/main b6a0eba (fully synchronized)
+- **Stash Actions**: Dropped final lint-staged backup stash@{5} (trivial whitespace cleanup)
+- **Remaining Stashes**: 11 entries (all non-problematic feature branch WIPs)
+- **Open PRs**: Zero - all enforcement and recovery PRs completed and merged
+
+### Trade v1 Staging Smoke - BLOCKED (2025-09-15)
+
+- **Status**: BLOCKED - No resolvable staging frontend URL
+- **API Found**: https://api.staging.pbcex.com (from Postman/Thunder configs)
+- **Frontend URLs Tested**:
+  - staging.pbcex.com → DNS resolution failed
+  - app.staging.pbcex.com → DNS resolution failed
+  - web.staging.pbcex.com → DNS resolution failed
+- **Environment**: STAGING_WEB_BASE_URL not set
+- **Evidence**: docs/evidence/staging/staging-blocked.log
+- **Next Steps**: Configure staging frontend deployment, set STAGING_WEB_BASE_URL, rerun smoke test
+- **Local Alternative**: Trade v1 smoke already verified locally (3/3 tests passed)
