@@ -8,6 +8,7 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
+    "preinstall": "node scripts/check-node-20.js",
     "dev": "vite",
     "prebuild:legal": "node scripts/generate-legal-manifest.mjs",
     "prebuild": "npm run prebuild:legal",
