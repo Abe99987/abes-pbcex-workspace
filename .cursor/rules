@@ -1,0 +1,20 @@
+# Cursor IDE Rules
+
+## Pre-open Files on Session Start
+
+These files should be opened automatically when starting a new Cursor session to provide immediate context:
+
+- docs/architecture/tldr.md
+- docs/roadmap/phase1_milestones.md  
+- docs/contracts/trade_v1.md
+- docs/journal/now.md
+- docs/handbook-mount/README.md
+
+## File Priority
+
+High-signal documentation for quick reference and planning:
+1. Current status (journal/now.md)
+2. Architecture overview (architecture/tldr.md)
+3. Development roadmap (roadmap/phase1_milestones.md)
+4. API contracts (contracts/trade_v1.md)
+5. External documentation mount point (handbook-mount/README.md)
