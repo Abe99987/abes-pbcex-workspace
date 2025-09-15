@@ -246,3 +246,16 @@ Notes:
 - **Stash Actions**: Dropped final lint-staged backup stash@{5} (trivial whitespace cleanup)
 - **Remaining Stashes**: 11 entries (all non-problematic feature branch WIPs)
 - **Open PRs**: Zero - all enforcement and recovery PRs completed and merged
+
+### Trade v1 Staging Smoke - BLOCKED (2025-09-15)
+
+- **Status**: BLOCKED - No resolvable staging frontend URL
+- **API Found**: https://api.staging.pbcex.com (from Postman/Thunder configs)
+- **Frontend URLs Tested**:
+  - staging.pbcex.com → DNS resolution failed
+  - app.staging.pbcex.com → DNS resolution failed
+  - web.staging.pbcex.com → DNS resolution failed
+- **Environment**: STAGING_WEB_BASE_URL not set
+- **Evidence**: docs/evidence/staging/staging-blocked.log
+- **Next Steps**: Configure staging frontend deployment, set STAGING_WEB_BASE_URL, rerun smoke test
+- **Local Alternative**: Trade v1 smoke already verified locally (3/3 tests passed)
