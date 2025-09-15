@@ -26,6 +26,7 @@ _Merge note: unified via PR #59 (Markets) and PR #60 (Spending)._
 
 ## Trading Wiring v1 - 2025-09-14
 
+- Trade v1 local smoke executed; staging still 404; SHA ff2e2a3
 - TradeAdapter added in `src/lib/api.ts` with:
   - `getBalances()` reading `/api/wallet/balances` (trading account) with mock fallback
   - `streamPrices(pair)` via single SSE multiplexor to `/markets/stream` (one EventSource)

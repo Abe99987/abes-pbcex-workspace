@@ -3,10 +3,31 @@
 - Merge: `main@ff2e2a3` (PR #61: feat(frontend): trade wiring v1)
 - Scope: src/\*, docs
 
+### Local Smoke Test Results (2025-09-15 20:39)
+
+- BASE_URL: http://localhost:8080
+- Command: `CI=1 BASE_URL=http://localhost:8080 npx playwright test --project=chromium e2e/tests/trading-smoke.e2e.spec.ts --reporter=line`
+- Result: FAILED (strict mode violations - duplicate UI elements)
+
+Test Assertions:
+
+- ❌ /trading/spot-usd: USD settle-in UI present but duplicate elements found (Buy/Sell panels)
+- ❌ /trading/spot-usdc: USDC/USDT toggles visible but duplicate "Settling in" banners
+- ❌ /trading/coin: Settle-in dropdown present but duplicate labels found
+- ⚠️ SSE: Not verified due to test failures
+- ⚠️ Orders idempotency: Not verified due to test failures
+
+Evidence:
+
+- docs/evidence/local/spot-usd-failure.png - Shows trading interface with Buy/Sell panels
+- docs/evidence/local/spot-usdc-failure.png - Shows USDC interface with duplicate elements
+
+Note: Tests failed due to strict mode selector issues (multiple matching elements on page). UI renders correctly but test selectors need refinement.
+
 Staging smoke checklist (pending staging URL):
 
 - [ ] /trading/spot-usd — USD settle-in locked, min notional $5 blocks submit, balances line visible
-- [ ] /trading/spot-usdc — USDC/USDT toggle + “Settling in …” banner
+- [ ] /trading/spot-usdc — USDC/USDT toggle + "Settling in …" banner
 - [ ] /trading/coin — settle-in dropdown; invalid combos disabled
 - [ ] SSE — exactly one EventSource per page; closes on route change
 - [ ] Order stub — POST /api/trading/orders; `X-Idempotency-Key` present (attach one network log)
