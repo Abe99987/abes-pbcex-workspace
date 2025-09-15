@@ -4,7 +4,7 @@ This directory contains project documentation and references.
 
 ## Quick Links
 
-High-signal guides for Cursor planning and development:
+High-signal guides for Cursor planning and development (✓ Submodule present):
 
 • [architecture/tldr.md](architecture/tldr.md) - Architecture overview and system invariants
 • [roadmap/phase1_milestones.md](roadmap/phase1_milestones.md) - Phase 1 development milestones  

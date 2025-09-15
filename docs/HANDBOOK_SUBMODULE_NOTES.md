@@ -62,6 +62,34 @@ git add docs/handbook-mount
 git commit -m "docs: update submodule to track main branch"
 ```
 
+## CI Usage
+
+**Important**: CI workflows must enable submodules with `recursive` option:
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    submodules: recursive
+    fetch-depth: 0
+```
+
+For integrity verification, add this step after checkout:
+
+```yaml
+- name: Verify handbook submodule
+  run: |
+    git submodule status --recursive
+    test -f docs/handbook-mount/docs/index.md
+```
+
+To update the submodule pointer in CI/CD:
+
+```bash
+git submodule update --remote --merge docs/handbook-mount
+git add docs/handbook-mount
+git commit -m "docs: update handbook submodule pointer"
+```
+
 ## Repository Links
 
 - **Parent Repo**: `abes-pbcex-workspace`
