@@ -21,6 +21,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Verify handbook submodule
+        run: |
+          git submodule status --recursive
+          test -f docs/handbook-mount/docs/index.md
       - uses: reviewdog/action-actionlint@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -41,6 +48,13 @@ jobs:
       ENCRYPTION_KEY: 'test-encryption-key-32-chars-long'
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Verify handbook submodule
+        run: |
+          git submodule status --recursive
+          test -f docs/handbook-mount/docs/index.md
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -93,6 +107,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Verify handbook submodule
+        run: |
+          git submodule status --recursive
+          test -f docs/handbook-mount/docs/index.md
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
