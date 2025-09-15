@@ -10,12 +10,13 @@
 • Placeholder: Security audit findings addressed
 • Placeholder: Performance baseline established
 • Placeholder: Documentation updates in progress
+• Handbook submodule bumped to latest MAIN (includes VIBE_CODING_PROMPTS + ADR-0002)
 
 ## Do-First Next Session
 
-• Placeholder: Review pending pull requests
-• Placeholder: Update integration test coverage
-• Placeholder: Address technical debt backlog items
+• Provision STAGING_WEB_BASE_URL + redeploy
+• Run Trade v1 staging smoke (attach evidence)
+• Start Paxos PAXG custody slice (scaffold contracts & guardrails)
 
 ## Links
 
