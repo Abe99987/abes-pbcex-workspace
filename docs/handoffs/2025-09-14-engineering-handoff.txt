@@ -1,0 +1,56 @@
+ENGINEERING HANDOFF — Code + Ops Continuity
+
+📍 SESSION HEADER
+Date: 2025-09-14 to 2025-09-15
+Repo: github.com/Abe99987/abes-pbcex-workspace
+Branch: main@8018f98 (post-merge hygiene + Trade v1 stabilization)
+Environment: Local operational, Staging blocked (DNS)
+Models: claude-4-sonnet (implementation), claude-4.1-opus (recovery)
+
+🔄 SCOPE DELTA  
+Paths: e2e/tests/*, src/lib/api.ts, docs/*, .nvmrc, .npmrc, scripts/
+PRs: #62→#65 (smoke tests→staging block)
+Tests: Trade v1 Playwright E2E stabilized (strict mode selectors fixed)
+Configs: Node 20.x enforcement added (.nvmrc, engine-strict, preinstall guard)
+
+🔌 CONTRACT MAP
+Trade Pages ↔ API Endpoints:
+- /trading/spot-usd → /api/wallet/balances + /api/trading/orders  
+- /trading/spot-usdc → /api/wallet/balances + /api/trading/orders
+- /trading/coin → /api/wallet/balances + /api/trading/orders
+- SSE: /api/markets/stream (single EventSource per page)
+- Headers: X-Idempotency-Key on all order submissions
+
+🧪 CHECKS SNAPSHOT
+Local: TypeScript ✅, ESLint ✅, Prettier ✅
+E2E: 3/3 Trade v1 tests passing (4.2s runtime)
+CI: All required checks green on PRs #62-#65
+Staging: BLOCKED (no resolvable frontend URL)
+
+📋 DECISIONS LOCKED
+- Unified SSE: Single EventSource per page, cleanup on route change
+- Idempotency: X-Idempotency-Key required on all order endpoints  
+- Node 20 Guard: Preinstall script enforces version consistency
+- Stash Policy: Drop large artifact stashes, selective recovery only
+
+🔴 GAPS/RISKS
+1. Staging URL missing: No STAGING_WEB_BASE_URL → smoke tests blocked
+2. SSE Dashboard: No monitoring for connection counts/cleanup
+3. Order Validation: Min notional logic needs backend endpoint alignment
+4. Node Drift: Users on Node 24.x will hit preinstall guard
+
+📝 UNSTICK HISTORY
+Wedges: Backend port conflicts (8080), Playwright strict mode violations, stash conflicts
+Routines: pkill vite, restart TS/ESLint servers, reload window, selective stash restore
+
+🔄 DO-FIRST NEXT SESSION (EXACT ORDER)
+1. Set STAGING_WEB_BASE_URL + run staging smoke (verify 3/3 Trade v1 tests)
+2. PaxG integration start: legal compliance check + spot price feeds
+3. TradingView parity: verify chart SSE data consistency vs /api/markets/stream
+
+📎 TECHNICAL LINKS
+- Smoke Test: e2e/tests/trading-smoke.e2e.spec.ts
+- Trade API: src/lib/api.ts (TradeAdapter)  
+- Node Guard: scripts/check-node-20.js
+- Evidence: docs/evidence/local/, docs/evidence/staging/
+- Logs: docs/operator-log.md, docs/decision-log.md
