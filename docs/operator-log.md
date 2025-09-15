@@ -238,3 +238,11 @@ Notes:
 - **Purpose**: Prevent lockfile drift from Node version mismatches (avoid repeat of 4K+ line diff from Node 24.x)
 - **Implementation**: Preinstall script fails fast with clear message if Node major version ≠ 20
 - **Developer workflow**: Use `nvm use 20` or `nvm install 20` before `npm install`
+
+### Node 20.x Enforcement Complete (2025-09-15)
+
+- **PR #64 Result**: MERGED at 2025-09-15T02:24:51Z - Node 20.x enforcement successful
+- **Main/Origin Sync**: Local main b6a0eba == origin/main b6a0eba (fully synchronized)
+- **Stash Actions**: Dropped final lint-staged backup stash@{5} (trivial whitespace cleanup)
+- **Remaining Stashes**: 11 entries (all non-problematic feature branch WIPs)
+- **Open PRs**: Zero - all enforcement and recovery PRs completed and merged
