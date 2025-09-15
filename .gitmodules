@@ -1,4 +1,4 @@
 [submodule "docs/handbook-mount"]
 	path = docs/handbook-mount
-	url = https://github.com/Abe99987/pbcex-handbook.git
+	url = git@github.com:Abe99987/pbcex-handbook.git
 	branch = main
