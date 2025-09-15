@@ -12,6 +12,7 @@ High-signal guides for Cursor planning and development (✓ Submodule present):
 • [handbook-mount/docs/index.md](handbook-mount/docs/index.md) - Handbook overview and navigation
 • [handbook-mount/docs/vision-roadmap.md](handbook-mount/docs/vision-roadmap.md) - Product vision and roadmap
 • [handbook-mount/decision-log/ADR-INDEX.md](handbook-mount/decision-log/ADR-INDEX.md) - Architecture decision records
+• [handbook-mount/prompts/cursor/VIBE_CODING_PROMPTS.md](handbook-mount/prompts/cursor/VIBE_CODING_PROMPTS.md) - Vibe Coding Prompts — canonical index
 
 ## Journal
 
