@@ -28,6 +28,7 @@ _Merge note: unified via PR #59 (Markets) and PR #60 (Spending)._
 
 - Trade v1 local smoke executed; staging still 404; SHA ff2e2a3
 - Trade v1 local smoke passed locally; staging still 404; SHA ff2e2a3
+- Trade v1 smoke tests stabilized via PR #62; SSE + idempotency verified
 - TradeAdapter added in `src/lib/api.ts` with:
   - `getBalances()` reading `/api/wallet/balances` (trading account) with mock fallback
   - `streamPrices(pair)` via single SSE multiplexor to `/markets/stream` (one EventSource)
