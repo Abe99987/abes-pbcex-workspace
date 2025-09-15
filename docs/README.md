@@ -9,7 +9,9 @@ High-signal guides for Cursor planning and development:
 • [architecture/tldr.md](architecture/tldr.md) - Architecture overview and system invariants
 • [roadmap/phase1_milestones.md](roadmap/phase1_milestones.md) - Phase 1 development milestones  
 • [contracts/trade_v1.md](contracts/trade_v1.md) - Trading API contracts and specifications
-• [handbook-mount/README.md](handbook-mount/README.md) - Mirror surface for external documentation
+• [handbook-mount/docs/index.md](handbook-mount/docs/index.md) - Handbook overview and navigation
+• [handbook-mount/docs/vision-roadmap.md](handbook-mount/docs/vision-roadmap.md) - Product vision and roadmap
+• [handbook-mount/decision-log/ADR-INDEX.md](handbook-mount/decision-log/ADR-INDEX.md) - Architecture decision records
 
 ## Journal
 
@@ -20,7 +22,7 @@ Quick-access status tracking for the project:
 
 ## Handbook Mount
 
-**Note**: `handbook-mount/` is a mirror surface, not canonical source. Drag markdown files here from external sources for easy access during development sessions.
+**Note**: `handbook-mount/` is a Git submodule linking to the [`pbcex-handbook`](https://github.com/Abe99987/pbcex-handbook.git) repository. This provides access to the canonical business plan, architecture, legal documents, and decision logs. See [HANDBOOK_SUBMODULE_NOTES.md](HANDBOOK_SUBMODULE_NOTES.md) for usage instructions.
 
 ## Other Documentation
 

@@ -5,10 +5,10 @@
 These files should be opened automatically when starting a new Cursor session to provide immediate context:
 
 - docs/architecture/tldr.md
-- docs/roadmap/phase1_milestones.md  
+- docs/roadmap/phase1_milestones.md
 - docs/contracts/trade_v1.md
 - docs/journal/now.md
-- docs/handbook-mount/README.md
+- docs/handbook-mount/docs/index.md
 
 ## File Priority
 
