@@ -31,6 +31,7 @@ _Merge note: unified via PR #59 (Markets) and PR #60 (Spending)._
 - Trade v1 smoke tests stabilized via PR #62; SSE + idempotency verified
 - Post-merge verification complete: SHA 5b511c4; local smoke tests pass (3/3)
 - Safety stash@{11} dropped; lockfile deferred; enforce Node 20.x locally (SHA dac8a79)
+- Node 20.x enforcement added: .nvmrc files, engine-strict, preinstall guard to prevent lockfile drift
 - TradeAdapter added in `src/lib/api.ts` with:
   - `getBalances()` reading `/api/wallet/balances` (trading account) with mock fallback
   - `streamPrices(pair)` via single SSE multiplexor to `/markets/stream` (one EventSource)

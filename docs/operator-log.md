@@ -231,3 +231,10 @@ Notes:
 - **Rationale**: Avoiding non-deterministic churn; enforce Node 20.x locally per repo engines
 - **stash@{11} Status**: Will be dropped (129 duplicate " 2" artifacts + problematic lockfile)
 - **Evidence**: 4,083 line diff in lockfile caused by version mismatch, exceeds ≤10 line safety threshold
+
+### Node 20.x Enforcement (2025-09-15)
+
+- **Added enforcement files**: .nvmrc (backend), .npmrc (engine-strict=true), preinstall guard script
+- **Purpose**: Prevent lockfile drift from Node version mismatches (avoid repeat of 4K+ line diff from Node 24.x)
+- **Implementation**: Preinstall script fails fast with clear message if Node major version ≠ 20
+- **Developer workflow**: Use `nvm use 20` or `nvm install 20` before `npm install`
