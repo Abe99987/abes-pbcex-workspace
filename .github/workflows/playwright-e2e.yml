@@ -2,6 +2,22 @@ name: CI Checks and E2E
 
 on:
   pull_request:
+    paths:
+      - 'src/**'
+      - 'backend/**'
+      - 'frontend/**'
+      - 'e2e/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - '.eslintrc.*'
+      - 'tsconfig*.json'
+      - '!docs/**'
+      - '!prompts/**'
+      - '!.gitmodules'
+      - '!**/*.md'
   workflow_dispatch:
 
 concurrency:
