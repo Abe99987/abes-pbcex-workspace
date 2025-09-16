@@ -16,8 +16,10 @@
 
 ## Do-First Next Session
 
-• Provision STAGING_WEB_BASE_URL + redeploy
-• Run Trade v1 staging smoke (attach evidence)
+• ✅ STAGING_WEB_BASE_URL wiring complete (feat/staging-web-smoke-setup)
+• Pending: DNS/hosting provision actual staging URL value
+• Ready: `npm run smoke:staging` - Trade v1 smoke script with HTML reports
+• Evidence: artifacts/e2e/staging/ (pending staging environment)
 • Start Paxos PAXG custody slice (scaffold contracts & guardrails)
 
 ## Links
