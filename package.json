@@ -40,6 +40,7 @@
     "e2e:smoke": "cd e2e && npx playwright test --config playwright.config.ts --project=chromium --workers=1 --grep @smoke",
     "smoke:staging": "cd e2e && BASE_URL=$STAGING_WEB_BASE_URL npx playwright test --config playwright.config.ts --project=chromium --workers=1 --grep @smoke --reporter=html",
     "e2e:report": "cd e2e && npx playwright show-report test-results/html-report",
+    "preflight": "node scripts/preflight.mjs",
     "prepush": "npx gitleaks detect --verbose --no-git || exit 0"
   },
   "dependencies": {
