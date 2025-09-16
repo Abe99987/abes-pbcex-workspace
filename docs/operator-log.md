@@ -1,5 +1,88 @@
 <<<<<<< HEAD
 
+<<<<<<< HEAD
+
+## 2025-09-16 — Idempotency Visibility Panel (/api/ops/idem/stats + /ops/idem) (feat/idem-ops-panel)
+
+- Branch: feat/idem-ops-panel
+- Commit SHA: 9421505
+- Scope: Idempotency monitoring, admin-only, Redis-based counters
+
+### Session Delta Checklist
+
+- [x] Last SHA → Current SHA: 29a3e7d → 9421505
+- [x] ADRs touched/confirmed: None modified in this session
+- [x] Do-First carried forward: Y (preflight automation complete, idempotency visibility added)
+- [x] PR(s) links and result: https://github.com/Abe99987/abes-pbcex-workspace/pull/new/feat/idem-ops-panel (target squash merge)
+- [x] Preflight output pasted:
+
+```
+🚀 PBCEx Preflight Check
+══════════════════════════════════════════════════
+📁 Repo: abes-pbcex-workspace
+🌿 Branch: feat/idem-ops-panel
+📝 SHA: 29a3e7d
+⚙️  Node: v24.6.0 | npm: 11.5.1
+
+📋 Environment Configuration:
+   env-template: STAGING_WEB_BASE_URL PASS
+   frontend/env-template: STAGING_WEB_BASE_URL PASS
+   Hard-coded URLs in src/**: FOUND 11
+
+📡 SSE Infrastructure:
+   Frontend: /ops/sse route PASS
+   Backend: /api/ops/sse/stats endpoint PASS
+
+⚠️  PREFLIGHT WARNINGS - Some checks need attention
+══════════════════════════════════════════════════
+🕐 2025-09-16T14:20:48.845Z
+```
+
+### Implementation Complete
+
+- ✅ Created IdempotencyMetricsService with Redis/in-memory tracking
+- ✅ Added non-invasive middleware for tracking X-Idempotency-Key usage
+- ✅ Built `/api/ops/idem/stats` and `/api/ops/idem/test` endpoints with admin RBAC
+- ✅ Created `/ops/idem` frontend dashboard with 5m/60m windows and duplicate test
+- ✅ Added backend integration tests and E2E specs for full coverage
+- ✅ Updated seams-invariants.md with idempotency visibility requirements
+
+### Idempotency Monitoring Features
+
+- **Dual Time Windows**: 5-minute and 60-minute rolling metrics with TTL cleanup
+- **Duplicate Detection**: Tracks first-time vs repeated idempotency keys automatically
+- **Admin-Only Access**: RBAC protection with X-Admin-Key fallback for non-production
+- **Safe Test Endpoint**: POST `/api/ops/idem/test` for duplicate behavior verification
+- **Response Headers**: X-Idempotency-Observed and X-Idempotency-Window for diagnostics
+- **Privacy-Safe**: Sample keys truncated, no PII stored, Redis/memory fallback
+
+### Test Coverage
+
+- **Backend Integration**: RBAC verification, duplicate tracking accuracy, fallback behavior
+- **E2E Automation**: Dashboard functionality, duplicate test widget, metric calculations
+- **Production Safety**: Test endpoints blocked in production, graceful error handling
+
+### Files Modified
+
+- `backend/src/services/IdempotencyMetricsService.ts` - Core tracking service with Redis/memory
+- `backend/src/controllers/OpsController.ts` - Admin endpoints for stats and testing
+- `backend/src/routes/opsRoutes.ts` - Route registration
+- `src/pages/ops/Idempotency.tsx` - Frontend dashboard with tiles and test widget
+- `src/App.tsx` - Route configuration
+- `backend/src/__tests__/idempotency.integration.test.ts` - Backend test coverage
+- `e2e/tests/idempotency-ops.spec.ts` - E2E duplicate test verification
+- `docs/seams-invariants.md` - Updated with visibility requirements
+
+# Evidence: `/ops/idem` dashboard operational with duplicate test passing verification
+
+<<<<<<< HEAD
+
+> > > > > > > origin/main
+
+=======
+
+> > > > > > > origin/main
+
 ## 2025-09-16 — Preflight + Session Delta Template + Seams-Invariants (chore/preflight-delta-seams)
 
 - Branch: chore/preflight-delta-seams
@@ -62,10 +145,23 @@
 - `docs/seams-invariants.md` - Non-negotiable constraints documentation
 - `docs/journal/now.md` - Updated with preflight and invariants links
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+Evidence: npm run preflight provides one-screen PASS summary with all checks
+=======
+
+=======
+
+> > > > > > > origin/main
+
 # Evidence: npm run preflight provides one-screen PASS summary with all checks
 
 <<<<<<< HEAD
 
+> > > > > > > origin/main
+> > > > > > > <<<<<<< HEAD
+> > > > > > > origin/main
+> > > > > > > =======
 > > > > > > > origin/main
 
 ## 2025-09-16 — SSE Observability Dashboard + Leak Test (feat/sse-ops-dashboard)
@@ -76,6 +172,17 @@
 
 <<<<<<< HEAD
 
+# <<<<<<< HEAD
+
+<<<<<<< HEAD
+
+> > > > > > > origin/main
+
+=======
+<<<<<<< HEAD
+
+> > > > > > > origin/main
+
 ### Session Delta Checklist
 
 - [x] Last SHA → Current SHA: 418b379 → c8e1876
@@ -83,6 +190,20 @@
 - [x] Do-First carried forward: Y (staging setup complete)
 - [x] PR(s) links and result: https://github.com/Abe99987/abes-pbcex-workspace/pull/new/feat/sse-ops-dashboard (pending)
 - [x] Preflight output: N/A (preflight script added in next session)
+
+<<<<<<< HEAD
+
+# <<<<<<< HEAD
+
+=======
+
+> > > > > > > # origin/main
+
+> > > > > > > origin/main
+
+<<<<<<< HEAD
+
+> > > > > > > origin/main
 
 =======
 
@@ -159,6 +280,13 @@ Tests include:
 Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
 
 =======
+<<<<<<< HEAD
+<<<<<<< HEAD
+Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
+
+# =======
+
+> > > > > > > origin/main
 
 # Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
 
@@ -272,6 +400,14 @@ Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
 - **Status**: PR #73 now shows "MERGEABLE" with no conflicts
 - **Evidence**: https://github.com/Abe99987/abes-pbcex-workspace/pull/73
   > > > > > > > origin/main
+
+> > > > > > > origin/main
+
+<<<<<<< HEAD
+
+> > > > > > > origin/main
+
+=======
 
 > > > > > > > origin/main
 

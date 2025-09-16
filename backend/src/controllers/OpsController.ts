@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { createError, asyncHandler } from '@/middlewares/errorMiddleware';
 import { logInfo, logWarn, logError } from '@/utils/logger';
 import { SSEObservabilityService } from '@/services/SSEObservabilityService';
+import { IdempotencyMetricsService } from '@/services/IdempotencyMetricsService';
 import { env } from '@/config/env';
 
 /**
@@ -198,6 +199,142 @@ export class OpsController {
         });
 
         throw createError.internalServerError('Failed to cleanup SSE connections');
+      }
+    })  
+  ];
+
+  /**
+   * POST /api/ops/idem/test
+   * Safe test endpoint for idempotency duplicate testing (admin-only, non-prod)
+   */
+  static testIdempotency = [
+    OpsController.checkAdminAccess,
+    IdempotencyMetricsService.createMiddleware(),
+    asyncHandler(async (req: Request, res: Response) => {
+      const requestId = (req as { requestId?: string }).requestId || 'unknown';
+
+      // Only available in non-production
+      if (process.env.NODE_ENV === 'production') {
+        throw createError.forbidden('Test endpoint not available in production');
+      }
+
+      logInfo('Idempotency test endpoint hit', { 
+        requestId,
+        ip: req.ip,
+        idempotencyKey: req.headers['x-idempotency-key'] ? 'present' : 'absent',
+      });
+
+      // Return 204 No Content - no side effects
+      res.status(204).end();
+    })
+  ];
+
+  /**
+   * GET /api/ops/idem/stats
+   * Get idempotency key usage statistics (admin-only)
+   */
+  static getIdempotencyStats = [
+    OpsController.checkAdminAccess,
+    asyncHandler(async (req: Request, res: Response) => {
+      const requestId = (req as { requestId?: string }).requestId || 'unknown';
+
+      logInfo('Idempotency stats request', { 
+        requestId,
+        ip: req.ip,
+      });
+
+      try {
+        const stats = await IdempotencyMetricsService.getStats();
+        
+        // Calculate percentages
+        const dupePercentage5m = stats.window5m.present > 0 
+          ? ((stats.window5m.dupes / stats.window5m.present) * 100).toFixed(1)
+          : '0.0';
+        
+        const dupePercentage60m = stats.window60m.present > 0
+          ? ((stats.window60m.dupes / stats.window60m.present) * 100).toFixed(1)
+          : '0.0';
+
+        const response = {
+          success: true,
+          data: {
+            ...stats,
+            window5m: {
+              ...stats.window5m,
+              dupePercentage: `${dupePercentage5m}%`,
+            },
+            window60m: {
+              ...stats.window60m,
+              dupePercentage: `${dupePercentage60m}%`,
+            },
+            timestamp: new Date().toISOString(),
+          },
+          meta: {
+            requestId,
+            collectedAt: new Date().toISOString(),
+            description: 'Idempotency key usage statistics',
+          }
+        };
+
+        logInfo('Idempotency stats retrieved', {
+          requestId,
+          present5m: stats.window5m.present,
+          dupes5m: stats.window5m.dupes,
+          present60m: stats.window60m.present,
+          dupes60m: stats.window60m.dupes,
+        });
+
+        res.status(200).json(response);
+      } catch (error) {
+        logError('Failed to get idempotency stats', {
+          requestId,
+          error: error as Error,
+        });
+
+        throw createError.internalServerError('Failed to retrieve idempotency statistics');
+      }
+    })
+  ];
+
+  /**
+   * GET /api/ops/idem/samples
+   * Get sample idempotency keys for debugging (admin-only)
+   */
+  static getIdempotencySamples = [
+    OpsController.checkAdminAccess,
+    asyncHandler(async (req: Request, res: Response) => {
+      const requestId = (req as { requestId?: string }).requestId || 'unknown';
+
+      try {
+        const stats = await IdempotencyMetricsService.getStats();
+        
+        const response = {
+          success: true,
+          data: {
+            samples5m: stats.window5m.sampleKeys.map(key => ({
+              key: key.substring(0, 12) + '...', // Truncate for privacy
+              window: '5m'
+            })),
+            samples60m: stats.window60m.sampleKeys.map(key => ({
+              key: key.substring(0, 12) + '...', // Truncate for privacy  
+              window: '60m'
+            })),
+            timestamp: new Date().toISOString(),
+          },
+          meta: {
+            requestId,
+            description: 'Sample idempotency keys for debugging',
+          }
+        };
+
+        res.status(200).json(response);
+      } catch (error) {
+        logError('Failed to get idempotency samples', {
+          requestId,
+          error: error as Error,
+        });
+
+        throw createError.internalServerError('Failed to retrieve idempotency samples');
       }
     })
   ];
