@@ -200,9 +200,8 @@ export class OpsController {
 
         throw createError.internalServerError('Failed to cleanup SSE connections');
       }
-    })
+    })  
   ];
-<<<<<<< HEAD
 
   /**
    * POST /api/ops/idem/test
@@ -339,8 +338,6 @@ export class OpsController {
       }
     })
   ];
-=======
->>>>>>> origin/main
 }
 
 export default OpsController;

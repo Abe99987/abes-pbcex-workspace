@@ -1,5 +1,7 @@
 <<<<<<< HEAD
 
+<<<<<<< HEAD
+
 ## 2025-09-16 — Idempotency Visibility Panel (/api/ops/idem/stats + /ops/idem) (feat/idem-ops-panel)
 
 - Branch: feat/idem-ops-panel
@@ -77,6 +79,10 @@
 
 > > > > > > > origin/main
 
+=======
+
+> > > > > > > origin/main
+
 ## 2025-09-16 — Preflight + Session Delta Template + Seams-Invariants (chore/preflight-delta-seams)
 
 - Branch: chore/preflight-delta-seams
@@ -140,14 +146,22 @@
 - `docs/journal/now.md` - Updated with preflight and invariants links
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Evidence: npm run preflight provides one-screen PASS summary with all checks
 =======
+
+=======
+
+> > > > > > > origin/main
 
 # Evidence: npm run preflight provides one-screen PASS summary with all checks
 
 <<<<<<< HEAD
 
 > > > > > > > origin/main
+> > > > > > > <<<<<<< HEAD
+> > > > > > > origin/main
+> > > > > > > =======
 > > > > > > > origin/main
 
 ## 2025-09-16 — SSE Observability Dashboard + Leak Test (feat/sse-ops-dashboard)
@@ -156,8 +170,15 @@ Evidence: npm run preflight provides one-screen PASS summary with all checks
 - Commit SHA: c8e1876
 - Scope: SSE connection monitoring, no spend, read-only ops endpoints
 
+<<<<<<< HEAD
+
 # <<<<<<< HEAD
 
+<<<<<<< HEAD
+
+> > > > > > > origin/main
+
+=======
 <<<<<<< HEAD
 
 > > > > > > > origin/main
@@ -170,11 +191,21 @@ Evidence: npm run preflight provides one-screen PASS summary with all checks
 - [x] PR(s) links and result: https://github.com/Abe99987/abes-pbcex-workspace/pull/new/feat/sse-ops-dashboard (pending)
 - [x] Preflight output: N/A (preflight script added in next session)
 
+<<<<<<< HEAD
+
 # <<<<<<< HEAD
 
 =======
 
+> > > > > > > # origin/main
+
 > > > > > > > origin/main
+
+<<<<<<< HEAD
+
+> > > > > > > origin/main
+
+=======
 
 > > > > > > > origin/main
 
@@ -250,9 +281,12 @@ Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
 
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
 
-=======
+# =======
+
+> > > > > > > origin/main
 
 # Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
 
@@ -368,6 +402,12 @@ Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
   > > > > > > > origin/main
 
 > > > > > > > origin/main
+
+<<<<<<< HEAD
+
+> > > > > > > origin/main
+
+=======
 
 > > > > > > > origin/main
 
