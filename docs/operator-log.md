@@ -119,6 +119,65 @@ Tests include:
 - Run staging smoke tests after PR #73 merge and staging deployment
 - Verify ops dashboards after infrastructure PRs merge
 
+## 2025-09-16 — Staging Web Base URL Wiring + Smoke Scripts (feat/staging-web-smoke-setup)
+
+- Branch: feat/staging-web-smoke-setup
+- Commit SHA: c878866
+- Staging URL: https://staging.pbcex.com (expected - DNS/hosting TBD)
+
+### Session Delta Checklist
+
+- [x] Last SHA → Current SHA: 418b379 → c878866
+- [x] ADRs touched/confirmed: None
+- [x] Do-First carried forward: Y (staging setup complete)
+- [x] PR(s) links and result: https://github.com/Abe99987/abes-pbcex-workspace/pull/73 (target squash merge)
+- [x] Preflight output:
+
+```
+✈️  PBCEx Preflight Checker
+
+Running pre-startup validation checks...
+
+🔧 Environment Configuration
+   ✅ Environment configuration valid
+
+🐘 PostgreSQL Connection
+   ✅ PostgreSQL connection successful
+
+🔴 Redis Connection
+   ✅ Redis connection successful
+
+📊 Preflight Summary
+===================================
+✅ ALL SYSTEMS GO
+   3 checks passed
+```
+
+### Implementation Complete
+
+- ✅ Added STAGING_WEB_BASE_URL to env-template files (root & frontend)
+- ✅ Verified API base URLs are centralized (no hard-coded URLs found)
+- ✅ Playwright already honors STAGING_WEB_BASE_URL as BASE_URL fallback
+- ✅ Added npm script: `smoke:staging` with HTML reporter
+- ✅ Tagged trading-smoke.e2e.spec.ts with @smoke for filtering
+- ✅ Created artifacts directories: artifacts/e2e/staging/, artifacts/evidence/
+
+### Smoke Test Status
+
+- Command: `npm run smoke:staging`
+- Status: Ready (pending STAGING_WEB_BASE_URL value)
+- Note: Test setup verified but requires live staging environment
+
+### Trade v1 Flow Coverage
+
+Tests include:
+
+- spot-usd: USD balances, buy flow, idempotency headers, SSE connections
+- spot-usdc: USDC/USDT toggles, settling banners
+- coin: settle-in dropdown functionality
+
+Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
+
 ### Conflict Resolution (2025-09-16)
 
 - **PR #73 Conflicts Resolved**: docs/operator-log.md conflicts resolved at SHA: a592894
