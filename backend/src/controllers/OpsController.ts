@@ -202,6 +202,7 @@ export class OpsController {
       }
     })
   ];
+<<<<<<< HEAD
 
   /**
    * POST /api/ops/idem/test
@@ -338,6 +339,8 @@ export class OpsController {
       }
     })
   ];
+=======
+>>>>>>> origin/main
 }
 
 export default OpsController;

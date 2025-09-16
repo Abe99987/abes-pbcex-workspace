@@ -16,6 +16,8 @@
 
 ## Do-First Next Session
 
+<<<<<<< HEAD
+
 - ✅ STAGING_WEB_BASE_URL wiring complete (feat/staging-web-smoke-setup)
 - ✅ SSE observability dashboard complete (feat/sse-ops-dashboard)
 - ✅ Preflight automation added (chore/preflight-delta-seams)
@@ -26,7 +28,42 @@
 - Ready: `npm run smoke:staging` - Trade v1 smoke script with HTML reports
 - Pending: DNS/hosting provision actual staging URL value
 - Evidence: artifacts/e2e/staging/ (pending staging environment)
-- Start Paxos PAXG custody slice (scaffold contracts & guardrails)
+- # Start Paxos PAXG custody slice (scaffold contracts & guardrails)
+  • ✅ STAGING_WEB_BASE_URL wiring complete (feat/staging-web-smoke-setup)
+  <<<<<<< HEAD
+  • ✅ SSE observability dashboard complete (feat/sse-ops-dashboard)
+  • ✅ Preflight automation added (chore/preflight-delta-seams)
+  • Ready: `npm run preflight` - Fast repo status and env verification before each session
+  • Ready: `/ops/sse` - Live connection stats, leak test widget, admin-only access
+  • Ready: `npm run smoke:staging` - Trade v1 smoke script with HTML reports
+  • Pending: DNS/hosting provision actual staging URL value
+  • Evidence: artifacts/e2e/staging/ (pending staging environment)
+  • Start Paxos PAXG custody slice (scaffold contracts & guardrails)
+  =======
+  <<<<<<< HEAD
+  • ✅ SSE observability dashboard complete (feat/sse-ops-dashboard)
+  • Ready: `/ops/sse` - Live connection stats, leak test widget, admin-only access
+  • Ready: `npm run smoke:staging` - Trade v1 smoke script with HTML reports
+  • Pending: DNS/hosting provision actual staging URL value
+  =======
+  • Pending: DNS/hosting provision actual staging URL value
+  • Ready: `npm run smoke:staging` - Trade v1 smoke script with HTML reports
+
+> > > > > > > origin/main
+> > > > > > > • Evidence: artifacts/e2e/staging/ (pending staging environment)
+> > > > > > > • Start Paxos PAXG custody slice (scaffold contracts & guardrails)
+
+## PRs Opened (2025-09-16)
+
+- **PR #73**: [Staging smoke setup](https://github.com/Abe99987/abes-pbcex-workspace/pull/73) - STAGING_WEB_BASE_URL wiring + npm run smoke:staging
+- **PR #74**: [SSE ops dashboard](https://github.com/Abe99987/abes-pbcex-workspace/pull/74) - /ops/sse with connection monitoring + leak test
+- **PR #75**: [Preflight automation](https://github.com/Abe99987/abes-pbcex-workspace/pull/75) - npm run preflight + session templates + seams-invariants.md
+- **PR #76**: [Idempotency panel](https://github.com/Abe99987/abes-pbcex-workspace/pull/76) - /ops/idem with duplicate detection + test widget
+
+**Today's Update**: All PR conflicts resolved - #73 (aef4b43), #74 (531b855), #76 (baed9b6); hygiene PR #77 created; all PRs awaiting CodeRabbit review
+**Tomorrow's Do-First**: Merge in order: staging → SSE ops → preflight-delta → idempotency ops; then run staging smoke
+
+> > > > > > > origin/main
 
 ## Non-Negotiables
 
@@ -35,6 +72,9 @@
 
 ## Links
 
-- PRs: [Placeholder - latest PR URL]
+<<<<<<< HEAD
+
+- # PRs: [Placeholder - latest PR URL]
+  > > > > > > > origin/main
 - CI: [Placeholder - build status URL]
 - Latest SHA: [Placeholder - commit hash]
