@@ -15,6 +15,11 @@
 
 # SVG is text; normalize to LF
 *.svg text eol=lf
+
+# Union merge strategy for append-only documentation
+docs/operator-log.md merge=union
+docs/journal/now.md merge=union
+
 backend/src/openapi/openapi.yaml merge=ours
 backend/HEALTH_SUMMARY.md merge=theirs
 backend/tests/unit/tradingEngine.test.ts merge=theirs
