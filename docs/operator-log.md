@@ -1,8 +1,80 @@
+## 2025-09-16 — Preflight + Session Delta Template + Seams-Invariants (chore/preflight-delta-seams)
+
+- Branch: chore/preflight-delta-seams
+- Commit SHA: (pending)
+- Scope: Development workflow automation, docs templates, tripwire documentation
+
+### Session Delta Checklist
+
+- [ ] Last SHA → Current SHA: c8e1876 → (pending)
+- [ ] ADRs touched/confirmed: None modified in this session
+- [ ] Do-First carried forward: Y (SSE observability completed, preflight added)
+- [ ] PR(s) links and result: (pending - target squash merge)
+- [x] Preflight output pasted:
+
+```
+🚀 PBCEx Preflight Check
+══════════════════════════════════════════════════
+📁 Repo: abes-pbcex-workspace
+🌿 Branch: chore/preflight-delta-seams
+📝 SHA: 6ee39ec
+⚙️  Node: v24.6.0 | npm: 11.5.1
+
+📋 Environment Configuration:
+   env-template: STAGING_WEB_BASE_URL PASS
+   frontend/env-template: STAGING_WEB_BASE_URL PASS
+   Hard-coded URLs in src/**: FOUND 11
+
+📡 SSE Infrastructure:
+   Frontend: /ops/sse route PASS
+   Backend: /api/ops/sse/stats endpoint PASS
+
+⚠️  PREFLIGHT WARNINGS - Some checks need attention
+══════════════════════════════════════════════════
+🕐 2025-09-16T14:09:01.783Z
+```
+
+### Implementation Complete
+
+- ✅ Created scripts/preflight.mjs with zero-external-call repo status checks
+- ✅ Added npm run preflight task for fast environment verification
+- ✅ Updated .cursor/rules pre-open order with docs-first approach
+- ✅ Added Session-Delta checklist template to operator log
+- ✅ Created docs/seams-invariants.md with non-negotiable constraints
+- ✅ Updated journal with preflight automation and invariants links
+
+### Preflight Script Features
+
+- **Repo Status**: Branch, SHA, Node/npm versions
+- **Environment Checks**: STAGING_WEB_BASE_URL presence in templates
+- **URL Hygiene**: Count hard-coded http(s) URLs in src/\*\* (target: 0)
+- **SSE Sanity**: Static check for /ops/sse route and /api/ops/sse/stats endpoint
+- **Fast Execution**: <2s runtime, never fails CI, clean PASS/WARNINGS output
+
+### Files Modified
+
+- `scripts/preflight.mjs` - Fast repo status and environment verification
+- `package.json` - Added preflight npm task
+- `.cursor/rules` - Updated pre-open order (docs-first workflow)
+- `docs/operator-log.md` - Added Session-Delta checklist template
+- `docs/seams-invariants.md` - Non-negotiable constraints documentation
+- `docs/journal/now.md` - Updated with preflight and invariants links
+
+Evidence: npm run preflight provides one-screen PASS summary with all checks
+
 ## 2025-09-16 — SSE Observability Dashboard + Leak Test (feat/sse-ops-dashboard)
 
 - Branch: feat/sse-ops-dashboard
 - Commit SHA: c8e1876
 - Scope: SSE connection monitoring, no spend, read-only ops endpoints
+
+### Session Delta Checklist
+
+- [x] Last SHA → Current SHA: 418b379 → c8e1876
+- [x] ADRs touched/confirmed: None
+- [x] Do-First carried forward: Y (staging setup complete)
+- [x] PR(s) links and result: https://github.com/Abe99987/abes-pbcex-workspace/pull/new/feat/sse-ops-dashboard (pending)
+- [x] Preflight output: N/A (preflight script added in next session)
 
 ### Implementation Complete
 

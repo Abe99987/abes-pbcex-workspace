@@ -18,11 +18,18 @@
 
 • ✅ STAGING_WEB_BASE_URL wiring complete (feat/staging-web-smoke-setup)
 • ✅ SSE observability dashboard complete (feat/sse-ops-dashboard)
+• ✅ Preflight automation added (chore/preflight-delta-seams)
+• Ready: `npm run preflight` - Fast repo status and env verification before each session
 • Ready: `/ops/sse` - Live connection stats, leak test widget, admin-only access
 • Ready: `npm run smoke:staging` - Trade v1 smoke script with HTML reports
 • Pending: DNS/hosting provision actual staging URL value
 • Evidence: artifacts/e2e/staging/ (pending staging environment)
 • Start Paxos PAXG custody slice (scaffold contracts & guardrails)
+
+## Non-Negotiables
+
+• System constraints documented in [seams-invariants.md](seams-invariants.md)
+• Session workflow templates in operator log with delta checklists
 
 ## Links
 
