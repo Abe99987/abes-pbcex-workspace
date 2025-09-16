@@ -1,15 +1,15 @@
 ## 2025-09-16 — Preflight + Session Delta Template + Seams-Invariants (chore/preflight-delta-seams)
 
 - Branch: chore/preflight-delta-seams
-- Commit SHA: (pending)
+- Commit SHA: 02fc946
 - Scope: Development workflow automation, docs templates, tripwire documentation
 
 ### Session Delta Checklist
 
-- [ ] Last SHA → Current SHA: c8e1876 → (pending)
-- [ ] ADRs touched/confirmed: None modified in this session
-- [ ] Do-First carried forward: Y (SSE observability completed, preflight added)
-- [ ] PR(s) links and result: (pending - target squash merge)
+- [x] Last SHA → Current SHA: c8e1876 → 02fc946
+- [x] ADRs touched/confirmed: None modified in this session
+- [x] Do-First carried forward: Y (SSE observability completed, preflight added)
+- [x] PR(s) links and result: https://github.com/Abe99987/abes-pbcex-workspace/pull/new/chore/preflight-delta-seams (target squash merge)
 - [x] Preflight output pasted:
 
 ```
