@@ -5,6 +5,10 @@ NEXT_PUBLIC_APP_NAME=PBCEx
 NEXT_PUBLIC_API_BASE_URL=http://localhost:4001
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
+# Staging environment URLs
+# Set this to the actual staging frontend base URL (e.g., https://staging.pbcex.com)  
+STAGING_WEB_BASE_URL=
+
 # Environment
 NODE_ENV=development
 

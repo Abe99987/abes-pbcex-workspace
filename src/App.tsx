@@ -73,6 +73,8 @@ import HelpCenter from './pages/support/HelpCenter';
 import SupportSecurity from './pages/support/Security';
 import Compliance from './pages/support/Compliance';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import SSEOpsPage from './pages/ops/SSE';
+import IdempotencyOpsPage from './pages/ops/Idempotency';
 import TermsOfService from './pages/legal/TermsOfService';
 import Regulatory from './pages/legal/Regulatory';
 import Licenses from './pages/legal/Licenses';
@@ -245,6 +247,11 @@ const App = () => (
             <Route path='/support/help-center' element={<HelpCenter />} />
             <Route path='/support/security' element={<SupportSecurity />} />
             <Route path='/support/compliance' element={<Compliance />} />
+
+            {/* Operations Routes (not linked in public nav) */}
+            <Route path='/ops/sse' element={<SSEOpsPage />} />
+            <Route path='/ops/idem' element={<IdempotencyOpsPage />} />
+
             <Route path='/legal' element={<LegalList />} />
             <Route path='/legal/privacy' element={<PrivacyHub />} />
             <Route path='/legal/compliance' element={<ComplianceHub />} />

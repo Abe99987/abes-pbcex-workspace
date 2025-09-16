@@ -51,6 +51,7 @@ import tradesRoutes from '@/routes/tradesRoutes';
 import moneyMovementRoutes from '@/routes/moneyMovement';
 import ledgerRoutes from '@/routes/ledgerRoutes';
 import testRoutes from '@/routes/testRoutes';
+import opsRoutes from '@/routes/opsRoutes';
 
 // Import admin terminal modules
 // TODO: Re-enable after fixing TypeScript errors  
@@ -333,6 +334,7 @@ app.use('/api/trade', tradeRoutes);
 app.use('/api/shop', shopRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/dca', dcaRoutes);
+app.use('/api/ops', opsRoutes);
 
 // Alias route for spending compatibility
 import { DCAController } from '@/modules/dca/dca.controller';

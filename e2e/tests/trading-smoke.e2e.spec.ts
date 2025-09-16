@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 const BASE = process.env.BASE_URL || process.env.STAGING_WEB_BASE_URL || '';
 
-test.describe('Trading staging smoke', () => {
+test.describe('Trading staging smoke @smoke', () => {
   test.skip(!BASE, 'BASE_URL/STAGING_WEB_BASE_URL is required');
 
   test('spot-usd: USD locked, min notional blocks, balances visible; SSE single; idempotency header', async ({
