@@ -1,7 +1,7 @@
 ## 2025-09-16 — SSE Observability Dashboard + Leak Test (feat/sse-ops-dashboard)
 
 - Branch: feat/sse-ops-dashboard
-- Commit SHA: (pending)
+- Commit SHA: c8e1876
 - Scope: SSE connection monitoring, no spend, read-only ops endpoints
 
 ### Implementation Complete
