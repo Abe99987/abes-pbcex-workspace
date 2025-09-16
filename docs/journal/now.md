@@ -37,8 +37,10 @@
 - **PR #76**: [Idempotency panel](https://github.com/Abe99987/abes-pbcex-workspace/pull/76) - /ops/idem with duplicate detection + test widget
 - **PR #77**: [Docs hygiene](https://github.com/Abe99987/abes-pbcex-workspace/pull/77) - Union merge + style normalization
 
-**Today's Update**: PR #76 MERGED (6-file conflicts resolved via union merge); SSE + Idempotency ops coexist; PR #77 closed  
-**Tomorrow's Do-First**: Merge remaining PRs (#73, #74, #75); provision staging URL → run Trade v1 smoke test
+**Today's Update**: PR #76 MERGED (6-file conflicts resolved via union merge); SSE + Idempotency ops coexist; PR #77 closed
+
+- Handbook submodule bumped after ADR-0003; journals are mainline-only.
+  **Tomorrow's Do-First**: Merge remaining PRs (#73, #74, #75); provision staging URL → run Trade v1 smoke test
 
 ## Non-Negotiables
 
