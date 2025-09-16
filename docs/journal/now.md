@@ -29,6 +29,7 @@
 • **PR #75**: [Preflight automation](https://github.com/Abe99987/abes-pbcex-workspace/pull/75) - npm run preflight + session templates + seams-invariants.md
 • **PR #76**: [Idempotency panel](https://github.com/Abe99987/abes-pbcex-workspace/pull/76) - /ops/idem with duplicate detection + test widget
 
+**Today's Update**: PR #73 conflicts resolved; ready to merge after review  
 **Tomorrow's Do-First**: Merge in order: staging → SSE ops → preflight-delta → idempotency ops; then run staging smoke
 
 ## Links

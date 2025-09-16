@@ -101,6 +101,13 @@ Tests include:
 
 Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
 
+### Conflict Resolution (2025-09-16)
+
+- **PR #73 Conflicts Resolved**: docs/operator-log.md conflicts resolved at SHA: a592894
+- **Policy Applied**: Append-only chronology preserved, Session-Delta checklist maintained
+- **Status**: PR #73 now shows "MERGEABLE" with no conflicts
+- **Evidence**: https://github.com/Abe99987/abes-pbcex-workspace/pull/73
+
 ## 2025-09-14 — Trading wiring v1 post-merge (PR #61)
 
 - Merge: `main@ff2e2a3` (PR #61: feat(frontend): trade wiring v1)
