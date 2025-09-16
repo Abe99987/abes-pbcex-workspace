@@ -1,3 +1,9 @@
+# Docs/Journals Merge Guard (App Repo)
+- Protected paths: docs/journal/now.md, docs/operator-log.md.
+- Policy: Journals are mainline-only. If branch != main, do not edit these files; treat them as read-only context. Update journals on main after merge or inside the single active PR for that area only.
+- Merge style: union for these files is configured in .gitattributes; do not override.
+- Style normalization: dash "- " bullets, LF endings, no trailing spaces; do not reflow paragraphs.
+
 # Cursor IDE Rules
 
 ## Pre-open Files on Session Start
@@ -5,8 +11,8 @@
 These files should be opened automatically when starting a new Cursor session to provide immediate context:
 
 - docs/handbook-mount/prompts/cursor/VIBE_CODING_PROMPTS.md
-- docs/operator-log.md
-- docs/journal/now.md
+- docs/operator-log.md — read-only if branch != main
+- docs/journal/now.md — read-only if branch != main
 - docs/handbook-mount/decision-log/ADR-INDEX.md
 - docs/seams-invariants.md
 - env-template
@@ -19,8 +25,8 @@ These files should be opened automatically when starting a new Cursor session to
 
 High-signal documentation for quick reference and planning:
 1. Development guidelines (handbook-mount/prompts/cursor/VIBE_CODING_PROMPTS.md)
-2. Operator log (operator-log.md)
-3. Current status (journal/now.md)
+2. Operator log (operator-log.md) — read-only unless on main
+3. Current status (journal/now.md) — read-only unless on main
 4. Architectural decisions (handbook-mount/decision-log/ADR-INDEX.md)
 5. Non-negotiables (seams-invariants.md)
 6. Environment setup (env-template)

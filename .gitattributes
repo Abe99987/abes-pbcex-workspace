@@ -18,3 +18,5 @@
 backend/src/openapi/openapi.yaml merge=ours
 backend/HEALTH_SUMMARY.md merge=theirs
 backend/tests/unit/tradingEngine.test.ts merge=theirs
+docs/journal/now.md merge=union
+docs/operator-log.md merge=union
