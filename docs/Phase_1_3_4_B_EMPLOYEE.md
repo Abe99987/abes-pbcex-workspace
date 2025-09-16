@@ -1,3 +1,15 @@
+## ARCHIVED — see handbook (canonical)
+
+This doc is kept for historical context. Do not update here. For live, maintained content use:
+
+- docs/handbook-mount/product-specs/business-plan/2025-09_pbcex_business_plan.md
+- docs/handbook-mount/docs/architecture/mvp_technical_architecture.md
+- docs/handbook-mount/prompts/cursor/VIBE_CODING_PROMPTS.md
+
+Last reviewed: 2025-09-15 US-ET
+
+---
+
 # PBCEx Phase 1-3-4-B Employee Reference Document
 
 ## Phase 1 — MVP Scope
