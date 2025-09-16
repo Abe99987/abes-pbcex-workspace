@@ -1,8 +1,80 @@
+## 2025-09-16 — Four Operational Slices PRs Opened
+
+### PRs Created Today
+
+- **PR #73**: [chore(staging): STAGING_WEB_BASE_URL wiring + smoke script](https://github.com/Abe99987/abes-pbcex-workspace/pull/73)
+  - Branch: feat/staging-web-smoke-setup → SHA: c878866
+  - Scope: Environment wiring + smoke test automation (6 files, ~45 LOC)
+  - Ready for staging deployment and Trade v1 smoke execution
+
+- **PR #74**: [feat(ops): SSE observability dashboard + leak test](https://github.com/Abe99987/abes-pbcex-workspace/pull/74)
+  - Branch: feat/sse-ops-dashboard → SHA: 6ee39ec
+  - Scope: SSE connection monitoring + leak detection (11 files, ~380 LOC)
+  - Evidence: /ops/sse dashboard operational with successful leak test results
+
+- **PR #75**: [chore(docs/devx): preflight script, Session-Delta checklist, seams-invariants](https://github.com/Abe99987/abes-pbcex-workspace/pull/75)
+  - Branch: chore/preflight-delta-seams → SHA: 29a3e7d
+  - Scope: Development workflow automation + documentation (6 files, ~285 LOC)
+  - Evidence: npm run preflight provides one-screen PASS summary
+
+- **PR #76**: [feat(ops): idempotency visibility panel (/api/ops/idem/stats + /ops/idem)](https://github.com/Abe99987/abes-pbcex-workspace/pull/76)
+  - Branch: feat/idem-ops-panel → SHA: a8202f0
+  - Scope: Idempotency monitoring + duplicate detection (10 files, ~385 LOC)
+  - Evidence: /ops/idem dashboard with real-time duplicate tracking
+
+### Merge Order Plan
+
+1. **Staging setup** (PR #73) - Foundation for smoke testing
+2. **SSE ops** (PR #74) - Connection monitoring infrastructure
+3. **Preflight/docs** (PR #75) - Workflow automation and templates
+4. **Idempotency ops** (PR #76) - Duplicate detection monitoring
+
+### CodeRabbit Status
+
+- All PRs have @coderabbitai review requested with focus on scope, tests, and security
+- Target: Squash merge after review approval
+- All within constraints: ≤10 files, ≤400 LOC, additive only, no spend
+
+### Next Actions
+
+- Monitor CodeRabbit reviews and address feedback
+- Merge PRs in order after approval
+- Run staging smoke tests after PR #73 merge and staging deployment
+- Verify ops dashboards after infrastructure PRs merge
+
 ## 2025-09-16 — Staging Web Base URL Wiring + Smoke Scripts (feat/staging-web-smoke-setup)
 
 - Branch: feat/staging-web-smoke-setup
-- Commit SHA: 418b379
+- Commit SHA: c878866
 - Staging URL: https://staging.pbcex.com (expected - DNS/hosting TBD)
+
+### Session Delta Checklist
+
+- [x] Last SHA → Current SHA: 418b379 → c878866
+- [x] ADRs touched/confirmed: None
+- [x] Do-First carried forward: Y (staging setup complete)
+- [x] PR(s) links and result: https://github.com/Abe99987/abes-pbcex-workspace/pull/73 (target squash merge)
+- [x] Preflight output:
+
+```
+✈️  PBCEx Preflight Checker
+
+Running pre-startup validation checks...
+
+🔧 Environment Configuration
+   ✅ Environment configuration valid
+
+🐘 PostgreSQL Connection
+   ✅ PostgreSQL connection successful
+
+🔴 Redis Connection
+   ✅ Redis connection successful
+
+📊 Preflight Summary
+===================================
+✅ ALL SYSTEMS GO
+   3 checks passed
+```
 
 ### Implementation Complete
 
