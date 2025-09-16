@@ -19,8 +19,10 @@
 • ✅ STAGING_WEB_BASE_URL wiring complete (feat/staging-web-smoke-setup)
 • ✅ SSE observability dashboard complete (feat/sse-ops-dashboard)
 • ✅ Preflight automation added (chore/preflight-delta-seams)
+• ✅ Idempotency visibility panel added (feat/idem-ops-panel)
 • Ready: `npm run preflight` - Fast repo status and env verification before each session
-• Ready: `/ops/sse` - Live connection stats, leak test widget, admin-only access
+• Ready: `/ops/sse` - Live SSE connection stats, leak test widget, admin-only access
+• Ready: `/ops/idem` - Live idempotency metrics, 5m/60m windows, duplicate test widget
 • Ready: `npm run smoke:staging` - Trade v1 smoke script with HTML reports
 • Pending: DNS/hosting provision actual staging URL value
 • Evidence: artifacts/e2e/staging/ (pending staging environment)

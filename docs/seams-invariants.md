@@ -8,6 +8,7 @@
 - **Server Deduplication**: Backend prevents duplicate side-effects within key TTL window
 - **Client Responsibility**: UI generates unique request IDs for retry-safe operations
 - **Key Format**: Use nanoid(16) or UUID for idempotency keys, never sequential IDs
+- **Visibility**: Idempotency metrics tracked and visible at `/ops/idem` with duplicate detection
 
 ## 📡 SSE Hygiene
 
