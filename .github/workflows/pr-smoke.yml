@@ -4,11 +4,21 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
+      - 'src/**'
+      - 'backend/**'
       - 'frontend/**'
       - 'e2e/**'
-    paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
+      - 'scripts/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - '.eslintrc.*'
+      - 'tsconfig*.json'
+      - '!docs/**'
+      - '!prompts/**'
+      - '!.gitmodules'
+      - '!**/*.md'
 
 concurrency:
   group: pr-smoke-${{ github.head_ref }}
