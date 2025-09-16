@@ -11,6 +11,7 @@
 • Placeholder: Performance baseline established
 • Placeholder: Documentation updates in progress
 • Handbook submodule bumped to latest MAIN (includes VIBE_CODING_PROMPTS + ADR-0002)
+• Merged PR #71 — handbook submodule updated to canonical prompts + ADR-0002 (commit 438ebcb)
 
 ## Do-First Next Session
 
