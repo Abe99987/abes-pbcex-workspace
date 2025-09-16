@@ -1,7 +1,7 @@
 ## 2025-09-16 — Staging Web Base URL Wiring + Smoke Scripts (feat/staging-web-smoke-setup)
 
 - Branch: feat/staging-web-smoke-setup
-- Commit SHA: (pending)
+- Commit SHA: 418b379
 - Staging URL: https://staging.pbcex.com (expected - DNS/hosting TBD)
 
 ### Implementation Complete
