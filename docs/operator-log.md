@@ -1,3 +1,47 @@
+## 2025-09-16 — SSE Observability Dashboard + Leak Test (feat/sse-ops-dashboard)
+
+- Branch: feat/sse-ops-dashboard
+- Commit SHA: (pending)
+- Scope: SSE connection monitoring, no spend, read-only ops endpoints
+
+### Implementation Complete
+
+- ✅ Added SSE instrumentation with connId tracking and Redis/in-memory fallback
+- ✅ Instrumented existing prices stream with connection lifecycle hooks
+- ✅ Created `/api/ops/sse/stats` endpoint with admin RBAC (X-Admin-Key fallback for non-prod)
+- ✅ Built `/ops/sse` frontend dashboard with live stats and leak test widget
+- ✅ Added backend integration tests for ops endpoints
+- ✅ Created E2E leak detection tests with Playwright
+
+### SSE Observability Features
+
+- **Connection tracking**: Each SSE connection gets unique connId, tracked in Redis/memory
+- **Heartbeat monitoring**: 15s heartbeats update connection TTLs, detect stale connections
+- **Metrics collection**: Opens/closes counters, active connections by channel
+- **Health status**: OK (<30s), WARN (30-60s), STALE (>60s) based on max heartbeat age
+- **Admin-only access**: Role-based or X-Admin-Key header for non-production
+
+### Leak Test Coverage
+
+- **Manual test widget**: Open/close EventSource, verify cleanup in real-time
+- **Navigation simulation**: Route changes with connection cleanup verification
+- **Stress testing**: Multiple rapid connections to test tracking robustness
+- **E2E automation**: Playwright specs for CI integration
+
+### Files Modified
+
+- `backend/src/services/SSEObservabilityService.ts` - Core tracking service
+- `backend/src/controllers/PricesController.ts` - SSE handler instrumentation
+- `backend/src/controllers/OpsController.ts` - Admin ops endpoints
+- `backend/src/routes/opsRoutes.ts` - Route definitions
+- `backend/src/server.ts` - Route registration
+- `src/pages/ops/SSE.tsx` - Frontend dashboard
+- `src/App.tsx` - Route configuration
+- `backend/src/__tests__/ops.integration.test.ts` - Backend tests
+- `e2e/tests/sse-leak.spec.ts` - E2E leak tests
+
+Evidence: `/ops/sse` dashboard with live connection stats and successful leak test results
+
 ## 2025-09-16 — Staging Web Base URL Wiring + Smoke Scripts (feat/staging-web-smoke-setup)
 
 - Branch: feat/staging-web-smoke-setup

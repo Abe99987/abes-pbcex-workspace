@@ -17,8 +17,10 @@
 ## Do-First Next Session
 
 • ✅ STAGING_WEB_BASE_URL wiring complete (feat/staging-web-smoke-setup)
-• Pending: DNS/hosting provision actual staging URL value
+• ✅ SSE observability dashboard complete (feat/sse-ops-dashboard)
+• Ready: `/ops/sse` - Live connection stats, leak test widget, admin-only access
 • Ready: `npm run smoke:staging` - Trade v1 smoke script with HTML reports
+• Pending: DNS/hosting provision actual staging URL value
 • Evidence: artifacts/e2e/staging/ (pending staging environment)
 • Start Paxos PAXG custody slice (scaffold contracts & guardrails)
 
