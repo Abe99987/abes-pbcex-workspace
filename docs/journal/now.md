@@ -16,9 +16,9 @@
 
 ## Do-First Next Session
 
-• Provision STAGING_WEB_BASE_URL + redeploy
-• Run Trade v1 staging smoke (attach evidence)
-• Start Paxos PAXG custody slice (scaffold contracts & guardrails)
+- Provision STAGING_WEB_BASE_URL + redeploy
+- Run Trade v1 staging smoke (attach evidence)
+- Start Paxos PAXG custody slice (scaffold contracts & guardrails)
 
 ## PRs Opened (2025-09-16)
 
