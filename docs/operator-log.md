@@ -1,3 +1,80 @@
+<<<<<<< HEAD
+
+## 2025-09-16 — SSE Observability Dashboard + Leak Test (feat/sse-ops-dashboard)
+
+- Branch: feat/sse-ops-dashboard
+- Commit SHA: c8e1876
+- Scope: SSE connection monitoring, no spend, read-only ops endpoints
+
+### Implementation Complete
+
+- ✅ Added SSE instrumentation with connId tracking and Redis/in-memory fallback
+- ✅ Instrumented existing prices stream with connection lifecycle hooks
+- ✅ Created `/api/ops/sse/stats` endpoint with admin RBAC (X-Admin-Key fallback for non-prod)
+- ✅ Built `/ops/sse` frontend dashboard with live stats and leak test widget
+- ✅ Added backend integration tests for ops endpoints
+- ✅ Created E2E leak detection tests with Playwright
+
+### SSE Observability Features
+
+- **Connection tracking**: Each SSE connection gets unique connId, tracked in Redis/memory
+- **Heartbeat monitoring**: 15s heartbeats update connection TTLs, detect stale connections
+- **Metrics collection**: Opens/closes counters, active connections by channel
+- **Health status**: OK (<30s), WARN (30-60s), STALE (>60s) based on max heartbeat age
+- **Admin-only access**: Role-based or X-Admin-Key header for non-production
+
+### Leak Test Coverage
+
+- **Manual test widget**: Open/close EventSource, verify cleanup in real-time
+- **Navigation simulation**: Route changes with connection cleanup verification
+- **Stress testing**: Multiple rapid connections to test tracking robustness
+- **E2E automation**: Playwright specs for CI integration
+
+### Files Modified
+
+- `backend/src/services/SSEObservabilityService.ts` - Core tracking service
+- `backend/src/controllers/PricesController.ts` - SSE handler instrumentation
+- `backend/src/controllers/OpsController.ts` - Admin ops endpoints
+- `backend/src/routes/opsRoutes.ts` - Route definitions
+- `backend/src/server.ts` - Route registration
+- `src/pages/ops/SSE.tsx` - Frontend dashboard
+- `src/App.tsx` - Route configuration
+- `backend/src/__tests__/ops.integration.test.ts` - Backend tests
+- `e2e/tests/sse-leak.spec.ts` - E2E leak tests
+
+Evidence: `/ops/sse` dashboard with live connection stats and successful leak test results
+
+## 2025-09-16 — Staging Web Base URL Wiring + Smoke Scripts (feat/staging-web-smoke-setup)
+
+- Branch: feat/staging-web-smoke-setup
+- Commit SHA: 418b379
+- Staging URL: https://staging.pbcex.com (expected - DNS/hosting TBD)
+
+### Implementation Complete
+
+- ✅ Added STAGING_WEB_BASE_URL to env-template files (root & frontend)
+- ✅ Verified API base URLs are centralized (no hard-coded URLs found)
+- ✅ Playwright already honors STAGING_WEB_BASE_URL as BASE_URL fallback
+- ✅ Added npm script: `smoke:staging` with HTML reporter
+- ✅ Tagged trading-smoke.e2e.spec.ts with @smoke for filtering
+- ✅ Created artifacts directories: artifacts/e2e/staging/, artifacts/evidence/
+
+### Smoke Test Status
+
+- Command: `npm run smoke:staging`
+- Status: Ready (pending STAGING_WEB_BASE_URL value)
+- Note: Test setup verified but requires live staging environment
+
+### Trade v1 Flow Coverage
+
+Tests include:
+
+- spot-usd: USD balances, buy flow, idempotency headers, SSE connections
+- spot-usdc: USDC/USDT toggles, settling banners
+- coin: settle-in dropdown functionality
+
+# Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
+
 ## 2025-09-16 — Four Operational Slices PRs Opened
 
 ### PRs Created Today
@@ -107,6 +184,7 @@ Evidence: artifacts/e2e/staging/index.html (generated after staging deployment)
 - **Policy Applied**: Append-only chronology preserved, Session-Delta checklist maintained
 - **Status**: PR #73 now shows "MERGEABLE" with no conflicts
 - **Evidence**: https://github.com/Abe99987/abes-pbcex-workspace/pull/73
+  > > > > > > > origin/main
 
 ## 2025-09-14 — Trading wiring v1 post-merge (PR #61)
 

@@ -5,6 +5,7 @@ import { PricesService } from '@/services/PricesService';
 import { CANONICAL_SYMBOLS, normalizeSymbol } from '@/lib/symbols';
 import { nowUtcMs, toUtcIso } from '@/lib/time';
 import { cache } from '@/cache/redis';
+import { SSEObservabilityService } from '@/services/SSEObservabilityService';
 
 /**
  * Prices Controller for PBCEx
@@ -365,21 +366,32 @@ export class PricesController {
     res.write(`retry: 2000\n\n`);
     res.flushHeaders?.();
 
+    // Register connection with observability service
+    const connId = await SSEObservabilityService.registerConnection(
+      'prices',
+      req.headers['user-agent'],
+      req.ip || req.connection.remoteAddress
+    );
+
     let isClosed = false;
     req.on('close', () => {
       isClosed = true;
       clearInterval(heartbeatTimer);
+      // Unregister connection
+      SSEObservabilityService.unregisterConnection(connId, 'prices');
     });
 
     // Simple backoff state per symbol
     const backoff: Record<string, number> = {};
 
-    // Heartbeat every ~20s to keep connection alive
-    const heartbeatTimer = setInterval(() => {
+    // Heartbeat every ~15s to keep connection alive and update observability
+    const heartbeatTimer = setInterval(async () => {
       if (!isClosed) {
         res.write(`:hb\n\n`);
+        // Update heartbeat timestamp in observability service
+        await SSEObservabilityService.updateHeartbeat(connId, 'prices');
       }
-    }, 20000);
+    }, 15000);
 
     // per-symbol monotonic id using Redis as a counter when available
     const nextIdKey = (s: string) => `sse:id:${s}`;
