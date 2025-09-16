@@ -1,15 +1,15 @@
 ## 2025-09-16 — Idempotency Visibility Panel (/api/ops/idem/stats + /ops/idem) (feat/idem-ops-panel)
 
 - Branch: feat/idem-ops-panel
-- Commit SHA: (pending)
+- Commit SHA: 9421505
 - Scope: Idempotency monitoring, admin-only, Redis-based counters
 
 ### Session Delta Checklist
 
-- [ ] Last SHA → Current SHA: 29a3e7d → (pending)
-- [ ] ADRs touched/confirmed: None modified in this session
-- [ ] Do-First carried forward: Y (preflight automation complete, idempotency visibility added)
-- [ ] PR(s) links and result: (pending - target squash merge)
+- [x] Last SHA → Current SHA: 29a3e7d → 9421505
+- [x] ADRs touched/confirmed: None modified in this session
+- [x] Do-First carried forward: Y (preflight automation complete, idempotency visibility added)
+- [x] PR(s) links and result: https://github.com/Abe99987/abes-pbcex-workspace/pull/new/feat/idem-ops-panel (target squash merge)
 - [x] Preflight output pasted:
 
 ```
