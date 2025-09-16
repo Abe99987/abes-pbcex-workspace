@@ -37,8 +37,8 @@
 - **PR #76**: [Idempotency panel](https://github.com/Abe99987/abes-pbcex-workspace/pull/76) - /ops/idem with duplicate detection + test widget
 - **PR #77**: [Docs hygiene](https://github.com/Abe99987/abes-pbcex-workspace/pull/77) - Union merge + style normalization
 
-**Today's Update**: All PR conflicts resolved - #73 (aef4b43), #74 (531b855), #75 (9f78816), #76 (42ef407); hygiene PR #77 created; all PRs awaiting merge  
-**Tomorrow's Do-First**: Merge in order: staging → SSE ops → preflight-delta → idempotency ops → hygiene; then run staging smoke
+**Today's Update**: PR #76 MERGED (6-file conflicts resolved via union merge); SSE + Idempotency ops coexist; PR #77 closed  
+**Tomorrow's Do-First**: Merge remaining PRs (#73, #74, #75); provision staging URL → run Trade v1 smoke test
 
 ## Non-Negotiables
 
