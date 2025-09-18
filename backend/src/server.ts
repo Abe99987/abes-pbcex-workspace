@@ -219,8 +219,44 @@ if (env.NODE_ENV !== 'production' && process.env.E2E_TEST_ENABLED === 'true') {
   });
 }
 
+// Simple preview-safe health endpoint
+app.get('/healthz', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    version: process.env.npm_package_version || '1.0.0',
+    environment: env.NODE_ENV,
+    uptime: process.uptime(),
+    preview: process.env.PREVIEW === '1' || process.env.NODE_ENV === 'development',
+  });
+});
+
 // Health check endpoint with service status
 app.get('/health', async (req, res) => {
+  // Skip external service checks in preview mode
+  const isPreview = process.env.PREVIEW === '1' || (
+    process.env.NODE_ENV === 'development' && 
+    !process.env.DATABASE_URL?.includes('supabase.co')
+  );
+
+  if (isPreview) {
+    return res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      version: process.env.npm_package_version || '1.0.0',
+      environment: env.NODE_ENV,
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      preview: true,
+      services: {
+        priceFeed: { status: 'preview', message: 'Preview mode - mocked data' },
+        notifications: { status: 'preview', message: 'Preview mode - mocked data' },
+        database: { status: 'preview', message: 'Preview mode - no external DB' },
+        redis: { status: 'preview', message: 'Preview mode - no external cache' },
+      },
+    });
+  }
+
   const [dbHealth, redisHealth] = await Promise.all([
     db.healthCheck(),
     cache.healthCheck(),
