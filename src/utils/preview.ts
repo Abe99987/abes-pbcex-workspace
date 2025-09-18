@@ -54,3 +54,32 @@ export const withPreviewFallback = <T>(
   }
   return apiCall();
 };
+
+/**
+ * Safe environment variable access with fallbacks
+ */
+export const getEnvVar = (key: string, fallback: string = ''): string => {
+  if (typeof process === 'undefined') return fallback;
+  if (!process.env) return fallback;
+  return process.env[key] || fallback;
+};
+
+/**
+ * Guard for external service initialization
+ */
+export const withServiceGuard = <T>(
+  serviceInitializer: () => T,
+  mockService: T
+): T => {
+  if (isPreviewMode()) {
+    console.log(`Preview mode: using mock service instead of real service`);
+    return mockService;
+  }
+
+  try {
+    return serviceInitializer();
+  } catch (error) {
+    console.warn('Service initialization failed, using mock:', error);
+    return mockService;
+  }
+};
