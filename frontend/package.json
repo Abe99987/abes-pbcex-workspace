@@ -20,7 +20,6 @@
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.56.1",
     "@tailwindcss/aspect-ratio": "^0.4.2",
-    "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/react-query": "^5.0.0",
     "axios": "^1.5.0",
@@ -39,6 +38,7 @@
   "devDependencies": {
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
+    "@tailwindcss/forms": "^0.5.10",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^20.4.5",
@@ -51,6 +51,7 @@
     "eslint": "^8.48.0",
     "eslint-config-next": "^14.0.0",
     "jest-environment-jsdom": "^30.1.2",
+    "mini-svg-data-uri": "^1.4.4",
     "postcss": "^8.4.29",
     "prettier": "^3.0.3",
     "prettier-plugin-tailwindcss": "^0.5.4",

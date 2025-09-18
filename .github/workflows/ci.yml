@@ -37,6 +37,7 @@ jobs:
     name: Backend (lint + build + test)
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    if: ${{ !contains(github.event.head_commit.message, 'PREVIEW=1') && env.PREVIEW != '1' }}
     env:
       # Stability environment variables
       TEST_NO_DB: '1'
@@ -103,9 +104,42 @@ jobs:
             npm run test:unit
           fi
 
+  preview:
+    name: Preview Build (lint + typecheck + root build)
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.head_commit.message, 'PREVIEW=1') || env.PREVIEW == '1' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - name: Show versions
+        run: |
+          node -v
+          npm -v
+      - name: Install root deps
+        run: npm ci --prefer-offline --no-audit
+      - name: Preview mode notice
+        run: echo "Preview mode - skipping backend/e2e"
+      - name: Lint root
+        run: npm run lint
+      - name: Type-check root
+        run: npm run type-check
+      - name: Build root (generates dist/ and preview-ok.html)
+        run: npm run build
+      - name: Verify preview files
+        run: |
+          ls -la dist/index.html dist/preview-ok.html dist/preview-config.json
+          echo "✅ Preview build complete"
+
   frontend:
     name: Frontend (lint + build + test)
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'PREVIEW=1') && env.PREVIEW != '1' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -139,7 +173,7 @@ jobs:
 
   summary:
     name: CI Summary
-    needs: [backend, frontend]
+    needs: [backend, frontend, preview]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
@@ -147,12 +181,24 @@ jobs:
         run: |
           echo "backend:    ${{ needs.backend.result }}"
           echo "frontend:   ${{ needs.frontend.result }}"
+          echo "preview:    ${{ needs.preview.result }}"
 
-          # Check if any required job failed
-          if [[ "${{ needs.backend.result }}" != "success" || \
-                "${{ needs.frontend.result }}" != "success" ]]; then
-            echo "❌ CI Pipeline failed - some jobs did not complete successfully"
-            exit 1
+          # Check if any required job failed (skip skipped jobs)
+          if [[ "${{ contains(github.event.head_commit.message, 'PREVIEW=1') || env.PREVIEW == '1' }}" == "true" ]]; then
+            # Preview mode - only check preview job
+            if [[ "${{ needs.preview.result }}" != "success" ]]; then
+              echo "❌ Preview build failed"
+              exit 1
+            else
+              echo "✅ Preview build completed successfully!"
+            fi
           else
-            echo "✅ CI Pipeline completed successfully!"
+            # Normal mode - check backend and frontend
+            if [[ "${{ needs.backend.result }}" != "success" || \
+                  "${{ needs.frontend.result }}" != "success" ]]; then
+              echo "❌ CI Pipeline failed - some jobs did not complete successfully"
+              exit 1
+            else
+              echo "✅ CI Pipeline completed successfully!"
+            fi
           fi
