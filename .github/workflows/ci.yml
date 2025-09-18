@@ -37,7 +37,7 @@ jobs:
     name: Backend (lint + build + test)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    if: ${{ !contains(github.event.head_commit.message, 'PREVIEW=1') && env.PREVIEW != '1' }}
+    if: ${{ !contains(github.event.head_commit.message, 'PREVIEW=1') }}
     env:
       # Stability environment variables
       TEST_NO_DB: '1'
@@ -107,7 +107,7 @@ jobs:
   preview:
     name: Preview Build (lint + typecheck + root build)
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.head_commit.message, 'PREVIEW=1') || env.PREVIEW == '1' }}
+    if: ${{ contains(github.event.head_commit.message, 'PREVIEW=1') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -139,7 +139,7 @@ jobs:
   frontend:
     name: Frontend (lint + build + test)
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, 'PREVIEW=1') && env.PREVIEW != '1' }}
+    if: ${{ !contains(github.event.head_commit.message, 'PREVIEW=1') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -184,7 +184,7 @@ jobs:
           echo "preview:    ${{ needs.preview.result }}"
 
           # Check if any required job failed (skip skipped jobs)
-          if [[ "${{ contains(github.event.head_commit.message, 'PREVIEW=1') || env.PREVIEW == '1' }}" == "true" ]]; then
+          if [[ "${{ contains(github.event.head_commit.message, 'PREVIEW=1') }}" == "true" ]]; then
             # Preview mode - only check preview job
             if [[ "${{ needs.preview.result }}" != "success" ]]; then
               echo "❌ Preview build failed"
