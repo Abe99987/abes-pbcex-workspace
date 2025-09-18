@@ -4,10 +4,11 @@ import tailwindcssAnimate from 'tailwindcss-animate';
 export default {
   darkMode: ['class'],
   content: [
+    './index.html',
+    './src/**/*.{ts,tsx,js,jsx}',
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
   ],
   prefix: '',
   theme: {
@@ -106,5 +107,8 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [
+    tailwindcssAnimate,
+    require('@tailwindcss/forms'),
+  ],
 } satisfies Config;

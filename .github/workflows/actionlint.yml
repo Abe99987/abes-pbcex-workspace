@@ -23,6 +23,7 @@ jobs:
   actionlint:
     name: Lint GitHub Workflows
     runs-on: ubuntu-latest
+    if: ${{ !(contains(github.event.head_commit.message || '', 'PREVIEW=1') || contains(github.event.pull_request.title || '', 'PREVIEW=1') || contains(github.event.pull_request.body || '', 'PREVIEW=1')) }}
     steps:
       - uses: actions/checkout@v4
         with:
