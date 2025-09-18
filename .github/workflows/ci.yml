@@ -16,6 +16,7 @@ on:
       - '.eslintrc.*'
       - 'tsconfig*.json'
       - '.github/workflows/**'
+      - 'docs/preview-timestamp.txt'
       - '!docs/**'
       - '!prompts/**'
       - '!.gitmodules'
