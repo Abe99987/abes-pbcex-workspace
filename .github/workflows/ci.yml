@@ -119,12 +119,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install and build
+      - name: Install dependencies
         run: |
-          export NPM_CONFIG_LEGACY_PEER_DEPS=true
-          npm ci || npm install --legacy-peer-deps
+          echo "Node version: $(node -v)"
+          echo "NPM version: $(npm -v)"
+          npm ci --legacy-peer-deps
       - name: Build root app
-        run: npm run build
+        run: |
+          echo "Building root Vite app..."
+          npm run build
       - name: Verify artifacts
         run: |
           echo "DIST CONTENTS:"
