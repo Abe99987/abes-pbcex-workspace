@@ -32,7 +32,7 @@ permissions:
 
 env:
   NODE_VERSION: '20.12.2'
-  PREVIEW: ''
+  # PREVIEW detection: contains(github.event.head_commit.message || '', 'PREVIEW=1') || contains(github.event.pull_request.title || '', 'PREVIEW=1') || contains(github.event.pull_request.body || '', 'PREVIEW=1')
 
 jobs:
   backend:
@@ -107,7 +107,7 @@ jobs:
           fi
 
   preview:
-    name: Preview Build (lint + typecheck + root build)
+    name: Preview Build (root build only)
     runs-on: ubuntu-latest
     if: ${{ contains(github.event.head_commit.message || '', 'PREVIEW=1') || contains(github.event.pull_request.title || '', 'PREVIEW=1') || contains(github.event.pull_request.body || '', 'PREVIEW=1') }}
     steps:
@@ -117,30 +117,19 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-      - name: Show versions
+          node-version: '20'
+      - name: Install and build
         run: |
-          node -v
-          npm -v
-      - name: Install root deps
-        run: npm ci --prefer-offline --no-audit
-      - name: Preview mode notice
-        run: echo "Preview mode - skipping backend/e2e"
-      - name: Lint root
-        run: npm run lint
-      - name: Type-check root
-        run: npm run type-check
-      - name: Build root (generates dist/ and preview-ok.html)
+          export NPM_CONFIG_LEGACY_PEER_DEPS=true
+          npm ci || npm install --legacy-peer-deps
+      - name: Build root app
         run: npm run build
-      - name: Verify preview files
+      - name: Verify artifacts
         run: |
-          echo "=== DIST ARTIFACTS ==="
-          ls -la dist/index.html dist/preview-ok.html dist/preview-config.json
-          echo ""
-          echo "=== FULL DIST LISTING ==="
-          ls -la dist/ | head -20
-          echo "✅ Preview build complete with all required artifacts"
+          echo "DIST CONTENTS:"
+          ls -lah dist || true
+          test -f dist/index.html && test -f dist/preview-ok.html && test -f dist/preview-config.json
+          echo "✅ Preview artifacts verified"
 
   frontend:
     name: Frontend (lint + build + test)

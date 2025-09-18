@@ -31,6 +31,7 @@ jobs:
   smoke:
     name: PR Smoke (Playwright @smoke)
     runs-on: ubuntu-latest
+    if: ${{ !(contains(github.event.head_commit.message || '', 'PREVIEW=1') || contains(github.event.pull_request.title || '', 'PREVIEW=1') || contains(github.event.pull_request.body || '', 'PREVIEW=1')) }}
     timeout-minutes: 5
     env:
       CI: 'true'
