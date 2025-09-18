@@ -8,7 +8,7 @@
     "npm": ">=9.0.0"
   },
   "scripts": {
-    "preinstall": "echo 'Skipping Node version check for preview build'",
+    "preinstall": "if [ -z \"$CI\" ] || [ -z \"$PREVIEW_CI\" ]; then echo 'Node version check skipped in CI preview'; fi",
     "dev": "vite",
     "prebuild:legal": "node scripts/generate-legal-manifest.mjs",
     "prebuild": "npm run prebuild:legal",

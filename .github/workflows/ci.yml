@@ -111,6 +111,9 @@ jobs:
     name: Preview Build (root build only)
     runs-on: ubuntu-latest
     if: ${{ contains(github.event.head_commit.message || '', 'PREVIEW=1') || contains(github.event.pull_request.title || '', 'PREVIEW=1') || contains(github.event.pull_request.body || '', 'PREVIEW=1') }}
+    env:
+      PREVIEW_CI: '1'
+      CI: 'true'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -118,12 +121,16 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.12.2'
+          cache: 'npm'
       - name: Install dependencies
         run: |
           echo "Node version: $(node -v)"
           echo "NPM version: $(npm -v)"
-          npm ci --legacy-peer-deps
+          export NPM_CONFIG_ENGINE_STRICT=false
+          export NPM_CONFIG_LEGACY_PEER_DEPS=true
+          export CI=true
+          npm ci || npm install --legacy-peer-deps
       - name: Build root app
         run: |
           echo "Building root Vite app..."
