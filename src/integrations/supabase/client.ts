@@ -6,6 +6,12 @@ const SUPABASE_URL = 'https://arjrtbhuzftydzblttoa.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyanJ0Ymh1emZ0eWR6Ymx0dG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NzIxNDMsImV4cCI6MjA3MjE0ODE0M30.S22Ttb8jgHjxfrhgDZHWEIbt0fpzzomC-r67jqeIRSA';
 
+// Check if we're in preview mode or if localStorage is available
+const isPreviewMode =
+  typeof window !== 'undefined' &&
+  window.location?.pathname?.includes('preview');
+const hasLocalStorage = typeof localStorage !== 'undefined';
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
@@ -14,9 +20,9 @@ export const supabase = createClient<Database>(
   SUPABASE_PUBLISHABLE_KEY,
   {
     auth: {
-      storage: localStorage,
-      persistSession: true,
-      autoRefreshToken: true,
+      storage: hasLocalStorage ? localStorage : undefined,
+      persistSession: !isPreviewMode && hasLocalStorage,
+      autoRefreshToken: !isPreviewMode && hasLocalStorage,
     },
   }
 );
