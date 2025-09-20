@@ -138,3 +138,9 @@ docker-compose.override.yml
 *.tfstate
 *.tfstate.*
 .terraform/backend_corrupted/
+
+# Test snapshots
+**/snapshots/
+
+# Lock files
+bun.lockb
