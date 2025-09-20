@@ -10,16 +10,12 @@ import { env } from '@/config/env';
  * Handles admin-only operational endpoints for monitoring and diagnostics
  */
 
-interface AdminRequest extends Request {
-  user?: { role: string };
-}
-
 export class OpsController {
   /**
    * Middleware to check admin access
    * Uses existing admin role or X-Admin-Key header for non-prod environments
    */
-  static checkAdminAccess = asyncHandler(async (req: AdminRequest, res: Response, next: Function) => {
+  static checkAdminAccess = asyncHandler(async (req: Request, res: Response, next: Function) => {
     // Check for admin role (production)
     if (req.user?.role === 'admin') {
       return next();

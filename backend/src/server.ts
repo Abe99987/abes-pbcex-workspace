@@ -300,7 +300,7 @@ app.get('/health', async (req, res) => {
     res.status(503);
   }
 
-  res.json(healthData);
+  return res.json(healthData);
 });
 
 // Metrics endpoint for monitoring

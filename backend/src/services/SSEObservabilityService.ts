@@ -242,10 +242,11 @@ export class SSEObservabilityService {
         sampleConnIds[conn.channel] = [];
       }
       
-      activeByChannel[conn.channel]++;
+      activeByChannel[conn.channel] = (activeByChannel[conn.channel] ?? 0) + 1;
       
-      if (sampleConnIds[conn.channel].length < 5) {
-        sampleConnIds[conn.channel].push(connId);
+      const sampleArray = sampleConnIds[conn.channel] ?? [];
+      if (sampleArray.length < 5) {
+        sampleArray.push(connId);
       }
 
       const heartbeatAge = now - conn.lastHeartbeat;

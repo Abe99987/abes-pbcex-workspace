@@ -40,7 +40,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 0
 
       - name: Setup Node.js
@@ -101,12 +101,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 0
-      - name: Verify handbook submodule
-        run: |
-          git submodule status --recursive
-          test -f docs/handbook-mount/docs/index.md
+      # Handbook submodule verification removed - submodule no longer configured
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:

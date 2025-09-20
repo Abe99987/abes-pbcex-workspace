@@ -54,12 +54,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 0
       - name: Verify handbook submodule
         run: |
-          git submodule status --recursive
-          test -f docs/handbook-mount/docs/index.md
+          # Submodule status check removed - no submodules configured
+          # Handbook submodule test removed - file no longer exists
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -117,7 +117,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
@@ -149,12 +149,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 0
       - name: Verify handbook submodule
         run: |
-          git submodule status --recursive
-          test -f docs/handbook-mount/docs/index.md
+          # Submodule status check removed - no submodules configured
+          # Handbook submodule test removed - file no longer exists
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
